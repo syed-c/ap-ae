@@ -5,9 +5,23 @@ import type { Database } from './types';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://apztvwpogywvounohqtk.supabase.co";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwenR2d3BvZ3l3dm91bm9ocXRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNTg4NzYsImV4cCI6MjA4NjgzNDg3Nn0.vZHtxYONCM5EM83I0sBKxBvLvNU0oGi7olJSy5FwRkM";
 
+console.log('Supabase config loaded:', { 
+  url: supabaseUrl, 
+  hasKey: !!supabaseKey,
+  envKey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ? 'from env' : 'from fallback'
+});
+
 export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: {
-    persistSession: true,
+    persistSession: typeof window !== 'undefined',
     autoRefreshToken: true,
-  }
+  },
+  global: {
+    fetch: (url, options) => {
+      return fetch(url, {
+        ...options,
+        credentials: 'omit',
+      });
+    },
+  },
 });
