@@ -1,0 +1,136 @@
+# AppointPanda Robots.txt
+# Last updated: 2026-01-20
+# 
+# IMPORTANT: All indexable pages must be allowed.
+# Only private/utility pages are blocked.
+
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /auth/callback
+Disallow: /onboarding
+Disallow: /gmb-select
+Disallow: /claim-profile
+Disallow: /list-your-practice
+Disallow: /list-your-practice/success
+Disallow: /book/
+Disallow: /appointment/
+Disallow: /review/
+Disallow: /rq/
+Disallow: /form/
+Disallow: /search
+Disallow: /find-dentist
+Disallow: /*?p=*
+Disallow: /*?utm_*
+Disallow: /*?ref=*
+Disallow: /*?source=*
+Disallow: /*?fbclid=*
+Disallow: /*?gclid=*
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /auth/callback
+Disallow: /onboarding
+Disallow: /gmb-select
+Disallow: /claim-profile
+Disallow: /list-your-practice
+Disallow: /list-your-practice/success
+Disallow: /book/
+Disallow: /appointment/
+Disallow: /review/
+Disallow: /rq/
+Disallow: /form/
+Disallow: /search
+Disallow: /find-dentist
+Disallow: /*?p=*
+Disallow: /*?utm_*
+Disallow: /*?ref=*
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+# AI Crawlers - explicitly allowed with llms.txt reference
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+
+User-agent: Anthropic-AI
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+
+User-agent: Cohere-ai
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /auth/callback
+Disallow: /onboarding
+Disallow: /gmb-select
+Disallow: /claim-profile
+Disallow: /list-your-practice
+Disallow: /list-your-practice/success
+Disallow: /book/
+Disallow: /appointment/
+Disallow: /review/
+Disallow: /rq/
+Disallow: /form/
+Disallow: /search
+Disallow: /find-dentist
+Disallow: /*?p=*
+Disallow: /*?utm_*
+Disallow: /*?ref=*
+Disallow: /*?source=*
+Disallow: /*?fbclid=*
+Disallow: /*?gclid=*
+
+# Sitemap
+Sitemap: https://www.appointpanda.ae/sitemap.xml
+
+# Crawl-delay for non-Google bots (reduce server load)
+# Note: Googlebot ignores Crawl-delay
+
+# LLMs.txt for AI assistants
+# See: https://www.appointpanda.ae/llms.txt
+# Full version: https://www.appointpanda.ae/llms-full.txt

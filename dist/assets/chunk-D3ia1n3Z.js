@@ -1,0 +1,1 @@
+import{j as s}from"./chunk-CPh6voF3.js";import{l as t,b8 as x,b9 as n}from"./index-DflORfjh.js";const c=({children:e,className:r,showNavbar:a=!0,showFooter:o=!0})=>s.jsxs("div",{className:t("min-h-screen bg-background flex flex-col overflow-x-hidden",r),children:[a&&s.jsx(x,{}),s.jsx("main",{className:"flex-1",children:e}),o&&s.jsx(n,{})]});export{c as P};

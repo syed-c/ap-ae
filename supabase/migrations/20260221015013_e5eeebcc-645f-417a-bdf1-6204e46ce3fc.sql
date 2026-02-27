@@ -1,0 +1,1 @@
+ALTER TABLE public.seo_pages ADD COLUMN IF NOT EXISTS last_content_edit_source text;

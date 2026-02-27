@@ -1,0 +1,1 @@
+ALTER TYPE seo_page_type ADD VALUE IF NOT EXISTS 'service_location';
