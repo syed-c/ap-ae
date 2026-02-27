@@ -1,0 +1,1 @@
+function n(t){if(!t)return"";if(typeof t=="string")return t;if(typeof t=="object"&&t!==null){const r=t;return typeof r.body=="string"?r.body:JSON.stringify(t)}return""}function o(t,r="markdown"){return{type:r,body:t}}function i(t){const e=n(t).split(/\s+/).filter(Boolean).length;return Math.max(1,Math.ceil(e/200))}export{o as a,i as c,n as g};

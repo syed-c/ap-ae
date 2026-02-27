@@ -1,0 +1,1 @@
+async function s(h,e={}){const t=e.chunkSize??1e3,o=e.maxRows??1/0,a=[];let n=0;for(;;){const c=Math.min(n+t-1,o-1);if(c<n)break;const i=await h(n,c);if(a.push(...i),i.length<t)break;n+=t}return a}export{s as f};

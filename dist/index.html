@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- 
+      PERFORMANCE OPTIMIZED HEAD
+      - Critical CSS inlined
+      - Font loading with fallback
+      - Resource hints for faster LCP
+    -->
+    <title>AppointPanda</title>
+    <meta name="author" content="AppointPanda" />
+
+    <!-- Critical inline CSS for fastest FCP -->
+    <style>
+      /* Font fallback to prevent FOIT */
+      @font-face {
+        font-family: 'DM Sans Fallback';
+        src: local('Arial');
+        size-adjust: 104%;
+        ascent-override: 97%;
+        descent-override: 26%;
+        line-gap-override: 0%;
+      }
+      
+      /* Critical base styles */
+      *, *::before, *::after { box-sizing: border-box; border-width: 0; border-style: solid; }
+      html { line-height: 1.5; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+      body { 
+        margin: 0; 
+        font-family: 'DM Sans', 'DM Sans Fallback', system-ui, -apple-system, sans-serif;
+        font-weight: 400;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: hsl(210 20% 98%);
+        color: hsl(210 40% 14%);
+      }
+      #root { min-height: 100vh; display: flex; flex-direction: column; }
+      img, video { display: block; max-width: 100%; height: auto; }
+      
+      /* Loading state */
+      .page-loader { 
+        min-height: 100vh; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        background-color: hsl(220 25% 97%); 
+      }
+      .page-loader-text { 
+        color: hsl(186 50% 42%); 
+        font-weight: 600;
+        animation: pulse 1.5s ease-in-out infinite; 
+      }
+      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+
+    <!-- Favicon - AppointPanda brand icon (NOT Lovable) - v5 cache bust for Google re-indexing -->
+    <link rel="icon" type="image/png" href="/favicon.png?v=5" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon.png?v=5" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=5" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png?v=5" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png?v=5" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png?v=5" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png?v=5" />
+    <link rel="shortcut icon" href="/favicon.png?v=5" />
+    <link rel="manifest" href="/site.webmanifest?v=5" />
+    <meta name="msapplication-TileImage" content="/favicon.png?v=5" />
+    <meta name="msapplication-TileColor" content="#0d9488" />
+
+    <!-- Preconnect to external domains - HIGHEST PRIORITY for LCP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+    <link rel="preconnect" href="https://jocawqsqflgplujcorcc.supabase.co" crossorigin />
+    
+    <!-- DNS prefetch for lower priority domains -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    
+    <!-- Fonts: Varela Round (headings) + DM Sans (body) + Quicksand -->
+    <link 
+      rel="preload" 
+      as="style" 
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Varela+Round&family=Quicksand:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link 
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Varela+Round&family=Quicksand:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" 
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <!-- Google Search Console Verification -->
+    <meta name="google-site-verification" content="QXeUyCI6vHRD4bv5ZLJCYQVSvESe4uqju4tWaamlr2A" />
+    <meta name="google-site-verification" content="H9uwPx5Kjhrqb_8-MKqMjxN9CBQkXuBaOie7Qw61Y-0" />
+    <meta name="google-site-verification" content="BSC5k9_BO_dNca0dSrKEi8KeE9p9uKCAC4vJ_eDVQxk" />
+    <meta name="google-site-verification" content="rRYuAOlERaQwgPvDUKyirGO1QMVjD43uY-eXEPn--OM" />
+
+    <!-- Geo targeting for UAE -->
+    <meta name="geo.region" content="AE" />
+    <meta name="geo.placename" content="United Arab Emirates" />
+    
+    <!-- Base Organization Schema - Available in raw HTML for all crawlers (Google logo/favicon) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "AppointPanda",
+      "url": "https://www.appointpanda.ae",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.appointpanda.ae/logo.png",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://www.appointpanda.ae/logo.png",
+      "description": "Find and book appointments with top-rated dental professionals across the UAE.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "AE"
+      },
+      "sameAs": []
+    }
+    </script>
+    
+    <!-- Theme color for mobile browsers -->
+    <meta name="theme-color" content="#3a8f95" />
+    <script type="module" crossorigin src="/assets/index-DflORfjh.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/chunk-CffrGP6S.js">
+    <link rel="modulepreload" crossorigin href="/assets/chunk-CPh6voF3.js">
+    <link rel="modulepreload" crossorigin href="/assets/chunk-B8auUmee.js">
+    <link rel="modulepreload" crossorigin href="/assets/chunk-DK8nT4cj.js">
+    <link rel="modulepreload" crossorigin href="/assets/chunk-Drd-rt-S.js">
+    <link rel="modulepreload" crossorigin href="/assets/chunk-BEQ5VEiB.js">
+    <link rel="modulepreload" crossorigin href="/assets/chunk-yff5u8mE.js">
+    <link rel="modulepreload" crossorigin href="/assets/chunk-xExVBHTi.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CigGl4-1.css">
+  </head>
+
+  <body>
+    <div id="root"></div>
+    
+    <!-- Fallback content for crawlers/bots that don't execute JavaScript -->
+    <noscript>
+      <main style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.7;">
+        <header style="border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 30px;">
+          <a href="/" style="font-size: 1.5rem; font-weight: bold; color: #0d9488; text-decoration: none;">AppointPanda</a>
+          <nav style="margin-top: 15px;">
+            <a href="/" style="margin-right: 20px; color: #0066cc;">Home</a>
+            <a href="/services/" style="margin-right: 20px; color: #0066cc;">Services</a>
+            <a href="/insurance/" style="margin-right: 20px; color: #0066cc;">Insurance</a>
+            <a href="/blog/" style="margin-right: 20px; color: #0066cc;">Blog</a>
+            <a href="/about/" style="margin-right: 20px; color: #0066cc;">About</a>
+            <a href="/contact/" style="color: #0066cc;">Contact</a>
+          </nav>
+        </header>
+
+        <article>
+          <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem; color: #111;">AppointPanda - Find the Best Dentists in Dubai & UAE</h1>
+          <p style="font-size: 1.25rem; color: #555; margin-bottom: 2rem; max-width: 800px;">
+            AppointPanda is the UAE's leading dental directory connecting patients with DHA & DOH licensed dental professionals. 
+            Find, compare, and book appointments with top-rated dentists across all 7 Emirates.
+          </p>
+          
+          <section style="margin-bottom: 40px;">
+            <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem; color: #222; border-bottom: 2px solid #0d9488; padding-bottom: 8px;">UAE Dental Directory</h2>
+            <p style="margin-bottom: 1rem; color: #444;">AppointPanda offers a comprehensive directory of verified dental professionals in the UAE:</p>
+            <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem; color: #444;">
+              <li><strong>6,600+</strong> verified dental clinics across the UAE</li>
+              <li><strong>35+</strong> dental treatment categories with AED pricing</li>
+              <li>Coverage across all <strong>7 Emirates</strong> — Dubai, Abu Dhabi, Sharjah, Ajman, RAK, Fujairah, UAQ</li>
+              <li>DHA, DOH & MOHAP licensed professionals</li>
+              <li>Multilingual dentists (English, Arabic, Hindi, Tagalog)</li>
+              <li>Insurance acceptance: Daman, AXA, Cigna, MetLife & more</li>
+              <li>Online appointment booking available</li>
+            </ul>
+          </section>
+          
+          <section style="margin-bottom: 40px;">
+            <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem; color: #222; border-bottom: 2px solid #0d9488; padding-bottom: 8px;">Browse Dentists by Emirate</h2>
+            <p style="margin-bottom: 1rem; color: #444;">Find dental clinics in your emirate:</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 1.5rem;">
+              <a href="/dubai/" style="display: block; padding: 12px 16px; background: #f5f5f5; border-radius: 8px; color: #0066cc; text-decoration: none; font-weight: 500;">Dubai</a>
+              <a href="/abu-dhabi/" style="display: block; padding: 12px 16px; background: #f5f5f5; border-radius: 8px; color: #0066cc; text-decoration: none; font-weight: 500;">Abu Dhabi</a>
+              <a href="/sharjah/" style="display: block; padding: 12px 16px; background: #f5f5f5; border-radius: 8px; color: #0066cc; text-decoration: none; font-weight: 500;">Sharjah</a>
+              <a href="/ajman/" style="display: block; padding: 12px 16px; background: #f5f5f5; border-radius: 8px; color: #0066cc; text-decoration: none; font-weight: 500;">Ajman</a>
+              <a href="/ras-al-khaimah/" style="display: block; padding: 12px 16px; background: #f5f5f5; border-radius: 8px; color: #0066cc; text-decoration: none; font-weight: 500;">Ras Al Khaimah</a>
+              <a href="/fujairah/" style="display: block; padding: 12px 16px; background: #f5f5f5; border-radius: 8px; color: #0066cc; text-decoration: none; font-weight: 500;">Fujairah</a>
+              <a href="/umm-al-quwain/" style="display: block; padding: 12px 16px; background: #f5f5f5; border-radius: 8px; color: #0066cc; text-decoration: none; font-weight: 500;">Umm Al Quwain</a>
+            </div>
+          </section>
+
+          <section style="margin-bottom: 40px;">
+            <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem; color: #222; border-bottom: 2px solid #0d9488; padding-bottom: 8px;">Popular Areas</h2>
+            <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem; columns: 3; column-gap: 30px;">
+              <li><a href="/dubai/jumeirah/" style="color: #0066cc;">Jumeirah, Dubai</a></li>
+              <li><a href="/dubai/marina/" style="color: #0066cc;">Marina, Dubai</a></li>
+              <li><a href="/dubai/downtown/" style="color: #0066cc;">Downtown, Dubai</a></li>
+              <li><a href="/dubai/deira/" style="color: #0066cc;">Deira, Dubai</a></li>
+              <li><a href="/dubai/al-barsha/" style="color: #0066cc;">Al Barsha, Dubai</a></li>
+              <li><a href="/dubai/business-bay/" style="color: #0066cc;">Business Bay, Dubai</a></li>
+              <li><a href="/dubai/jlt/" style="color: #0066cc;">JLT, Dubai</a></li>
+              <li><a href="/abu-dhabi/khalidiyah/" style="color: #0066cc;">Khalidiyah, Abu Dhabi</a></li>
+              <li><a href="/sharjah/al-nahda/" style="color: #0066cc;">Al Nahda, Sharjah</a></li>
+            </ul>
+          </section>
+
+          <section style="margin-bottom: 40px;">
+            <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem; color: #222; border-bottom: 2px solid #0d9488; padding-bottom: 8px;">How AppointPanda Works</h2>
+            <ol style="margin-bottom: 1.5rem; padding-left: 1.5rem; color: #444;">
+              <li style="margin-bottom: 10px;"><strong>Search</strong>: Enter your location or use our directory to find dentists near you.</li>
+              <li style="margin-bottom: 10px;"><strong>Compare</strong>: Review ratings, patient reviews, services offered, and insurance accepted.</li>
+              <li style="margin-bottom: 10px;"><strong>Book</strong>: Request an appointment directly through our platform.</li>
+              <li style="margin-bottom: 10px;"><strong>Visit</strong>: Attend your appointment and leave a review to help others.</li>
+            </ol>
+          </section>
+
+          <section style="margin-bottom: 40px;">
+            <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem; color: #222; border-bottom: 2px solid #0d9488; padding-bottom: 8px;">Frequently Asked Questions</h2>
+            <dl>
+              <div style="margin-bottom: 20px; padding: 16px; background: #f9f9f9; border-radius: 8px;">
+                <dt style="font-weight: 600; color: #222; margin-bottom: 8px;">How do I find a DHA-licensed dentist in Dubai?</dt>
+                <dd style="margin: 0; color: #444;">Use our search to filter by emirate, area, or treatment. All dentists are licensed by DHA, DOH, or MOHAP. Look for the 'Verified' badge for extra assurance.</dd>
+              </div>
+              <div style="margin-bottom: 20px; padding: 16px; background: #f9f9f9; border-radius: 8px;">
+                <dt style="font-weight: 600; color: #222; margin-bottom: 8px;">What is the average cost of dental treatment in Dubai (AED)?</dt>
+                <dd style="margin: 0; color: #444;">Costs vary: teeth whitening from AED 500, dental implants from AED 3,000, Invisalign from AED 8,000. Prices differ by area and clinic. Confirm at your consultation.</dd>
+              </div>
+              <div style="margin-bottom: 20px; padding: 16px; background: #f9f9f9; border-radius: 8px;">
+                <dt style="font-weight: 600; color: #222; margin-bottom: 8px;">Do dentists in UAE accept insurance?</dt>
+                <dd style="margin: 0; color: #444;">Yes, most clinics accept Daman Health, AXA Gulf, Cigna, MetLife, ADNIC, Noor Takaful, and more. Use our insurance filter to find clinics that accept your plan.</dd>
+              </div>
+            </dl>
+          </section>
+        </article>
+
+        <footer style="margin-top: 60px; padding-top: 30px; border-top: 1px solid #e0e0e0; color: #666; font-size: 0.9rem;">
+          <nav style="margin-bottom: 20px;">
+            <a href="/about/" style="margin-right: 20px; color: #0066cc;">About Us</a>
+            <a href="/contact/" style="margin-right: 20px; color: #0066cc;">Contact</a>
+            <a href="/privacy/" style="margin-right: 20px; color: #0066cc;">Privacy Policy</a>
+            <a href="/terms/" style="margin-right: 20px; color: #0066cc;">Terms of Service</a>
+            <a href="/sitemap/" style="margin-right: 20px; color: #0066cc;">Sitemap</a>
+            <a href="/list-your-practice/" style="color: #0066cc;">For Dentists</a>
+          </nav>
+          <p>&copy; 2026 AppointPanda. All rights reserved. Find your perfect dentist today.</p>
+          <p style="color: #999; font-size: 0.85rem; margin-top: 10px;">
+            For the best experience including online booking, please enable JavaScript.
+          </p>
+        </footer>
+      </main>
+    </noscript>
+    
+    <!-- Modulepreload for critical chunks -->
+  </body>
+</html>

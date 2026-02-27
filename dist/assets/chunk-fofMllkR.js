@@ -1,0 +1,1 @@
+import{u as t}from"./chunk-CPh6voF3.js";import{s}from"./index-DflORfjh.js";function u(){return t({queryKey:["treatments"],queryFn:async()=>{const{data:e,error:r}=await s.from("treatments").select("*").eq("is_active",!0).order("display_order");if(r)throw r;return e||[]}})}export{u};

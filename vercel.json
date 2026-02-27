@@ -1,0 +1,70 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "query", "key": "p" }],
+      "destination": "/blog",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Robots-Tag", "value": "index, follow" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/api/stripe-webhook", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/stripe-webhook" },
+    { "source": "/api/whatsapp-webhook", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/whatsapp-webhook" },
+    { "source": "/sitemap.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap" },
+    { "source": "/sitemap-static.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=static" },
+    { "source": "/sitemap-states.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=states" },
+    { "source": "/sitemap-cities.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=cities" },
+    { "source": "/sitemap-cities-1.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=cities&chunk=1" },
+    { "source": "/sitemap-cities-2.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=cities&chunk=2" },
+    { "source": "/sitemap-locations.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=locations" },
+    { "source": "/sitemap-services.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=services" },
+    { "source": "/sitemap-service-locations-1.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=service-locations&chunk=1" },
+    { "source": "/sitemap-service-locations-2.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=service-locations&chunk=2" },
+    { "source": "/sitemap-service-locations-3.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=service-locations&chunk=3" },
+    { "source": "/sitemap-service-locations-4.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=service-locations&chunk=4" },
+    { "source": "/sitemap-service-locations-5.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=service-locations&chunk=5" },
+    { "source": "/sitemap-profiles-1.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=profiles&chunk=1" },
+    { "source": "/sitemap-profiles-2.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=profiles&chunk=2" },
+    { "source": "/sitemap-profiles-3.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=profiles&chunk=3" },
+    { "source": "/sitemap-profiles-4.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=profiles&chunk=4" },
+    { "source": "/sitemap-profiles-5.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=profiles&chunk=5" },
+    { "source": "/sitemap-clinics-1.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=clinics&chunk=1" },
+    { "source": "/sitemap-clinics-2.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=clinics&chunk=2" },
+    { "source": "/sitemap-clinics-3.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=clinics&chunk=3" },
+    { "source": "/sitemap-clinics-4.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=clinics&chunk=4" },
+    { "source": "/sitemap-clinics-5.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=clinics&chunk=5" },
+    { "source": "/sitemap-dentists.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=dentists" },
+    { "source": "/sitemap-posts.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=posts" },
+    { "source": "/sitemap-insurance.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=insurance" },
+    { "source": "/sitemap-clinics.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=clinics" },
+    { "source": "/sitemap-service-locations.xml", "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/sitemap?type=service-locations" },
+    { "source": "/robots.txt", "destination": "/robots.txt" },
+    { "source": "/llms.txt", "destination": "/llms.txt" },
+    { "source": "/llms-full.txt", "destination": "/llms-full.txt" },
+    {
+      "source": "/:path*",
+      "has": [
+        { "type": "header", "key": "user-agent", "value": "(?i).*(googlebot|google-inspectiontool|google-extended|google-safety|storebot-google|googleother|bingbot|bingpreview|msnbot|yandex|baiduspider|facebookexternalhit|facebookbot|twitterbot|linkedinbot|discordbot|whatsapp|telegrambot|applebot|ahrefs|semrush|screaming frog|dotbot|petalbot|bytespider|rogerbot|embedly|quora|pinterest|slackbot|redditbot|flipboard|ia_archiver|archive.org_bot|duckduckbot|ecosia|qwant|gigabot|sogou|exabot|swiftbot|yacybot|seznambot|ccbot|gptbot|chatgpt-user|oai-searchbot|openai|claude-web|claudebot|anthropic-ai|perplexitybot|perplexity-user|cohere-ai|youbot|you.com|meta-externalagent|meta-externalfetcher|amazonbot|adsbot-google).*" }
+        ],
+      "missing": [
+        { "type": "header", "key": "x-prerender-bypass", "value": "true" }
+      ],
+      "destination": "https://apztvwpogywvounohqtk.supabase.co/functions/v1/serve-static?path=/:path*"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

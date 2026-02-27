@@ -1,0 +1,1 @@
+ALTER TABLE public.gmb_scraper_sessions ADD COLUMN IF NOT EXISTS categories text[] DEFAULT '{}';
