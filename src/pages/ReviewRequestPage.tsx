@@ -5,6 +5,8 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from "@/lib/utils";
+import { proxyImageUrl } from "@/lib/proxyImageUrl";
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -53,7 +55,7 @@ export default function ReviewRequestPage() {
         `)
         .eq('short_code', requestCode)
         .single();
-      
+
       if (error) throw error;
       return data as unknown as RequestData;
     },
@@ -69,7 +71,7 @@ export default function ReviewRequestPage() {
       document.head.appendChild(meta);
     }
     meta.setAttribute('content', 'noindex, nofollow');
-    
+
     return () => {
       meta?.setAttribute('content', 'index, follow');
     };
@@ -94,7 +96,7 @@ export default function ReviewRequestPage() {
   const recordClick = useMutation({
     mutationFn: async (action: string) => {
       if (!request?.clinic?.id) return;
-      
+
       const { error } = await supabase.from('review_clicks').insert({
         request_id: request.id,
         clinic_id: request.clinic.id,
@@ -102,7 +104,7 @@ export default function ReviewRequestPage() {
         user_agent: navigator.userAgent,
         metadata: { source: 'review_request_page' },
       } as any);
-      
+
       if (error) console.error('Failed to record click:', error);
     },
   });
@@ -111,12 +113,12 @@ export default function ReviewRequestPage() {
   const updateRequest = useMutation({
     mutationFn: async (updates: Record<string, unknown>) => {
       if (!request?.id) return;
-      
+
       const { error } = await supabase
         .from('review_requests')
         .update(updates as any)
         .eq('id', request.id);
-      
+
       if (error) console.error('Failed to update request:', error);
     },
   });
@@ -125,7 +127,7 @@ export default function ReviewRequestPage() {
   const submitInternalReview = useMutation({
     mutationFn: async () => {
       if (!request?.clinic?.id) throw new Error('No clinic');
-      
+
       const { error } = await supabase.from('internal_reviews').insert({
         clinic_id: request.clinic.id,
         request_id: request.id,
@@ -135,7 +137,7 @@ export default function ReviewRequestPage() {
         rating,
         comment: comment.trim() || null,
       } as any);
-      
+
       if (error) throw error;
     },
     onSuccess: () => {
@@ -167,7 +169,7 @@ export default function ReviewRequestPage() {
   // Handle thumbs up - redirect to Google
   const handleThumbsUp = async () => {
     recordClick.mutate('thumbs_up');
-    
+
     if (request?.clinic?.google_place_id) {
       recordClick.mutate('google_redirect');
       updateRequest.mutate({
@@ -176,14 +178,14 @@ export default function ReviewRequestPage() {
         outcome: 'positive',
         google_redirect_clicked: true,
       });
-      
+
       // Also record to legacy funnel events for compatibility
       await supabase.from('review_funnel_events').insert({
         clinic_id: request.clinic.id,
         source: 'review_request',
         event_type: 'thumbs_up',
       });
-      
+
       window.location.href = `https://search.google.com/local/writereview?placeid=${request.clinic.google_place_id}`;
     } else {
       toast.success('Thank you for your positive feedback!');
@@ -280,8 +282,8 @@ export default function ReviewRequestPage() {
           {/* Logo/Header */}
           <div className="text-center mb-8">
             {clinic?.cover_image_url ? (
-              <img 
-                src={clinic.cover_image_url} 
+              <img
+                src={proxyImageUrl(clinic.cover_image_url) || clinic.cover_image_url}
                 alt={clinic.name}
                 className="h-20 w-20 rounded-2xl object-cover mx-auto mb-4 shadow-lg border-2 border-white"
               />
@@ -302,7 +304,7 @@ export default function ReviewRequestPage() {
           {/* Main Card */}
           <Card className="shadow-2xl border-0 overflow-hidden">
             <div className="h-2 bg-gradient-to-r from-primary via-teal to-primary" />
-            
+
             <CardContent className="p-8">
               {step === 'initial' && (
                 <div className="text-center">
@@ -310,10 +312,10 @@ export default function ReviewRequestPage() {
                     <Sparkles className="h-4 w-4" />
                     Your opinion matters
                   </div>
-                  
+
                   <h2 className="text-2xl font-bold mb-2">How was your experience?</h2>
                   <p className="text-muted-foreground mb-8">Your feedback helps us serve you better</p>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       onClick={handleThumbsUp}
@@ -360,7 +362,7 @@ export default function ReviewRequestPage() {
                     <h2 className="text-xl font-bold mb-1">We're sorry to hear that</h2>
                     <p className="text-sm text-muted-foreground">Your feedback will help us do better</p>
                   </div>
-                  
+
                   {/* Patient Name (required) */}
                   <div className="mb-4">
                     <Label htmlFor="patientName" className="text-sm font-semibold">
@@ -389,7 +391,7 @@ export default function ReviewRequestPage() {
                       className="mt-1"
                     />
                   </div>
-                  
+
                   {/* Star Rating */}
                   <div className="mb-6">
                     <Label className="text-sm font-semibold mb-3 block">
@@ -405,11 +407,10 @@ export default function ReviewRequestPage() {
                           className="p-1 transition-all duration-200 hover:scale-110"
                         >
                           <Star
-                            className={`h-10 w-10 transition-all duration-200 ${
-                              star <= (hoveredRating || rating)
+                            className={`h-10 w-10 transition-all duration-200 ${star <= (hoveredRating || rating)
                                 ? 'text-gold fill-gold'
                                 : 'text-muted hover:text-gold/50'
-                            }`}
+                              }`}
                           />
                         </button>
                       ))}

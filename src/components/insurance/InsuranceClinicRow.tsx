@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
-import { 
-  Star, 
-  MapPin, 
-  BadgeCheck, 
-  Building2, 
+import {
+  Star,
+  MapPin,
+  BadgeCheck,
+  Building2,
   ArrowRight,
-  Shield 
+  Shield
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { proxyImageUrl } from "@/lib/proxyImageUrl";
 import { buildClinicProfileUrl } from "@/lib/url/buildProfileUrl";
 
 interface ClinicData {
@@ -51,7 +53,7 @@ export function InsuranceClinicRow({ clinic, insuranceName }: InsuranceClinicRow
       <div className="shrink-0 w-16 h-16 rounded-lg bg-muted overflow-hidden">
         {clinic.cover_image_url ? (
           <img
-            src={clinic.cover_image_url}
+            src={proxyImageUrl(clinic.cover_image_url) || clinic.cover_image_url}
             alt={clinic.name}
             className="w-full h-full object-cover"
             loading="lazy"

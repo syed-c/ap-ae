@@ -5,6 +5,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X, Images } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { proxyImageUrl } from "@/lib/proxyImageUrl";
 
 interface GalleryImage {
   id: string;
@@ -19,20 +20,20 @@ interface ClinicGalleryProps {
 
 export function ClinicGallery({ images, clinicName }: ClinicGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  
+
   if (images.length === 0) {
     return null;
   }
 
   const openLightbox = (index: number) => setSelectedIndex(index);
   const closeLightbox = () => setSelectedIndex(null);
-  
+
   const goNext = () => {
     if (selectedIndex !== null) {
       setSelectedIndex((selectedIndex + 1) % images.length);
     }
   };
-  
+
   const goPrev = () => {
     if (selectedIndex !== null) {
       setSelectedIndex((selectedIndex - 1 + images.length) % images.length);
@@ -61,7 +62,7 @@ export function ClinicGallery({ images, clinicName }: ClinicGalleryProps) {
             )}
           >
             <img
-              src={img.image_url}
+              src={proxyImageUrl(img.image_url) || img.image_url}
               alt={img.caption || `${clinicName} photo ${i + 1}`}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
@@ -70,7 +71,7 @@ export function ClinicGallery({ images, clinicName }: ClinicGalleryProps) {
               }}
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-            
+
             {/* Show +N overlay on last visible image if more exist */}
             {i === 5 && images.length > 6 && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -97,7 +98,7 @@ export function ClinicGallery({ images, clinicName }: ClinicGalleryProps) {
             >
               <X className="h-6 w-6" />
             </Button>
-            
+
             {/* Navigation */}
             {images.length > 1 && (
               <>
@@ -119,16 +120,16 @@ export function ClinicGallery({ images, clinicName }: ClinicGalleryProps) {
                 </Button>
               </>
             )}
-            
+
             {/* Image */}
             {selectedIndex !== null && (
               <div className="max-w-full max-h-full p-12">
                 <img
-                  src={images[selectedIndex].image_url}
+                  src={proxyImageUrl(images[selectedIndex].image_url) || images[selectedIndex].image_url}
                   alt={images[selectedIndex].caption || `${clinicName} photo`}
                   className="max-w-full max-h-[70vh] object-contain mx-auto"
                 />
-                
+
                 {/* Caption & counter */}
                 <div className="absolute bottom-6 left-0 right-0 text-center">
                   {images[selectedIndex].caption && (

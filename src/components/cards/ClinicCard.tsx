@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LazyImage } from "@/components/common/LazyImage";
+import { proxyImageUrl } from "@/lib/proxyImageUrl";
 
 interface ClinicCardProps {
   id: string;
@@ -41,8 +42,8 @@ export const ClinicCard = ({
     )}>
       <div className="relative h-48 bg-muted overflow-hidden">
         {coverImage ? (
-          <LazyImage 
-            src={coverImage} 
+          <LazyImage
+            src={proxyImageUrl(coverImage) || coverImage}
             alt={name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             width={400}
@@ -55,7 +56,7 @@ export const ClinicCard = ({
             </span>
           </div>
         )}
-        
+
         {/* Badges */}
         <div className="absolute top-3 left-3 flex gap-2">
           {isVerified && (
@@ -105,9 +106,9 @@ export const ClinicCard = ({
         {services.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-4">
             {services.slice(0, 3).map((service) => (
-              <Badge 
-                key={service} 
-                variant="secondary" 
+              <Badge
+                key={service}
+                variant="secondary"
                 className="rounded-full text-xs font-medium"
               >
                 {service}

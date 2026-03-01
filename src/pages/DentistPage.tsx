@@ -33,6 +33,7 @@ import {
   Copy
 } from "lucide-react";
 import { TrustSignalStrip, AEDPricingDisplay, CredentialsBadge } from "@/components/healthcare";
+import { proxyImageUrl } from "@/lib/proxyImageUrl";
 
 const DentistPage = () => {
   const { dentistSlug } = useParams();
@@ -104,7 +105,7 @@ const DentistPage = () => {
   const handleShare = async () => {
     const url = window.location.href;
     const title = `${dentist?.name || 'Dentist'} - AppointPanda`;
-    
+
     if (navigator.share) {
       try {
         await navigator.share({ title, url });
@@ -135,7 +136,7 @@ const DentistPage = () => {
   const handleLike = () => {
     setIsLiked(!isLiked);
     setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
-    
+
     // Store in localStorage for persistence
     const likedDentists = JSON.parse(localStorage.getItem('likedDentists') || '[]');
     if (isLiked) {
@@ -236,7 +237,7 @@ const DentistPage = () => {
         name={dentist.name}
         jobTitle={dentist.title || 'Dental Professional'}
         description={dentist.bio || `${dentist.name} is a verified dental professional in ${locationDisplay}.`}
-        image={dentist.image_url || undefined}
+        image={proxyImageUrl(dentist.image_url) || undefined}
         url={`/dentist/${dentist.slug}/`}
         worksFor={dentist.clinic ? { name: dentist.clinic.name, url: `/clinic/${dentist.clinic.slug}/` } : undefined}
       />
@@ -244,7 +245,7 @@ const DentistPage = () => {
       <section className="gradient-hero py-12 md:py-16">
         <div className="container">
           <Breadcrumbs items={breadcrumbs} className="mb-8" />
-          
+
           <div className="card-modern p-6 md:p-8">
             <div className="flex flex-col md:flex-row gap-6">
               {/* Photo */}
@@ -252,7 +253,7 @@ const DentistPage = () => {
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-4 border-background shadow-elevated">
                   {dentist.image_url ? (
                     <img
-                      src={dentist.image_url}
+                      src={proxyImageUrl(dentist.image_url) || dentist.image_url}
                       alt={dentist.name}
                       className="w-full h-full object-cover"
                     />
@@ -280,7 +281,7 @@ const DentistPage = () => {
                 <h1 className="font-display text-3xl md:text-4xl font-bold mb-1">
                   {dentist.name}
                 </h1>
-                
+
                 {dentist.title && (
                   <p className="text-lg text-muted-foreground font-medium mb-4">
                     {dentist.title}
@@ -311,7 +312,7 @@ const DentistPage = () => {
                     </div>
                   )}
                   {dentist.clinic && (
-                    <Link 
+                    <Link
                       to={`/clinic/${dentist.clinic.slug}`}
                       className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
                     >
@@ -339,17 +340,17 @@ const DentistPage = () => {
                   Book Appointment
                 </Button>
                 <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
+                  <Button
+                    variant="outline"
+                    size="icon"
                     className="rounded-xl"
                     onClick={handleShare}
                   >
                     {shareSuccess ? <Check className="h-4 w-4 text-teal" /> : <Share2 className="h-4 w-4" />}
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
+                  <Button
+                    variant="outline"
+                    size="icon"
                     className={`rounded-xl ${isLiked ? 'bg-coral/10 border-coral/30' : ''}`}
                     onClick={handleLike}
                   >
@@ -439,7 +440,7 @@ const DentistPage = () => {
                   <Briefcase className="h-5 w-5 text-primary" />
                   Works At
                 </h3>
-                <Link 
+                <Link
                   to={`/clinic/${dentist.clinic.slug}`}
                   className="block p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors"
                 >
@@ -482,7 +483,7 @@ const DentistPage = () => {
           })).filter(t => t.name)}
         />
       </Section>
-      
+
       {/* Multi-Step Booking Modal */}
       <MultiStepBookingModal
         open={bookingOpen}

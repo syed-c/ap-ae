@@ -1,4 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from "@/lib/utils";
+import { proxyImageUrl } from "@/lib/proxyImageUrl";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -72,14 +74,14 @@ export function TeamMemberCard({ member, onEdit, onDelete }: TeamMemberCardProps
 
   const typeInfo = getTypeInfo(member.professional_type);
   const TypeIcon = typeInfo.icon;
-  
+
   return (
     <Card className="card-modern overflow-hidden group">
       <CardContent className="p-4">
         <div className="flex items-start gap-4">
           <div className="relative">
             <Avatar className="h-16 w-16 border-2 border-border">
-              <AvatarImage src={member.image_url || undefined} alt={member.name} />
+              <AvatarImage src={proxyImageUrl(member.image_url) || undefined} alt={member.name} />
               <AvatarFallback className="bg-primary/10 text-primary text-lg font-bold">
                 {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
               </AvatarFallback>
@@ -90,7 +92,7 @@ export function TeamMemberCard({ member, onEdit, onDelete }: TeamMemberCardProps
               </div>
             )}
           </div>
-          
+
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between">
               <div>
@@ -108,7 +110,7 @@ export function TeamMemberCard({ member, onEdit, onDelete }: TeamMemberCardProps
                     <Edit className="h-4 w-4 mr-2" /> Edit
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={() => onDelete(member.id)}
                     className="text-destructive"
                   >
@@ -117,7 +119,7 @@ export function TeamMemberCard({ member, onEdit, onDelete }: TeamMemberCardProps
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            
+
             <div className="flex items-center gap-2 mt-2">
               <Badge variant="outline" className={`${typeInfo.color} border-0 text-xs`}>
                 <TypeIcon className="h-3 w-3 mr-1" />
@@ -130,7 +132,7 @@ export function TeamMemberCard({ member, onEdit, onDelete }: TeamMemberCardProps
                 </Badge>
               )}
             </div>
-            
+
             {(member.rating || 0) > 0 && (
               <div className="flex items-center gap-1 mt-2 text-sm">
                 <Star className="h-3.5 w-3.5 text-gold fill-gold" />
