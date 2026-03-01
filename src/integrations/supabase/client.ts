@@ -4,9 +4,10 @@ import type { Database } from './types';
 const rawSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "";
 
-// If we are in the browser, we use the local API proxy to bypass DNS poisoning
+// Only use the local API proxy to bypass DNS poisoning when developing locally
 const isBrowser = typeof window !== 'undefined';
-const supabaseUrl = isBrowser ? `${window.location.origin}/api/sb-proxy/` : rawSupabaseUrl;
+const isLocalhost = isBrowser && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const supabaseUrl = isLocalhost ? `${window.location.origin}/api/sb-proxy/` : rawSupabaseUrl;
 
 if (!rawSupabaseUrl || !supabaseKey) {
   console.error('Supabase credentials missing! Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY are set in .env');
