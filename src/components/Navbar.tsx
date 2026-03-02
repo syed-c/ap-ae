@@ -78,9 +78,9 @@ export function Navbar() {
       </div>
 
       {/* Main Navigation */}
-      <nav className={`sticky top-0 z-50 transition-all duration-200 ${isScrolled
-        ? 'bg-card/98 backdrop-blur-sm border-b border-border shadow-sm'
-        : 'bg-card border-b border-border/60'
+      <nav className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled
+        ? 'bg-white/95 backdrop-blur-xl border-b border-gray-200/80 shadow-md shadow-black/[0.06]'
+        : 'bg-white/80 backdrop-blur-md border-b border-gray-200/60'
         }`}>
         <div className="container">
           <div className="flex items-center justify-between h-14 lg:h-16">
