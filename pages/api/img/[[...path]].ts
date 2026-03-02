@@ -1,24 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import https from 'https';
 
-/**
- * Image proxy for Supabase Storage URLs.
- * 
- * Usage: /api/img-proxy/storage/v1/object/public/clinic-assets/...
- * 
- * This proxies requests to apztvwpogywvounohqtk.supabase.co
- * using direct IP + SNI to bypass DNS poisoning.
- */
-
 const STORAGE_HOST = 'eneuthbghipsdvsqilmb.supabase.co';
-// Cloudflare IP for Supabase storage (same CDN)
 const STORAGE_IP = '104.18.38.10';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { path: queryPath } = req.query;
-    const pathStr = Array.isArray(queryPath) ? queryPath.join('/') : queryPath || '';
+    const pathSegments = Array.isArray(queryPath) ? queryPath : [];
+    const pathStr = pathSegments.join('/') || '';
 
-    const targetUrl = `https://${STORAGE_IP}/${pathStr}`;
+    const targetUrl = `https://${STORAGE_IP}/${pathStr}${req.url?.includes('?') ? '?' + req.url.split('?')[1] : ''}`;
 
     try {
         const axios = (await import('axios')).default;
@@ -35,10 +26,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 rejectUnauthorized: false,
                 servername: STORAGE_HOST,
             }),
-            timeout: 15000,
+            timeout: 20000,
         });
 
-        // Forward content-type for images
         const contentType = response.headers['content-type'] || 'image/jpeg';
         res.setHeader('Content-Type', contentType);
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');

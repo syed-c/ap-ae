@@ -6,7 +6,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "";
 
 // Always use proxy in the browser to bypass DNS poisoning/blocking
 const isBrowser = typeof window !== 'undefined';
-const supabaseUrl = isBrowser ? `${window.location.origin}/api/sb-proxy/` : rawSupabaseUrl;
+const supabaseUrl = isBrowser ? `${window.location.origin}/api/sb` : rawSupabaseUrl;
 
 if (!rawSupabaseUrl || !supabaseKey) {
   console.error('Supabase credentials missing! Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY are set in .env');

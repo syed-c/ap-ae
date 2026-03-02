@@ -15,7 +15,7 @@ export function proxyImageUrl(url: string | null | undefined): string | null {
     // Match any Supabase storage URL
     const match = url.match(/https?:\/\/[a-z0-9]+\.supabase\.co\/(storage\/.*)/);
     if (match) {
-        return `/api/img-proxy/${match[1]}`;
+        return `/api/img/${match[1]}`;
     }
 
     return url;
