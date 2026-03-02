@@ -28,14 +28,22 @@ export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps)
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [sessionId] = useState(() => crypto.randomUUID());
-  const [visitorId] = useState(() => {
-    const stored = localStorage.getItem('visitor_id');
-    if (stored) return stored;
-    const newId = crypto.randomUUID();
-    localStorage.setItem('visitor_id', newId);
-    return newId;
-  });
+  const [sessionId, setSessionId] = useState('');
+  const [visitorId, setVisitorId] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSessionId(crypto.randomUUID());
+      const stored = localStorage.getItem('visitor_id');
+      if (stored) {
+        setVisitorId(stored);
+      } else {
+        const newId = crypto.randomUUID();
+        localStorage.setItem('visitor_id', newId);
+        setVisitorId(newId);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -154,9 +162,9 @@ export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps)
       }
     } catch (error) {
       console.error('Panda Bot error:', error);
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'I apologize, I\'m having trouble connecting. Please try again in a moment.' 
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: 'I apologize, I\'m having trouble connecting. Please try again in a moment.'
       }]);
     } finally {
       setIsLoading(false);
@@ -239,9 +247,9 @@ export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps)
         )}
         style={{ animationDuration: '3s' }}
       >
-        <img 
-          src={iconUrl} 
-          alt="Chat" 
+        <img
+          src={iconUrl}
+          alt="Chat"
           className="h-6 w-6 md:h-8 md:w-8 object-contain"
           onError={(e) => {
             e.currentTarget.src = '/logo.png';
@@ -268,9 +276,9 @@ export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps)
       <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center overflow-hidden">
-            <img 
-              src={iconUrl} 
-              alt="Assistant" 
+            <img
+              src={iconUrl}
+              alt="Assistant"
               className="h-6 w-6 object-contain"
               onError={(e) => {
                 e.currentTarget.src = '/logo.png';
@@ -311,9 +319,9 @@ export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps)
             {messages.length === 0 && (
               <div className="text-center py-4">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3 overflow-hidden">
-                  <img 
-                    src={iconUrl} 
-                    alt="" 
+                  <img
+                    src={iconUrl}
+                    alt=""
                     className="h-8 w-8 object-contain"
                     onError={(e) => {
                       e.currentTarget.src = '/logo.png';
@@ -352,9 +360,9 @@ export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps)
                 >
                   {message.role === 'assistant' && (
                     <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      <img 
-                        src={iconUrl} 
-                        alt="" 
+                      <img
+                        src={iconUrl}
+                        alt=""
                         className="h-4 w-4 object-contain"
                         onError={(e) => {
                           e.currentTarget.src = '/logo.png';
@@ -371,7 +379,7 @@ export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps)
                     )}
                   >
                     {message.content ? (
-                      message.role === 'assistant' 
+                      message.role === 'assistant'
                         ? renderMessageContent(message.content)
                         : message.content
                     ) : (
@@ -388,9 +396,9 @@ export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps)
               {isLoading && messages[messages.length - 1]?.role === 'user' && (
                 <div className="flex gap-2 justify-start">
                   <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                    <img 
-                      src={iconUrl} 
-                      alt="" 
+                    <img
+                      src={iconUrl}
+                      alt=""
                       className="h-4 w-4 object-contain"
                       onError={(e) => {
                         e.currentTarget.src = '/logo.png';
@@ -420,9 +428,9 @@ export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps)
                 disabled={isLoading}
                 className="flex-1 text-sm h-9"
               />
-              <Button 
-                type="submit" 
-                size="icon" 
+              <Button
+                type="submit"
+                size="icon"
                 disabled={isLoading || !input.trim()}
                 className="h-9 w-9"
               >

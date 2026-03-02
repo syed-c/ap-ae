@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams, MemoryRouter } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 import { useDynamicFavicon } from "@/hooks/useDynamicFavicon";
@@ -77,16 +77,16 @@ const EmergencyDentist = lazyRetry(() => import("./pages/EmergencyDentist"));
 const ServicePricePage = lazyRetry(() => import("./pages/ServicePricePage"));
 const EmirateComparisonPage = lazyRetry(() => import("./pages/EmirateComparisonPage"));
 
-const queryClient = new QueryClient();
-
 // Scroll to top component
 function ScrollToTop() {
   const { pathname } = useLocation();
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  
+
+  import("react").then(m => m.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname]));
+
   return null;
 }
 
@@ -119,127 +119,136 @@ const PageLoader = () => (
   </div>
 );
 
-const App = () => (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          {/* Performance monitoring in development */}
-          {process.env.NODE_ENV === 'development' && <PerformanceMonitor debug />}
-          <Toaster />
-          <Sonner />
+const App = ({ ssrPath }: { ssrPath?: string }) => {
+  return (
+    <HelmetProvider>
+      <TooltipProvider>
+        {/* Performance monitoring in development */}
+        {process.env.NODE_ENV === 'development' && typeof window !== 'undefined' && <PerformanceMonitor debug />}
+        <Toaster />
+        <Sonner />
+
+        {typeof window !== 'undefined' ? (
           <BrowserRouter>
-            {/* Google Analytics 4 tracking - must be inside Router for useLocation */}
-            <AnalyticsProvider>
-            <MetaTagInjector />
-            <ScrollToTop />
-            <TrailingSlashRedirect />
-            <VisitorTracker />
-            <DynamicFavicon />
-            <CriticalResourceLoader delay={3000} />
-            <PandaBot />
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                {/* Homepage - Main Design (Default) */}
-                <Route path="/" element={<Index />} />
-                
-                {/* Alternative Homepage Design */}
-                <Route path="/home-v2" element={<HomeV2 />} />
-                
-                {/* Search */}
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/find-dentist" element={<SearchPage />} />
-                
-                {/* Directory - Services */}
-                <Route path="/services" element={<ServicesPage />} />
-                <Route path="/services/:serviceSlug" element={<ServicePage />} />
-
-                {/* Directory - Profiles - Exact slug match only, extra paths = 404 */}
-                <Route path="/clinic/:clinicSlug" element={<ClinicPage />} />
-                <Route path="/clinic/:clinicSlug/*" element={<NotFound />} />
-                <Route path="/dentist/:dentistSlug" element={<DentistPage />} />
-                <Route path="/dentist/:dentistSlug/*" element={<NotFound />} />
-
-                {/* Directory - State Pages (e.g., /california, /massachusetts) */}
-                <Route path="/:stateSlug" element={<StatePage />} />
-
-                {/* Directory - City Pages (e.g., /california/los-angeles) */}
-                <Route path="/:stateSlug/:citySlug" element={<CityPage />} />
-
-                {/* Directory - Service + City combination (e.g., /california/los-angeles/cosmetic-dentist) */}
-                <Route path="/:stateSlug/:citySlug/:serviceSlug" element={<ServiceLocationPage />} />
-
-                {/* Blog */}
-                <Route path="/blog" element={<BlogPage />} />
-                <Route path="/blog/:postSlug" element={<BlogPostPage />} />
-                
-                {/* Auth */}
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                <Route path="/onboarding" element={<GMBOnboarding />} />
-                <Route path="/gmb-select" element={<GMBBusinessSelection />} />
-                
-                {/* Dashboards */}
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/dashboard" element={<AdminDashboard />} />
-                <Route path="/dashboard-v2" element={<DentistDashboardV2 />} />
-                
-                {/* Static Pages */}
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/faq" element={<FAQPage />} />
-                <Route path="/how-it-works" element={<HowItWorksPage />} />
-                <Route path="/privacy" element={<PrivacyPage />} />
-                <Route path="/terms" element={<TermsPage />} />
-                <Route path="/sitemap" element={<SitemapPage />} />
-                <Route path="/editorial-policy" element={<EditorialPolicyPage />} />
-                <Route path="/medical-review-policy" element={<MedicalReviewPolicyPage />} />
-                <Route path="/verification-policy" element={<VerificationPolicyPage />} />
-                
-                {/* Pricing */}
-                <Route path="/pricing" element={<PricingPage />} />
-                
-                {/* Insurance */}
-                <Route path="/insurance" element={<InsurancePage />} />
-                <Route path="/insurance/:insuranceSlug" element={<InsuranceDetailPage />} />
-                <Route path="/insurance/:insuranceSlug/:emirateSlug" element={<InsuranceDetailPage />} />
-                <Route path="/insurance/:insuranceSlug/:emirateSlug/:citySlug" element={<InsuranceDetailPage />} />
-                
-                {/* Business */}
-                <Route path="/claim-profile" element={<ClaimProfilePage />} />
-                <Route path="/list-your-practice" element={<ListYourPracticePage />} />
-                <Route path="/list-your-practice/success" element={<ListYourPracticeSuccessPage />} />
-                <Route path="/review/:clinicId" element={<ReviewFunnelPage />} />
-                <Route path="/rq/:requestCode" element={<ReviewRequestPage />} />
-                <Route path="/appointment/:token" element={<AppointmentManagePage />} />
-                <Route path="/form/:submissionId" element={<PatientFormPage />} />
-                <Route path="/book/:clinicId" element={<BookDirectPage />} />
-
-                {/* Free Tools - Phase 3 */}
-                <Route path="/tools/dental-cost-calculator" element={<DentalCostCalculator />} />
-                <Route path="/tools/insurance-checker" element={<InsuranceChecker />} />
-                <Route path="/emergency-dentist" element={<EmergencyDentist />} />
-
-                {/* Price Intelligence Pages */}
-                <Route path="/cost/:serviceSlug" element={<ServicePricePage />} />
-                <Route path="/compare/:serviceSlug/:emirate1-vs-:emirate2" element={<EmirateComparisonPage />} />
-
-                {/* Legacy redirects - UAE routes to new US structure */}
-                <Route path="/ae/clinic/:clinicSlug" element={<LegacyClinicRedirect />} />
-                <Route path="/ae/dentist/:dentistSlug" element={<LegacyDentistRedirect />} />
-                <Route path="/ae" element={<Navigate to="/" replace />} />
-                <Route path="/ae/*" element={<Navigate to="/" replace />} />
-                
-                {/* Catch-all */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-            </AnalyticsProvider>
+            <AppContent />
           </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  </HelmetProvider>
+        ) : (
+          <MemoryRouter initialEntries={[ssrPath || '/']}>
+            <AppContent />
+          </MemoryRouter>
+        )}
+      </TooltipProvider>
+    </HelmetProvider>
+  );
+};
+
+// Extracted content to keep routes clean
+const AppContent = () => (
+  <AnalyticsProvider>
+    <MetaTagInjector />
+    {typeof window !== 'undefined' && <ScrollToTop />}
+    <TrailingSlashRedirect />
+    {typeof window !== 'undefined' && <VisitorTracker />}
+    {typeof window !== 'undefined' && <DynamicFavicon />}
+    <CriticalResourceLoader delay={3000} />
+    <PandaBot />
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        {/* Homepage - Main Design (Default) */}
+        <Route path="/" element={<Index />} />
+
+        {/* Alternative Homepage Design */}
+        <Route path="/home-v2" element={<HomeV2 />} />
+
+        {/* Search */}
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/find-dentist" element={<SearchPage />} />
+
+        {/* Directory - Services */}
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/services/:serviceSlug" element={<ServicePage />} />
+
+        {/* Directory - Profiles - Exact slug match only, extra paths = 404 */}
+        <Route path="/clinic/:clinicSlug" element={<ClinicPage />} />
+        <Route path="/clinic/:clinicSlug/*" element={<NotFound />} />
+        <Route path="/dentist/:dentistSlug" element={<DentistPage />} />
+        <Route path="/dentist/:dentistSlug/*" element={<NotFound />} />
+
+        {/* Directory - State Pages (e.g., /california, /massachusetts) */}
+        <Route path="/:stateSlug" element={<StatePage />} />
+
+        {/* Directory - City Pages (e.g., /california/los-angeles) */}
+        <Route path="/:stateSlug/:citySlug" element={<CityPage />} />
+
+        {/* Directory - Service + City combination (e.g., /california/los-angeles/cosmetic-dentist) */}
+        <Route path="/:stateSlug/:citySlug/:serviceSlug" element={<ServiceLocationPage />} />
+
+        {/* Blog */}
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:postSlug" element={<BlogPostPage />} />
+
+        {/* Auth */}
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/onboarding" element={<GMBOnboarding />} />
+        <Route path="/gmb-select" element={<GMBBusinessSelection />} />
+
+        {/* Dashboards */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/dashboard-v2" element={<DentistDashboardV2 />} />
+
+        {/* Static Pages */}
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/how-it-works" element={<HowItWorksPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/sitemap" element={<SitemapPage />} />
+        <Route path="/editorial-policy" element={<EditorialPolicyPage />} />
+        <Route path="/medical-review-policy" element={<MedicalReviewPolicyPage />} />
+        <Route path="/verification-policy" element={<VerificationPolicyPage />} />
+
+        {/* Pricing */}
+        <Route path="/pricing" element={<PricingPage />} />
+
+        {/* Insurance */}
+        <Route path="/insurance" element={<InsurancePage />} />
+        <Route path="/insurance/:insuranceSlug" element={<InsuranceDetailPage />} />
+        <Route path="/insurance/:insuranceSlug/:emirateSlug" element={<InsuranceDetailPage />} />
+        <Route path="/insurance/:insuranceSlug/:emirateSlug/:citySlug" element={<InsuranceDetailPage />} />
+
+        {/* Business */}
+        <Route path="/claim-profile" element={<ClaimProfilePage />} />
+        <Route path="/list-your-practice" element={<ListYourPracticePage />} />
+        <Route path="/list-your-practice/success" element={<ListYourPracticeSuccessPage />} />
+        <Route path="/review/:clinicId" element={<ReviewFunnelPage />} />
+        <Route path="/rq/:requestCode" element={<ReviewRequestPage />} />
+        <Route path="/appointment/:token" element={<AppointmentManagePage />} />
+        <Route path="/form/:submissionId" element={<PatientFormPage />} />
+        <Route path="/book/:clinicId" element={<BookDirectPage />} />
+
+        {/* Free Tools - Phase 3 */}
+        <Route path="/tools/dental-cost-calculator" element={<DentalCostCalculator />} />
+        <Route path="/tools/insurance-checker" element={<InsuranceChecker />} />
+        <Route path="/emergency-dentist" element={<EmergencyDentist />} />
+
+        {/* Price Intelligence Pages */}
+        <Route path="/cost/:serviceSlug" element={<ServicePricePage />} />
+        <Route path="/compare/:serviceSlug/:emirate1-vs-:emirate2" element={<EmirateComparisonPage />} />
+
+        {/* Legacy redirects - UAE routes to new US structure */}
+        <Route path="/ae/clinic/:clinicSlug" element={<LegacyClinicRedirect />} />
+        <Route path="/ae/dentist/:dentistSlug" element={<LegacyDentistRedirect />} />
+        <Route path="/ae" element={<Navigate to="/" replace />} />
+        <Route path="/ae/*" element={<Navigate to="/" replace />} />
+
+        {/* Catch-all */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
+  </AnalyticsProvider>
 );
 
 export default App;

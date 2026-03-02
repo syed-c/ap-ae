@@ -1,4 +1,5 @@
-import { Helmet } from 'react-helmet-async';
+import Head from 'next/head';
+import { useLocation } from 'react-router-dom';
 import { classifyPath } from '@/config/pageRegistry';
 
 export interface SEOHeadProps {
@@ -30,11 +31,13 @@ export const SEOHead = ({
   publishedAt,
   modifiedAt,
 }: SEOHeadProps) => {
+  const location = useLocation();
+  const currentPath = location?.pathname || '/';
+
   // Avoid double branding: if title already contains the site name, use it as-is
   const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
 
   // CRITICAL: Always generate canonical URL - use provided or derive from current path
-  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
   const canonicalUrl = canonical
     ? `${BASE_URL}${canonical.startsWith('/') ? canonical : `/${canonical}`}`
     : `${BASE_URL}${currentPath}`;
@@ -53,15 +56,8 @@ export const SEOHead = ({
   // If registry says indexable, override any noindex prop
   const effectiveNoindex = isPageIndexable ? false : noindex;
 
-  // Log a warning if there's a mismatch (helpful for debugging)
-  if (typeof window !== 'undefined' && isPageIndexable && noindex) {
-    console.warn(
-      `SEO Warning: Page "${currentPath}" is marked indexable in registry but component requested noindex. Registry takes precedence.`
-    );
-  }
-
   return (
-    <Helmet>
+    <Head>
       {/* Primary Meta Tags - These are CRITICAL for SEO */}
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
@@ -103,7 +99,7 @@ export const SEOHead = ({
       {ogType === 'article' && modifiedAt && (
         <meta property="article:modified_time" content={modifiedAt} />
       )}
-    </Helmet>
+    </Head>
   );
 };
 
