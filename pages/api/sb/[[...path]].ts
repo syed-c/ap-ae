@@ -3,13 +3,12 @@ import https from 'https';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const targetHost = 'eneuthbghipsdvsqilmb.supabase.co';
-    const targetIp = '104.18.38.10'; // Stable Cloudflare IP
 
-    // Remove the /api/sb prefix from the URL to get the real Supabase path
+    // Remove the /api/sb prefix from the URL
     const targetPath = req.url?.replace('/api/sb', '') || '';
 
     const options: https.RequestOptions = {
-        hostname: targetIp,
+        hostname: targetHost, // Use domain name directly (relies on next.config.js hack for IP)
         port: 443,
         path: targetPath,
         method: req.method,
@@ -36,11 +35,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const proxy = https.request(options, (targetRes) => {
         res.status(targetRes.statusCode || 200);
 
-        // Whitelist safe response headers
+        // Whitelist safe response headers to prevent cookie/protocol conflicts
         const SAFE_RESPONSE_HEADERS = [
             'content-type', 'content-length', 'cache-control', 'etag',
-            'last-modified', 'content-range', 'x-content-range',
-            'access-control-allow-origin', 'preference-applied'
+            'last-modified', 'content-range', 'x-content-range', 'accept-ranges',
+            'access-control-allow-origin', 'preference-applied', 'timing-allow-origin'
         ];
 
         Object.entries(targetRes.headers).forEach(([key, value]) => {
@@ -66,7 +65,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
 export const config = {
     api: {
-        bodyParser: false, // Don't parse the body, just stream it
+        bodyParser: false,
         externalResolver: true,
     },
 };

@@ -3,17 +3,18 @@ import https from 'https';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const targetHost = 'eneuthbghipsdvsqilmb.supabase.co';
-    const targetIp = '104.18.38.10'; // Stable Cloudflare IP
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
 
     // Remove the /api/img prefix from the URL
     const targetPath = req.url?.replace('/api/img', '') || '';
 
     const options: https.RequestOptions = {
-        hostname: targetIp,
+        hostname: targetHost, // Relies on next.config.js for IP override on localhost
         port: 443,
         path: targetPath,
-        method: 'GET', // Images are always GET
+        method: 'GET',
         headers: {
+            'apikey': supabaseKey,
             'host': targetHost,
             'accept': req.headers['accept'] as string,
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
@@ -27,8 +28,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const proxy = https.request(options, (targetRes) => {
         res.status(targetRes.statusCode || 200);
 
+        // Whitelist safe response headers
         const SAFE_RESPONSE_HEADERS = [
-            'content-type', 'content-length', 'cache-control', 'etag', 'last-modified'
+            'content-type', 'content-length', 'cache-control', 'etag', 'last-modified', 'accept-ranges'
         ];
 
         Object.entries(targetRes.headers).forEach(([key, value]) => {
@@ -47,9 +49,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
     proxy.on('error', (err) => {
         console.error('[Proxy Image Error]', err.message);
-        if (!res.headersSent) {
-            res.status(502).json({ error: 'Image Proxy failed' });
-        }
+        if (!res.headersSent) res.status(502).json({ error: 'Image Proxy failed' });
     });
 
     proxy.end();
