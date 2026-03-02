@@ -3,43 +3,41 @@ import https from 'https';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const targetHost = 'eneuthbghipsdvsqilmb.supabase.co';
+    const targetIp = '104.18.38.10'; // DIRECT EDGE IP
 
-    // Remove the /api/sb prefix from the URL
     const targetPath = req.url?.replace('/api/sb', '') || '';
 
+    // Explicitly whitelist ONLY what Supabase needs
+    const headers: Record<string, string> = {
+        'host': targetHost,
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+    };
+
+    if (req.headers['apikey']) headers['apikey'] = req.headers['apikey'] as string;
+    if (req.headers['authorization']) headers['authorization'] = req.headers['authorization'] as string;
+    if (req.headers['content-type']) headers['content-type'] = req.headers['content-type'] as string;
+    if (req.headers['accept']) headers['accept'] = req.headers['accept'] as string;
+    if (req.headers['prefer']) headers['prefer'] = req.headers['prefer'] as string;
+    if (req.headers['range']) headers['range'] = req.headers['range'] as string;
+
     const options: https.RequestOptions = {
-        hostname: targetHost, // Use domain name directly (relies on next.config.js hack for IP)
+        hostname: targetIp,
         port: 443,
         path: targetPath,
         method: req.method,
-        headers: {
-            'apikey': req.headers['apikey'] as string,
-            'authorization': req.headers['authorization'] as string,
-            'content-type': req.headers['content-type'] as string,
-            'accept': req.headers['accept'] as string,
-            'x-client-info': req.headers['x-client-info'] as string,
-            'prefer': req.headers['prefer'] as string,
-            'range': req.headers['range'] as string,
-            'host': targetHost,
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        },
+        headers,
         rejectUnauthorized: false,
-        servername: targetHost,
+        servername: targetHost, // SNI is required
     };
-
-    // Clean up undefined headers
-    Object.keys(options.headers || {}).forEach(key => {
-        if (!options.headers?.[key]) delete options.headers![key];
-    });
 
     const proxy = https.request(options, (targetRes) => {
         res.status(targetRes.statusCode || 200);
 
-        // Whitelist safe response headers to prevent cookie/protocol conflicts
+        // Strip ALL potentially conflicting headers from the source (Set-Cookie, Transfer-Encoding, etc.)
         const SAFE_RESPONSE_HEADERS = [
             'content-type', 'content-length', 'cache-control', 'etag',
-            'last-modified', 'content-range', 'x-content-range', 'accept-ranges',
-            'access-control-allow-origin', 'preference-applied', 'timing-allow-origin'
+            'last-modified', 'content-range', 'x-content-range',
+            'access-control-allow-origin', 'preference-applied'
         ];
 
         Object.entries(targetRes.headers).forEach(([key, value]) => {
@@ -52,8 +50,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     });
 
     proxy.on('error', (err) => {
-        console.error('[Proxy SB Error]', err.message);
-        if (!res.headersSent) res.status(502).json({ error: 'Proxy failed' });
+        console.error(`[Proxy SB Error] ${req.method} ${targetPath}:`, err.message);
+        if (!res.headersSent) res.status(502).json({ error: 'Proxy failed', detail: err.message });
     });
 
     if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'DELETE') {

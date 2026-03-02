@@ -1,23 +1,3 @@
-const dns = require('dns');
-
-console.log('[next.config.js] Initializing DNS Workaround...');
-
-// DNS Workaround for Supabase (bypasses poisoned DNS on developer machines)
-const originalLookup = dns.lookup;
-dns.lookup = function (hostname, options, callback) {
-  if (typeof options === 'function') {
-    callback = options;
-    options = {};
-  }
-
-  if (hostname === 'eneuthbghipsdvsqilmb.supabase.co') {
-    // Force a stable Cloudflare IP for Supabase
-    return callback(null, '172.67.68.214', 4);
-  }
-
-  return originalLookup.call(dns, hostname, options, callback);
-};
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
