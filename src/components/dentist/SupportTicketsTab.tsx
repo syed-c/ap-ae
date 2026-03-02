@@ -27,7 +27,7 @@ import {
   Building2,
   Sparkles,
   Loader2,
-}from 'lucide-react';
+} from 'lucide-react';
 
 const TICKET_CATEGORIES = [
   { value: 'billing', label: 'Billing & Subscription', icon: '💳' },
@@ -64,7 +64,7 @@ interface SupportTicket {
 export default function SupportTicketsTab() {
   const { user } = useAuth();
   const { data: siteSettings } = useSiteSettings();
-  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@appointpanda.ae';
+  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@DubaiDentist.ae.ae';
   const queryClient = useQueryClient();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -139,7 +139,7 @@ export default function SupportTicketsTab() {
     mutationFn: async () => {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (!currentUser) throw new Error('Not authenticated');
-      
+
       const { error } = await supabase.from('support_tickets').insert({
         clinic_id: clinic?.id,
         user_id: currentUser.id,
@@ -200,8 +200,8 @@ export default function SupportTicketsTab() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Category</Label>
-                <Select 
-                  value={formData.category} 
+                <Select
+                  value={formData.category}
                   onValueChange={(v) => setFormData({ ...formData, category: v })}
                 >
                   <SelectTrigger>
@@ -245,7 +245,7 @@ export default function SupportTicketsTab() {
                 />
               </div>
 
-              <Button 
+              <Button
                 onClick={() => createTicket.mutate()}
                 disabled={!formData.category || !formData.subject || !formData.description || createTicket.isPending}
                 className="w-full gap-2"

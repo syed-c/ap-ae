@@ -9,7 +9,7 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const ListYourPracticeSuccessPage = () => {
   const { data: siteSettings } = useSiteSettings();
-  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@appointpanda.ae';
+  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@DubaiDentist.ae.ae';
   // Set noindex for success pages - they should not be indexed
   useEffect(() => {
     let meta = document.querySelector('meta[name="robots"]');
@@ -19,7 +19,7 @@ const ListYourPracticeSuccessPage = () => {
       document.head.appendChild(meta);
     }
     meta.setAttribute('content', 'noindex, nofollow');
-    
+
     return () => {
       meta?.setAttribute('content', 'index, follow');
     };
@@ -38,7 +38,7 @@ const ListYourPracticeSuccessPage = () => {
           <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
             Submission <span className="text-gradient">Received!</span>
           </h1>
-          
+
           <p className="text-xl text-muted-foreground mb-8">
             Thank you for listing your practice with us. We're excited to have you on board!
           </p>
@@ -54,7 +54,7 @@ const ListYourPracticeSuccessPage = () => {
                 We've sent a confirmation email with details about your submission and next steps.
               </p>
             </div>
-            
+
             <div className="card-modern p-6 text-left">
               <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center mb-4">
                 <Clock className="h-6 w-6 text-gold" />

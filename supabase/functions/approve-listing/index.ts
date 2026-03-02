@@ -130,13 +130,13 @@ serve(async (req) => {
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '')
       .slice(0, 80);
-    
+
     // Check for existing slugs to ensure uniqueness
     const { data: existingSlugs } = await supabaseAdmin
       .from('clinics')
       .select('slug')
       .like('slug', `${baseSlug}%`);
-    
+
     let slug = baseSlug;
     if (existingSlugs && existingSlugs.length > 0) {
       const exactMatch = existingSlugs.some((row: any) => row.slug === baseSlug);
@@ -197,12 +197,12 @@ serve(async (req) => {
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '')
       .slice(0, 80);
-    
+
     const { data: existingDentistSlugs } = await supabaseAdmin
       .from('dentists')
       .select('slug')
       .like('slug', `${dentistBaseSlug}%`);
-    
+
     let dentistSlug = dentistBaseSlug;
     if (existingDentistSlugs && existingDentistSlugs.length > 0) {
       const exactMatch = existingDentistSlugs.some((row: any) => row.slug === dentistBaseSlug);
@@ -236,7 +236,7 @@ serve(async (req) => {
     // 10. Update lead status
     await supabaseAdmin
       .from("leads")
-      .update({ 
+      .update({
         status: "converted",
         contacted_at: new Date().toISOString(),
       })
@@ -247,7 +247,7 @@ serve(async (req) => {
       try {
         const branding = await getBranding(supabaseAdmin);
         const siteUrl = branding.siteUrl;
-        
+
         const bodyContent = `
           <h2 style="color: #1e293b; margin: 0 0 16px 0; font-size: 22px; font-weight: 600;">
             Welcome to ${branding.siteName}!
@@ -295,7 +295,7 @@ serve(async (req) => {
         `;
 
         const emailHtml = wrapEmailContent(branding, '🎉 Your Practice Has Been Approved!', '🎉', bodyContent);
-        
+
         await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -333,7 +333,7 @@ serve(async (req) => {
           body: new URLSearchParams({
             To: formattedPhone,
             From: twilioPhone,
-            Body: `Welcome to AppointPanda! Your practice "${clinicName}" has been approved. Log in at www.appointpanda.com/auth with your email and temp password sent to your inbox.`,
+            Body: `Welcome to DubaiDentist.ae! Your practice "${clinicName}" has been approved. Log in at www.DubaiDentist.ae.com/auth with your email and temp password sent to your inbox.`,
           }),
         });
       } catch (smsError) {

@@ -65,7 +65,7 @@ const ListYourPracticePage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { data: treatments = [] } = useTreatments();
-  
+
   const [listingMethod, setListingMethod] = useState<'gmb' | 'manual' | null>(null);
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -96,7 +96,7 @@ const ListYourPracticePage = () => {
     try {
       localStorage.setItem('gmb_listing_flow', 'true');
       // Always use production domain for OAuth callback
-      const redirectTo = 'https://www.appointpanda.ae/auth/callback?listing=true';
+      const redirectTo = 'https://www.DubaiDentist.ae.ae/auth/callback?listing=true';
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -126,7 +126,7 @@ const ListYourPracticePage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
+
     // Format phone number for UAE
     if (name === 'phone') {
       const formatted = formatUAEPhone(value);
@@ -134,15 +134,15 @@ const ListYourPracticePage = () => {
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
-    
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
   };
 
   const handleServiceToggle = (serviceId: string) => {
-    setSelectedServices(prev => 
-      prev.includes(serviceId) 
+    setSelectedServices(prev =>
+      prev.includes(serviceId)
         ? prev.filter(id => id !== serviceId)
         : [...prev, serviceId]
     );
@@ -198,7 +198,7 @@ const ListYourPracticePage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.agreeTerms) {
       toast({
         title: "Terms Required",
@@ -301,8 +301,8 @@ const ListYourPracticePage = () => {
   return (
     <PageLayout>
       <SEOHead
-        title="List Your Dental Practice | Join AppointPanda Directory"
-        description="List your dental practice for free on AppointPanda. Reach thousands of patients, get verified, collect reviews, and grow your practice with our dental directory."
+        title="List Your Dental Practice | Join DubaiDentist.ae Directory"
+        description="List your dental practice for free on DubaiDentist.ae. Reach thousands of patients, get verified, collect reviews, and grow your practice with our dental directory."
         canonical="/list-your-practice/"
         keywords={['list dental practice', 'dental directory listing', 'dentist marketing', 'dental practice growth']}
       />
@@ -314,7 +314,7 @@ const ListYourPracticePage = () => {
             <div className="mb-6">
               <PromotionBanner variant="inline" />
             </div>
-            
+
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
               <Building2 className="h-4 w-4" />
               For Dental Professionals
@@ -344,7 +344,7 @@ const ListYourPracticePage = () => {
                     </div>
 
                     {/* GMB Option */}
-                    <Card 
+                    <Card
                       className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-teal/5 cursor-pointer hover:border-primary/50 transition-all"
                       onClick={handleGoogleSignIn}
                     >
@@ -354,9 +354,9 @@ const ListYourPracticePage = () => {
                             {isConnectingGoogle ? (
                               <Loader2 className="h-8 w-8 animate-spin text-primary" />
                             ) : (
-                              <img 
-                                src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" 
-                                alt="Google" 
+                              <img
+                                src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png"
+                                alt="Google"
                                 className="h-8 w-8"
                               />
                             )}
@@ -390,7 +390,7 @@ const ListYourPracticePage = () => {
                     </div>
 
                     {/* Manual Option */}
-                    <Card 
+                    <Card
                       className="border border-border cursor-pointer hover:border-primary/30 transition-all"
                       onClick={() => setListingMethod('manual')}
                     >
@@ -431,9 +431,8 @@ const ListYourPracticePage = () => {
                     <div className="flex items-center gap-2 mb-8">
                       {[1, 2, 3].map((s) => (
                         <div key={s} className="flex items-center gap-2 flex-1">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                            step >= s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                          }`}>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step >= s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                            }`}>
                             {step > s ? <CheckCircle className="h-5 w-5" /> : s}
                           </div>
                           {s < 3 && (
@@ -611,11 +610,10 @@ const ListYourPracticePage = () => {
                                 {treatments.map((treatment: any) => (
                                   <label
                                     key={treatment.id}
-                                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-                                      selectedServices.includes(treatment.id)
+                                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${selectedServices.includes(treatment.id)
                                         ? 'border-primary bg-primary/5'
                                         : 'border-border hover:border-primary/30'
-                                    }`}
+                                      }`}
                                   >
                                     <Checkbox
                                       checked={selectedServices.includes(treatment.id)}

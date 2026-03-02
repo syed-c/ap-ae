@@ -100,7 +100,7 @@ export default function GMBBusinessSelection() {
       document.head.appendChild(meta);
     }
     meta.setAttribute('content', 'noindex, nofollow');
-    
+
     return () => {
       meta?.setAttribute('content', 'index, follow');
     };
@@ -201,7 +201,7 @@ export default function GMBBusinessSelection() {
 
       // Check if this is a re-link flow (existing dentist linking GMB to their clinic)
       const isRelinkFlow = localStorage.getItem('gmb_relink_flow') === 'true';
-      
+
       if (isRelinkFlow) {
         // For re-link, just update the existing clinic with the new google_place_id
         const { data: existingClinic } = await supabase
@@ -209,7 +209,7 @@ export default function GMBBusinessSelection() {
           .select('id')
           .eq('claimed_by', user?.id)
           .single();
-        
+
         if (existingClinic) {
           const { error: updateError } = await supabase
             .from('clinics')
@@ -229,13 +229,13 @@ export default function GMBBusinessSelection() {
               updated_at: new Date().toISOString(),
             })
             .eq('id', existingClinic.id);
-          
+
           if (updateError) throw updateError;
-          
+
           toast.success('Google Business Profile connected successfully!');
           localStorage.removeItem('gmb_relink_flow');
           clearGmbProviderToken();
-          
+
           navigate('/dashboard?tab=settings&gmb_connected=true', { replace: true });
           return;
         }
@@ -264,7 +264,7 @@ export default function GMBBusinessSelection() {
 
       // Check if location requires manual selection
       const locationMatch: LocationMatchResult = data.locationMatch;
-      
+
       if (locationMatch?.requiresManualSelection) {
         // Navigate to onboarding with location selection needed flag
         navigate(
@@ -286,13 +286,13 @@ export default function GMBBusinessSelection() {
   const handleSkipGMB = async () => {
     // If user doesn't want to select a business, check if this is a relink flow
     const isRelinkFlow = localStorage.getItem('gmb_relink_flow') === 'true';
-    
+
     // Clean up flow flags
     localStorage.removeItem('gmb_listing_flow');
     localStorage.removeItem('gmb_relink_flow');
     localStorage.removeItem('gmb_restore_session');
     clearGmbProviderToken();
-    
+
     if (isRelinkFlow) {
       // For relink flow, go back to dashboard settings
       navigate('/dashboard?tab=settings', { replace: true });
@@ -326,7 +326,7 @@ export default function GMBBusinessSelection() {
     }
 
     // Always use production domain for OAuth callback
-    const redirectTo = `https://www.appointpanda.ae/auth/callback?${isRelinkFlow ? 'relink=true' : 'listing=true'}`;
+    const redirectTo = `https://www.DubaiDentist.ae.ae/auth/callback?${isRelinkFlow ? 'relink=true' : 'listing=true'}`;
 
     // IMPORTANT: Always use signInWithOAuth (not linkIdentity) for GMB flows
     // signInWithOAuth ensures we get a fresh provider_token with business.manage scope
@@ -444,27 +444,25 @@ export default function GMBBusinessSelection() {
           {businesses.map((business) => (
             <Card
               key={business.id}
-              className={`cursor-pointer transition-all ${
-                selectedBusiness?.id === business.id
+              className={`cursor-pointer transition-all ${selectedBusiness?.id === business.id
                   ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
                   : 'hover:border-primary/30'
-              }`}
+                }`}
               onClick={() => setSelectedBusiness(business)}
             >
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    selectedBusiness?.id === business.id
+                  <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${selectedBusiness?.id === business.id
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
-                  }`}>
+                    }`}>
                     {selectedBusiness?.id === business.id ? (
                       <CheckCircle className="h-6 w-6" />
                     ) : (
                       <Building2 className="h-6 w-6 text-muted-foreground" />
                     )}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-bold text-lg truncate">{business.name}</h3>
@@ -474,7 +472,7 @@ export default function GMBBusinessSelection() {
                         </Badge>
                       )}
                     </div>
-                    
+
                     <div className="space-y-1 text-sm text-muted-foreground">
                       {business.address && (
                         <div className="flex items-center gap-2">

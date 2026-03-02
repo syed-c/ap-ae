@@ -31,7 +31,7 @@ function generateReviewEmailHTML(
   logoUrl: string | null,
   primaryColor: string
 ): string {
-  const message = customMessage || 
+  const message = customMessage ||
     `We hope your recent visit to ${clinicName} was excellent! Your feedback means the world to us and helps other patients find quality dental care.`;
 
   return `<!DOCTYPE html>
@@ -204,9 +204,9 @@ Deno.serve(async (req) => {
       throw new Error('Clinic not found');
     }
 
-    const siteUrl = Deno.env.get('SITE_URL') || 'https://appointpanda.ae';
+    const siteUrl = Deno.env.get('SITE_URL') || 'https://DubaiDentist.ae.ae';
     const reviewLink = `${siteUrl}/review/${clinic.slug}`;
-    const googleReviewLink = clinic.google_place_id 
+    const googleReviewLink = clinic.google_place_id
       ? `https://search.google.com/local/writereview?placeid=${clinic.google_place_id}`
       : null;
 
@@ -239,7 +239,7 @@ Deno.serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: `${clinic.name} <no-reply@appointpanda.ae>`,
+          from: `${clinic.name} <no-reply@DubaiDentist.ae.ae>`,
           to: [recipientEmail],
           subject: `${recipientName}, how was your visit to ${clinic.name}?`,
           html: htmlContent,
@@ -267,7 +267,7 @@ Deno.serve(async (req) => {
         throw new Error('Phone number required');
       }
 
-      const message = customMessage || 
+      const message = customMessage ||
         `Hi ${recipientName}! Thanks for visiting ${clinic.name}. We'd love your feedback: ${reviewLink}`;
 
       const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
@@ -307,7 +307,7 @@ Deno.serve(async (req) => {
         throw new Error('Phone number required');
       }
 
-      const message = customMessage || 
+      const message = customMessage ||
         `Hi ${recipientName}! 👋\n\nThank you for visiting *${clinic.name}*!\n\nWe'd love to hear about your experience. Please take a moment to share your feedback:\n\n${reviewLink}\n\nThank you! ⭐`;
 
       const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
@@ -356,9 +356,9 @@ Deno.serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, message: 'Review request sent successfully' }),
-      { 
-        status: 200, 
-        headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
       }
     );
 
@@ -367,9 +367,9 @@ Deno.serve(async (req) => {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      { 
-        status: 500, 
-        headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
       }
     );
   }

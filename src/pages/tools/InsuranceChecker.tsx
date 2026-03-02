@@ -125,7 +125,7 @@ export default function InsuranceChecker() {
   return (
     <PageLayout>
       <SEOHead
-        title={seoContent?.meta_title || "Insurance Coverage Checker | Find In-Network Dentists | AppointPanda"}
+        title={seoContent?.meta_title || "Insurance Coverage Checker | Find In-Network Dentists | DubaiDentist.ae"}
         description={seoContent?.meta_description || "Check which dentists accept your insurance. Find in-network dental offices near you with real-time coverage data."}
         canonical="/tools/insurance-checker/"
       />

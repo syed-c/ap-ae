@@ -27,7 +27,7 @@ interface Phase2Request {
 // SERVICE PAGE TEMPLATE (Sprint 2.1)
 // 14 sections, 3,500-5,000 words
 // ========================================
-const SERVICE_PAGE_TEMPLATE = `You are generating a COMPREHENSIVE service page for AppointPanda dental directory.
+const SERVICE_PAGE_TEMPLATE = `You are generating a COMPREHENSIVE service page for DubaiDentist.ae dental directory.
 
 === TEMPLATE STRUCTURE (3,500-5,000 words) ===
 
@@ -79,7 +79,7 @@ const SERVICE_PAGE_TEMPLATE = `You are generating a COMPREHENSIVE service page f
    - What's usually included/excluded
    - How to verify your coverage
    - FSA/HSA applicability
-   - CTA: "Check dentists accepting your insurance on AppointPanda"
+   - CTA: "Check dentists accepting your insurance on DubaiDentist.ae"
 
 8. H2: Recovery & Aftercare (400 words)
    - Immediate post-procedure expectations
@@ -116,7 +116,7 @@ const SERVICE_PAGE_TEMPLATE = `You are generating a COMPREHENSIVE service page f
     - Importance of before/after photos and reviews
 
 12. H2: Find Top [Service] Dentists Near You (200 words)
-    - CTA to search AppointPanda directory
+    - CTA to search DubaiDentist.ae directory
     - Featured cities links
     - "Book your consultation today"
     - Trust signals (verified dentists, reviews)
@@ -132,7 +132,7 @@ const SERVICE_PAGE_TEMPLATE = `You are generating a COMPREHENSIVE service page f
     - Link to verified reviews
 
 === CONTENT REQUIREMENTS ===
-- Write in AppointPanda's first-party voice
+- Write in DubaiDentist.ae's first-party voice
 - No medical claims or diagnoses
 - Cite approximate costs with ranges
 - Include multiple CTAs throughout
@@ -144,7 +144,7 @@ const SERVICE_PAGE_TEMPLATE = `You are generating a COMPREHENSIVE service page f
 // CITY PAGE TEMPLATE (Sprint 2.2)
 // 11 sections, 2,500-3,500 words
 // ========================================
-const CITY_PAGE_TEMPLATE = `You are generating a COMPREHENSIVE city directory page for AppointPanda.
+const CITY_PAGE_TEMPLATE = `You are generating a COMPREHENSIVE city directory page for DubaiDentist.ae.
 
 === TEMPLATE STRUCTURE (2,500-3,500 words) ===
 
@@ -159,7 +159,7 @@ const CITY_PAGE_TEMPLATE = `You are generating a COMPREHENSIVE city directory pa
 3. H2: Top-Rated Dentists in [City] (300 words)
    - Preview of what patients can find
    - Types of practices available
-   - How ratings work on AppointPanda
+   - How ratings work on DubaiDentist.ae
    - CTA: "View all dentists in [City]"
 
 4. H2: Dental Services Available in [City] (400 words)
@@ -190,7 +190,7 @@ const CITY_PAGE_TEMPLATE = `You are generating a COMPREHENSIVE city directory pa
    - Most commonly accepted insurance providers
    - Percentage of dentists accepting major insurers
    - Medicaid/Medicare acceptance
-   - How to find dentists with your insurance on AppointPanda
+   - How to find dentists with your insurance on DubaiDentist.ae
 
 7. H2: Dentists by Neighborhood (400 words)
    - List 6-10 major neighborhoods
@@ -242,7 +242,7 @@ const CITY_PAGE_TEMPLATE = `You are generating a COMPREHENSIVE city directory pa
 // 4 categories, 1,500-2,800 words each
 // ========================================
 const BLOG_TEMPLATES = {
-  'cost-guides': `You are writing a COST GUIDE blog post for AppointPanda.
+  'cost-guides': `You are writing a COST GUIDE blog post for DubaiDentist.ae.
 
 === TEMPLATE: "How Much Does [Procedure] Cost in [State]? [2026 Price Guide]" ===
 Target: 1,800-2,200 words
@@ -283,14 +283,14 @@ H1: How Much Does [Procedure] Cost in [State]? [2026 Price Guide]
    - Shop around tips
 
 7. H2: Find Affordable [Procedure] Dentists (200 words)
-   - CTA to AppointPanda
+   - CTA to DubaiDentist.ae
    - How to filter by price
    - Request quotes
 
 8. H2: FAQs (200 words)
    - 5-6 cost-specific questions`,
 
-  'comparisons': `You are writing a COMPARISON blog post for AppointPanda.
+  'comparisons': `You are writing a COMPARISON blog post for DubaiDentist.ae.
 
 === TEMPLATE: "[Option A] vs [Option B]: Complete Comparison Guide [2026]" ===
 Target: 2,000-2,500 words
@@ -344,12 +344,12 @@ H1: [A] vs [B]: Complete Comparison Guide [2026]
    - Questions to ask your dentist
 
 9. H2: Find Dentists Offering Both Options (150 words)
-   - CTA to AppointPanda
+   - CTA to DubaiDentist.ae
 
 10. H2: FAQs (150 words)
     - 5 comparison questions`,
 
-  'how-to': `You are writing a HOW-TO GUIDE blog post for AppointPanda.
+  'how-to': `You are writing a HOW-TO GUIDE blog post for DubaiDentist.ae.
 
 === TEMPLATE: "How to [Action]: Complete Guide [2026]" ===
 Target: 1,500-2,000 words
@@ -390,13 +390,13 @@ H1: How to [Action]: Complete Guide [2026]
    - Industry best practices
 
 9. H2: Take Action Today (150 words)
-   - CTA to AppointPanda
+   - CTA to DubaiDentist.ae
    - Next steps
 
 10. H2: FAQs (150 words)
     - 5 how-to questions`,
 
-  'local-content': `You are writing a LOCAL/LISTICLE blog post for AppointPanda.
+  'local-content': `You are writing a LOCAL/LISTICLE blog post for DubaiDentist.ae.
 
 === TEMPLATE: "Best [Type] Dentists in [City]: Top [#] Clinics [2026]" ===
 Target: 2,200-2,800 words
@@ -418,7 +418,7 @@ H1: Best [Type] Dentists in [City]: Top [#] Clinics [2026]
    - Services offered
    - Patient experience highlights
    - Location advantages
-   - CTA: Book on AppointPanda
+   - CTA: Book on DubaiDentist.ae
 
 4. H2: 2-7. [Repeat for each featured entry]
    - 200-250 words each
@@ -488,7 +488,7 @@ serve(async (req) => {
       .select("role")
       .eq("user_id", userId);
 
-    const isAdmin = (roles ?? []).some((r) => 
+    const isAdmin = (roles ?? []).some((r) =>
       ["super_admin", "district_manager", "content_team", "seo_team"].includes(r.role)
     );
     if (!isAdmin) {
@@ -509,14 +509,14 @@ serve(async (req) => {
     // AI call helper with retries
     async function callAI(messages: any[], maxRetries = 4): Promise<any> {
       let lastError: Error | null = null;
-      
+
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         if (attempt > 0) {
           const delay = Math.pow(2, attempt) * 1000;
           await new Promise(r => setTimeout(r, delay));
           console.log(`phase2-content-generator: Retry ${attempt + 1}/${maxRetries}`);
         }
-        
+
         try {
           const response = await fetch("https://api.aimlapi.com/v1/chat/completions", {
             method: "POST",
@@ -545,7 +545,7 @@ serve(async (req) => {
           lastError = e instanceof Error ? e : new Error(String(e));
         }
       }
-      
+
       throw lastError || new Error("AI call failed");
     }
 
@@ -583,7 +583,7 @@ serve(async (req) => {
     if (template === "service") {
       // Sprint 2.1: Service pages
       const serviceName = pageData.title || pageData.slug?.split("/").pop()?.replace(/-/g, " ") || "Dental Service";
-      
+
       systemPrompt = SERVICE_PAGE_TEMPLATE;
       userPrompt = `Generate a COMPLETE service page for: ${serviceName}
 
@@ -597,7 +597,7 @@ Generate the FULL content following all 14 sections in the template.
 Include realistic cost data for CA, MA, CT, NJ.
 Include comparison with the most common alternative treatment.
 
-Write in AppointPanda's voice. Return pure markdown content.`;
+Write in DubaiDentist.ae's voice. Return pure markdown content.`;
 
     } else if (template === "city") {
       // Sprint 2.2: City pages
@@ -619,13 +619,13 @@ Include realistic cost comparison table (15 procedures).
 Include 6-10 real neighborhoods/areas in ${cityName}.
 Add local context about ${cityName}'s dental care landscape.
 
-Write in AppointPanda's voice. Return pure markdown content.`;
+Write in DubaiDentist.ae's voice. Return pure markdown content.`;
 
     } else if (template === "blog") {
       // Sprint 2.3: Blog posts
       const category = blog_category || "cost-guides";
       const blogTemplate = BLOG_TEMPLATES[category as keyof typeof BLOG_TEMPLATES] || BLOG_TEMPLATES["cost-guides"];
-      
+
       systemPrompt = blogTemplate;
       userPrompt = `Generate a COMPLETE blog post.
 
@@ -639,7 +639,7 @@ This content MUST be 100% unique and provide genuine value to readers.
 
 Generate the FULL content following the template structure.
 Include relevant data tables where specified.
-Write in AppointPanda's voice - helpful, trustworthy, patient-focused.
+Write in DubaiDentist.ae's voice - helpful, trustworthy, patient-focused.
 
 Return pure markdown content.`;
     } else {
@@ -749,9 +749,9 @@ Return pure markdown content.`;
   } catch (error) {
     console.error("phase2-content-generator error:", error);
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error" 
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error"
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

@@ -35,9 +35,9 @@ export interface SchemaSettings {
 
 // Default settings as fallback
 const defaultOrganization: OrganizationSettings = {
-  name: 'AppointPanda',
-  url: 'https://www.appointpanda.ae',
-  logo: 'https://www.appointpanda.ae/logo.png',
+  name: 'DubaiDentist.ae',
+  url: 'https://www.DubaiDentist.ae.ae',
+  logo: 'https://www.DubaiDentist.ae.ae/logo.png',
   description: 'Find and book appointments with top-rated dental professionals across the UAE.',
   email: '',
   phone: '',
@@ -68,7 +68,7 @@ export function useSchemaSettings() {
       const { data, error } = await supabase
         .from('schema_settings')
         .select('setting_key, setting_value');
-      
+
       if (error) {
         console.warn('Failed to load schema settings, using defaults:', error);
         return {
@@ -76,12 +76,12 @@ export function useSchemaSettings() {
           sitewide: defaultSitewide,
         };
       }
-      
+
       const settings: Record<string, any> = {};
       data?.forEach(row => {
         settings[row.setting_key] = row.setting_value;
       });
-      
+
       return {
         organization: settings.organization || defaultOrganization,
         sitewide: settings.sitewide || defaultSitewide,

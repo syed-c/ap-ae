@@ -21,7 +21,7 @@ const MedicalReviewPolicyPage = () => {
     <PageLayout>
       <SEOHead
         title="Medical Review Policy - Clinical Content Standards"
-        description="Understand how AppointPanda's dental health content is reviewed by licensed professionals to ensure clinical accuracy and compliance with UAE health standards."
+        description="Understand how DubaiDentist.ae's dental health content is reviewed by licensed professionals to ensure clinical accuracy and compliance with UAE health standards."
         canonical="/medical-review-policy/"
       />
 
@@ -46,7 +46,7 @@ const MedicalReviewPolicyPage = () => {
           <div>
             <h2 className="text-2xl font-bold text-foreground mb-4">Our Review Process</h2>
             <p className="text-muted-foreground mb-8">
-              Every piece of health-related content on AppointPanda undergoes a rigorous multi-step medical review process to ensure patients receive accurate, trustworthy information.
+              Every piece of health-related content on DubaiDentist.ae undergoes a rigorous multi-step medical review process to ensure patients receive accurate, trustworthy information.
             </p>
 
             <div className="space-y-6">
@@ -74,7 +74,7 @@ const MedicalReviewPolicyPage = () => {
           <div className="bg-muted/50 rounded-2xl p-6 border border-border">
             <h3 className="font-bold text-foreground mb-2">Important Notice</h3>
             <p className="text-sm text-muted-foreground">
-              Medical content on AppointPanda is reviewed for general accuracy but does not replace professional dental advice. Individual treatment decisions should always be made in consultation with a qualified dentist who can evaluate your specific situation.
+              Medical content on DubaiDentist.ae is reviewed for general accuracy but does not replace professional dental advice. Individual treatment decisions should always be made in consultation with a qualified dentist who can evaluate your specific situation.
             </p>
           </div>
         </div>

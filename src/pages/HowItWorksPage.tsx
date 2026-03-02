@@ -104,7 +104,7 @@ const HowItWorksPage = () => {
     <PageLayout>
       <SEOHead
         title="How It Works | Find Dentists or List Your Practice"
-        description="Learn how AppointPanda works. Patients can search, compare, and book dental appointments. Dentists can list their practice and reach more patients."
+        description="Learn how DubaiDentist.ae works. Patients can search, compare, and book dental appointments. Dentists can list their practice and reach more patients."
         canonical="/how-it-works/"
         keywords={['how to find dentist', 'book dental appointment', 'list dental practice', 'dental directory']}
       />
@@ -116,20 +116,20 @@ const HowItWorksPage = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.1),transparent_50%)]" />
         <div className="absolute top-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-10 left-10 w-96 h-96 bg-gold/10 rounded-full blur-3xl" />
-        
+
         <div className="container relative py-20 md:py-28">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
               <Sparkles className="h-4 w-4 text-primary" />
               <span className="text-sm font-bold text-primary">Simple & Easy</span>
             </div>
-            
+
             <h1 className="font-display text-4xl md:text-6xl font-bold mb-6">
               How{" "}
-              <span className="text-gradient">AppointPanda</span>{" "}
+              <span className="text-gradient">DubaiDentist.ae</span>{" "}
               Works
             </h1>
-            
+
             <p className="text-xl md:text-2xl text-dark-section-foreground/70 max-w-2xl mx-auto mb-8">
               Whether you're a patient looking for dental care or a dentist wanting to grow your practice, we make it easy.
             </p>
@@ -282,7 +282,7 @@ const HowItWorksPage = () => {
             Ready to get started?
           </h2>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
-            Join thousands of patients and dentists already using AppointPanda.
+            Join thousands of patients and dentists already using DubaiDentist.ae.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button asChild size="lg" variant="secondary" className="rounded-2xl font-bold">

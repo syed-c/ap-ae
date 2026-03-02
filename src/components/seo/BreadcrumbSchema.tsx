@@ -28,13 +28,13 @@ const ensureTrailingSlash = (url: string): string => {
   return url.endsWith('/') ? url : `${url}/`;
 };
 
-export const BreadcrumbSchema = ({ 
-  items, 
-  baseUrl = "https://www.appointpanda.ae" 
+export const BreadcrumbSchema = ({
+  items,
+  baseUrl = "https://www.DubaiDentist.ae.ae"
 }: BreadcrumbSchemaProps) => {
   const schemaItems = items.map((item, index) => {
-    const url = item.url.startsWith("http") 
-      ? item.url 
+    const url = item.url.startsWith("http")
+      ? item.url
       : `${baseUrl}${ensureTrailingSlash(item.url)}`;
     return {
       "@type": "ListItem",
@@ -68,9 +68,9 @@ export const generateStateBreadcrumbs = (
   stateName: string,
   stateSlug: string
 ): BreadcrumbItem[] => [
-  { name: "Home", url: "/" },
-  { name: stateName, url: `/${stateSlug}/` },
-];
+    { name: "Home", url: "/" },
+    { name: stateName, url: `/${stateSlug}/` },
+  ];
 
 export const generateCityBreadcrumbs = (
   stateName: string,
@@ -78,19 +78,19 @@ export const generateCityBreadcrumbs = (
   cityName: string,
   citySlug: string
 ): BreadcrumbItem[] => [
-  { name: "Home", url: "/" },
-  { name: stateName, url: `/${stateSlug}/` },
-  { name: cityName, url: `/${stateSlug}/${citySlug}/` },
-];
+    { name: "Home", url: "/" },
+    { name: stateName, url: `/${stateSlug}/` },
+    { name: cityName, url: `/${stateSlug}/${citySlug}/` },
+  ];
 
 export const generateServiceBreadcrumbs = (
   serviceName: string,
   serviceSlug: string
 ): BreadcrumbItem[] => [
-  { name: "Home", url: "/" },
-  { name: "Services", url: "/services/" },
-  { name: serviceName, url: `/services/${serviceSlug}/` },
-];
+    { name: "Home", url: "/" },
+    { name: "Services", url: "/services/" },
+    { name: serviceName, url: `/services/${serviceSlug}/` },
+  ];
 
 export const generateServiceLocationBreadcrumbs = (
   stateName: string,
@@ -100,11 +100,11 @@ export const generateServiceLocationBreadcrumbs = (
   serviceName: string,
   serviceSlug: string
 ): BreadcrumbItem[] => [
-  { name: "Home", url: "/" },
-  { name: stateName, url: `/${stateSlug}/` },
-  { name: cityName, url: `/${stateSlug}/${citySlug}/` },
-  { name: serviceName, url: `/${stateSlug}/${citySlug}/${serviceSlug}/` },
-];
+    { name: "Home", url: "/" },
+    { name: stateName, url: `/${stateSlug}/` },
+    { name: cityName, url: `/${stateSlug}/${citySlug}/` },
+    { name: serviceName, url: `/${stateSlug}/${citySlug}/${serviceSlug}/` },
+  ];
 
 export const generateClinicBreadcrumbs = (
   clinicName: string,
@@ -115,17 +115,17 @@ export const generateClinicBreadcrumbs = (
   citySlug?: string
 ): BreadcrumbItem[] => {
   const crumbs: BreadcrumbItem[] = [{ name: "Home", url: "/" }];
-  
+
   if (stateName && stateSlug) {
     crumbs.push({ name: stateName, url: `/${stateSlug}/` });
   }
-  
+
   if (cityName && citySlug && stateSlug) {
     crumbs.push({ name: cityName, url: `/${stateSlug}/${citySlug}/` });
   }
-  
+
   crumbs.push({ name: clinicName, url: `/clinic/${clinicSlug}/` });
-  
+
   return crumbs;
 };
 
@@ -138,17 +138,17 @@ export const generateDentistBreadcrumbs = (
   citySlug?: string
 ): BreadcrumbItem[] => {
   const crumbs: BreadcrumbItem[] = [{ name: "Home", url: "/" }];
-  
+
   if (stateName && stateSlug) {
     crumbs.push({ name: stateName, url: `/${stateSlug}/` });
   }
-  
+
   if (cityName && citySlug && stateSlug) {
     crumbs.push({ name: cityName, url: `/${stateSlug}/${citySlug}/` });
   }
-  
+
   crumbs.push({ name: dentistName, url: `/dentist/${dentistSlug}/` });
-  
+
   return crumbs;
 };
 

@@ -79,19 +79,18 @@ export function Navbar() {
       </div>
 
       {/* Main Navigation */}
-      <nav className={`sticky top-0 z-50 transition-all duration-200 ${
-        isScrolled 
-          ? 'bg-card/98 backdrop-blur-sm border-b border-border shadow-sm' 
+      <nav className={`sticky top-0 z-50 transition-all duration-200 ${isScrolled
+          ? 'bg-card/98 backdrop-blur-sm border-b border-border shadow-sm'
           : 'bg-card border-b border-border/60'
-      }`}>
+        }`}>
         <div className="container">
           <div className="flex items-center justify-between h-14 lg:h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 shrink-0">
               {logoUrl ? (
-                <img 
-                  src={logoUrl} 
-                  alt={siteSettings?.siteName || 'AppointPanda'} 
+                <img
+                  src={logoUrl}
+                  alt={siteSettings?.siteName || 'DubaiDentist.ae'}
                   className="h-8 w-auto max-w-[160px] object-contain"
                 />
               ) : (
@@ -163,8 +162,8 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Link 
-                to="/pricing" 
+              <Link
+                to="/pricing"
                 className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
                 onMouseEnter={() => onMouseEnter('/pricing')}
                 onMouseLeave={onMouseLeave}
@@ -181,8 +180,8 @@ export function Navbar() {
               <Button variant="ghost" size="icon" className="rounded-lg text-foreground/60 hover:text-foreground h-9 w-9" asChild>
                 <Link to="/auth"><User className="h-4 w-4" /></Link>
               </Button>
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-9 px-4"
                 onClick={() => navigate("/search")}
               >
@@ -217,10 +216,10 @@ export function Navbar() {
                 </Link>
                 <p className="px-3 pt-3 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Locations</p>
                 {states?.map((state) => (
-                  <Link 
-                    key={state.slug} 
-                    to={`/${state.slug}`} 
-                    className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" 
+                  <Link
+                    key={state.slug}
+                    to={`/${state.slug}`}
+                    className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {state.name}

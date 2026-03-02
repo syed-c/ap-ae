@@ -28,14 +28,14 @@ async function getEmailSettings(supabase: any): Promise<EmailSettings> {
     .select('value')
     .eq('key', 'email')
     .single();
-  
+
   if (data?.value) {
     return data.value as EmailSettings;
   }
-  
+
   return {
-    from_email: 'no-reply@appointpanda.ae',
-    from_name: 'AppointPanda'
+    from_email: 'no-reply@DubaiDentist.ae.ae',
+    from_name: 'DubaiDentist.ae'
   };
 }
 
@@ -59,7 +59,7 @@ async function sendEmailViaResend(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const cleanHtml = minifyHtml(html);
-    
+
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -177,14 +177,14 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const body: SendFormRequest = await req.json();
     const { submissionId, templateName, deliveryMethod, patientEmail, patientPhone, patientName, customMessage, clinicName } = body;
 
     // Generate the form URL
-    const baseUrl = `https://www.appointpanda.com/form/${submissionId}`;
+    const baseUrl = `https://www.DubaiDentist.ae.com/form/${submissionId}`;
     const { data: submissionRow } = await supabase
       .from('patient_form_submissions')
       .select('access_token')

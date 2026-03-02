@@ -131,7 +131,7 @@ export default function NotificationPreferencesTab() {
 
   const sendTestNotification = useMutation({
     mutationFn: async (channel: 'email' | 'whatsapp') => {
-      const destination = channel === 'email' 
+      const destination = channel === 'email'
         ? (settings.notification_email_secondary || user?.email)
         : settings.notification_whatsapp_number;
 
@@ -143,9 +143,9 @@ export default function NotificationPreferencesTab() {
         body: {
           to: destination,
           type: channel === 'email' ? 'email' : 'whatsapp',
-          subject: 'Test Notification from AppointPanda',
-          html: `<p>This is a test notification from AppointPanda.</p><p>Your notification preferences are working correctly!</p>`,
-          message: 'This is a test notification from AppointPanda. Your preferences are working correctly!',
+          subject: 'Test Notification from DubaiDentist.ae',
+          html: `<p>This is a test notification from DubaiDentist.ae.</p><p>Your notification preferences are working correctly!</p>`,
+          message: 'This is a test notification from DubaiDentist.ae. Your preferences are working correctly!',
         },
       });
 

@@ -12,7 +12,7 @@
 import { useSchemaSettings } from '@/hooks/useSchemaSettings';
 import { withTrailingSlash } from '@/lib/url/withTrailingSlash';
 
-const BASE_URL = 'https://www.appointpanda.ae';
+const BASE_URL = 'https://www.DubaiDentist.ae.ae';
 
 // ========================== SCHEMA GENERATORS ==========================
 
@@ -143,7 +143,7 @@ export type SyncSchemaData =
 // Schema generation functions
 const generateOrganizationSchema = (settings?: any) => {
   const org = settings || {
-    name: 'AppointPanda',
+    name: 'DubaiDentist.ae',
     url: BASE_URL,
     logo: `${BASE_URL}/logo.png`,
     description: 'Find and book appointments with top-rated dental professionals across the UAE.',
@@ -268,11 +268,11 @@ const generateArticleSchema = (data: ArticleSchemaData) => ({
   dateModified: data.dateModified || data.datePublished,
   author: {
     '@type': 'Person',
-    name: data.author || 'AppointPanda Team',
+    name: data.author || 'DubaiDentist.ae Team',
   },
   publisher: {
     '@type': 'Organization',
-    name: 'AppointPanda',
+    name: 'DubaiDentist.ae',
     logo: {
       '@type': 'ImageObject',
       url: `${BASE_URL}/logo.png`,
@@ -316,7 +316,7 @@ const generateServiceSchema = (data: ServiceSchemaData) => ({
   url: `${BASE_URL}${withTrailingSlash(data.url)}`,
   provider: {
     '@type': 'Organization',
-    name: data.provider || 'AppointPanda',
+    name: data.provider || 'DubaiDentist.ae',
   },
   ...(data.areaServed && {
     areaServed: {
@@ -359,7 +359,7 @@ const generateMedicalProcedureSchema = (data: MedicalProcedureSchemaData) => ({
 const generateWebSiteSchema = (data: WebSiteSchemaData) => ({
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: data.name || 'AppointPanda',
+  name: data.name || 'DubaiDentist.ae',
   url: data.url || BASE_URL,
   potentialAction: {
     '@type': 'SearchAction',
@@ -441,14 +441,14 @@ interface SyncStructuredDataProps {
  */
 export const SyncStructuredData = ({ data, id }: SyncStructuredDataProps) => {
   const { data: schemaSettings } = useSchemaSettings();
-  
+
   const schemas = Array.isArray(data) ? data : [data];
-  
+
   // Generate all schemas
   const jsonLdScripts = schemas.map((schemaData, index) => {
     const schema = generateSchema(schemaData, schemaSettings?.organization);
     const schemaId = id ? `${id}-${index}` : `sync-schema-${schemaData.type}-${index}`;
-    
+
     return (
       <script
         key={schemaId}

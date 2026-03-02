@@ -125,7 +125,7 @@ export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
               <Link to="/" className="inline-flex items-center gap-2 mb-4">
                 <img
                   src="/logo.png"
-                  alt={siteSettings?.siteName || 'AppointPanda'}
+                  alt={siteSettings?.siteName || 'DubaiDentist.ae'}
                   className="h-7 w-auto max-w-[140px] object-contain"
                 />
               </Link>

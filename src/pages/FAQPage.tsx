@@ -18,7 +18,7 @@ const FAQPage = () => {
   const { data: siteSettings } = useSiteSettings();
   const { data: counts } = useRealCounts();
   const { data: seoContent } = useSeoPageContent("faq");
-  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@appointpanda.ae';
+  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@DubaiDentist.ae.ae';
   const supportPhone = siteSettings?.contactDetails?.support_phone || '+971 4 123 4567';
 
   const categories = [
@@ -29,7 +29,7 @@ const FAQPage = () => {
       faqs: [
         {
           q: "How do I find a DHA-licensed dentist in Dubai?",
-          a: "Use our search feature to filter by emirate, area, or treatment type. All dentists on AppointPanda are licensed by DHA (Dubai), DOH (Abu Dhabi), or MOHAP. Dentists with the 'Verified' badge have completed our additional credential verification."
+          a: "Use our search feature to filter by emirate, area, or treatment type. All dentists on DubaiDentist.ae are licensed by DHA (Dubai), DOH (Abu Dhabi), or MOHAP. Dentists with the 'Verified' badge have completed our additional credential verification."
         },
         {
           q: "What is the average cost of dental treatment in Dubai (AED)?",
@@ -45,15 +45,15 @@ const FAQPage = () => {
         },
         {
           q: "Can I book same-day emergency dental appointments in Dubai?",
-          a: "Yes, many clinics on AppointPanda offer same-day emergency appointments. Search for 'Emergency Dental Care' and filter by your area. Clinics in Dubai, Abu Dhabi, and Sharjah typically have extended hours for emergencies."
+          a: "Yes, many clinics on DubaiDentist.ae offer same-day emergency appointments. Search for 'Emergency Dental Care' and filter by your area. Clinics in Dubai, Abu Dhabi, and Sharjah typically have extended hours for emergencies."
         },
         {
           q: "Are dental treatments covered under my employment visa insurance?",
           a: "Most UAE employment visa insurance plans include basic dental coverage (check-ups, cleaning, extractions). Coverage for cosmetic procedures varies by plan. Check with your insurer or use our insurance filter to find clinics that accept your specific provider."
         },
         {
-          q: "Is AppointPanda free for patients?",
-          a: "Yes, AppointPanda is completely free for patients. You can search for dentists, read reviews, compare AED pricing, and request appointments without any charges."
+          q: "Is DubaiDentist.ae free for patients?",
+          a: "Yes, DubaiDentist.ae is completely free for patients. You can search for dentists, read reviews, compare AED pricing, and request appointments without any charges."
         },
       ]
     },
@@ -63,7 +63,7 @@ const FAQPage = () => {
       color: "from-gold/20 to-amber-500/10",
       faqs: [
         {
-          q: "How do I list my clinic on AppointPanda?",
+          q: "How do I list my clinic on DubaiDentist.ae?",
           a: "Visit our 'List Your Practice' page and fill out the registration form with your DHA/DOH/MOHAP license number. Our team will verify your credentials and contact you within 24-48 hours. Basic listings are free."
         },
         {
@@ -94,8 +94,8 @@ const FAQPage = () => {
           a: "DHA (Dubai Health Authority) licenses and regulates healthcare practitioners in Dubai. DOH (Department of Health) does the same for Abu Dhabi. MOHAP (Ministry of Health and Prevention) covers the remaining 5 emirates — Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain. All maintain rigorous standards."
         },
         {
-          q: "What areas does AppointPanda cover?",
-          a: "AppointPanda covers dental practices across all 7 UAE Emirates — Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain. Within Dubai alone, we cover areas including Jumeirah, Marina, Downtown, Deira, Bur Dubai, JLT, DIFC, Business Bay, Mirdif, Al Barsha, Karama, and Satwa."
+          q: "What areas does DubaiDentist.ae cover?",
+          a: "DubaiDentist.ae covers dental practices across all 7 UAE Emirates — Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain. Within Dubai alone, we cover areas including Jumeirah, Marina, Downtown, Deira, Bur Dubai, JLT, DIFC, Business Bay, Mirdif, Al Barsha, Karama, and Satwa."
         },
         {
           q: "Are dental clinics in UAE JCI accredited?",
@@ -116,7 +116,7 @@ const FAQPage = () => {
   return (
     <PageLayout>
       <SEOHead
-        title={seoContent?.meta_title || "FAQ | Dental Care Questions in Dubai & UAE | AppointPanda"}
+        title={seoContent?.meta_title || "FAQ | Dental Care Questions in Dubai & UAE | DubaiDentist.ae"}
         description={seoContent?.meta_description || "Find answers about DHA-licensed dentists, dental costs in AED, UAE insurance coverage, and booking appointments in Dubai, Abu Dhabi & Sharjah."}
         canonical="/faq/"
         keywords={['dental FAQ UAE', 'dentist dubai questions', 'DHA licensed dentist', 'dental cost AED', 'UAE dental insurance']}
@@ -128,19 +128,19 @@ const FAQPage = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.1),transparent_50%)]" />
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-gold/10 rounded-full blur-3xl" />
-        
+
         <div className="container relative py-16 md:py-24">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
               <HelpCircle className="h-4 w-4 text-primary" />
               <span className="text-sm font-bold text-primary">Help Center</span>
             </div>
-            
+
             <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ fontFamily: "'Varela Round', 'Quicksand', sans-serif" }}>
               Frequently Asked{" "}
               <span className="text-primary">Questions</span>
             </h1>
-            
+
             <p className="text-lg text-dark-section-foreground/70 max-w-xl mx-auto mb-8">
               Find answers about dental care in the UAE — from DHA licensing to AED costs and insurance coverage.
             </p>
@@ -174,7 +174,7 @@ const FAQPage = () => {
                 </div>
                 <h2 className="text-2xl font-black" style={{ fontFamily: "'Varela Round', 'Quicksand', sans-serif" }}>{category.title}</h2>
               </div>
-              
+
               <Accordion type="single" collapsible className="w-full">
                 {category.faqs.map((faq, faqIndex) => (
                   <AccordionItem key={faqIndex} value={`${catIndex}-${faqIndex}`} className="border-border/50">
@@ -228,7 +228,7 @@ const FAQPage = () => {
             Ready to find your dentist in UAE?
           </h2>
           <p className="text-dark-section-foreground/70 mb-8 max-w-xl mx-auto">
-            Join thousands of patients across Dubai, Abu Dhabi & Sharjah who've found their perfect dental care provider through AppointPanda.
+            Join thousands of patients across Dubai, Abu Dhabi & Sharjah who've found their perfect dental care provider through DubaiDentist.ae.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button asChild size="lg" className="rounded-2xl font-bold shadow-glow">

@@ -1,5 +1,5 @@
 /**
- * AppointPanda Premium Design System v2
+ * DubaiDentist.ae Premium Design System v2
  * A collection of reusable components with consistent styling
  */
 
@@ -43,7 +43,7 @@ interface PremiumCardProps {
 export const PremiumCard = forwardRef<HTMLDivElement, PremiumCardProps>(
   ({ children, className, variant = 'default', hover = false, padding = 'md', onClick }, ref) => {
     const baseStyles = 'relative overflow-hidden';
-    
+
     const variantStyles = {
       default: 'bg-card border border-border/50 shadow-sm',
       glass: 'bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg',
@@ -129,7 +129,7 @@ export const StatCard = ({
           <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
         )}
       </div>
-      
+
       <div className="mt-3">
         {loading ? (
           <div className="h-7 w-20 bg-muted animate-pulse rounded-lg" />
@@ -176,19 +176,19 @@ interface PremiumButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 export const PremiumButton = forwardRef<HTMLButtonElement, PremiumButtonProps>(
-  ({ 
-    children, 
-    className, 
-    variant = 'primary', 
-    size = 'md', 
+  ({
+    children,
+    className,
+    variant = 'primary',
+    size = 'md',
     loading = false,
     icon: Icon,
     iconPosition = 'left',
     disabled,
-    ...props 
+    ...props
   }, ref) => {
     const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-    
+
     const variantStyles = {
       primary: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 focus:ring-primary',
       secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-secondary',
@@ -239,10 +239,10 @@ interface SectionHeaderProps {
   badge?: string;
 }
 
-export const SectionHeader = ({ 
-  title, 
-  description, 
-  icon: Icon, 
+export const SectionHeader = ({
+  title,
+  description,
+  icon: Icon,
   iconColor = 'text-primary',
   action,
   badge,
@@ -390,11 +390,11 @@ interface QuickActionProps {
   disabled?: boolean;
 }
 
-export const QuickAction = ({ 
-  icon: Icon, 
-  label, 
-  description, 
-  onClick, 
+export const QuickAction = ({
+  icon: Icon,
+  label,
+  description,
+  onClick,
   color = 'from-primary to-teal',
   disabled = false,
 }: QuickActionProps) => (

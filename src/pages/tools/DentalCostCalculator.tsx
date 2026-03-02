@@ -154,7 +154,7 @@ export default function DentalCostCalculator() {
   return (
     <PageLayout>
       <SEOHead
-        title={seoContent?.meta_title || "Dental Cost Calculator | Real Dentist Prices | AppointPanda"}
+        title={seoContent?.meta_title || "Dental Cost Calculator | Real Dentist Prices | DubaiDentist.ae"}
         description={seoContent?.meta_description || "Get real cost estimates from verified dentists. Compare prices for dental implants, crowns, cleanings and more in your city."}
         canonical="/tools/dental-cost-calculator/"
       />
@@ -433,7 +433,7 @@ export default function DentalCostCalculator() {
             <div>
               <h3 className="font-semibold mb-2">How can I get an accurate quote?</h3>
               <p className="text-muted-foreground">
-                Request a consultation from 2-3 dentists in your area through AppointPanda for the most accurate pricing.
+                Request a consultation from 2-3 dentists in your area through DubaiDentist.ae for the most accurate pricing.
               </p>
             </div>
           </CardContent>

@@ -11,11 +11,11 @@ import { useLocation } from 'react-router-dom';
 interface CanonicalUrlProps {
   /** Override the auto-generated canonical URL */
   href?: string;
-  /** Base domain (defaults to appointpanda.com) */
+  /** Base domain (defaults to DubaiDentist.ae.com) */
   baseDomain?: string;
 }
 
-const BASE_URL = 'https://www.appointpanda.ae';
+const BASE_URL = 'https://www.DubaiDentist.ae.ae';
 
 export function CanonicalUrl({ href, baseDomain }: CanonicalUrlProps) {
   const location = useLocation();
@@ -23,15 +23,15 @@ export function CanonicalUrl({ href, baseDomain }: CanonicalUrlProps) {
   // Build canonical URL: strip query params, enforce trailing slash
   const buildCanonical = () => {
     if (href) return href;
-    
+
     const base = baseDomain || BASE_URL;
     let path = location.pathname;
-    
+
     // Enforce trailing slash (except root)
     if (path !== '/' && !path.endsWith('/')) {
       path += '/';
     }
-    
+
     return `${base}${path}`;
   };
 
@@ -50,10 +50,10 @@ export function CanonicalUrl({ href, baseDomain }: CanonicalUrlProps) {
 export function HreflangTags({ path }: { path?: string }) {
   const location = useLocation();
   const currentPath = path || location.pathname;
-  
+
   // Normalize path with trailing slash
-  const normalizedPath = currentPath.endsWith('/') || currentPath === '/' 
-    ? currentPath 
+  const normalizedPath = currentPath.endsWith('/') || currentPath === '/'
+    ? currentPath
     : `${currentPath}/`;
 
   return (

@@ -25,7 +25,7 @@ interface Phase3Request {
 // BLOG TEMPLATES BY CATEGORY
 // ========================================
 
-const INFORMATIONAL_TEMPLATE = `You are writing an INFORMATIONAL DEEP DIVE blog post for AppointPanda dental directory.
+const INFORMATIONAL_TEMPLATE = `You are writing an INFORMATIONAL DEEP DIVE blog post for DubaiDentist.ae dental directory.
 
 === TEMPLATE: "What to Expect During Your First [Specialty] Visit" ===
 Target: 1,800-2,200 words
@@ -73,13 +73,13 @@ H1: What to Expect During Your First [Specialty] Visit: Complete Guide [2026]
    - Payment options
 
 8. H2: Find a [Specialty] Near You (150 words)
-   - CTA to AppointPanda
+   - CTA to DubaiDentist.ae
    - Benefits of using directory
 
 9. H2: FAQs (200 words)
    - 5-6 common first-visit questions`;
 
-const PROBLEM_SOLVING_TEMPLATE = `You are writing a PROBLEM-SOLVING blog post for AppointPanda.
+const PROBLEM_SOLVING_TEMPLATE = `You are writing a PROBLEM-SOLVING blog post for DubaiDentist.ae.
 
 === TEMPLATE: Emergency/Problem-Solving Content ===
 Target: 1,200-1,800 words
@@ -126,7 +126,7 @@ H1: [Problem]: Causes, Treatment & When to See a Dentist [2026]
 8. H2: FAQs (150 words)
    - 5 urgent questions`;
 
-const INSURANCE_TEMPLATE = `You are writing an INSURANCE & FINANCIAL blog post for AppointPanda.
+const INSURANCE_TEMPLATE = `You are writing an INSURANCE & FINANCIAL blog post for DubaiDentist.ae.
 
 === TEMPLATE: "Does [Insurance] Cover [Procedure]?" ===
 Target: 1,800-2,200 words
@@ -175,13 +175,13 @@ H1: Does [Insurance Company] Cover [Procedure]? [2026 Coverage Guide]
    - FSA/HSA usage
 
 8. H2: Find [Insurance] Dentists Near You (150 words)
-   - CTA to AppointPanda
+   - CTA to DubaiDentist.ae
    - Filter by insurance
 
 9. H2: FAQs (150 words)
    - 5 insurance-specific questions`;
 
-const NEIGHBORHOOD_TEMPLATE = `You are generating a NEIGHBORHOOD landing page for AppointPanda.
+const NEIGHBORHOOD_TEMPLATE = `You are generating a NEIGHBORHOOD landing page for DubaiDentist.ae.
 
 === TEMPLATE: Best Dentists in [Neighborhood], [City] ===
 Target: 1,500-2,000 words
@@ -241,15 +241,15 @@ async function generateContent(
   targetWordCount: number,
   aimlApiKey: string
 ): Promise<{ content: string; word_count: number }> {
-  const systemPrompt = `You are an expert dental content writer for AppointPanda, a leading dental directory platform.
+  const systemPrompt = `You are an expert dental content writer for DubaiDentist.ae, a leading dental directory platform.
 
-VOICE: Write in AppointPanda's first-party platform voice ("we", "our directory", "on AppointPanda").
+VOICE: Write in DubaiDentist.ae's first-party platform voice ("we", "our directory", "on DubaiDentist.ae").
 STYLE: Professional yet accessible, patient-focused, medically accurate but not clinical.
 FORMAT: Use markdown with proper heading hierarchy (H1, H2, H3).
 TABLES: Use markdown tables for cost comparisons and structured data.
 LENGTH: Target ${targetWordCount} words minimum. Be comprehensive.
 E-E-A-T: Demonstrate expertise, experience, authoritativeness, trustworthiness.
-CTAs: Include natural calls-to-action to AppointPanda directory throughout.
+CTAs: Include natural calls-to-action to DubaiDentist.ae directory throughout.
 
 CRITICAL RULES:
 - NO medical advice or diagnoses
@@ -446,7 +446,7 @@ Neighborhood: ${neighborhoodName}
 Approximate dentists in city: ${dentistCount || 50}
 
 Generate a comprehensive neighborhood page for ${neighborhoodName} in ${cityName}.
-Include local context, cost estimates, and natural CTAs to AppointPanda.
+Include local context, cost estimates, and natural CTAs to DubaiDentist.ae.
 Target ${target_word_count}+ words.`;
 
       const { content, word_count } = await generateContent(prompt, target_word_count, AIMLAPI_KEY);

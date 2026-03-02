@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const BASE_URL = "https://www.appointpanda.ae";
+const BASE_URL = "https://www.DubaiDentist.ae.ae";
 const CHUNK_SIZE = 2500; // Max URLs per sitemap chunk
 
 interface SitemapUrl {
@@ -30,16 +30,16 @@ function escapeXml(text: string): string {
 function normalizeUrl(path: string): string {
   // Remove leading slash if present (we'll add BASE_URL)
   let cleanPath = path.startsWith('/') ? path : `/${path}`;
-  
+
   // Remove double slashes
   cleanPath = cleanPath.replace(/\/+/g, '/');
-  
+
   // Add trailing slash (canonical: WITH trailing slash)
   // Exception: root path stays as /
   if (cleanPath !== '/' && !cleanPath.endsWith('/')) {
     cleanPath = cleanPath + '/';
   }
-  
+
   return `${BASE_URL}${cleanPath}`;
 }
 
@@ -58,18 +58,18 @@ function isValidSitemapUrl(loc: string): boolean {
 function generateSitemapXml(urls: SitemapUrl[]): string {
   // Filter out invalid URLs
   const validUrls = urls.filter(url => isValidSitemapUrl(url.loc));
-  
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${validUrls
-  .map(
-    (url) => `  <url>
+      .map(
+        (url) => `  <url>
     <loc>${escapeXml(url.loc)}</loc>
     ${url.lastmod ? `<lastmod>${new Date(url.lastmod).toISOString().split("T")[0]}</lastmod>\n    ` : ""}<changefreq>${url.changefreq}</changefreq>
     <priority>${url.priority}</priority>
   </url>`
-  )
-  .join("\n")}
+      )
+      .join("\n")}
 </urlset>`;
 }
 
@@ -80,33 +80,33 @@ function generateSitemapIndex(clinicChunks: number, serviceLocationChunks: numbe
     "sitemap-static.xml",
     "sitemap-states.xml",
   ];
-  
+
   for (let i = 1; i <= cityChunks; i++) {
     sitemaps.push(cityChunks > 1 ? `sitemap-cities-${i}.xml` : "sitemap-cities.xml");
   }
-  
+
   sitemaps.push("sitemap-services.xml");
-  
+
   for (let i = 1; i <= serviceLocationChunks; i++) {
     sitemaps.push(`sitemap-service-locations-${i}.xml`);
   }
-  
+
   for (let i = 1; i <= clinicChunks; i++) {
     sitemaps.push(`sitemap-profiles-${i}.xml`);
   }
-  
+
   sitemaps.push("sitemap-dentists.xml", "sitemap-posts.xml", "sitemap-insurance.xml");
-  
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${sitemaps
-  .map(
-    (sitemap) => `  <sitemap>
+      .map(
+        (sitemap) => `  <sitemap>
     <loc>${BASE_URL}/${sitemap}</loc>
     <lastmod>${today}</lastmod>
   </sitemap>`
-  )
-  .join("\n")}
+      )
+      .join("\n")}
 </sitemapindex>`;
 }
 
@@ -115,29 +115,29 @@ async function fetchAllRows(supabase: any, table: string, selectQuery: string, f
   const allRows: any[] = [];
   let offset = 0;
   const limit = 1000;
-  
+
   while (true) {
     let query = supabase.from(table).select(selectQuery).range(offset, offset + limit - 1);
-    
+
     for (const [key, value] of Object.entries(filters)) {
       query = query.eq(key, value);
     }
-    
+
     const { data, error } = await query;
-    
+
     if (error) {
       console.error(`Error fetching ${table}:`, error);
       break;
     }
-    
+
     if (!data || data.length === 0) break;
-    
+
     allRows.push(...data);
-    
+
     if (data.length < limit) break;
     offset += limit;
   }
-  
+
   return allRows;
 }
 
@@ -224,7 +224,7 @@ serve(async (req) => {
       for (const state of states) {
         if (!state.slug || state.slug.trim() === '') continue;
         urls.push({
-        loc: normalizeUrl(`/${state.slug}`),
+          loc: normalizeUrl(`/${state.slug}`),
           lastmod: state.updated_at,
           priority: 0.9,
           changefreq: "weekly",
@@ -244,7 +244,7 @@ serve(async (req) => {
 
       for (const city of cities) {
         if (!city.slug || city.slug.trim() === '') continue;
-        
+
         const stateData = Array.isArray(city.states) ? city.states[0] : city.states;
         if (stateData?.slug) {
           allUrls.push({
@@ -303,7 +303,7 @@ serve(async (req) => {
         // Skip cities with no clinics (would be thin content / soft 404)
         if (!cityClinicMap[city.id] || cityClinicMap[city.id] < 1) continue;
         if (!city.slug || city.slug.trim() === '') continue;
-        
+
         const stateData = Array.isArray(city.states) ? city.states[0] : city.states;
         if (stateData?.slug) {
           urls.push({
@@ -350,7 +350,7 @@ serve(async (req) => {
 
       for (const city of cities) {
         if (!city.slug || city.slug.trim() === '') continue;
-        
+
         const stateData = Array.isArray(city.states) ? city.states[0] : city.states;
         if (stateData?.slug) {
           for (const treatment of treatments) {
@@ -385,7 +385,7 @@ serve(async (req) => {
       for (const clinic of clinicsData) {
         // Skip clinics with invalid slugs
         if (!clinic.slug || clinic.slug.trim() === '') continue;
-        
+
         const hasThinContent = !clinic.description || clinic.description.length < 50;
         allUrls.push({
           loc: normalizeUrl(`/clinic/${clinic.slug}`),
@@ -416,7 +416,7 @@ serve(async (req) => {
       for (const dentist of dentists) {
         // Skip dentists with invalid slugs
         if (!dentist.slug || dentist.slug.trim() === '') continue;
-        
+
         const hasThinContent = !dentist.bio || dentist.bio.length < 50;
         urls.push({
           loc: normalizeUrl(`/dentist/${dentist.slug}`),
@@ -487,13 +487,13 @@ serve(async (req) => {
     // DEFAULT: Return sitemap index with statically defined chunks
     // This avoids fetching ALL data just to count rows (which caused timeouts/processing errors in GSC)
     console.log("Generating sitemap index with static chunk estimates");
-    
+
     // Use generous static estimates - extra chunks that return empty sitemaps are harmless
     // but missing chunks means missing URLs from the index
     const clinicChunks = 1;  // ~1172 clinics fits in 1 chunk of 2500
     const serviceLocationChunks = 1; // ~1380 combos fits in 1 chunk
     const cityChunks = 1; // ~69 cities fits in 1 chunk
-    
+
     return xmlResponse(generateSitemapIndex(clinicChunks, serviceLocationChunks, cityChunks), corsHeaders);
   } catch (err) {
     const error = err as Error;

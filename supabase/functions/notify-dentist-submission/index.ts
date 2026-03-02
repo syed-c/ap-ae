@@ -26,14 +26,14 @@ async function getEmailSettings(supabase: any): Promise<EmailSettings | null> {
     .select('value')
     .eq('key', 'email')
     .single();
-  
+
   if (data?.value) {
     return data.value as EmailSettings;
   }
-  
+
   return {
-    from_email: 'no-reply@appointpanda.com',
-    from_name: 'AppointPanda'
+    from_email: 'no-reply@DubaiDentist.ae.com',
+    from_name: 'DubaiDentist.ae'
   };
 }
 
@@ -57,7 +57,7 @@ async function sendEmailViaResend(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const cleanHtml = minifyHtml(html);
-    
+
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -183,10 +183,10 @@ function generateNotificationEmailHTML(
           <tr>
             <td style="background-color: #1e293b; border-radius: 0 0 16px 16px; padding: 28px 32px; text-align: center;">
               <p style="color: #94a3b8; font-size: 13px; margin: 0 0 8px 0;">
-                This is an automated notification from AppointPanda
+                This is an automated notification from DubaiDentist.ae
               </p>
               <p style="color: #64748b; font-size: 12px; margin: 0;">
-                &copy; ${new Date().getFullYear()} AppointPanda. All rights reserved
+                &copy; ${new Date().getFullYear()} DubaiDentist.ae. All rights reserved
               </p>
             </td>
           </tr>
@@ -208,7 +208,7 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const body: NotifyRequest = await req.json();
@@ -244,7 +244,7 @@ serve(async (req) => {
 
     // Check if form submission notifications are enabled
     const notifyFormSubmission = automationSettings?.is_messaging_enabled !== false;
-    
+
     if (!notifyFormSubmission) {
       console.log('Form submission notifications disabled for clinic:', clinicId);
       return new Response(
@@ -283,7 +283,7 @@ serve(async (req) => {
     const emailSettings = await getEmailSettings(supabase);
 
     // Generate dashboard URL
-    const dashboardUrl = 'https://www.appointpanda.com/dashboard?tab=my-intake-forms';
+    const dashboardUrl = 'https://www.DubaiDentist.ae.com/dashboard?tab=my-intake-forms';
 
     // Generate and send email
     const emailHtml = generateNotificationEmailHTML(

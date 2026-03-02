@@ -42,54 +42,54 @@ function generateTitle(pageType: string, data: Record<string, any>): string {
   const name = data.name || data.title || "";
   const cityName = data.cityName || "";
   const stateAbbr = data.stateAbbr || "";
-  
+
   let title = "";
-  
+
   switch (pageType) {
     case "state":
       title = `${pickFromSeed(TITLE_MODIFIERS, slug)} Dentists in ${name}`;
       break;
-    
+
     case "city": {
       const loc = stateAbbr ? `${name}, ${stateAbbr}` : name;
       title = `Dentists in ${loc} - Book Online`;
       break;
     }
-    
+
     case "treatment":
       title = `${name} - Find Dental Providers`;
       break;
-    
+
     case "city_treatment": {
       const loc = stateAbbr ? `${cityName}, ${stateAbbr}` : cityName;
       title = `${name} in ${loc}`;
       break;
     }
-    
+
     case "clinic": {
       const loc = cityName && stateAbbr ? ` - ${cityName}, ${stateAbbr}` : "";
       title = `${name}${loc}`;
       break;
     }
-    
+
     case "dentist": {
       const spec = data.specialty ? `, ${data.specialty}` : "";
       title = `${name}${spec}${cityName ? ` in ${cityName}` : ""}`;
       break;
     }
-    
+
     case "blog":
       title = `${name} | Dental Tips`;
       break;
-    
+
     case "static":
-      title = `${name} | AppointPanda`;
+      title = `${name} | DubaiDentist.ae`;
       break;
-    
+
     default:
-      title = `${name || "Dental Care"} | AppointPanda`;
+      title = `${name || "Dental Care"} | DubaiDentist.ae`;
   }
-  
+
   return truncateTitle(title, 60);
 }
 
@@ -108,70 +108,70 @@ function generateDescription(pageType: string, data: Record<string, any>): strin
   const cityName = data.cityName || "";
   const stateAbbr = data.stateAbbr || "";
   const clinicCount = data.clinicCount || 0;
-  
+
   const opener = pickFromSeed(DESC_OPENERS, slug);
   const closer = pickFromSeed(DESC_CLOSERS, slug, 1);
-  
+
   let desc = "";
-  
+
   switch (pageType) {
     case "state":
       desc = `${opener} dentists in ${name}? Browse verified dental professionals, compare ratings and ${closer.toLowerCase()}`;
       break;
-    
+
     case "city": {
       const loc = stateAbbr ? `${name}, ${stateAbbr}` : name;
       desc = `${opener} a dentist in ${loc}? Explore dental clinics with verified reviews and ${closer.toLowerCase()}`;
       break;
     }
-    
+
     case "treatment":
       desc = `Learn about ${name.toLowerCase()} treatment. Find qualified providers, compare costs, and book online.`;
       break;
-    
+
     case "city_treatment": {
       const loc = stateAbbr ? `${cityName}, ${stateAbbr}` : cityName;
       desc = `${opener} ${name.toLowerCase()} in ${loc}? Compare providers, read reviews and ${closer.toLowerCase()}`;
       break;
     }
-    
+
     case "clinic": {
       const loc = cityName ? ` in ${cityName}` : "";
       desc = `${name}${loc} - View services, patient reviews, hours and contact info. ${closer}`;
       break;
     }
-    
+
     case "dentist":
       desc = `${name}${data.specialty ? `, ${data.specialty}` : ""} - Read patient reviews and ${closer.toLowerCase()}`;
       break;
-    
+
     case "blog":
       desc = data.excerpt || `${name} - Expert dental health advice and tips from verified professionals.`;
       break;
-    
+
     case "static": {
       const staticDescs: Record<string, string> = {
         "/": "Find and book trusted dentists near you. Compare reviews and schedule appointments online.",
         "/services": "Browse dental services from cleanings to implants. Find providers in your area.",
         "/blog": "Expert dental health tips and oral care advice from verified professionals.",
         "/insurance": "Find dentists that accept your insurance. Compare in-network providers.",
-        "/about": "AppointPanda connects patients with verified dental professionals.",
-        "/contact": "Get in touch with AppointPanda. Questions about booking or listings?",
-        "/faq": "FAQs about AppointPanda. Learn how to find dentists and book appointments.",
+        "/about": "DubaiDentist.ae connects patients with verified dental professionals.",
+        "/contact": "Get in touch with DubaiDentist.ae. Questions about booking or listings?",
+        "/faq": "FAQs about DubaiDentist.ae. Learn how to find dentists and book appointments.",
         "/how-it-works": "Book a dentist in 3 easy steps. Search, compare, and schedule online.",
-        "/pricing": "Transparent pricing for dental practices. List your clinic on AppointPanda.",
-        "/privacy": "Learn how AppointPanda protects your personal information and data.",
-        "/terms": "Terms of service for AppointPanda platform users.",
-        "/sitemap": "Browse all pages on AppointPanda. Find dentists by location or service.",
+        "/pricing": "Transparent pricing for dental practices. List your clinic on DubaiDentist.ae.",
+        "/privacy": "Learn how DubaiDentist.ae protects your personal information and data.",
+        "/terms": "Terms of service for DubaiDentist.ae platform users.",
+        "/sitemap": "Browse all pages on DubaiDentist.ae. Find dentists by location or service.",
       };
-      desc = staticDescs[slug] || `${name} - AppointPanda helps you find trusted dentists online.`;
+      desc = staticDescs[slug] || `${name} - DubaiDentist.ae helps you find trusted dentists online.`;
       break;
     }
-    
+
     default:
-      desc = `Find trusted dental care with AppointPanda. ${closer}`;
+      desc = `Find trusted dental care with DubaiDentist.ae. ${closer}`;
   }
-  
+
   return truncateDesc(desc, 155);
 }
 
@@ -181,43 +181,43 @@ function generateH1(pageType: string, data: Record<string, any>): string {
   const name = data.name || data.title || "";
   const cityName = data.cityName || "";
   const stateAbbr = data.stateAbbr || "";
-  
+
   switch (pageType) {
     case "state":
       return `Dentists in ${name}`;
-    
+
     case "city": {
       const locationPart = stateAbbr ? `${name}, ${stateAbbr}` : name;
       return `Find a Dentist in ${locationPart}`;
     }
-    
+
     case "treatment":
       return `${name} Dental Services`;
-    
+
     case "city_treatment": {
       const locationPart = stateAbbr ? `${cityName}, ${stateAbbr}` : cityName;
       return `${name} in ${locationPart}`;
     }
-    
+
     case "clinic":
       return name;
-    
+
     case "dentist":
       return data.title ? `${data.title} ${name}` : name;
-    
+
     case "blog":
       return name;
-    
+
     case "static": {
       const staticH1s: Record<string, string> = {
         "/": "Find Your Perfect Dentist",
         "/services": "Dental Services & Treatments",
         "/blog": "Dental Health Insights",
         "/insurance": "Dental Insurance Guide",
-        "/about": "About AppointPanda",
+        "/about": "About DubaiDentist.ae",
         "/contact": "Contact Us",
         "/faq": "Frequently Asked Questions",
-        "/how-it-works": "How AppointPanda Works",
+        "/how-it-works": "How DubaiDentist.ae Works",
         "/pricing": "Pricing for Practices",
         "/privacy": "Privacy Policy",
         "/terms": "Terms of Service",
@@ -225,7 +225,7 @@ function generateH1(pageType: string, data: Record<string, any>): string {
       };
       return staticH1s[slug] || name;
     }
-    
+
     default:
       return name || "Dental Care";
   }
@@ -245,15 +245,15 @@ function hashMetadata(title: string, desc: string, h1: string): string {
 // Similarity check using Jaccard index on word sets
 function calculateSimilarity(text1: string, text2: string): number {
   if (!text1 || !text2) return 0;
-  
+
   const words1 = new Set(text1.toLowerCase().split(/\s+/).filter(w => w.length > 2));
   const words2 = new Set(text2.toLowerCase().split(/\s+/).filter(w => w.length > 2));
-  
+
   if (words1.size === 0 || words2.size === 0) return 0;
-  
+
   const intersection = new Set([...words1].filter(w => words2.has(w)));
   const union = new Set([...words1, ...words2]);
-  
+
   return intersection.size / union.size;
 }
 
@@ -269,10 +269,10 @@ async function fetchAllRecords(supabase: any, table: string, select: string, fil
   const pageSize = 1000;
   let page = 0;
   let hasMore = true;
-  
+
   while (hasMore) {
     let query = supabase.from(table).select(select).range(page * pageSize, (page + 1) * pageSize - 1);
-    
+
     // Apply filters
     for (const [key, value] of Object.entries(filters)) {
       if (value === true || value === false) {
@@ -281,14 +281,14 @@ async function fetchAllRecords(supabase: any, table: string, select: string, fil
         query = query.eq(key, value);
       }
     }
-    
+
     const { data, error } = await query;
-    
+
     if (error) {
       console.error(`Error fetching ${table}:`, error);
       break;
     }
-    
+
     if (data && data.length > 0) {
       allRecords.push(...data);
       if (data.length < pageSize) {
@@ -300,7 +300,7 @@ async function fetchAllRecords(supabase: any, table: string, select: string, fil
       hasMore = false;
     }
   }
-  
+
   return allRecords;
 }
 
@@ -360,7 +360,7 @@ serve(async (req) => {
     const { data: settingsRows } = await supabaseAdmin
       .from("seo_bot_settings")
       .select("setting_key, setting_value");
-    
+
     const settings: Record<string, any> = {};
     for (const s of settingsRows ?? []) {
       settings[s.setting_key] = s.setting_value;
@@ -585,7 +585,7 @@ serve(async (req) => {
           h1: h1,
           og_title: title,
           og_description: description,
-          canonical_url: `https://www.appointpanda.com${page.slug}`,
+          canonical_url: `https://www.DubaiDentist.ae.com${page.slug}`,
           metadata_hash: metaHash,
           is_indexed: true,
           last_generated_at: now,
@@ -770,7 +770,7 @@ serve(async (req) => {
     if (action === "audit") {
       // Quick audit - just count and report issues
       const totalPages = await fetchAllRecords(supabaseAdmin, "seo_pages", "slug,meta_title,meta_description,is_indexed,is_duplicate");
-      
+
       const issues = {
         missing_title: 0,
         missing_description: 0,
@@ -786,11 +786,11 @@ serve(async (req) => {
         if (!p.meta_title) issues.missing_title++;
         else if (p.meta_title.length < 30) issues.short_title++;
         else if (p.meta_title.length > 70) issues.long_title++;
-        
+
         if (!p.meta_description) issues.missing_description++;
         else if (p.meta_description.length < 100) issues.short_description++;
         else if (p.meta_description.length > 170) issues.long_description++;
-        
+
         if (p.is_duplicate) issues.duplicates++;
         if (!p.is_indexed) issues.not_indexed++;
       }

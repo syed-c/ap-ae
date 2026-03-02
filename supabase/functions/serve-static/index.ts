@@ -11,7 +11,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const BASE_URL = "https://www.appointpanda.ae";
+const BASE_URL = "https://www.DubaiDentist.ae.ae";
 
 // IMPORTANT:
 // When we call Prerender.io, we must NOT use a bot User-Agent.
@@ -418,9 +418,9 @@ async function generateMinimalHtmlWithContent(
 
   // Build contextual title and description
   // IMPORTANT: Generate page-type-specific defaults FIRST, then override with seo_pages data
-  let title = 'AppointPanda - Find Your Perfect Dentist in UAE';
+  let title = 'DubaiDentist.ae - Find Your Perfect Dentist in UAE';
   let h1 = 'Find Top-Rated Dentists in UAE';
-  let description = 'AppointPanda helps you find and book appointments with trusted dental professionals across the UAE. Compare verified clinics in Dubai, Sharjah, Abu Dhabi with transparent AED pricing.';
+  let description = 'DubaiDentist.ae helps you find and book appointments with trusted dental professionals across the UAE. Compare verified clinics in Dubai, Sharjah, Abu Dhabi with transparent AED pricing.';
   let contentHtml = '';
   let faqHtml = '';
   let listingsHtml = '';
@@ -430,72 +430,72 @@ async function generateMinimalHtmlWithContent(
   // These apply regardless of whether seo_pages has data
   if (pageType === 'state' && stateSlug) {
     const stateName = CORE_STATES.find(s => s.slug === stateSlug)?.name || formatSlugToName(stateSlug);
-    title = `Dentists in ${stateName}, UAE | AppointPanda`;
+    title = `Dentists in ${stateName}, UAE | DubaiDentist.ae`;
     h1 = `Find Dentists in ${stateName}`;
     description = `Discover top-rated dental clinics and dentists in ${stateName}, UAE. Book appointments online with DHA-aligned dental professionals. Transparent AED pricing.`;
   } else if (pageType === 'city' && stateSlug && citySlug) {
     const stateName = CORE_STATES.find(s => s.slug === stateSlug)?.name || formatSlugToName(stateSlug);
     const cityName = formatSlugToName(citySlug);
-    title = `Dentists in ${cityName}, ${stateName} | AppointPanda`;
+    title = `Dentists in ${cityName}, ${stateName} | DubaiDentist.ae`;
     h1 = `Find Dentists in ${cityName}, ${stateName}`;
     description = `Book appointments with top-rated dentists in ${cityName}, ${stateName}, UAE. Browse verified reviews, compare AED pricing, and find the perfect dental care provider.`;
   } else if (pageType === 'service-location' && stateSlug && citySlug && serviceSlug) {
     const stateName = CORE_STATES.find(s => s.slug === stateSlug)?.name || formatSlugToName(stateSlug);
     const cityName = formatSlugToName(citySlug);
     const serviceName = formatSlugToName(serviceSlug);
-    title = `${serviceName} in ${cityName}, ${stateName} | AppointPanda`;
+    title = `${serviceName} in ${cityName}, ${stateName} | DubaiDentist.ae`;
     h1 = `${serviceName} Dentists in ${cityName}, ${stateName}`;
     description = `Find the best ${serviceName.toLowerCase()} specialists in ${cityName}, ${stateName}, UAE. Compare dentists, read reviews, check AED pricing, and book online.`;
   } else if (pageType === 'state-service' && stateSlug && serviceSlug) {
     const stateName = CORE_STATES.find(s => s.slug === stateSlug)?.name || formatSlugToName(stateSlug);
     const serviceName = CORE_SERVICES.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
-    title = `${serviceName} in ${stateName} - Best Clinics & Prices (AED) | AppointPanda`;
+    title = `${serviceName} in ${stateName} - Best Clinics & Prices (AED) | DubaiDentist.ae`;
     h1 = `${serviceName} in ${stateName}`;
     description = `Find the best ${serviceName.toLowerCase()} clinics in ${stateName}, UAE. Compare verified providers, prices in AED, and book appointments online.`;
   } else if (pageType === 'cost-guide' && serviceSlug) {
     const serviceName = CORE_SERVICES.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
-    title = `${serviceName} Cost in UAE - Prices by Emirate | AppointPanda`;
+    title = `${serviceName} Cost in UAE - Prices by Emirate | DubaiDentist.ae`;
     h1 = `${serviceName} Cost in UAE`;
     description = `How much does ${serviceName.toLowerCase()} cost in the UAE? Compare AED prices across all 7 Emirates and find the best value.`;
   } else if (pageType === 'comparison' && serviceSlug) {
     const serviceName = CORE_SERVICES.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
-    title = `${serviceName} Price Comparison | AppointPanda`;
+    title = `${serviceName} Price Comparison | DubaiDentist.ae`;
     h1 = `${serviceName} Price Comparison`;
     description = `Compare ${serviceName.toLowerCase()} prices across UAE Emirates. See side-by-side pricing in AED and find the best value.`;
   } else if (pageType === 'service' && serviceSlug) {
     const serviceName = formatSlugToName(serviceSlug);
-    title = `${serviceName} Dentists in UAE | AppointPanda`;
+    title = `${serviceName} Dentists in UAE | DubaiDentist.ae`;
     h1 = `Find ${serviceName} Specialists in UAE`;
     description = `Discover top-rated ${serviceName.toLowerCase()} dentists across the UAE. Compare providers in Dubai, Abu Dhabi, Sharjah and book appointments online.`;
   } else if (pageType === 'blog-index') {
-    title = `Dental Health Blog | Tips & Guides | AppointPanda`;
+    title = `Dental Health Blog | Tips & Guides | DubaiDentist.ae`;
     h1 = `Dental Health Blog`;
     description = `Expert dental health articles, tips, and guides. Learn about dental treatments, costs in AED, and find the best dental care advice for UAE residents.`;
   } else if (pageType === 'blog-post') {
     // Blog posts get their title from the DB below
   } else if (pageType === 'clinic' && clinicSlug) {
     const clinicName = formatSlugToName(clinicSlug);
-    title = `${clinicName} | Dental Clinic in UAE | AppointPanda`;
+    title = `${clinicName} | Dental Clinic in UAE | DubaiDentist.ae`;
     h1 = clinicName;
-    description = `View ${clinicName} profile on AppointPanda. See services, reviews, AED pricing, and book an appointment.`;
+    description = `View ${clinicName} profile on DubaiDentist.ae. See services, reviews, AED pricing, and book an appointment.`;
   } else if (pageType === 'dentist' && dentistSlug) {
     const dentistName = formatSlugToName(dentistSlug);
-    title = `${dentistName} | Dentist in UAE | AppointPanda`;
+    title = `${dentistName} | Dentist in UAE | DubaiDentist.ae`;
     h1 = dentistName;
-    description = `View ${dentistName} profile on AppointPanda. See qualifications, reviews, and book an appointment.`;
+    description = `View ${dentistName} profile on DubaiDentist.ae. See qualifications, reviews, and book an appointment.`;
   } else if (pageType === 'insurance-index') {
-    title = `Dental Insurance Providers in UAE | AppointPanda`;
+    title = `Dental Insurance Providers in UAE | DubaiDentist.ae`;
     h1 = `Dental Insurance Providers`;
     description = `Compare dental insurance providers in the UAE. Find clinics that accept your insurance plan — Daman, AXA, Cigna, MetLife and more.`;
   } else if (pageType === 'insurance-detail') {
     const insuranceName = formatSlugToName(path.replace(/^\/insurance\//, '').replace(/\/$/, ''));
-    title = `${insuranceName} Dental Coverage in UAE | AppointPanda`;
+    title = `${insuranceName} Dental Coverage in UAE | DubaiDentist.ae`;
     h1 = `${insuranceName} Dental Insurance`;
     description = `Find dental clinics in the UAE that accept ${insuranceName} insurance. Compare providers, check coverage, and book appointments.`;
   } else if (pageType === 'home') {
-    title = `Find the Best Dentists in Dubai & UAE | AppointPanda`;
+    title = `Find the Best Dentists in Dubai & UAE | DubaiDentist.ae`;
     h1 = `Find Your Perfect Dentist in the UAE`;
-    description = `AppointPanda is the UAE's leading dental directory. Find, compare, and book appointments with 6,600+ verified dental clinics across all 7 Emirates.`;
+    description = `DubaiDentist.ae is the UAE's leading dental directory. Find, compare, and book appointments with 6,600+ verified dental clinics across all 7 Emirates.`;
   }
 
   // Override with seo_pages data if available (DB content takes priority)
@@ -589,7 +589,7 @@ async function generateMinimalHtmlWithContent(
   if (pageType === 'clinic' && clinicSlug) {
     const profile = await fetchClinicProfile(supabase, clinicSlug);
     if (profile) {
-      title = `${profile.name} | Dentist in ${profile.cityName} | AppointPanda`;
+      title = `${profile.name} | Dentist in ${profile.cityName} | DubaiDentist.ae`;
       h1 = profile.name;
       description = profile.description || `${profile.name} is a dental clinic in ${profile.cityName}, ${profile.stateName}. Book your appointment online.`;
 
@@ -623,7 +623,7 @@ async function generateMinimalHtmlWithContent(
       const serviceName = CORE_SERVICES.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
       contentHtml = `<section>
         <h2>${serviceName} in ${stateName}</h2>
-        <p>Looking for ${serviceName.toLowerCase()} in ${stateName}? AppointPanda lists verified dental clinics across ${stateName} offering professional ${serviceName.toLowerCase()} services with transparent AED pricing.</p>
+        <p>Looking for ${serviceName.toLowerCase()} in ${stateName}? DubaiDentist.ae lists verified dental clinics across ${stateName} offering professional ${serviceName.toLowerCase()} services with transparent AED pricing.</p>
         <p>Compare clinics, read patient reviews, and book your ${serviceName.toLowerCase()} appointment online. All practitioners are licensed by the ${stateName} health authority.</p>
       </section>`;
     } else if (pageType === 'cost-guide' && serviceSlug) {
@@ -631,7 +631,7 @@ async function generateMinimalHtmlWithContent(
       contentHtml = `<section>
         <h2>${serviceName} Cost in UAE</h2>
         <p>${serviceName} prices in the UAE vary by emirate, clinic, and complexity. Dubai tends to have higher prices, while Sharjah and Ajman are often more affordable.</p>
-        <p>AppointPanda provides transparent AED pricing so you can compare costs across all 7 Emirates and find the best value for your ${serviceName.toLowerCase()} treatment.</p>
+        <p>DubaiDentist.ae provides transparent AED pricing so you can compare costs across all 7 Emirates and find the best value for your ${serviceName.toLowerCase()} treatment.</p>
       </section>`;
     } else if (pageType === 'comparison') {
       contentHtml = `<section>
@@ -643,7 +643,7 @@ async function generateMinimalHtmlWithContent(
       contentHtml = `<section>
         <h2>Dental Care in ${stateName}</h2>
         <p>${stateName} is home to hundreds of dental professionals offering comprehensive oral health services. From routine cleanings to advanced cosmetic procedures, you'll find qualified, DHA-aligned dentists ready to help you achieve your best smile.</p>
-        <p>AppointPanda makes it easy to compare dentists in ${stateName}, read verified patient reviews, check AED pricing, and book appointments online.</p>
+        <p>DubaiDentist.ae makes it easy to compare dentists in ${stateName}, read verified patient reviews, check AED pricing, and book appointments online.</p>
       </section>`;
     } else if (pageType === 'city' && stateSlug && citySlug) {
       const cityName = formatSlugToName(citySlug);
@@ -671,7 +671,7 @@ async function generateMinimalHtmlWithContent(
     } else if (pageType === 'home') {
       contentHtml = `<section>
         <h2>UAE's Leading Dental Directory</h2>
-        <p>AppointPanda connects patients with 6,600+ verified dental clinics across all 7 Emirates. Find DHA, DOH & MOHAP licensed professionals with transparent AED pricing.</p>
+        <p>DubaiDentist.ae connects patients with 6,600+ verified dental clinics across all 7 Emirates. Find DHA, DOH & MOHAP licensed professionals with transparent AED pricing.</p>
         <p>Search by location, treatment type, or insurance provider. Read verified patient reviews and book appointments online.</p>
       </section>`;
     } else if (pageType === 'blog-index') {
@@ -765,7 +765,7 @@ async function generateMinimalHtmlWithContent(
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'AppointPanda',
+    name: 'DubaiDentist.ae',
     url: BASE_URL,
     logo: `${BASE_URL}/logo.png`,
     description: 'Find and book appointments with top-rated dental professionals across the UAE. Compare verified clinics in Dubai, Abu Dhabi, Sharjah with transparent AED pricing.',
@@ -795,7 +795,7 @@ async function generateMinimalHtmlWithContent(
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="${BASE_URL}${path}">
   
-  <!-- AppointPanda Favicon -->
+  <!-- DubaiDentist.ae Favicon -->
   <link rel="icon" type="image/png" href="${BASE_URL}/favicon.png?v=5">
   <link rel="apple-touch-icon" href="${BASE_URL}/favicon.png?v=5">
   
@@ -804,7 +804,7 @@ async function generateMinimalHtmlWithContent(
   <meta property="og:type" content="website">
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${description}">
-  <meta property="og:site_name" content="AppointPanda">
+  <meta property="og:site_name" content="DubaiDentist.ae">
   <meta property="og:image" content="${BASE_URL}/og-image.png">
   
   <!-- JSON-LD Structured Data (synchronous, in head) -->
@@ -854,8 +854,8 @@ async function generateMinimalHtmlWithContent(
 </head>
 <body>
   <header>
-    <a href="${BASE_URL}/" aria-label="AppointPanda Home">
-      <strong>AppointPanda</strong> - Find Your Perfect Dentist in UAE
+    <a href="${BASE_URL}/" aria-label="DubaiDentist.ae Home">
+      <strong>DubaiDentist.ae</strong> - Find Your Perfect Dentist in UAE
     </a>
     <nav aria-label="Main navigation">
       <ul>
@@ -918,7 +918,7 @@ async function generateMinimalHtmlWithContent(
   </main>
   
   <footer>
-    <p>&copy; ${new Date().getFullYear()} AppointPanda. All rights reserved.</p>
+    <p>&copy; ${new Date().getFullYear()} DubaiDentist.ae. All rights reserved.</p>
     <nav aria-label="Footer navigation">
       <a href="${BASE_URL}/privacy/">Privacy Policy</a> |
       <a href="${BASE_URL}/terms/">Terms of Service</a> |
@@ -1197,7 +1197,7 @@ serve(async (req) => {
 <head>
   <meta charset="UTF-8">
   <meta name="robots" content="noindex, nofollow">
-  <title>Private Page - AppointPanda</title>
+  <title>Private Page - DubaiDentist.ae</title>
 </head>
 <body>
   <p>This is a private page.</p>
@@ -1323,11 +1323,11 @@ serve(async (req) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="index, follow">
-  <title>AppointPanda - Find Your Dentist</title>
+  <title>DubaiDentist.ae - Find Your Dentist</title>
   <link rel="canonical" href="${BASE_URL}${requestedPath}">
 </head>
 <body>
-  <h1>AppointPanda</h1>
+  <h1>DubaiDentist.ae</h1>
   <p>Find and book appointments with top-rated dentists.</p>
   <p><a href="${BASE_URL}${requestedPath}">Visit this page</a></p>
 </body>
@@ -1351,7 +1351,7 @@ serve(async (req) => {
 <head>
   <meta charset="UTF-8">
   <meta name="robots" content="noindex">
-  <title>Error - AppointPanda</title>
+  <title>Error - DubaiDentist.ae</title>
 </head>
 <body>
   <p>An error occurred. <a href="${BASE_URL}">Go to homepage</a></p>

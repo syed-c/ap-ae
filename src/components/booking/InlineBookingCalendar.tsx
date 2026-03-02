@@ -92,13 +92,13 @@ interface InlineBookingCalendarProps {
 const formatTimeRange = (hour: number): string => {
   const startHour = hour;
   const endHour = hour + 1;
-  
+
   const formatHour = (h: number) => {
     if (h < 12) return `${h}:00 AM`;
     if (h === 12) return `12:00 PM`;
     return `${h - 12}:00 PM`;
   };
-  
+
   return `${formatHour(startHour)} - ${formatHour(endHour)}`;
 };
 
@@ -116,13 +116,13 @@ const generateTimeSlots = (openTime: string | null, closeTime: string | null) =>
   const slots: { value: string; label: string }[] = [];
   const [openHour] = openTime.split(":").map(Number);
   const [closeHour] = closeTime.split(":").map(Number);
-  
+
   // Generate 1-hour slots
   for (let hour = openHour; hour < closeHour; hour++) {
     const time = `${hour.toString().padStart(2, "0")}:00`;
     slots.push({ value: time, label: formatTimeRange(hour) });
   }
-  
+
   return slots;
 };
 
@@ -170,19 +170,19 @@ export function InlineBookingCalendar({
   // Get time slots for selected date based on clinic hours
   const timeSlots = useMemo(() => {
     if (!selectedDate) return defaultTimeSlots;
-    
+
     const dayOfWeek = getDay(selectedDate); // 0 = Sunday, 1 = Monday, etc.
-    
+
     if (!clinicHours || clinicHours.length === 0) {
       return defaultTimeSlots;
     }
-    
+
     const dayHours = clinicHours.find(h => h.day_of_week === dayOfWeek);
-    
+
     if (!dayHours || dayHours.is_closed) {
       return []; // Clinic is closed on this day
     }
-    
+
     return generateTimeSlots(dayHours.open_time, dayHours.close_time);
   }, [selectedDate, clinicHours]);
 
@@ -253,7 +253,7 @@ export function InlineBookingCalendar({
     setIsSubmitting(true);
     try {
       const targetClinicId = profileType === "clinic" ? profileId : clinicId || null;
-      
+
       // Check if this is a returning patient
       let isReturningPatient = false;
       if (targetClinicId) {
@@ -263,7 +263,7 @@ export function InlineBookingCalendar({
           .eq("clinic_id", targetClinicId)
           .or(`patient_phone.eq.${data.patient_phone}${data.patient_email ? `,patient_email.eq.${data.patient_email}` : ""}`)
           .limit(1);
-        
+
         isReturningPatient = (existingAppointments?.length || 0) > 0;
       }
 
@@ -298,7 +298,7 @@ export function InlineBookingCalendar({
             type: 'new_booking',
             newStatus: 'pending'
           }
-        }).catch(() => {});
+        }).catch(() => { });
       }
 
       setIsSuccess(true);
@@ -377,7 +377,7 @@ export function InlineBookingCalendar({
 
           <p className="text-xs text-center text-muted-foreground">
             <Heart className="h-3 w-3 inline mr-1 text-destructive" />
-            Thank you for choosing AppointPanda
+            Thank you for choosing DubaiDentist.ae
           </p>
         </div>
       </div>

@@ -18,7 +18,7 @@ const corsHeaders = {
  * - status: Returns current booking link status
  */
 
-const BOOKING_BASE_URL = 'https://www.appointpanda.com';
+const BOOKING_BASE_URL = 'https://www.DubaiDentist.ae.com';
 
 interface PlaceActionLink {
   name?: string;
@@ -107,9 +107,9 @@ serve(async (req) => {
 
     if (tokenError || !oauthTokens) {
       return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'GMB not connected. Please connect your Google Business Profile first.' 
+        JSON.stringify({
+          success: false,
+          error: 'GMB not connected. Please connect your Google Business Profile first.'
         }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -117,9 +117,9 @@ serve(async (req) => {
 
     if (!oauthTokens.gmb_access_token) {
       return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'GMB access token not available. Please reconnect your Google Business Profile.' 
+        JSON.stringify({
+          success: false,
+          error: 'GMB access token not available. Please reconnect your Google Business Profile.'
         }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -146,7 +146,7 @@ serve(async (req) => {
               clinicId,
               oauthTokens.gmb_refresh_token
             );
-            
+
             if (refreshResult.success && refreshResult.accessToken) {
               const retryResult = await setBookingLink(
                 refreshResult.accessToken,
@@ -154,7 +154,7 @@ serve(async (req) => {
                 bookingUrl,
                 oauthTokens.gmb_booking_link_id
               );
-              
+
               if (retryResult.success) {
                 await supabaseAdmin
                   .from('clinic_oauth_tokens')
@@ -167,8 +167,8 @@ serve(async (req) => {
                   .eq('clinic_id', clinicId);
 
                 return new Response(
-                  JSON.stringify({ 
-                    success: true, 
+                  JSON.stringify({
+                    success: true,
                     message: 'Booking link set on Google Business Profile',
                     linkId: retryResult.linkId,
                     bookingUrl,
@@ -206,8 +206,8 @@ serve(async (req) => {
         });
 
         return new Response(
-          JSON.stringify({ 
-            success: true, 
+          JSON.stringify({
+            success: true,
             message: 'Booking link set on Google Business Profile',
             linkId: result.linkId,
             bookingUrl,
@@ -261,10 +261,10 @@ serve(async (req) => {
         });
 
         return new Response(
-          JSON.stringify({ 
-            success: true, 
-            message: result.success 
-              ? 'Booking link removed from Google Business Profile' 
+          JSON.stringify({
+            success: true,
+            message: result.success
+              ? 'Booking link removed from Google Business Profile'
               : 'Booking link disabled (could not remove from GMB)',
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -351,21 +351,21 @@ async function setBookingLink(
 
     if (!response.ok) {
       console.error('GMB Place Actions API error:', data);
-      return { 
-        success: false, 
-        error: data.error?.message || `API error: ${response.status}` 
+      return {
+        success: false,
+        error: data.error?.message || `API error: ${response.status}`
       };
     }
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       linkId: data.name // The resource name of the created/updated link
     };
   } catch (error) {
     console.error('Error setting booking link:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to set booking link' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to set booking link'
     };
   }
 }
@@ -391,18 +391,18 @@ async function removeBookingLink(
     if (!response.ok) {
       const data = await response.json();
       console.error('GMB Place Actions API delete error:', data);
-      return { 
-        success: false, 
-        error: data.error?.message || `API error: ${response.status}` 
+      return {
+        success: false,
+        error: data.error?.message || `API error: ${response.status}`
       };
     }
 
     return { success: true };
   } catch (error) {
     console.error('Error removing booking link:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to remove booking link' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to remove booking link'
     };
   }
 }
@@ -431,7 +431,7 @@ async function refreshAccessToken(
         .select('value')
         .eq('key', 'google_oauth')
         .single();
-      
+
       if (settingsData?.value && typeof settingsData.value === 'object') {
         const settings = settingsData.value as Record<string, unknown>;
         clientId = settings.client_id as string;

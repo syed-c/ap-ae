@@ -41,7 +41,7 @@ async function getEmailSettings(supabase: any): Promise<EmailSettings | null> {
 
   // Default sender should be on your verified domain.
   return {
-    from_email: 'no-reply@appointpanda.ae',
+    from_email: 'no-reply@DubaiDentist.ae.ae',
     from_name: 'Appoint Panda',
   };
 }
@@ -68,7 +68,7 @@ async function sendEmailViaResend(
     const cleanHtml = minifyHtml(html);
 
     const fromName = (settings.from_name || 'Appoint Panda').trim() || 'Appoint Panda';
-    const fromEmail = (settings.from_email || '').trim() || 'no-reply@appointpanda.ae';
+    const fromEmail = (settings.from_email || '').trim() || 'no-reply@DubaiDentist.ae.ae';
 
     const send = async () => {
       const response = await fetch('https://api.resend.com/emails', {
@@ -117,7 +117,7 @@ async function sendEmailViaResend(
       return {
         success: false,
         error:
-          'Resend is still treating this API key as test mode. This usually means the RESEND_API_KEY belongs to a different Resend account/team than the one where your domain is verified, OR the "from" address is not on the verified domain. Please confirm the API key and ensure from_email uses @appointpanda.ae.',
+          'Resend is still treating this API key as test mode. This usually means the RESEND_API_KEY belongs to a different Resend account/team than the one where your domain is verified, OR the "from" address is not on the verified domain. Please confirm the API key and ensure from_email uses @DubaiDentist.ae.ae.',
       };
     }
 
@@ -527,13 +527,13 @@ Deno.serve(async (req) => {
     const status = newStatus || appointment.status || 'pending';
     const patientName = appointment.patient_name || 'Patient';
     const treatmentName = appointment.treatment?.name || 'Dental Consultation';
-    const appointmentDate = appointment.preferred_date 
-      ? new Date(appointment.preferred_date).toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        })
+    const appointmentDate = appointment.preferred_date
+      ? new Date(appointment.preferred_date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
       : 'To be confirmed';
     const appointmentTime = appointment.preferred_time || 'To be confirmed';
 
@@ -545,7 +545,7 @@ Deno.serve(async (req) => {
       mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinicData.address)}`;
     }
 
-    const siteUrl = Deno.env.get('SITE_URL') || 'https://www.appointpanda.ae';
+    const siteUrl = Deno.env.get('SITE_URL') || 'https://www.DubaiDentist.ae.ae';
     const manageToken = appointment.manage_token || appointmentId;
 
     const subject = getSubjectLine(status, clinicBranding.name, patientName);

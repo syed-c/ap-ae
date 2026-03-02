@@ -11,13 +11,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Bot, 
-  Zap, 
-  Play, 
-  Pause, 
-  Plus, 
-  Edit, 
+import {
+  Bot,
+  Zap,
+  Play,
+  Pause,
+  Plus,
+  Edit,
   Trash2,
   Clock,
   Mail,
@@ -99,7 +99,7 @@ const JOB_PRESETS = [
     description: 'Generate weekly report on review funnel performance',
     rule_type: 'review_report',
     trigger_config: { schedule: 'weekly', day: 'monday', time: '08:00' },
-    action_config: { send_email: true, recipients: ['admin@appointpanda.ae'] },
+    action_config: { send_email: true, recipients: ['admin@DubaiDentist.ae.ae'] },
   },
   {
     name: 'Verification Expiry Reminder',
@@ -446,9 +446,9 @@ export default function AutomationTab() {
                 </div>
                 <div className="space-y-2">
                   <Label>Trigger Configuration (JSON)</Label>
-                  <Textarea 
-                    value={form.trigger_config} 
-                    onChange={(e) => setForm({ ...form, trigger_config: e.target.value })} 
+                  <Textarea
+                    value={form.trigger_config}
+                    onChange={(e) => setForm({ ...form, trigger_config: e.target.value })}
                     placeholder='{"schedule": "daily", "time": "10:00"}'
                     rows={4}
                     className="font-mono text-sm"
@@ -459,9 +459,9 @@ export default function AutomationTab() {
                 </div>
                 <div className="space-y-2">
                   <Label>Action Configuration (JSON)</Label>
-                  <Textarea 
-                    value={form.action_config} 
-                    onChange={(e) => setForm({ ...form, action_config: e.target.value })} 
+                  <Textarea
+                    value={form.action_config}
+                    onChange={(e) => setForm({ ...form, action_config: e.target.value })}
                     placeholder='{"max_per_run": 50, "template": "welcome"}'
                     rows={4}
                     className="font-mono text-sm"

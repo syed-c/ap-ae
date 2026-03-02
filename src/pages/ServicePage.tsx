@@ -25,7 +25,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { 
+import {
   Users,
   Star,
   Shield,
@@ -135,34 +135,34 @@ const ServicePage = () => {
         name={`${treatmentName} in UAE`}
         description={treatment?.description || `Professional ${treatmentName} services across the UAE`}
         url={`/services/${serviceSlug}/`}
-        provider="AppointPanda Partner Clinics"
+        provider="DubaiDentist.ae Partner Clinics"
         areaServed="United Arab Emirates"
       />
       <StructuredData type="faq" questions={faqs.map(f => ({ question: f.q, answer: f.a }))} />
-      
+
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-background via-emerald-light/30 to-background pt-6 pb-10">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div 
+          <motion.div
             className="absolute top-20 left-[10%] w-48 md:w-64 h-48 md:h-64 bg-foreground/5 rounded-full blur-3xl"
             animate={{ scale: [1, 1.1, 1], opacity: [0.05, 0.1, 0.05] }}
             transition={{ duration: 6, repeat: Infinity }}
           />
-          <motion.div 
+          <motion.div
             className="absolute bottom-10 right-[15%] w-56 md:w-80 h-56 md:h-80 bg-primary/10 rounded-full blur-3xl"
             animate={{ scale: [1, 1.15, 1], opacity: [0.1, 0.15, 0.1] }}
             transition={{ duration: 8, repeat: Infinity, delay: 2 }}
           />
           <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--foreground)/0.02)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--foreground)/0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
         </div>
-        
+
         <div className="container relative z-10 px-4">
           <div className="flex justify-center mb-4">
             <Breadcrumbs items={breadcrumbs} />
           </div>
-          
+
           <div className="max-w-3xl mx-auto text-center">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="inline-flex items-center gap-2 bg-foreground/5 backdrop-blur-sm border border-foreground/10 rounded-full px-4 py-2 mb-4"
@@ -170,8 +170,8 @@ const ServicePage = () => {
               <Stethoscope className="h-4 w-4 text-emerald" />
               <span className="text-xs md:text-sm font-bold text-foreground/80">UAE Dental Service</span>
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -179,8 +179,8 @@ const ServicePage = () => {
             >
               {treatmentName} in <span className="text-primary">UAE</span>
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -189,7 +189,7 @@ const ServicePage = () => {
               {treatment?.description || `Find the best ${treatmentName.toLowerCase()} specialists across all 7 UAE emirates. Compare prices, check insurance coverage, and book verified clinics.`}
             </motion.p>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -199,7 +199,7 @@ const ServicePage = () => {
             </motion.div>
 
             {/* Stats */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
@@ -254,7 +254,7 @@ const ServicePage = () => {
                 UAE-wide prices range from <strong className="text-primary">AED {uaeMin.toLocaleString()}</strong> to <strong className="text-primary">AED {uaeMax.toLocaleString()}</strong>
               </p>
             </div>
-            
+
             <div className="space-y-3 mb-6">
               {sortedByPrice.map((range, i) => {
                 const barWidth = uaeMax > 0 ? ((range.price_max - range.price_min) / uaeMax) * 100 : 50;
@@ -390,7 +390,7 @@ const ServicePage = () => {
               Frequently Asked <span className="text-primary">Questions</span>
             </h2>
           </div>
-          
+
           <Accordion type="single" collapsible className="space-y-3">
             {faqs.map((faq, i) => (
               <AccordionItem

@@ -162,7 +162,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
             name: `${treatmentName} in ${stateName}`,
             description: pageDescription,
             url: `/${normalizedStateSlug}/${serviceSlug}/`,
-            provider: 'AppointPanda',
+            provider: 'DubaiDentist.ae',
             areaServed: stateName,
           },
         ]}
@@ -252,7 +252,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
       <Section size="md">
         <div className="max-w-4xl mx-auto">
           <p className="text-muted-foreground leading-relaxed">
-            Looking for <strong>{treatmentName.toLowerCase()}</strong> in {stateName}? Our directory features {profiles?.length || 0}+ verified dental clinics offering {treatmentName.toLowerCase()} across {stateName}. 
+            Looking for <strong>{treatmentName.toLowerCase()}</strong> in {stateName}? Our directory features {profiles?.length || 0}+ verified dental clinics offering {treatmentName.toLowerCase()} across {stateName}.
             Compare prices, read patient reviews, and book your appointment online. Whether you're in{' '}
             {cityLinks.slice(0, 3).map((c, i) => (
               <span key={c.slug}>

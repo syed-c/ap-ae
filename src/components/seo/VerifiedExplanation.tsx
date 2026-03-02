@@ -45,7 +45,7 @@ export function VerifiedExplanation({ className = "" }: VerifiedExplanationProps
           Understanding Our Verification System
         </h2>
         <p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-          We maintain strict verification standards to ensure you can trust the dental professionals on our platform. 
+          We maintain strict verification standards to ensure you can trust the dental professionals on our platform.
           Here's what each verification level means for your safety and peace of mind.
         </p>
       </div>
@@ -70,11 +70,11 @@ export function VerifiedExplanation({ className = "" }: VerifiedExplanationProps
         </div>
         <h3 className="font-bold text-foreground mb-3">Our Verification Process</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Every verified dentist on AppointPanda undergoes a thorough vetting process including license verification, 
+          Every verified dentist on DubaiDentist.ae undergoes a thorough vetting process including license verification,
           identity confirmation, and credential checks with the relevant health authorities (DHA, DOH, MOH).
         </p>
-        <Link 
-          to="/list-your-practice" 
+        <Link
+          to="/list-your-practice"
           className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
         >
           Are you a dentist? Get verified →

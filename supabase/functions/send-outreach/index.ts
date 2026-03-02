@@ -52,14 +52,14 @@ async function getSmtpSettings(supabase: any): Promise<SMTPSettings | null> {
     .select('value')
     .eq('key', 'smtp')
     .single();
-  
+
   if (!data?.value) return null;
-  
+
   const settings = data.value as unknown as SMTPSettings;
   if (!settings.enabled || !settings.host || !settings.username || !settings.password) {
     return null;
   }
-  
+
   return settings;
 }
 
@@ -94,9 +94,9 @@ async function sendEmailViaSMTP(
     return { success: true };
   } catch (error) {
     console.error('SMTP send error:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'SMTP send failed' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'SMTP send failed'
     };
   }
 }
@@ -110,9 +110,9 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-    
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
+
     // Authentication check
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -142,7 +142,7 @@ serve(async (req) => {
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id);
-    
+
     const isAdmin = roles?.some(r => ['super_admin', 'district_manager'].includes(r.role as string));
     if (!isAdmin) {
       console.error(`Outreach: Unauthorized access attempt by user ${user.id}`);
@@ -154,15 +154,15 @@ serve(async (req) => {
 
     // Get SMTP settings
     const smtpSettings = await getSmtpSettings(supabase);
-    
+
     // Parse and validate input
     const rawBody = await req.json();
     const validationResult = OutreachSchema.safeParse(rawBody);
     if (!validationResult.success) {
       console.error('Outreach: Input validation failed', validationResult.error.issues);
       return new Response(
-        JSON.stringify({ 
-          success: false, 
+        JSON.stringify({
+          success: false,
           error: 'Invalid input',
           details: validationResult.error.issues.map(i => i.message)
         }),
@@ -183,7 +183,7 @@ serve(async (req) => {
         }
 
         const { testEmail, templateId } = params;
-        
+
         if (!testEmail) {
           return new Response(
             JSON.stringify({ success: false, error: 'Test email address is required' }),
@@ -192,7 +192,7 @@ serve(async (req) => {
         }
 
         let htmlContent = '';
-        let subject = 'Test Email from AppointPanda';
+        let subject = 'Test Email from DubaiDentist.ae';
 
         if (templateId) {
           const { data: template } = await supabase
@@ -200,7 +200,7 @@ serve(async (req) => {
             .select('*')
             .eq('id', templateId)
             .single();
-          
+
           if (template) {
             htmlContent = template.html_content;
             subject = template.subject;
@@ -239,7 +239,7 @@ serve(async (req) => {
                 </div>
                 <div style="text-align: center; margin-top: 30px;">
                   <p style="font-size: 12px; color: #9ca3af;">
-                    Sent from AppointPanda • Powered by your SMTP server
+                    Sent from DubaiDentist.ae • Powered by your SMTP server
                   </p>
                 </div>
               </div>
@@ -251,8 +251,8 @@ serve(async (req) => {
         // Replace variables with test data
         const testVariables = {
           clinic_name: 'Test Dental Clinic',
-          claim_link: 'https://appointpanda.ae/claim-profile?test=true',
-          unsubscribe_link: 'https://appointpanda.ae/unsubscribe?test=true',
+          claim_link: 'https://DubaiDentist.ae.ae/claim-profile?test=true',
+          unsubscribe_link: 'https://DubaiDentist.ae.ae/unsubscribe?test=true',
           dentist_name: 'Dr. Test User',
           patient_name: 'Test Patient',
         };
@@ -263,7 +263,7 @@ serve(async (req) => {
         }
 
         const result = await sendEmailViaSMTP(smtpSettings, testEmail, subject, htmlContent);
-        
+
         if (!result.success) {
           return new Response(
             JSON.stringify({ success: false, error: result.error }),
@@ -297,28 +297,28 @@ serve(async (req) => {
         }
 
         const { messageId } = params;
-        
+
         if (!messageId) {
           return new Response(
             JSON.stringify({ success: false, error: 'Missing messageId' }),
             { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        
+
         // Get message details
         const { data: message, error: msgError } = await supabase
           .from('outreach_messages')
           .select('*, campaign:outreach_campaigns(*, template:email_templates(*))')
           .eq('id', messageId)
           .single();
-        
+
         if (msgError || !message) {
           return new Response(
             JSON.stringify({ success: false, error: 'Message not found' }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        
+
         const template = message.campaign?.template;
         if (!template) {
           return new Response(
@@ -326,33 +326,33 @@ serve(async (req) => {
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        
+
         // Get clinic details for variable substitution
         const { data: clinic } = await supabase
           .from('clinics')
           .select('*')
           .eq('id', message.clinic_id)
           .single();
-        
+
         // Replace variables in template
         let htmlContent = template.html_content;
         let subject = message.subject;
-        
-        const siteUrl = Deno.env.get('SITE_URL') || 'https://appointpanda.ae';
+
+        const siteUrl = Deno.env.get('SITE_URL') || 'https://DubaiDentist.ae.ae';
         const variables = {
           clinic_name: clinic?.name || 'Your Clinic',
           claim_link: `${siteUrl}/claim-profile?clinic_id=${message.clinic_id}`,
           unsubscribe_link: `${siteUrl}/unsubscribe?email=${encodeURIComponent(message.recipient_email)}`,
         };
-        
+
         for (const [key, value] of Object.entries(variables)) {
           htmlContent = htmlContent.replace(new RegExp(`{{${key}}}`, 'g'), value);
           subject = subject.replace(new RegExp(`{{${key}}}`, 'g'), value);
         }
-        
+
         // Send email via SMTP
         const result = await sendEmailViaSMTP(smtpSettings, message.recipient_email, subject, htmlContent);
-        
+
         if (!result.success) {
           // Update message with error
           await supabase
@@ -362,13 +362,13 @@ serve(async (req) => {
               error_message: result.error || 'Email send failed',
             })
             .eq('id', messageId);
-          
+
           return new Response(
             JSON.stringify({ success: false, error: result.error || 'Email send failed' }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        
+
         // Update message as sent
         await supabase
           .from('outreach_messages')
@@ -377,7 +377,7 @@ serve(async (req) => {
             sent_at: new Date().toISOString(),
           })
           .eq('id', messageId);
-        
+
         // Log to automation logs
         await supabase.from('automation_logs').insert({
           status: 'success',
@@ -388,7 +388,7 @@ serve(async (req) => {
             user_id: user.id,
           },
         });
-        
+
         return new Response(
           JSON.stringify({ success: true, message_id: messageId }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -397,35 +397,35 @@ serve(async (req) => {
 
       case 'run-campaign': {
         const { campaignId, limit = 50 } = params;
-        
+
         if (!campaignId) {
           return new Response(
             JSON.stringify({ success: false, error: 'Missing campaignId' }),
             { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        
+
         // Get campaign details
         const { data: campaign, error: campaignError } = await supabase
           .from('outreach_campaigns')
           .select('*, template:email_templates(*)')
           .eq('id', campaignId)
           .single();
-        
+
         if (campaignError || !campaign) {
           return new Response(
             JSON.stringify({ success: false, error: 'Campaign not found' }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        
+
         if (!campaign.is_active) {
           return new Response(
             JSON.stringify({ success: false, error: 'Campaign is not active' }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        
+
         // Get target clinics based on filter
         const filter = campaign.target_filter || {};
         let clinicsQuery = supabase
@@ -435,9 +435,9 @@ serve(async (req) => {
           .eq('claim_status', filter.claim_status || 'unclaimed')
           .not('email', 'is', null)
           .limit(limit);
-        
+
         const { data: targetClinics } = await clinicsQuery;
-        
+
         // Filter out clinics that already received max emails
         const clinicIds = targetClinics?.map(c => c.id) || [];
         const { data: existingMessages } = await supabase
@@ -445,16 +445,16 @@ serve(async (req) => {
           .select('clinic_id')
           .eq('campaign_id', campaignId)
           .in('clinic_id', clinicIds);
-        
+
         const sentCounts = new Map<string, number>();
         existingMessages?.forEach(m => {
           sentCounts.set(m.clinic_id, (sentCounts.get(m.clinic_id) || 0) + 1);
         });
-        
-        const eligibleClinics = targetClinics?.filter(c => 
+
+        const eligibleClinics = targetClinics?.filter(c =>
           (sentCounts.get(c.id) || 0) < campaign.max_sends_per_clinic
         ) || [];
-        
+
         // Create pending messages
         const newMessages = eligibleClinics.slice(0, campaign.max_sends_per_day).map(clinic => ({
           campaign_id: campaignId,
@@ -463,11 +463,11 @@ serve(async (req) => {
           subject: campaign.template?.subject || 'Claim Your Clinic Profile',
           status: 'pending',
         }));
-        
+
         if (newMessages.length > 0) {
           await supabase.from('outreach_messages').insert(newMessages);
         }
-        
+
         // Log campaign run
         await supabase.from('automation_logs').insert({
           status: 'success',
@@ -478,10 +478,10 @@ serve(async (req) => {
             user_id: user.id,
           },
         });
-        
+
         return new Response(
-          JSON.stringify({ 
-            success: true, 
+          JSON.stringify({
+            success: true,
             queued: newMessages.length,
             eligible: eligibleClinics.length,
           }),
@@ -498,7 +498,7 @@ serve(async (req) => {
         }
 
         const { templateId, targetFilter, limit = 10 } = params;
-        
+
         if (!templateId) {
           return new Response(
             JSON.stringify({ success: false, error: 'Template ID is required' }),
@@ -512,7 +512,7 @@ serve(async (req) => {
           .select('*')
           .eq('id', templateId)
           .single();
-        
+
         if (!template) {
           return new Response(
             JSON.stringify({ success: false, error: 'Template not found' }),
@@ -543,7 +543,7 @@ serve(async (req) => {
           );
         }
 
-        const siteUrl = Deno.env.get('SITE_URL') || 'https://appointpanda.ae';
+        const siteUrl = Deno.env.get('SITE_URL') || 'https://DubaiDentist.ae.ae';
         let successCount = 0;
         let failCount = 0;
         const errors: string[] = [];
@@ -564,7 +564,7 @@ serve(async (req) => {
           }
 
           const result = await sendEmailViaSMTP(smtpSettings, clinic.email, subject, htmlContent);
-          
+
           if (result.success) {
             successCount++;
           } else {
@@ -590,8 +590,8 @@ serve(async (req) => {
         });
 
         return new Response(
-          JSON.stringify({ 
-            success: true, 
+          JSON.stringify({
+            success: true,
             total: clinics.length,
             sent: successCount,
             failed: failCount,
@@ -603,19 +603,19 @@ serve(async (req) => {
 
       case 'get-stats': {
         const { campaignId } = params;
-        
+
         if (!campaignId) {
           return new Response(
             JSON.stringify({ success: false, error: 'Missing campaignId' }),
             { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        
+
         const { data: stats } = await supabase
           .from('outreach_messages')
           .select('status')
           .eq('campaign_id', campaignId);
-        
+
         const counts = {
           pending: 0,
           sent: 0,
@@ -624,13 +624,13 @@ serve(async (req) => {
           failed: 0,
           bounced: 0,
         };
-        
+
         stats?.forEach(s => {
           if (counts[s.status as keyof typeof counts] !== undefined) {
             counts[s.status as keyof typeof counts]++;
           }
         });
-        
+
         return new Response(
           JSON.stringify({ success: true, stats: counts }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

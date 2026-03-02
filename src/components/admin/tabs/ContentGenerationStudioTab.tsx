@@ -18,10 +18,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { ACTIVE_STATE_SLUGS, isPageInActiveState } from '@/lib/constants/activeStates';
-import { 
-  FileEdit, 
-  Sparkles, 
-  CheckCircle, 
+import {
+  FileEdit,
+  Sparkles,
+  CheckCircle,
   Clock,
   Play,
   Search,
@@ -170,11 +170,11 @@ const PAGE_TYPE_ICONS: Record<string, any> = {
 export default function ContentGenerationStudioTab() {
   const queryClient = useQueryClient();
   const [activeView, setActiveView] = useState<'selection' | 'generation' | 'history'>('selection');
-  
+
   // Selection state
   const [selectedPages, setSelectedPages] = useState<string[]>([]);
   const [selectionMode, setSelectionMode] = useState<'single' | 'bulk'>('bulk');
-  
+
   // Filter state
   const [pageTypeFilter, setPageTypeFilter] = useState<string>('__all__');
   const [stateFilters, setStateFilters] = useState<string[]>([]);
@@ -184,7 +184,7 @@ export default function ContentGenerationStudioTab() {
   const [wordCountRange, setWordCountRange] = useState<[number, number]>([0, 5000]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  
+
   // Generation config - STRICT SEPARATION: No FAQ generation (handled by FAQ Studio)
   const [config, setConfig] = useState<GenerationConfig>({
     wordCount: 700,
@@ -200,18 +200,18 @@ export default function ContentGenerationStudioTab() {
     rewriteOnlyThinSections: false,
     generateH1: true,
   });
-  
+
   // Job state
   const [currentJob, setCurrentJob] = useState<GenerationJob | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const stopFlagRef = useRef(false);
   const logsScrollRef = useRef<HTMLDivElement>(null);
-  
+
   // Preview state
   const [previewPage, setPreviewPage] = useState<SeoPage | null>(null);
   const [previewContent, setPreviewContent] = useState<any>(null);
   const [showPreview, setShowPreview] = useState(false);
-  
+
   // Edit state
   const [editingPage, setEditingPage] = useState<SeoPage | null>(null);
   const [editActiveTab, setEditActiveTab] = useState('seo');
@@ -346,11 +346,11 @@ export default function ContentGenerationStudioTab() {
   // Filter pages based on all criteria
   const filteredPages = useMemo(() => {
     if (!seoPages) return [];
-    
+
     return seoPages.filter(page => {
       // Page type filter
       if (pageTypeFilter !== '__all__' && page.page_type !== pageTypeFilter) return false;
-      
+
       // State filter (check slug pattern) - supports multi-select
       if (stateFilters.length > 0) {
         const selectedStates = states?.filter(s => stateFilters.includes(s.id)) || [];
@@ -361,7 +361,7 @@ export default function ContentGenerationStudioTab() {
         });
         if (!matchesAnyState) return false;
       }
-      
+
       // Service filter (check slug pattern)
       if (serviceFilter !== '__all__') {
         const treatment = treatments?.find(t => t.id === serviceFilter);
@@ -369,7 +369,7 @@ export default function ContentGenerationStudioTab() {
           return false;
         }
       }
-      
+
       // Content status filter
       if (contentStatusFilter === 'has_content' && (!page.content || (page.word_count || 0) < 100)) return false;
       if (contentStatusFilter === 'no_content' && page.content && (page.word_count || 0) >= 50) return false;
@@ -378,21 +378,21 @@ export default function ContentGenerationStudioTab() {
       if (contentStatusFilter === 'not_optimized' && page.is_optimized) return false;
       if (contentStatusFilter === 'has_meta' && (!page.meta_title || !page.meta_description)) return false;
       if (contentStatusFilter === 'no_meta' && page.meta_title && page.meta_description) return false;
-      
+
       // Word count range
       const wc = page.word_count || 0;
       if (wc < wordCountRange[0] || wc > wordCountRange[1]) return false;
-      
+
       // Search query
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        if (!page.slug.toLowerCase().includes(q) && 
-            !(page.title || '').toLowerCase().includes(q) &&
-            !(page.h1 || '').toLowerCase().includes(q)) {
+        if (!page.slug.toLowerCase().includes(q) &&
+          !(page.title || '').toLowerCase().includes(q) &&
+          !(page.h1 || '').toLowerCase().includes(q)) {
           return false;
         }
       }
-      
+
       return true;
     });
   }, [seoPages, pageTypeFilter, stateFilters, serviceFilter, contentStatusFilter, wordCountRange, searchQuery, states, treatments]);
@@ -409,8 +409,8 @@ export default function ContentGenerationStudioTab() {
 
   // Toggle page selection
   const togglePageSelection = (pageId: string) => {
-    setSelectedPages(prev => 
-      prev.includes(pageId) 
+    setSelectedPages(prev =>
+      prev.includes(pageId)
         ? prev.filter(id => id !== pageId)
         : [...prev, pageId]
     );
@@ -440,7 +440,7 @@ export default function ContentGenerationStudioTab() {
     setIsGenerating(true);
     stopFlagRef.current = false;
     setActiveView('generation');
-    
+
     const jobId = `job_${Date.now()}`;
     setCurrentJob({
       id: jobId,
@@ -454,7 +454,7 @@ export default function ContentGenerationStudioTab() {
     });
 
     addLog({ page: '', action: 'started', message: `Starting content generation for ${selectedPages.length} pages...` });
-    
+
     let success = 0;
     let errors = 0;
 
@@ -500,18 +500,18 @@ export default function ContentGenerationStudioTab() {
         if (error) throw error;
 
         success++;
-        addLog({ 
-          page: pageName, 
-          action: 'completed', 
+        addLog({
+          page: pageName,
+          action: 'completed',
           message: `Content generated successfully! Word count: ${data?.word_count || 'N/A'}`,
           details: data,
         });
 
       } catch (err) {
         errors++;
-        addLog({ 
-          page: pageName, 
-          action: 'error', 
+        addLog({
+          page: pageName,
+          action: 'error',
           message: `Failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
         });
       }
@@ -531,9 +531,9 @@ export default function ContentGenerationStudioTab() {
 
     if (!stopFlagRef.current) {
       setCurrentJob(prev => prev ? { ...prev, status: 'completed' } : null);
-      addLog({ 
-        page: '', 
-        action: 'completed', 
+      addLog({
+        page: '',
+        action: 'completed',
         message: `Generation complete! Success: ${success}, Errors: ${errors}`,
       });
     }
@@ -548,7 +548,7 @@ export default function ContentGenerationStudioTab() {
   const previewGeneration = async (page: SeoPage) => {
     setPreviewPage(page);
     setShowPreview(true);
-    
+
     try {
       const { data, error } = await supabase.functions.invoke('content-generation-studio', {
         body: {
@@ -571,7 +571,7 @@ export default function ContentGenerationStudioTab() {
   // Apply content from preview
   const applyPreviewContent = async () => {
     if (!previewPage || !previewContent) return;
-    
+
     try {
       const { error } = await supabase.functions.invoke('content-generation-studio', {
         body: {
@@ -596,7 +596,7 @@ export default function ContentGenerationStudioTab() {
   // Rollback to previous version
   const rollbackVersion = async (versionId: string) => {
     if (!previewPage) return;
-    
+
     try {
       const { error } = await supabase.functions.invoke('content-generation-studio', {
         body: {
@@ -620,22 +620,22 @@ export default function ContentGenerationStudioTab() {
     // Fetch full page data from DB to get all fields
     const { data: fullPage } = await supabase.from('seo_pages').select('*').eq('id', page.id).single();
     const p = fullPage || page;
-    
+
     // Parse the content markdown to extract real intro and sections
     // This is the SAME parsing the live pages use, so the editor shows exactly what's on the site
     const rawContent = (p as any).content || '';
     const parsed = rawContent ? parseMarkdownContent(rawContent) : { intro: '', sections: [] };
-    
+
     // Use dedicated page_intro if available, otherwise use parsed intro from content
     const introText = (p as any).page_intro || parsed.intro || '';
-    
+
     // Use dedicated h2_sections if available, otherwise convert parsed sections
-    const h2Sections = (p as any).h2_sections 
-      ? (p as any).h2_sections 
-      : parsed.sections.length > 0 
+    const h2Sections = (p as any).h2_sections
+      ? (p as any).h2_sections
+      : parsed.sections.length > 0
         ? parsed.sections.map((s: any) => ({ title: s.heading, content: s.content?.trim() || '' }))
         : [];
-    
+
     setEditingPage(page);
     setEditActiveTab('seo');
     setEditContent({
@@ -657,7 +657,7 @@ export default function ContentGenerationStudioTab() {
   // Save manual edits - direct DB update for full control
   const saveManualEdits = async () => {
     if (!editingPage) return;
-    
+
     try {
       // Parse JSON fields
       let parsedH2: any = null;
@@ -668,12 +668,12 @@ export default function ContentGenerationStudioTab() {
       // CRITICAL: Reconstruct the `content` markdown from edited parts
       // This is what the live pages actually read via parseMarkdownContent()
       let reconstructedContent = '';
-      
+
       // Add intro paragraph
       if (editContent.page_intro) {
         reconstructedContent += editContent.page_intro.trim() + '\n\n';
       }
-      
+
       // Add H2 sections from the JSON editor
       if (parsedH2 && Array.isArray(parsedH2) && parsedH2.length > 0) {
         for (const section of parsedH2) {
@@ -688,9 +688,9 @@ export default function ContentGenerationStudioTab() {
 
       // If user also edited the raw content directly, use that instead
       // (check if it differs from what we'd reconstruct)
-      const useRawContent = editContent.content.trim().length > 0 && 
+      const useRawContent = editContent.content.trim().length > 0 &&
         editContent.content.trim() !== reconstructedContent.trim();
-      
+
       const finalContent = useRawContent ? editContent.content : reconstructedContent.trim();
       const wordCount = finalContent ? finalContent.split(/\s+/).filter(Boolean).length : 0;
 
@@ -898,13 +898,13 @@ export default function ContentGenerationStudioTab() {
                   <Label>Emirates (Multi-Select)</Label>
                   <div className="border rounded-md p-2 space-y-1 max-h-48 overflow-y-auto">
                     <div className="flex items-center justify-between pb-1 mb-1 border-b">
-                      <button 
+                      <button
                         className="text-xs text-primary hover:underline"
                         onClick={() => setStateFilters(states?.map(s => s.id) || [])}
                       >
                         Select All
                       </button>
-                      <button 
+                      <button
                         className="text-xs text-muted-foreground hover:underline"
                         onClick={() => setStateFilters([])}
                       >
@@ -984,8 +984,8 @@ export default function ContentGenerationStudioTab() {
                       <Label>Search (URL, Title, H1)</Label>
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input 
-                          placeholder="Search pages..." 
+                        <Input
+                          placeholder="Search pages..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           className="pl-10"
@@ -1042,8 +1042,8 @@ export default function ContentGenerationStudioTab() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label>Content Length</Label>
-                  <Select 
-                    value={config.wordCount.toString()} 
+                  <Select
+                    value={config.wordCount.toString()}
                     onValueChange={(v) => setConfig(prev => ({ ...prev, wordCount: parseInt(v) }))}
                   >
                     <SelectTrigger>
@@ -1066,36 +1066,36 @@ export default function ContentGenerationStudioTab() {
                   <span>Content Studio generates <strong>body content only</strong>. Use <strong>FAQ Studio</strong> for FAQs and <strong>Meta Optimizer</strong> for meta tags.</span>
                 </p>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {/* H1 Generation Toggle (NEW) */}
                 <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="h1" 
+                  <Switch
+                    id="h1"
                     checked={config.generateH1}
                     onCheckedChange={(v) => setConfig(prev => ({ ...prev, generateH1: v }))}
                   />
                   <Label htmlFor="h1">Generate H1</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="rewrite" 
+                  <Switch
+                    id="rewrite"
                     checked={config.rewriteEntire}
                     onCheckedChange={(v) => setConfig(prev => ({ ...prev, rewriteEntire: v }))}
                   />
                   <Label htmlFor="rewrite">Rewrite Entire Page</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="intro" 
+                  <Switch
+                    id="intro"
                     checked={config.generateIntro}
                     onCheckedChange={(v) => setConfig(prev => ({ ...prev, generateIntro: v }))}
                   />
                   <Label htmlFor="intro">Generate Intro</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="sections" 
+                  <Switch
+                    id="sections"
                     checked={config.generateSections}
                     onCheckedChange={(v) => setConfig(prev => ({ ...prev, generateSections: v }))}
                   />
@@ -1103,8 +1103,8 @@ export default function ContentGenerationStudioTab() {
                 </div>
                 {/* FAQ toggle REMOVED - FAQ Studio is responsible for FAQs */}
                 <div className="flex items-center space-x-2 opacity-50 cursor-not-allowed">
-                  <Switch 
-                    id="faqs-disabled" 
+                  <Switch
+                    id="faqs-disabled"
                     checked={false}
                     disabled={true}
                   />
@@ -1113,36 +1113,36 @@ export default function ContentGenerationStudioTab() {
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="links" 
+                  <Switch
+                    id="links"
                     checked={config.generateInternalLinks}
                     onCheckedChange={(v) => setConfig(prev => ({ ...prev, generateInternalLinks: v }))}
                   />
                   <Label htmlFor="links">Internal Links Intro</Label>
                 </div>
               </div>
-              
+
               {/* Protection Controls (NEW) */}
               <div className="grid grid-cols-2 gap-3 mt-4 p-3 bg-muted/30 rounded-lg border border-dashed">
                 <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="no-overwrite" 
+                  <Switch
+                    id="no-overwrite"
                     checked={config.doNotOverwriteExisting}
                     onCheckedChange={(v) => setConfig(prev => ({ ...prev, doNotOverwriteExisting: v }))}
                   />
                   <Label htmlFor="no-overwrite" className="text-sm">Don't Overwrite Existing</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="thin-only" 
+                  <Switch
+                    id="thin-only"
                     checked={config.rewriteOnlyThinSections}
                     onCheckedChange={(v) => setConfig(prev => ({ ...prev, rewriteOnlyThinSections: v }))}
                   />
                   <Label htmlFor="thin-only" className="text-sm">Rewrite Thin Sections Only</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="expand" 
+                  <Switch
+                    id="expand"
                     checked={config.expandExisting}
                     onCheckedChange={(v) => setConfig(prev => ({ ...prev, expandExisting: v }))}
                   />
@@ -1152,15 +1152,15 @@ export default function ContentGenerationStudioTab() {
 
               <div className="flex items-center justify-between border-t pt-4">
                 <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="draft" 
+                  <Switch
+                    id="draft"
                     checked={config.saveAsDraft}
                     onCheckedChange={(v) => setConfig(prev => ({ ...prev, saveAsDraft: v }))}
                   />
                   <Label htmlFor="draft">Save as Draft (Don't Apply Live)</Label>
                 </div>
-                <Button 
-                  onClick={startGeneration} 
+                <Button
+                  onClick={startGeneration}
                   disabled={selectedPages.length === 0 || isGenerating}
                   size="lg"
                 >
@@ -1228,7 +1228,7 @@ export default function ContentGenerationStudioTab() {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-10">
-                        <Checkbox 
+                        <Checkbox
                           checked={filteredPages.length > 0 && filteredPages.every(p => selectedPages.includes(p.id))}
                           onCheckedChange={(checked) => {
                             if (checked) selectAllFiltered();
@@ -1262,11 +1262,11 @@ export default function ContentGenerationStudioTab() {
                       const Icon = PAGE_TYPE_ICONS[page.page_type] || FileText;
                       const hasContent = page.content && (page.word_count || 0) >= 100;
                       const hasMeta = page.meta_title && page.meta_description;
-                      
+
                       return (
                         <TableRow key={page.id}>
                           <TableCell>
-                            <Checkbox 
+                            <Checkbox
                               checked={selectedPages.includes(page.id)}
                               onCheckedChange={() => togglePageSelection(page.id)}
                             />
@@ -1317,16 +1317,16 @@ export default function ContentGenerationStudioTab() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-1">
-                              <Button 
-                                variant="ghost" 
+                              <Button
+                                variant="ghost"
                                 size="icon"
                                 onClick={() => previewGeneration(page)}
                                 title="Preview & Generate"
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              <Button 
-                                variant="ghost" 
+                              <Button
+                                variant="ghost"
                                 size="icon"
                                 onClick={() => openEditDialog(page)}
                                 title="Manual Edit"
@@ -1414,14 +1414,13 @@ export default function ContentGenerationStudioTab() {
                   <ScrollArea className="h-[300px]" ref={logsScrollRef}>
                     <div className="p-2 space-y-1">
                       {currentJob.logs.map((log, i) => (
-                        <div 
-                          key={i} 
-                          className={`text-xs font-mono p-1.5 rounded ${
-                            log.action === 'completed' ? 'bg-green-500/10 text-green-700' :
-                            log.action === 'error' ? 'bg-red-500/10 text-red-700' :
-                            log.action === 'skipped' ? 'bg-amber-500/10 text-amber-700' :
-                            'bg-muted'
-                          }`}
+                        <div
+                          key={i}
+                          className={`text-xs font-mono p-1.5 rounded ${log.action === 'completed' ? 'bg-green-500/10 text-green-700' :
+                              log.action === 'error' ? 'bg-red-500/10 text-red-700' :
+                                log.action === 'skipped' ? 'bg-amber-500/10 text-amber-700' :
+                                  'bg-muted'
+                            }`}
                         >
                           <span className="opacity-60">[{format(log.timestamp, 'HH:mm:ss')}]</span>{' '}
                           {log.page && <span className="font-semibold">{log.page}</span>}{' '}
@@ -1505,8 +1504,8 @@ export default function ContentGenerationStudioTab() {
                           </TableCell>
                           <TableCell>
                             {!version.is_current && (
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
                                 onClick={() => rollbackVersion(version.id)}
                               >
@@ -1539,7 +1538,7 @@ export default function ContentGenerationStudioTab() {
               Preview generated content before applying to: {previewPage?.slug}
             </DialogDescription>
           </DialogHeader>
-          
+
           {previewContent ? (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -1647,7 +1646,7 @@ export default function ContentGenerationStudioTab() {
             <TabsContent value="seo" className="space-y-4">
               <div className="space-y-2">
                 <Label>Meta Title (max 60 chars)</Label>
-                <Input 
+                <Input
                   value={editContent.meta_title}
                   onChange={(e) => setEditContent(prev => ({ ...prev, meta_title: e.target.value }))}
                 />
@@ -1661,7 +1660,7 @@ export default function ContentGenerationStudioTab() {
 
               <div className="space-y-2">
                 <Label>Meta Description (max 155 chars)</Label>
-                <Textarea 
+                <Textarea
                   value={editContent.meta_description}
                   onChange={(e) => setEditContent(prev => ({ ...prev, meta_description: e.target.value }))}
                   rows={3}
@@ -1677,7 +1676,7 @@ export default function ContentGenerationStudioTab() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>OG Title (Social Share)</Label>
-                  <Input 
+                  <Input
                     value={editContent.og_title}
                     onChange={(e) => setEditContent(prev => ({ ...prev, og_title: e.target.value }))}
                     placeholder="Defaults to meta title if empty"
@@ -1685,7 +1684,7 @@ export default function ContentGenerationStudioTab() {
                 </div>
                 <div className="space-y-2">
                   <Label>OG Description</Label>
-                  <Input 
+                  <Input
                     value={editContent.og_description}
                     onChange={(e) => setEditContent(prev => ({ ...prev, og_description: e.target.value }))}
                     placeholder="Defaults to meta description if empty"
@@ -1695,7 +1694,7 @@ export default function ContentGenerationStudioTab() {
 
               <div className="space-y-2">
                 <Label>Canonical URL</Label>
-                <Input 
+                <Input
                   value={editContent.canonical_url}
                   onChange={(e) => setEditContent(prev => ({ ...prev, canonical_url: e.target.value }))}
                   placeholder="Leave empty for default (self-referencing)"
@@ -1710,7 +1709,7 @@ export default function ContentGenerationStudioTab() {
                     {editContent.meta_title || editContent.h1 || 'Page Title'}
                   </p>
                   <p className="text-green-700 text-sm truncate">
-                    appointpanda.ae/{editingPage?.slug}
+                    DubaiDentist.ae.ae/{editingPage?.slug}
                   </p>
                   <p className="text-sm text-muted-foreground line-clamp-2">
                     {editContent.meta_description || 'No meta description set...'}
@@ -1723,7 +1722,7 @@ export default function ContentGenerationStudioTab() {
             <TabsContent value="hero" className="space-y-4">
               <div className="space-y-2">
                 <Label>H1 Heading (Main Title)</Label>
-                <Input 
+                <Input
                   value={editContent.h1}
                   onChange={(e) => setEditContent(prev => ({ ...prev, h1: e.target.value }))}
                   placeholder="Main visible heading on the page"
@@ -1733,7 +1732,7 @@ export default function ContentGenerationStudioTab() {
 
               <div className="space-y-2">
                 <Label>Page Introduction / Intro Paragraph</Label>
-                <Textarea 
+                <Textarea
                   value={editContent.page_intro}
                   onChange={(e) => setEditContent(prev => ({ ...prev, page_intro: e.target.value }))}
                   placeholder="Introduction text shown after the hero section. Supports Markdown..."
@@ -1747,7 +1746,7 @@ export default function ContentGenerationStudioTab() {
 
               <div className="space-y-2">
                 <Label>Internal Links Intro</Label>
-                <Textarea 
+                <Textarea
                   value={editContent.internal_links_intro}
                   onChange={(e) => setEditContent(prev => ({ ...prev, internal_links_intro: e.target.value }))}
                   placeholder="Introductory text for the internal links section..."
@@ -1762,7 +1761,7 @@ export default function ContentGenerationStudioTab() {
               <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
                 <p className="text-xs text-primary flex items-center gap-2">
                   <AlertCircle className="h-3 w-3" />
-                  <strong>How it works:</strong> The raw markdown below is what appears on the live site. 
+                  <strong>How it works:</strong> The raw markdown below is what appears on the live site.
                   Editing "Page Intro" or "H2 Sections" in other tabs will update this field when you save.
                   If you edit this raw content directly, it takes priority.
                 </p>
@@ -1770,7 +1769,7 @@ export default function ContentGenerationStudioTab() {
 
               <div className="space-y-2">
                 <Label>Raw Content (Markdown) — <span className="text-muted-foreground font-normal">This is what the live page renders</span></Label>
-                <Textarea 
+                <Textarea
                   value={editContent.content}
                   onChange={(e) => setEditContent(prev => ({ ...prev, content: e.target.value }))}
                   placeholder="Main page content. Supports Markdown formatting..."
@@ -1785,7 +1784,7 @@ export default function ContentGenerationStudioTab() {
 
               <div className="space-y-2">
                 <Label>H2 Sections (JSON) — <span className="text-muted-foreground font-normal">Auto-extracted from content above</span></Label>
-                <Textarea 
+                <Textarea
                   value={editContent.h2_sections}
                   onChange={(e) => setEditContent(prev => ({ ...prev, h2_sections: e.target.value }))}
                   placeholder='[{"title": "Section Title", "content": "Section content..."}]'
@@ -1802,7 +1801,7 @@ export default function ContentGenerationStudioTab() {
             <TabsContent value="faqs" className="space-y-4">
               <div className="space-y-2">
                 <Label>FAQ Content (JSON Array)</Label>
-                <Textarea 
+                <Textarea
                   value={editContent.faqs}
                   onChange={(e) => setEditContent(prev => ({ ...prev, faqs: e.target.value }))}
                   placeholder='[{"question": "What is...?", "answer": "It is..."}]'
@@ -1813,7 +1812,7 @@ export default function ContentGenerationStudioTab() {
                   JSON array of FAQ objects. Each must have "question" and "answer" string properties.
                 </p>
               </div>
-              
+
               {/* FAQ Preview */}
               {(() => {
                 try {
@@ -1855,7 +1854,7 @@ export default function ContentGenerationStudioTab() {
                   <Label className="text-sm font-medium">Indexed by Search Engines</Label>
                   <p className="text-xs text-muted-foreground mt-1">When enabled, search engines will index this page</p>
                 </div>
-                <Switch 
+                <Switch
                   checked={editContent.is_indexed}
                   onCheckedChange={(v) => setEditContent(prev => ({ ...prev, is_indexed: v }))}
                 />

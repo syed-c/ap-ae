@@ -14,7 +14,7 @@ const EditorialPolicyPage = () => {
     <PageLayout>
       <SEOHead
         title="Editorial Policy - How We Create & Review Content"
-        description="Learn about AppointPanda's editorial standards, fact-checking process, and commitment to accurate, evidence-based dental health information for UAE patients."
+        description="Learn about DubaiDentist.ae's editorial standards, fact-checking process, and commitment to accurate, evidence-based dental health information for UAE patients."
         canonical="/editorial-policy/"
       />
 
@@ -39,7 +39,7 @@ const EditorialPolicyPage = () => {
           <PolicySection
             icon={Shield}
             title="Our Commitment to Accuracy"
-            content="All content published on AppointPanda is created, reviewed, and maintained to the highest editorial standards. Our goal is to provide UAE residents with accurate, evidence-based dental health information that helps them make informed decisions about their oral care."
+            content="All content published on DubaiDentist.ae is created, reviewed, and maintained to the highest editorial standards. Our goal is to provide UAE residents with accurate, evidence-based dental health information that helps them make informed decisions about their oral care."
           />
           <PolicySection
             icon={FileCheck}
@@ -54,7 +54,7 @@ const EditorialPolicyPage = () => {
           <PolicySection
             icon={AlertTriangle}
             title="Corrections & Updates"
-            content="We take accuracy seriously. If you identify an error or outdated information, please contact us at editorial@appointpanda.ae. Corrections are made promptly and transparently. Significant corrections are noted at the top of the affected content."
+            content="We take accuracy seriously. If you identify an error or outdated information, please contact us at editorial@DubaiDentist.ae.ae. Corrections are made promptly and transparently. Significant corrections are noted at the top of the affected content."
           />
           <PolicySection
             icon={RefreshCw}
@@ -65,7 +65,7 @@ const EditorialPolicyPage = () => {
           <div className="bg-muted/50 rounded-2xl p-6 border border-border">
             <h3 className="font-bold text-foreground mb-2">Disclaimer</h3>
             <p className="text-sm text-muted-foreground">
-              Content on AppointPanda is for informational purposes only and does not constitute medical advice. Always consult a qualified dental professional for diagnosis and treatment. Pricing information displayed is estimated and subject to change — final costs require an in-person consultation.
+              Content on DubaiDentist.ae is for informational purposes only and does not constitute medical advice. Always consult a qualified dental professional for diagnosis and treatment. Pricing information displayed is estimated and subject to change — final costs require an in-person consultation.
             </p>
           </div>
         </div>

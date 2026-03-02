@@ -536,7 +536,7 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
-        title="Find Dentists & Clinics in UAE | AppointPanda"
+        title="Find Dentists & Clinics in UAE | DubaiDentist.ae"
         description="Search and compare dentists and dental clinics across all 7 Emirates. Filter by location, treatment, insurance, rating and more."
         canonical="/search/"
         keywords={["find dentist UAE", "dental clinic Dubai", "dentist near me", "dental search"]}

@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ACTIVE_STATE_SLUGS, isPageInActiveState } from '@/lib/constants/activeStates';
-import { 
+import {
   Search, Filter, CheckCircle, XCircle, AlertTriangle, Eye, ExternalLink,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight
 } from 'lucide-react';
@@ -82,14 +82,14 @@ export function SeoPagePicker({ selectedPages, onSelectionChange, onInspectPage 
       const pageSize = 1000;
       const all: SeoPage[] = [];
       let from = 0;
-      
+
       while (true) {
         const { data, error } = await supabase
           .from('seo_pages')
           .select('*')
           .order('slug', { ascending: true })
           .range(from, from + pageSize - 1);
-        
+
         if (error) throw error;
         const batch = (data || []) as unknown as SeoPage[];
         // Filter to only pages in active states
@@ -98,7 +98,7 @@ export function SeoPagePicker({ selectedPages, onSelectionChange, onInspectPage 
         if (batch.length < pageSize) break;
         from += pageSize;
       }
-      
+
       return all;
     },
   });
@@ -118,23 +118,23 @@ export function SeoPagePicker({ selectedPages, onSelectionChange, onInspectPage 
   // Filter pages
   const filteredPages = useMemo(() => {
     if (!allPages) return [];
-    
+
     return allPages.filter(page => {
       // Search filter
       if (searchQuery && !page.slug.toLowerCase().includes(searchQuery.toLowerCase()) &&
-          !(page.title || '').toLowerCase().includes(searchQuery.toLowerCase())) {
+        !(page.title || '').toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
       }
-      
+
       // Page type filter
       if (pageType !== 'all' && page.page_type !== pageType) return false;
-      
+
       // State filter
       if (stateFilter && !page.slug.includes(`/${stateFilter}/`)) return false;
-      
+
       // City filter  
       if (cityFilter && !page.slug.includes(`/${cityFilter}`)) return false;
-      
+
       // Status filters
       switch (statusFilter) {
         case 'missing_meta':
@@ -162,7 +162,7 @@ export function SeoPagePicker({ selectedPages, onSelectionChange, onInspectPage 
           if (!page.is_optimized) return false;
           break;
       }
-      
+
       return true;
     });
   }, [allPages, searchQuery, pageType, statusFilter, stateFilter, cityFilter]);
@@ -368,7 +368,7 @@ export function SeoPagePicker({ selectedPages, onSelectionChange, onInspectPage 
                             <Eye className="h-3 w-3" />
                           </Button>
                         )}
-                        <a href={`https://www.appointpanda.ae${page.slug}`} target="_blank" rel="noopener noreferrer">
+                        <a href={`https://www.DubaiDentist.ae.ae${page.slug}`} target="_blank" rel="noopener noreferrer">
                           <Button variant="ghost" size="icon" className="h-6 w-6">
                             <ExternalLink className="h-3 w-3" />
                           </Button>

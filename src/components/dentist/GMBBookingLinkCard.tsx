@@ -8,11 +8,11 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  ExternalLink, 
-  Link2, 
-  CheckCircle, 
-  AlertCircle, 
+import {
+  ExternalLink,
+  Link2,
+  CheckCircle,
+  AlertCircle,
   RefreshCw,
   Calendar,
   Info
@@ -26,10 +26,10 @@ interface GMBBookingLinkCardProps {
   isGmbConnected: boolean;
 }
 
-export default function GMBBookingLinkCard({ 
-  clinicId, 
+export default function GMBBookingLinkCard({
+  clinicId,
   clinicSlug,
-  isGmbConnected 
+  isGmbConnected
 }: GMBBookingLinkCardProps) {
   const queryClient = useQueryClient();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -93,7 +93,7 @@ export default function GMBBookingLinkCard({
     }
   };
 
-  const bookingUrl = `https://www.appointpanda.ae/book/${clinicId}`;
+  const bookingUrl = `https://www.DubaiDentist.ae.ae/book/${clinicId}`;
 
   if (!isGmbConnected) {
     return (

@@ -408,8 +408,8 @@ export default function ReviewRequestPage() {
                         >
                           <Star
                             className={`h-10 w-10 transition-all duration-200 ${star <= (hoveredRating || rating)
-                                ? 'text-gold fill-gold'
-                                : 'text-muted hover:text-gold/50'
+                              ? 'text-gold fill-gold'
+                              : 'text-muted hover:text-gold/50'
                               }`}
                           />
                         </button>
@@ -485,7 +485,7 @@ export default function ReviewRequestPage() {
           {/* Footer */}
           <div className="text-center mt-6">
             <p className="text-xs text-muted-foreground">
-              Request ID: {request.short_code || request.id.slice(0, 8)} • Powered by <span className="font-semibold text-primary">AppointPanda</span>
+              Request ID: {request.short_code || request.id.slice(0, 8)} • Powered by <span className="font-semibold text-primary">DubaiDentist.ae</span>
             </p>
           </div>
         </div>

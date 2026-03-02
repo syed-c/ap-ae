@@ -13,13 +13,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Download, 
-  Printer, 
-  Smartphone, 
-  Star, 
-  Palette, 
-  Type, 
+import {
+  Download,
+  Printer,
+  Smartphone,
+  Star,
+  Palette,
+  Type,
   Image as ImageIcon,
   Upload,
   Settings2,
@@ -59,17 +59,17 @@ interface QRSettings {
   showBranding: boolean;
 }
 
-const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(function QRCodeGenerator({ 
-  clinicName, 
-  clinicSlug, 
+const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(function QRCodeGenerator({
+  clinicName,
+  clinicSlug,
   clinicId,
-  googlePlaceId, 
-  clinicLogo 
+  googlePlaceId,
+  clinicLogo
 }, ref) {
   const cardRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
-  
+
   // Default settings
   const defaultSettings: QRSettings = {
     selectedStyle: 'modern',
@@ -89,7 +89,7 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  
+
   const reviewLink = `${window.location.origin}/review/${clinicSlug}`;
   const currentStyle = CARD_STYLES.find(s => s.id === settings.selectedStyle) || CARD_STYLES[0];
 
@@ -98,15 +98,15 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
     queryKey: ['qr-settings', clinicId],
     queryFn: async () => {
       if (!clinicId) return null;
-      
+
       const { data, error } = await supabase
         .from('clinic_oauth_tokens')
         .select('gmb_data')
         .eq('clinic_id', clinicId)
         .single();
-      
+
       if (error && error.code !== 'PGRST116') throw error;
-      
+
       if (data?.gmb_data && typeof data.gmb_data === 'object') {
         const gmbData = data.gmb_data as { qr_settings?: QRSettings };
         return gmbData.qr_settings || null;
@@ -138,7 +138,7 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
   const saveSettingsMutation = useMutation({
     mutationFn: async (newSettings: QRSettings) => {
       if (!clinicId) throw new Error('No clinic ID provided');
-      
+
       // Get existing gmb_data
       const { data: existing } = await supabase
         .from('clinic_oauth_tokens')
@@ -148,7 +148,7 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
 
       const existingData = (existing?.gmb_data as Record<string, unknown>) || {};
       const updatedGmbData = { ...existingData, qr_settings: newSettings } as any;
-      
+
       // Update with new QR settings - use update if exists, insert if not
       if (existing) {
         const { error } = await supabase
@@ -198,9 +198,9 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
       toast.error('Unable to capture QR code');
       return;
     }
-    
+
     setIsDownloading(true);
-    
+
     try {
       const canvas = await html2canvas(cardRef.current, {
         scale: 2,
@@ -209,12 +209,12 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
         backgroundColor: '#ffffff',
         logging: false,
       });
-      
+
       const link = document.createElement('a');
       link.download = `${clinicSlug}-review-qr-${settings.selectedStyle}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
-      
+
       toast.success('QR code downloaded successfully!');
     } catch (error) {
       console.error('Download error:', error);
@@ -338,7 +338,7 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
             <h2>${settings.customCTA}</h2>
             <p>${settings.customFooter}</p>
           </div>
-          ${settings.showBranding ? '<div class="footer">Powered by AppointPanda</div>' : ''}
+          ${settings.showBranding ? '<div class="footer">Powered by DubaiDentist.ae</div>' : ''}
         </div>
         <script>
           window.onload = function() { setTimeout(function() { window.print(); window.close(); }, 500); }
@@ -373,9 +373,8 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                   <button
                     key={style.id}
                     onClick={() => updateSettings({ selectedStyle: style.id })}
-                    className={`h-8 w-8 rounded-full bg-gradient-to-br ${style.gradient} transition-all ${
-                      settings.selectedStyle === style.id ? 'ring-2 ring-offset-2 ring-offset-background ring-primary scale-110' : 'opacity-70 hover:opacity-100 hover:scale-105'
-                    }`}
+                    className={`h-8 w-8 rounded-full bg-gradient-to-br ${style.gradient} transition-all ${settings.selectedStyle === style.id ? 'ring-2 ring-offset-2 ring-offset-background ring-primary scale-110' : 'opacity-70 hover:opacity-100 hover:scale-105'
+                      }`}
                     title={style.name}
                   />
                 ))}
@@ -388,9 +387,9 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                   <div className={`bg-gradient-to-r ${currentStyle.gradient} p-6 text-center text-white relative`}>
                     {settings.showLogo && settings.customLogo && (
                       <div className="mb-3">
-                        <img 
-                          src={settings.customLogo} 
-                          alt="Logo" 
+                        <img
+                          src={settings.customLogo}
+                          alt="Logo"
                           className="h-14 w-14 rounded-full object-cover mx-auto border-2 border-white/30"
                         />
                       </div>
@@ -399,7 +398,7 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                     <p className="text-sm opacity-90 mb-2">{settings.customSubtitle}</p>
                     {settings.showStars && (
                       <div className="flex justify-center gap-1">
-                        {[1,2,3,4,5].map(i => (
+                        {[1, 2, 3, 4, 5].map(i => (
                           <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                         ))}
                       </div>
@@ -436,7 +435,7 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                   {/* Footer */}
                   {settings.showBranding && (
                     <div className="border-t border-slate-100 py-3 text-center bg-slate-50">
-                      <span className="text-xs text-slate-400">Powered by <span className="font-semibold text-primary">AppointPanda</span></span>
+                      <span className="text-xs text-slate-400">Powered by <span className="font-semibold text-primary">DubaiDentist.ae</span></span>
                     </div>
                   )}
                 </Card>
@@ -486,9 +485,9 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                           <ImageIcon className="h-5 w-5 text-muted-foreground" />
                         </div>
                       )}
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className="gap-2"
                         onClick={() => fileInputRef.current?.click()}
                       >
@@ -526,8 +525,8 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground">Business Name</Label>
-                    <Input 
-                      value={settings.customTitle} 
+                    <Input
+                      value={settings.customTitle}
                       onChange={(e) => updateSettings({ customTitle: e.target.value })}
                       placeholder="Your Business Name"
                       className="text-sm"
@@ -535,8 +534,8 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground">Subtitle</Label>
-                    <Input 
-                      value={settings.customSubtitle} 
+                    <Input
+                      value={settings.customSubtitle}
                       onChange={(e) => updateSettings({ customSubtitle: e.target.value })}
                       placeholder="Share your experience with us!"
                       className="text-sm"
@@ -544,8 +543,8 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground">Call to Action</Label>
-                    <Input 
-                      value={settings.customCTA} 
+                    <Input
+                      value={settings.customCTA}
                       onChange={(e) => updateSettings({ customCTA: e.target.value })}
                       placeholder="How did we do?"
                       className="text-sm"
@@ -553,8 +552,8 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground">Footer Text</Label>
-                    <Textarea 
-                      value={settings.customFooter} 
+                    <Textarea
+                      value={settings.customFooter}
                       onChange={(e) => updateSettings({ customFooter: e.target.value })}
                       placeholder="Your feedback helps us improve."
                       className="text-sm resize-none"
@@ -578,11 +577,10 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                       <button
                         key={style.id}
                         onClick={() => updateSettings({ selectedStyle: style.id })}
-                        className={`p-3 rounded-xl border-2 transition-all ${
-                          settings.selectedStyle === style.id 
-                            ? 'border-primary ring-2 ring-primary/20' 
+                        className={`p-3 rounded-xl border-2 transition-all ${settings.selectedStyle === style.id
+                            ? 'border-primary ring-2 ring-primary/20'
                             : 'border-border hover:border-muted-foreground'
-                        }`}
+                          }`}
                       >
                         <div className={`h-8 rounded-lg bg-gradient-to-r ${style.gradient} mb-2`} />
                         <span className="text-xs font-medium">{style.name}</span>
@@ -594,7 +592,7 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
 
               {/* Save Button */}
               {clinicId && (
-                <Button 
+                <Button
                   onClick={handleSaveSettings}
                   disabled={isSaving || !hasUnsavedChanges}
                   className="w-full gap-2"

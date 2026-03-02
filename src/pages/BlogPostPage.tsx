@@ -13,7 +13,7 @@ import { getContentBody, calculateReadingTime } from "@/lib/blogContent";
 import { usePrerenderReady } from "@/hooks/usePrerenderReady";
 import { BlogDentistList } from "@/components/blog/BlogDentistList";
 import { BlogFAQList } from "@/components/blog/BlogFAQList";
-import { 
+import {
   Calendar, User, Clock, ArrowLeft, Share2, Facebook, Twitter, Linkedin,
   MapPin, Search, Phone, Star, Shield, ArrowRight
 } from "lucide-react";
@@ -152,8 +152,8 @@ const BlogPostPage = () => {
   const contentBlocks = extractBlocksFromContent(post.content);
   const contentStringForReading = contentBlocks
     ? contentBlocks
-        .map((b) => [b.headingText, b.content, b.imageAlt].filter(Boolean).join(" "))
-        .join("\n")
+      .map((b) => [b.headingText, b.content, b.imageAlt].filter(Boolean).join(" "))
+      .join("\n")
     : getContentBody(post.content);
   const readingTime = calculateReadingTime(contentStringForReading);
 
@@ -191,7 +191,7 @@ const BlogPostPage = () => {
         try {
           const data = JSON.parse(dentistMatch[1]);
           elements.push(
-            <BlogDentistList 
+            <BlogDentistList
               key={`dentist-${elementKey++}`}
               clinicIds={data.clinicIds || []}
               locationLabel={data.locationLabel}
@@ -210,7 +210,7 @@ const BlogPostPage = () => {
         try {
           const data = JSON.parse(faqMatch[1]);
           elements.push(
-            <BlogFAQList 
+            <BlogFAQList
               key={`faq-${elementKey++}`}
               faqs={data.faqs || []}
             />
@@ -259,9 +259,9 @@ const BlogPostPage = () => {
           if (imgMatch) {
             return (
               <figure key={i} className="my-6">
-                <img 
-                  src={imgMatch[2]} 
-                  alt={imgMatch[1]} 
+                <img
+                  src={imgMatch[2]}
+                  alt={imgMatch[1]}
                   className="w-full rounded-xl"
                   loading="lazy"
                 />
@@ -302,17 +302,17 @@ const BlogPostPage = () => {
         const isExternal = linkUrl.startsWith('http');
         parts.push(
           isExternal ? (
-            <a 
+            <a
               key={`link-${match.index}`}
-              href={linkUrl} 
-              target="_blank" 
+              href={linkUrl}
+              target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline"
             >
               {match[2]}
             </a>
           ) : (
-            <Link 
+            <Link
               key={`link-${match.index}`}
               to={linkUrl}
               className="text-primary hover:underline"
@@ -407,13 +407,13 @@ const BlogPostPage = () => {
     // If content contains HTML tags (and no special markers), render as HTML directly
     if (isHtmlContent(content)) {
       return (
-        <div 
+        <div
           className="blog-content"
-          dangerouslySetInnerHTML={{ __html: content }} 
+          dangerouslySetInnerHTML={{ __html: content }}
         />
       );
     }
-    
+
     // Parse content with special block markers
     return parseSpecialBlocks(content);
   };
@@ -422,11 +422,11 @@ const BlogPostPage = () => {
     <PageLayout>
       <SEOHead
         title={post.seo_title || post.title}
-        description={post.seo_description || post.excerpt || `Read "${post.title}" on AppointPanda's dental health blog.`}
+        description={post.seo_description || post.excerpt || `Read "${post.title}" on DubaiDentist.ae's dental health blog.`}
         canonical={`/blog/${post.slug}/`}
         ogType="article"
         ogImage={post.featured_image_url || undefined}
-        author={post.author_name || 'AppointPanda Team'}
+        author={post.author_name || 'DubaiDentist.ae Team'}
         publishedAt={post.published_at || undefined}
         modifiedAt={post.updated_at || undefined}
         keywords={post.tags || ['dental health', 'oral care']}
@@ -439,7 +439,7 @@ const BlogPostPage = () => {
         url={`/blog/${post.slug}/`}
         datePublished={post.published_at || ''}
         dateModified={post.updated_at || post.published_at || ''}
-        author={post.author_name || 'AppointPanda Team'}
+        author={post.author_name || 'DubaiDentist.ae Team'}
       />
       <StructuredData
         type="breadcrumb"
@@ -482,7 +482,7 @@ const BlogPostPage = () => {
                     <User className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="font-bold">{post.author_name || "AppointPanda Team"}</p>
+                    <p className="font-bold">{post.author_name || "DubaiDentist.ae Team"}</p>
                     <p className="text-sm text-muted-foreground">Dental Health Expert</p>
                   </div>
                 </div>
@@ -554,25 +554,25 @@ const BlogPostPage = () => {
                   Share this article:
                 </span>
                 <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
+                  <Button
+                    variant="outline"
+                    size="icon"
                     className="rounded-full h-10 w-10 hover:bg-blue-500/10 hover:border-blue-500/50"
                     onClick={() => window.open(`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank')}
                   >
                     <Facebook className="h-4 w-4" />
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
+                  <Button
+                    variant="outline"
+                    size="icon"
                     className="rounded-full h-10 w-10 hover:bg-sky-500/10 hover:border-sky-500/50"
                     onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(post.title)}`, '_blank')}
                   >
                     <Twitter className="h-4 w-4" />
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
+                  <Button
+                    variant="outline"
+                    size="icon"
                     className="rounded-full h-10 w-10 hover:bg-blue-700/10 hover:border-blue-700/50"
                     onClick={() => window.open(`https://linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(post.title)}`, '_blank')}
                   >
@@ -650,7 +650,7 @@ const BlogPostPage = () => {
             <div className="card-modern p-6 bg-muted/30">
               <div className="flex items-center gap-2 mb-4">
                 <Shield className="h-5 w-5 text-emerald-500" />
-                <h3 className="font-bold">Why AppointPanda?</h3>
+                <h3 className="font-bold">Why DubaiDentist.ae?</h3>
               </div>
               <ul className="space-y-3 text-sm">
                 <li className="flex items-start gap-2">

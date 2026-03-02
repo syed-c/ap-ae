@@ -11,19 +11,19 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 interface PageGenerationRequest {
-  action: 
-    | "generate_state_content"
-    | "generate_city_content"
-    | "validate_seo"
-    | "publish_page"
-    | "rollback_page"
-    | "get_queue"
-    | "approve_page"
-    | "reject_page"
-    | "get_settings"
-    | "update_settings"
-    | "get_stats"
-    | "enqueue_page";
+  action:
+  | "generate_state_content"
+  | "generate_city_content"
+  | "validate_seo"
+  | "publish_page"
+  | "rollback_page"
+  | "get_queue"
+  | "approve_page"
+  | "reject_page"
+  | "get_settings"
+  | "update_settings"
+  | "get_stats"
+  | "enqueue_page";
   entityId?: string;
   entityType?: "state" | "city";
   queueId?: string;
@@ -103,7 +103,7 @@ ${existingContent.slice(0, 1500)}`;
 Generate JSON with EXACTLY this structure:
 {
   "h1": "Find Dentists in ${state.name}",
-  "meta_title": "Dentists in ${state.name} | Find Local Dental Care | AppointPanda",
+  "meta_title": "Dentists in ${state.name} | Find Local Dental Care | DubaiDentist.ae",
   "meta_description": "Looking for a dentist in ${state.name}? Browse verified dental professionals, read patient reviews, and book appointments online.",
   "intro": "Two paragraphs introducing dental care options in ${state.name}. Be specific about the state's healthcare landscape without making false claims.",
   "service_overview": "A paragraph about general dental services available in the state.",
@@ -173,8 +173,8 @@ REQUIREMENTS:
     }
 
     // Check meta description length
-    if (content.meta_description?.length < SEO_RULES.metaDescription.min || 
-        content.meta_description?.length > SEO_RULES.metaDescription.max) {
+    if (content.meta_description?.length < SEO_RULES.metaDescription.min ||
+      content.meta_description?.length > SEO_RULES.metaDescription.max) {
       confidenceScore -= 0.1;
       issues.push("Meta description length out of range");
     }
@@ -259,7 +259,7 @@ ${existingContent.slice(0, 2000)}`;
 Generate JSON with EXACTLY this structure:
 {
   "h1": "Dentists in ${city.name}, ${city.state?.abbreviation}",
-  "meta_title": "Dentists in ${city.name}, ${city.state?.abbreviation} | AppointPanda",
+  "meta_title": "Dentists in ${city.name}, ${city.state?.abbreviation} | DubaiDentist.ae",
   "meta_description": "Find dentists in ${city.name}, ${city.state?.abbreviation}. Browse verified dental professionals, read reviews, and book appointments.",
   "intro": "Two paragraphs about dental care in ${city.name}. Make it specific to this city - mention what makes dental care here accessible or unique. DO NOT copy from other cities.",
   "service_overview": "A paragraph about dental services available in ${city.name}.",
@@ -329,8 +329,8 @@ REQUIREMENTS:
       issues.push("Title length out of range");
     }
 
-    if (content.meta_description?.length < SEO_RULES.metaDescription.min || 
-        content.meta_description?.length > SEO_RULES.metaDescription.max) {
+    if (content.meta_description?.length < SEO_RULES.metaDescription.min ||
+      content.meta_description?.length > SEO_RULES.metaDescription.max) {
       confidenceScore -= 0.1;
       issues.push("Meta description length out of range");
     }
@@ -360,9 +360,9 @@ REQUIREMENTS:
       content: {
         ...content,
         validationIssues: issues,
-        wordCount: (content.intro?.split(/\s+/).length || 0) + 
-                   (content.service_overview?.split(/\s+/).length || 0) +
-                   (content.local_info?.split(/\s+/).length || 0),
+        wordCount: (content.intro?.split(/\s+/).length || 0) +
+          (content.service_overview?.split(/\s+/).length || 0) +
+          (content.local_info?.split(/\s+/).length || 0),
       },
       confidenceScore: Math.max(0, confidenceScore),
     };
@@ -375,15 +375,15 @@ REQUIREMENTS:
 // Simple similarity calculation (Jaccard similarity on word sets)
 function calculateSimilarity(text1: string, text2: string): number {
   if (!text1 || !text2) return 0;
-  
+
   const words1 = new Set(text1.toLowerCase().split(/\s+/).filter(w => w.length > 3));
   const words2 = new Set(text2.toLowerCase().split(/\s+/).filter(w => w.length > 3));
-  
+
   if (words1.size === 0 || words2.size === 0) return 0;
-  
+
   const intersection = new Set([...words1].filter(x => words2.has(x)));
   const union = new Set([...words1, ...words2]);
-  
+
   return intersection.size / union.size;
 }
 
@@ -459,8 +459,8 @@ async function enqueuePageGeneration(
     return { success: false, error: `${entityType} not found` };
   }
 
-  const slug = entityType === "state" 
-    ? entity.slug 
+  const slug = entityType === "state"
+    ? entity.slug
     : `${entity.state?.slug}/${entity.slug}`;
 
   // Check if already in queue
@@ -526,8 +526,8 @@ async function publishPage(
   }
 
   const content = queue.content_generated;
-  const slug = queue.page_type === "state" 
-    ? queue.entity_slug 
+  const slug = queue.page_type === "state"
+    ? queue.entity_slug
     : queue.entity_slug;
 
   // Create or update SEO page
@@ -650,11 +650,11 @@ async function rollbackPage(
 
   // Restore old content
   const oldContent = JSON.parse(version.old_value || "{}");
-  
+
   if (!version.old_value) {
     // If rolling back to before page existed, delete the page
     await supabase.from("seo_pages").delete().eq("id", seoPageId);
-    
+
     // Update entity status
     const table = version.page_type === "state" ? "states" : "cities";
     await supabase

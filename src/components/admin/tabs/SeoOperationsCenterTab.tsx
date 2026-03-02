@@ -11,7 +11,7 @@ export default function SeoOperationsCenterTab() {
   const [activeTab, setActiveTab] = useState('operations');
 
   const handleInspectPage = (page: SeoPage) => {
-    window.open(`https://www.appointpanda.ae${page.slug}`, '_blank');
+    window.open(`https://www.DubaiDentist.ae.ae${page.slug}`, '_blank');
   };
 
   return (
@@ -72,7 +72,7 @@ export default function SeoOperationsCenterTab() {
             <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <h3 className="font-medium mb-2">Indexing Diagnostics</h3>
             <p className="text-sm">
-              Select pages in the Operations tab to run indexing diagnostics - 
+              Select pages in the Operations tab to run indexing diagnostics -
               checks for canonical issues, sitemap presence, internal links, and rendered HTML content.
             </p>
           </div>

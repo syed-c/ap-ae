@@ -214,7 +214,7 @@ const FAQS = [
   },
   {
     question: 'Do I need new software?',
-    answer: 'No. AppointPanda works alongside your existing systems. We provide a dashboard for reputation and leads — we don\'t replace your PMS, scheduling, or billing software.'
+    answer: 'No. DubaiDentist.ae works alongside your existing systems. We provide a dashboard for reputation and leads — we don\'t replace your PMS, scheduling, or billing software.'
   },
   {
     question: 'Who owns the website content?',
@@ -298,12 +298,12 @@ export default function PricingPage() {
   return (
     <>
       <SEOHead
-        title="Pricing | Dental Growth Platform | AppointPanda"
+        title="Pricing | Dental Growth Platform | DubaiDentist.ae"
         description="Monthly dental practice growth plans. Verified listings, reputation management, lead tracking, SEO. No contracts, cancel anytime."
       />
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
-        
+
         <main className="flex-1">
           {/* Hero Section - Pain-focused */}
           <section className="py-16 md:py-24 bg-gradient-to-b from-primary/5 to-background">
@@ -319,10 +319,10 @@ export default function PricingPage() {
                 <span className="text-primary">Unverified Competitors</span>
               </h1>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-                Your patients are searching online. They choose dentists with verified badges, 
+                Your patients are searching online. They choose dentists with verified badges,
                 strong reviews, and professional profiles. Don't let an unclaimed listing cost you cases.
               </p>
-              
+
               {/* Trust indicators */}
               <div className="flex flex-wrap justify-center gap-6 mb-8 text-sm text-muted-foreground">
                 <span className="flex items-center gap-2">
@@ -337,10 +337,10 @@ export default function PricingPage() {
                   <Check className="h-4 w-4 text-teal" />
                   No patient guarantees
                 </span>
-                 <span className="flex items-center gap-2">
-                   <Check className="h-4 w-4 text-teal" />
-                   DHA Compliant
-                 </span>
+                <span className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-teal" />
+                  DHA Compliant
+                </span>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -374,7 +374,7 @@ export default function PricingPage() {
 
               <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
                 {PLANS.map((plan) => (
-                  <Card 
+                  <Card
                     key={plan.id}
                     className={`relative rounded-2xl transition-all hover:shadow-xl ${getPlanColors(plan)}`}
                   >
@@ -386,7 +386,7 @@ export default function PricingPage() {
                         </Badge>
                       </div>
                     )}
-                    
+
                     <CardHeader className="pb-4 pt-8">
                       <div className="flex items-center gap-2 mb-2">
                         {plan.color === 'gold' ? (
@@ -399,7 +399,7 @@ export default function PricingPage() {
                         <CardTitle className="text-2xl">{plan.name}</CardTitle>
                       </div>
                       <CardDescription className="text-sm">{plan.tagline}</CardDescription>
-                      
+
                       <div className="mt-6">
                         {/* 50% OFF Pricing Display */}
                         <div className="flex items-baseline gap-2">
@@ -415,7 +415,7 @@ export default function PricingPage() {
                         </p>
                       </div>
                     </CardHeader>
-                    
+
                     <CardContent className="space-y-4">
                       <ul className="space-y-3">
                         {plan.features.slice(0, 8).map((feature, idx) => (
@@ -431,8 +431,8 @@ export default function PricingPage() {
                           </li>
                         ))}
                       </ul>
-                      
-                      <Button 
+
+                      <Button
                         className={`w-full mt-6 ${plan.popular ? 'bg-primary hover:bg-primary/90' : ''}`}
                         variant={plan.popular ? 'default' : 'outline'}
                         size="lg"
@@ -476,9 +476,9 @@ export default function PricingPage() {
                   <Card key={plan.id} className="border-0 shadow-sm">
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
-                        {plan.color === 'gold' ? <Crown className="h-5 w-5 text-gold" /> : 
-                         plan.popular ? <Zap className="h-5 w-5 text-primary" /> : 
-                         <Shield className="h-5 w-5" />}
+                        {plan.color === 'gold' ? <Crown className="h-5 w-5 text-gold" /> :
+                          plan.popular ? <Zap className="h-5 w-5 text-primary" /> :
+                            <Shield className="h-5 w-5" />}
                         {plan.name}
                       </CardTitle>
                     </CardHeader>
@@ -632,8 +632,8 @@ export default function PricingPage() {
                   Actual results depend on your profile quality, response time, reviews, and local market conditions.
                 </p>
                 <p>
-                 <strong>Data Protection:</strong> AppointPanda tracks contact intent only and follows UAE data protection standards.
-                   All patient treatment data remains in your practice management system.
+                  <strong>Data Protection:</strong> DubaiDentist.ae tracks contact intent only and follows UAE data protection standards.
+                  All patient treatment data remains in your practice management system.
                 </p>
                 <p>
                   <strong>Google Business Profile:</strong> We assist and optimize — we do not impersonate or auto-post on your behalf.
@@ -650,11 +650,11 @@ export default function PricingPage() {
                 Ready to Take Control of Your Online Presence?
               </h2>
               <p className="text-primary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
-                Join dental practices across Dubai, Abu Dhabi, and Sharjah who trust AppointPanda for verified visibility and reputation growth.
+                Join dental practices across Dubai, Abu Dhabi, and Sharjah who trust DubaiDentist.ae for verified visibility and reputation growth.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   variant="secondary"
                   className="gap-2"
                   onClick={() => navigate('/list-your-practice')}
@@ -662,8 +662,8 @@ export default function PricingPage() {
                   Get Verified Now
                   <BadgeCheck className="h-4 w-4" />
                 </Button>
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   variant="outline"
                   className="bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
                   onClick={() => navigate('/contact')}

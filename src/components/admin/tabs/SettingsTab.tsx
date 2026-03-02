@@ -10,12 +10,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Settings, 
-  Mail, 
-  Globe, 
-  Key, 
-  CreditCard, 
+import {
+  Settings,
+  Mail,
+  Globe,
+  Key,
+  CreditCard,
   Save,
   Eye,
   EyeOff,
@@ -89,7 +89,7 @@ export default function SettingsTab() {
   const saveSetting = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: Record<string, unknown> }) => {
       const existing = settings?.find(s => s.key === key);
-      
+
       if (existing) {
         const { error } = await (supabase
           .from('global_settings' as any) as any)
@@ -102,7 +102,7 @@ export default function SettingsTab() {
           .insert([{ key, value }]);
         if (error) throw error;
       }
-      
+
       await createAuditLog({
         action: 'UPDATE',
         entityType: 'global_settings',
@@ -130,7 +130,7 @@ export default function SettingsTab() {
     const value = getSettingValue(key);
     const fieldValue = (value[field] as string) || '';
     const isVisible = showSecrets[`${key}.${field}`];
-    
+
     return (
       <div className="space-y-2">
         <Label>{label}</Label>
@@ -208,7 +208,7 @@ export default function SettingsTab() {
                 <Input
                   value={(getSettingValue('platform')?.site_url as string) || ''}
                   onChange={(e) => updateFormValue('platform', 'site_url', e.target.value)}
-                  placeholder="https://appointpanda.ae"
+                  placeholder="https://DubaiDentist.ae.ae"
                 />
               </div>
               <div className="space-y-2">
@@ -216,7 +216,7 @@ export default function SettingsTab() {
                 <Input
                   value={(getSettingValue('platform')?.support_email as string) || ''}
                   onChange={(e) => updateFormValue('platform', 'support_email', e.target.value)}
-                  placeholder="support@appointpanda.ae"
+                  placeholder="support@DubaiDentist.ae.ae"
                 />
               </div>
               <div className="space-y-2">
@@ -303,9 +303,9 @@ export default function SettingsTab() {
                   </p>
                   {(getSettingValue('branding')?.logo_url as string) && (
                     <div className="p-4 border border-border rounded-xl bg-muted/30 relative group">
-                      <img 
-                        src={getSettingValue('branding')?.logo_url as string} 
-                        alt="Site Logo Preview" 
+                      <img
+                        src={getSettingValue('branding')?.logo_url as string}
+                        alt="Site Logo Preview"
                         className="max-h-12 object-contain"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                       />
@@ -380,9 +380,9 @@ export default function SettingsTab() {
                   </p>
                   {(getSettingValue('branding')?.favicon_url as string) && (
                     <div className="p-4 border border-border rounded-xl bg-muted/30 flex items-center gap-3 relative group">
-                      <img 
-                        src={getSettingValue('branding')?.favicon_url as string} 
-                        alt="Favicon Preview" 
+                      <img
+                        src={getSettingValue('branding')?.favicon_url as string}
+                        alt="Favicon Preview"
                         className="w-8 h-8 object-contain"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                       />
@@ -459,9 +459,9 @@ export default function SettingsTab() {
                 </p>
                 {(getSettingValue('branding')?.logo_dark_url as string) && (
                   <div className="p-4 border border-border rounded-xl bg-slate-800 relative group">
-                    <img 
-                      src={getSettingValue('branding')?.logo_dark_url as string} 
-                      alt="Dark Mode Logo Preview" 
+                    <img
+                      src={getSettingValue('branding')?.logo_dark_url as string}
+                      alt="Dark Mode Logo Preview"
                       className="max-h-12 object-contain"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
@@ -499,9 +499,9 @@ export default function SettingsTab() {
                 <Input
                   value={(getSettingValue('legal')?.copyright_text as string) || ''}
                   onChange={(e) => updateFormValue('legal', 'copyright_text', e.target.value)}
-                  placeholder="© 2026 AppointPanda. All rights reserved by Quick Commerce LLC."
+                  placeholder="© 2026 DubaiDentist.ae. All rights reserved by Quick Commerce LLC."
                 />
-                <p className="text-xs text-muted-foreground">Displays in the footer bottom bar (e.g., "© 2026 AppointPanda...")</p>
+                <p className="text-xs text-muted-foreground">Displays in the footer bottom bar (e.g., "© 2026 DubaiDentist.ae...")</p>
               </div>
               <div className="space-y-2">
                 <Label>Footer Legal Text</Label>
@@ -814,7 +814,7 @@ export default function SettingsTab() {
                   <Input
                     value={(getSettingValue('smtp')?.from_email as string) || ''}
                     onChange={(e) => updateFormValue('smtp', 'from_email', e.target.value)}
-                    placeholder="noreply@appointpanda.ae"
+                    placeholder="noreply@DubaiDentist.ae.ae"
                   />
                 </div>
               </div>
@@ -858,7 +858,7 @@ export default function SettingsTab() {
             <CardContent className="space-y-4">
               {renderSecretInput('google_oauth', 'client_id', 'Client ID', 'xxx.apps.googleusercontent.com')}
               {renderSecretInput('google_oauth', 'client_secret', 'Client Secret', '••••••••')}
-              
+
               {/* Callback URL - Editable */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
@@ -869,10 +869,10 @@ export default function SettingsTab() {
                   <Input
                     value={(getSettingValue('google_oauth')?.callback_url as string) || `${window.location.origin}/auth/callback`}
                     onChange={(e) => updateFormValue('google_oauth', 'callback_url', e.target.value)}
-                    placeholder="https://www.appointpanda.ae/auth/callback"
+                    placeholder="https://www.DubaiDentist.ae.ae/auth/callback"
                   />
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="icon"
                     onClick={() => {
                       const url = (getSettingValue('google_oauth')?.callback_url as string) || `${window.location.origin}/auth/callback`;
@@ -884,10 +884,10 @@ export default function SettingsTab() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Set your production callback URL (e.g., <strong>https://www.appointpanda.ae/auth/callback</strong>). Add this URL as an authorized redirect URI in your{' '}
-                  <a 
-                    href="https://console.cloud.google.com/apis/credentials" 
-                    target="_blank" 
+                  Set your production callback URL (e.g., <strong>https://www.DubaiDentist.ae.ae/auth/callback</strong>). Add this URL as an authorized redirect URI in your{' '}
+                  <a
+                    href="https://console.cloud.google.com/apis/credentials"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary hover:underline inline-flex items-center gap-1"
                   >
@@ -895,7 +895,7 @@ export default function SettingsTab() {
                   </a>
                 </p>
               </div>
-              
+
               {/* Status indicator */}
               {(() => {
                 const oauthSettings = getSettingValue('google_oauth');
@@ -922,7 +922,7 @@ export default function SettingsTab() {
                   </div>
                 );
               })()}
-              
+
               <Button onClick={() => handleSave('google_oauth')} disabled={saveSetting.isPending}>
                 <Save className="h-4 w-4 mr-2" />
                 Save Google OAuth Settings

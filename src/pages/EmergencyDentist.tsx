@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Zap, Phone, MapPin, Clock, AlertTriangle, 
+import {
+  Zap, Phone, MapPin, Clock, AlertTriangle,
   Navigation, Search, CheckCircle, Star, Shield,
   Heart, Thermometer, ArrowRight, Stethoscope,
   Building2
@@ -138,7 +138,7 @@ export default function EmergencyDentistFinder() {
   return (
     <PageLayout>
       <SEOHead
-        title={seoContent?.meta_title || "Emergency Dentist Near Me | 24/7 Dental Care | AppointPanda"}
+        title={seoContent?.meta_title || "Emergency Dentist Near Me | 24/7 Dental Care | DubaiDentist.ae"}
         description={seoContent?.meta_description || "Find emergency dentists open now near you. Get immediate dental care for toothaches, broken teeth, and dental emergencies."}
         canonical="/emergency-dentist/"
       />
@@ -149,17 +149,17 @@ export default function EmergencyDentistFinder() {
           <div className="flex justify-center mb-4">
             <Breadcrumbs items={breadcrumbs} />
           </div>
-          
+
           <div className="max-w-3xl mx-auto text-center">
             <motion.div {...fadeUp} className="inline-flex items-center gap-2 bg-destructive/10 border border-destructive/20 rounded-full px-4 py-2 mb-4">
               <Zap className="h-4 w-4 text-destructive" />
               <span className="text-xs font-semibold text-destructive">Urgent Dental Care</span>
             </motion.div>
-            
+
             <motion.h1 {...fadeUp} transition={{ delay: 0.1 }} className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
               Emergency <span className="text-destructive">Dentist</span> Finder
             </motion.h1>
-            
+
             <motion.p {...fadeUp} transition={{ delay: 0.2 }} className="text-base md:text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
               Find dentists open now for urgent dental care across the UAE. Select your location to see available clinics immediately.
             </motion.p>
@@ -398,7 +398,7 @@ export default function EmergencyDentistFinder() {
               Emergency Dental <span className="text-primary">FAQs</span>
             </h2>
           </motion.div>
-          
+
           <Accordion type="single" collapsible className="space-y-3">
             {[
               { q: "How much does an emergency dental visit cost in UAE?", a: "Emergency visits typically cost 200–500 AED for exam and X-rays. Procedures like root canals or extractions cost more. Many insurance plans cover emergency dental care." },

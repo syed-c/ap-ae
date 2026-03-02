@@ -106,9 +106,9 @@ export default function UnassignedQueriesTab() {
         .eq('is_active', true);
 
       if (error) throw error;
-      
+
       // Filter to only paid clinics (with active subscription)
-      return (data || []).filter((c: any) => 
+      return (data || []).filter((c: any) =>
         c.subscriptions?.some((s: any) => s.status === 'active')
       );
     },
@@ -207,7 +207,7 @@ export default function UnassignedQueriesTab() {
             to: appointment.patient_email,
             type: 'email',
             subject: 'Response to Your Appointment Inquiry',
-            html: `<p>Dear ${appointment.patient_name},</p><p>${message}</p><p>Best regards,<br>AppointPanda Team</p>`,
+            html: `<p>Dear ${appointment.patient_name},</p><p>${message}</p><p>Best regards,<br>DubaiDentist.ae Team</p>`,
           },
         });
       }
@@ -243,7 +243,7 @@ export default function UnassignedQueriesTab() {
   const stats = {
     total: appointments?.length || 0,
     pending: appointments?.filter(a => a.status === 'pending').length || 0,
-    today: appointments?.filter(a => 
+    today: appointments?.filter(a =>
       a.created_at && new Date(a.created_at).toDateString() === new Date().toDateString()
     ).length || 0,
   };

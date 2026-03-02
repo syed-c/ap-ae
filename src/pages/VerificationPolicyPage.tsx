@@ -43,7 +43,7 @@ const VerificationPolicyPage = () => {
     <PageLayout>
       <SEOHead
         title="Verification Policy - How We Verify Dental Practices"
-        description="Learn how AppointPanda verifies dental clinics and dentists in the UAE. Our multi-step process ensures patients connect with legitimate, licensed professionals."
+        description="Learn how DubaiDentist.ae verifies dental clinics and dentists in the UAE. Our multi-step process ensures patients connect with legitimate, licensed professionals."
         canonical="/verification-policy/"
       />
       <StructuredData type="faq" questions={faqs} />
@@ -138,7 +138,7 @@ const VerificationPolicyPage = () => {
               <h3 className="font-bold text-foreground mb-1">Report a Concern</h3>
               <p className="text-sm text-muted-foreground">
                 If you believe a listed practice is unlicensed or misrepresenting their credentials, please report it to{" "}
-                <a href="mailto:trust@appointpanda.ae" className="text-primary hover:underline">trust@appointpanda.ae</a>.
+                <a href="mailto:trust@DubaiDentist.ae.ae" className="text-primary hover:underline">trust@DubaiDentist.ae.ae</a>.
                 All reports are investigated within 48 hours.
               </p>
             </div>

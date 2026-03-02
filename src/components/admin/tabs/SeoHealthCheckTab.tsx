@@ -59,13 +59,13 @@ export default function SeoHealthCheckTab() {
 
       // Fetch the static HTML version (what bots see)
       const staticUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/serve-static?path=${encodeURIComponent(path)}&test=1`;
-      
+
       const res = await fetch(staticUrl, {
         headers: {
           'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}`,
         },
       });
-      
+
       const html = await res.text();
       const cacheStatus = res.headers.get('x-static-cache') || 'miss';
       const statusCode = res.status;
@@ -77,20 +77,20 @@ export default function SeoHealthCheckTab() {
       // Extract elements
       const titleEl = doc.querySelector('title');
       const titleText = titleEl?.textContent || '';
-      
+
       const descEl = doc.querySelector('meta[name="description"]');
       const descriptionText = descEl?.getAttribute('content') || '';
-      
+
       const h1El = doc.querySelector('h1');
       const h1Text = h1El?.textContent?.trim() || '';
-      
+
       const canonicalEl = doc.querySelector('link[rel="canonical"]');
       const canonicalUrl = canonicalEl?.getAttribute('href') || '';
-      
+
       const robotsEl = doc.querySelector('meta[name="robots"]');
       const robotsContent = robotsEl?.getAttribute('content') || '';
       const hasNoIndex = robotsContent.toLowerCase().includes('noindex');
-      
+
       // Content analysis
       const bodyText = doc.body?.textContent || '';
       const contentWordCount = bodyText.split(/\s+/).filter(Boolean).length;
@@ -221,7 +221,7 @@ export default function SeoHealthCheckTab() {
             <p className="text-xs text-muted-foreground mt-1">Routes that need prerendering</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Private Page Patterns</CardTitle>
@@ -231,7 +231,7 @@ export default function SeoHealthCheckTab() {
             <p className="text-xs text-muted-foreground mt-1">CSR-only, noindex routes</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Render Strategy</CardTitle>
@@ -257,7 +257,7 @@ export default function SeoHealthCheckTab() {
         <CardContent className="space-y-4">
           <div className="flex gap-2">
             <Input
-              placeholder="/dubai/jumeirah or https://www.appointpanda.ae/blog"
+              placeholder="/dubai/jumeirah or https://www.DubaiDentist.ae.ae/blog"
               value={testUrl}
               onChange={(e) => setTestUrl(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleCheck()}
@@ -301,8 +301,8 @@ export default function SeoHealthCheckTab() {
                   <h3 className="font-semibold text-lg">{result.url}</h3>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                     {/* Classification badge */}
-                    <Badge 
-                      variant="outline" 
+                    <Badge
+                      variant="outline"
                       className={result.classification.indexable ? 'bg-green-500/10 text-green-500' : 'bg-muted'}
                     >
                       <Shield className="h-3 w-3 mr-1" />
@@ -313,11 +313,11 @@ export default function SeoHealthCheckTab() {
                         {result.classification.pageType}
                       </Badge>
                     )}
-                    <Badge 
-                      variant="outline" 
+                    <Badge
+                      variant="outline"
                       className={
                         result.checks.cacheStatus === 'hit' || result.checks.cacheStatus === 'prerendered-cached'
-                          ? 'bg-green-500/10' 
+                          ? 'bg-green-500/10'
                           : result.checks.cacheStatus === 'prerendered'
                             ? 'bg-blue-500/10'
                             : 'bg-yellow-500/10'
@@ -477,7 +477,7 @@ export default function SeoHealthCheckTab() {
               <div className="pt-4 border-t">
                 <Button variant="outline" asChild>
                   <a
-                    href={`https://www.appointpanda.ae${result.url}`}
+                    href={`https://www.DubaiDentist.ae.ae${result.url}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -511,7 +511,7 @@ export default function SeoHealthCheckTab() {
                 ))}
               </div>
             </div>
-            
+
             <div>
               <h4 className="font-medium mb-2 text-muted-foreground">Private Pages (CSR)</h4>
               <div className="flex flex-wrap gap-2">

@@ -161,7 +161,7 @@ export default function ReputationSetupTab({
       localStorage.setItem('gmb_relink_flow', 'true');
       localStorage.setItem('gmb_restore_session', 'true');
 
-      const redirectTo = 'https://www.appointpanda.ae/auth/callback?relink=true';
+      const redirectTo = 'https://www.DubaiDentist.ae.ae/auth/callback?relink=true';
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {

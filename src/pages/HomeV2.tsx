@@ -1,7 +1,7 @@
 'use client';
 import { useState } from "react";
-import { 
-  ArrowRight, Shield, Star, MapPin, 
+import {
+  ArrowRight, Shield, Star, MapPin,
   Heart, Search, Building2, Stethoscope, Calendar,
   ChevronRight, BadgeCheck, Timer,
   Quote, CheckCircle
@@ -81,7 +81,7 @@ const HomeV2 = () => {
     {
       name: "Ahmed R.",
       location: "Al Majaz, Sharjah",
-      text: "I was nervous about finding a new dentist after moving to Sharjah. AppointPanda made it so easy to compare clinics.",
+      text: "I was nervous about finding a new dentist after moving to Sharjah. DubaiDentist.ae made it so easy to compare clinics.",
       rating: 5,
     },
     {
@@ -117,9 +117,9 @@ const HomeV2 = () => {
       <section className="relative min-h-[520px] md:min-h-[580px] flex items-center justify-center overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0">
-          <img 
-            src={heroDentalFamily} 
-            alt="Happy family at dental clinic" 
+          <img
+            src={heroDentalFamily}
+            alt="Happy family at dental clinic"
             className="w-full h-full object-cover"
             loading="eager"
           />
@@ -200,11 +200,11 @@ const HomeV2 = () => {
               { step: "02", title: "Compare", description: "Browse verified clinic profiles, real reviews, and AED pricing.", icon: Star, gradient: "from-gold/15 to-gold/5" },
               { step: "03", title: "Book", description: "Schedule your appointment online in under 60 seconds.", icon: Calendar, gradient: "from-primary/15 to-teal/5" },
             ].map((item, i) => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0, y: 30 }} 
-                whileInView={{ opacity: 1, y: 0 }} 
-                viewport={{ once: true }} 
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
                 transition={{ delay: i * 0.15, duration: 0.5 }}
                 className="text-center group"
               >
@@ -229,24 +229,24 @@ const HomeV2 = () => {
         <div className="container px-4">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-6xl mx-auto">
             {/* Image — Panda mascot */}
-            <motion.div 
-              initial={{ opacity: 0, x: -30 }} 
-              whileInView={{ opacity: 1, x: 0 }} 
-              viewport={{ once: true }} 
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.6 }}
               className="flex justify-center"
             >
               <div className="relative">
                 <div className="absolute -inset-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl -z-10" />
-                <img src={pandaMascot} alt="AppointPanda mascot" className="w-64 md:w-80 h-auto rounded-2xl" loading="lazy" />
+                <img src={pandaMascot} alt="DubaiDentist.ae mascot" className="w-64 md:w-80 h-auto rounded-2xl" loading="lazy" />
               </div>
             </motion.div>
-            
+
             {/* Content */}
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}>
               <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3">Why Choose Us</span>
               <h2 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-6">
-                Why Patients Trust <span className="text-primary">AppointPanda</span>
+                Why Patients Trust <span className="text-primary">DubaiDentist.ae</span>
               </h2>
               <div className="space-y-4">
                 {[
@@ -255,8 +255,8 @@ const HomeV2 = () => {
                   { icon: Heart, title: "Transparent AED Pricing", desc: "Clear cost ranges in AED for every dental service." },
                   { icon: Timer, title: "Book in 60 Seconds", desc: "No phone calls needed. Schedule your appointment instantly online." },
                 ].map((item, i) => (
-                  <motion.div 
-                    key={i} 
+                  <motion.div
+                    key={i}
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
@@ -439,7 +439,7 @@ const HomeV2 = () => {
             </motion.div>
             <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
               <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3">
-                Grow Your Practice with <span className="text-primary">AppointPanda</span>
+                Grow Your Practice with <span className="text-primary">DubaiDentist.ae</span>
               </h2>
               <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
                 Join dental professionals across the UAE who trust our platform to reach patients, manage bookings, and build their reputation.
@@ -473,12 +473,12 @@ const HomeV2 = () => {
           <div className="max-w-3xl mx-auto">
             <motion.div {...fadeUp} className="text-center mb-8">
               <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3">
-                About <span className="text-primary">AppointPanda</span>
+                About <span className="text-primary">DubaiDentist.ae</span>
               </h2>
             </motion.div>
             <div className="prose prose-sm max-w-none text-muted-foreground space-y-3">
               <p>
-                AppointPanda is the UAE's leading dental directory platform, built to help patients across Dubai, Sharjah, Abu Dhabi, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain find trusted dental professionals. Whether you need teeth cleaning, implants, Invisalign, or emergency care, we connect you with verified clinics — all with transparent AED pricing and real patient reviews.
+                DubaiDentist.ae is the UAE's leading dental directory platform, built to help patients across Dubai, Sharjah, Abu Dhabi, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain find trusted dental professionals. Whether you need teeth cleaning, implants, Invisalign, or emergency care, we connect you with verified clinics — all with transparent AED pricing and real patient reviews.
               </p>
               <p>
                 Every clinic listed is verified against DHA, DoH, and MOHAP standards. Our platform covers {realCounts?.clinics?.toLocaleString() || '500'}+ dental practices offering {treatments?.length || '15'}+ services including cosmetic dentistry, orthodontics, pediatric care, and oral surgery.
@@ -512,9 +512,9 @@ const HomeV2 = () => {
             </motion.div>
             <div className="space-y-3">
               {[
-                { q: "How do I find a dentist near me in Dubai?", a: "Use AppointPanda's search to select your emirate and area. Browse verified clinic profiles with real patient reviews, AED pricing, and available services." },
-                { q: "Is AppointPanda free for patients?", a: "Yes, AppointPanda is completely free for patients. Search, compare, and book appointments across all seven UAE Emirates at no cost." },
-                { q: "Are the dentists on AppointPanda verified?", a: "All clinics are verified against DHA, DoH, and MOHAP standards. Look for the verified badge on clinic profiles." },
+                { q: "How do I find a dentist near me in Dubai?", a: "Use DubaiDentist.ae's search to select your emirate and area. Browse verified clinic profiles with real patient reviews, AED pricing, and available services." },
+                { q: "Is DubaiDentist.ae free for patients?", a: "Yes, DubaiDentist.ae is completely free for patients. Search, compare, and book appointments across all seven UAE Emirates at no cost." },
+                { q: "Are the dentists on DubaiDentist.ae verified?", a: "All clinics are verified against DHA, DoH, and MOHAP standards. Look for the verified badge on clinic profiles." },
                 { q: "Can I search by dental insurance provider?", a: "Yes. Use our insurance search to find dentists who accept your plan — including Daman, Oman Insurance, AXA, and MetLife." },
                 { q: "How accurate are the prices shown?", a: "Prices shown are estimated ranges in AED. Final costs require an in-person consultation. We encourage confirming pricing directly with your chosen clinic." },
               ].map((faq, i) => (

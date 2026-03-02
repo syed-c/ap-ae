@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const BASE_URL = "https://www.appointpanda.ae";
+const BASE_URL = "https://www.DubaiDentist.ae.ae";
 const DEFAULT_BATCH_SIZE = 50;
 
 interface PageData {
@@ -53,7 +53,7 @@ function generateHtml(page: PageData): string {
   <meta property="og:description" content="${escapeHtml(page.metaDescription)}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="${BASE_URL}${page.path}">
-  <meta property="og:site_name" content="AppointPanda">
+  <meta property="og:site_name" content="DubaiDentist.ae">
   
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escapeHtml(page.metaTitle)}">
@@ -93,7 +93,7 @@ function generateHtml(page: PageData): string {
   </main>
   
   <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #eee; color: #666;">
-    <p>&copy; ${new Date().getFullYear()} AppointPanda. All rights reserved.</p>
+    <p>&copy; ${new Date().getFullYear()} DubaiDentist.ae. All rights reserved.</p>
     <p>
       <a href="/about">About</a> | 
       <a href="/contact">Contact</a> | 
@@ -116,7 +116,7 @@ function escapeHtml(text: string): string {
 
 function markdownToHtml(markdown: string): string {
   if (!markdown) return '<p>Content coming soon.</p>';
-  
+
   return markdown
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
@@ -147,7 +147,7 @@ async function fetchAllRows(supabase: any, table: string, selectQuery: string, f
   const allRows: any[] = [];
   let offset = 0;
   const limit = 1000;
-  
+
   while (true) {
     let query = supabase.from(table).select(selectQuery).range(offset, offset + limit - 1);
     for (const [key, value] of Object.entries(filters)) {
@@ -182,14 +182,14 @@ async function getCachedPaths(supabase: any, pageType: string): Promise<Set<stri
   const paths = new Set<string>();
   let offset = 0;
   const limit = 1000;
-  
+
   while (true) {
     const { data, error } = await supabase
       .from('static_page_cache')
       .select('path')
       .eq('page_type', pageType)
       .range(offset, offset + limit - 1);
-    
+
     if (error || !data || data.length === 0) break;
     for (const row of data) {
       paths.add(row.path);
@@ -197,7 +197,7 @@ async function getCachedPaths(supabase: any, pageType: string): Promise<Set<stri
     if (data.length < limit) break;
     offset += limit;
   }
-  
+
   return paths;
 }
 
@@ -216,9 +216,9 @@ serve(async (req) => {
     // Clear cache action
     if (action === 'clear_cache') {
       console.log(`Clearing cache${pageType ? ` for ${pageType}` : ' for all types'}`);
-      
+
       let query = supabase.from('static_page_cache').select('id', { count: 'exact', head: true });
-      
+
       if (pageType && pageType !== 'all') {
         if (pageType === 'stale') {
           query = query.eq('is_stale', true);
@@ -226,13 +226,13 @@ serve(async (req) => {
           query = query.eq('page_type', pageType);
         }
       }
-      
+
       // First get count
       const { count: countBeforeDelete } = await query;
-      
+
       // Now delete
       let deleteQuery = supabase.from('static_page_cache').delete();
-      
+
       if (pageType && pageType !== 'all') {
         if (pageType === 'stale') {
           deleteQuery = deleteQuery.eq('is_stale', true);
@@ -243,28 +243,28 @@ serve(async (req) => {
         // Delete all - need a condition
         deleteQuery = deleteQuery.not('id', 'is', null);
       }
-      
+
       const { error: deleteError } = await deleteQuery;
-      
+
       if (deleteError) {
         console.error('Error deleting cache:', deleteError);
         throw deleteError;
       }
-      
+
       // Also reset progress for the type if specified
       if (pageType && pageType !== 'all' && pageType !== 'stale') {
-        await updateProgress(supabase, pageType, { 
-          current_offset: 0, 
-          status: 'idle', 
+        await updateProgress(supabase, pageType, {
+          current_offset: 0,
+          status: 'idle',
           last_error: null,
           completed_at: null
         });
       }
-      
+
       console.log(`Deleted ${countBeforeDelete || 0} cache entries`);
-      
-      return new Response(JSON.stringify({ 
-        success: true, 
+
+      return new Response(JSON.stringify({
+        success: true,
         deleted: countBeforeDelete || 0,
         pageType: pageType || 'all'
       }), {
@@ -275,10 +275,10 @@ serve(async (req) => {
     // Reset progress for a type
     if (action === 'reset') {
       if (pageType) {
-        await updateProgress(supabase, pageType, { 
-          current_offset: 0, 
+        await updateProgress(supabase, pageType, {
+          current_offset: 0,
           total_count: 0,
-          status: 'idle', 
+          status: 'idle',
           last_error: null,
           started_at: null,
           completed_at: null
@@ -286,10 +286,10 @@ serve(async (req) => {
       } else {
         // Reset all
         for (const type of ['state', 'city', 'service', 'service_location', 'clinic']) {
-          await updateProgress(supabase, type, { 
-            current_offset: 0, 
+          await updateProgress(supabase, type, {
+            current_offset: 0,
             total_count: 0,
-            status: 'idle', 
+            status: 'idle',
             last_error: null,
             started_at: null,
             completed_at: null
@@ -307,7 +307,7 @@ serve(async (req) => {
       const cities = await fetchAllRows(supabase, 'cities', 'id', { is_active: true });
       const treatments = await fetchAllRows(supabase, 'treatments', 'id', { is_active: true });
       const { count: clinicCount } = await supabase.from('clinics').select('*', { count: 'exact', head: true }).eq('is_active', true);
-      
+
       // Get cached counts by type
       const allCacheEntries = await fetchAllRows(supabase, 'static_page_cache', 'page_type', {});
       const cachedByType: Record<string, number> = {
@@ -322,13 +322,13 @@ serve(async (req) => {
           cachedByType[row.page_type]++;
         }
       }
-      
+
       const totalPossible = states.length + cities.length + treatments.length + (cities.length * treatments.length) + (clinicCount || 0);
       const totalCached = Object.values(cachedByType).reduce((a, b) => a + b, 0);
-      
+
       // Get progress info
       const progress = await getProgress(supabase);
-      
+
       return new Response(JSON.stringify({
         cached: totalCached,
         stale: 0,
@@ -349,8 +349,8 @@ serve(async (req) => {
 
     // Generate pages in batches
     if (!pageType) {
-      return new Response(JSON.stringify({ 
-        error: "pageType is required for generation. Use 'state', 'city', 'service', 'service_location', or 'clinic'" 
+      return new Response(JSON.stringify({
+        error: "pageType is required for generation. Use 'state', 'city', 'service', 'service_location', or 'clinic'"
       }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -376,7 +376,7 @@ serve(async (req) => {
 
     // Build full item list based on page type
     let allItems: any[] = [];
-    
+
     if (pageType === 'state') {
       allItems = states;
     } else if (pageType === 'city') {
@@ -415,7 +415,7 @@ serve(async (req) => {
       } else if (pageType === 'clinic') {
         path = `/clinic/${item.slug}/`;
       }
-      
+
       if (!cachedPaths.has(path)) {
         uncachedItems.push({ ...item, _path: path });
       }
@@ -425,7 +425,7 @@ serve(async (req) => {
     console.log(`${remainingCount} pages remaining to generate for ${pageType} (${totalCount} total, ${cachedPaths.size} cached)`);
 
     // Update progress with totals
-    await updateProgress(supabase, pageType, { 
+    await updateProgress(supabase, pageType, {
       total_count: totalCount,
       current_offset: cachedPaths.size,
       status: remainingCount === 0 ? 'complete' : 'running',
@@ -468,7 +468,7 @@ serve(async (req) => {
             path,
             pageType: 'state',
             title: seo.title || `Dentists in ${item.name}`,
-            metaTitle: seo.meta_title || `Find Dentists in ${item.name} (${item.abbreviation}) | AppointPanda`,
+            metaTitle: seo.meta_title || `Find Dentists in ${item.name} (${item.abbreviation}) | DubaiDentist.ae`,
             metaDescription: seo.meta_description || `Find and book appointments with top-rated dentists in ${item.name}. Compare verified clinics, read reviews, and schedule your visit today.`,
             h1: seo.h1 || `Find Dentists in ${item.name}`,
             content: seo.content || `Browse our directory of verified dental professionals in ${item.name}. Find the right dentist for your needs and book an appointment online.`,
@@ -491,7 +491,7 @@ serve(async (req) => {
             path,
             pageType: 'city',
             title: seo.title || `Dentists in ${item.name}, ${stateData.abbreviation || stateData.name}`,
-            metaTitle: seo.meta_title || `Dentists in ${item.name}, ${stateData.abbreviation || stateData.name} | AppointPanda`,
+            metaTitle: seo.meta_title || `Dentists in ${item.name}, ${stateData.abbreviation || stateData.name} | DubaiDentist.ae`,
             metaDescription: seo.meta_description || `Find top-rated dentists in ${item.name}, ${stateData.name}. Compare clinics, read patient reviews, and book appointments online.`,
             h1: seo.h1 || `Dentists in ${item.name}, ${stateData.abbreviation || stateData.name}`,
             content: seo.content || `Looking for a dentist in ${item.name}? Browse our verified directory of dental professionals offering a range of services from routine checkups to cosmetic dentistry.`,
@@ -513,7 +513,7 @@ serve(async (req) => {
             path,
             pageType: 'service',
             title: seo.title || item.name,
-            metaTitle: seo.meta_title || `${item.name} | Find Dental Specialists | AppointPanda`,
+            metaTitle: seo.meta_title || `${item.name} | Find Dental Specialists | DubaiDentist.ae`,
             metaDescription: seo.meta_description || `Find dentists offering ${item.name}. Compare providers, read reviews, and book your appointment online.`,
             h1: seo.h1 || item.name,
             content: seo.content || item.description || `Find experienced dental professionals offering ${item.name}. Browse our directory to compare providers and book your appointment.`,
@@ -536,7 +536,7 @@ serve(async (req) => {
             path,
             pageType: 'service_location',
             title: seo.title || `${treatment.name} in ${city.name}, ${stateData.abbreviation || stateData.name}`,
-            metaTitle: seo.meta_title || `${treatment.name} in ${city.name}, ${stateData.abbreviation || stateData.name} | AppointPanda`,
+            metaTitle: seo.meta_title || `${treatment.name} in ${city.name}, ${stateData.abbreviation || stateData.name} | DubaiDentist.ae`,
             metaDescription: seo.meta_description || `Find ${treatment.name} specialists in ${city.name}, ${stateData.name}. Compare providers, read reviews, and book your appointment.`,
             h1: seo.h1 || `${treatment.name} in ${city.name}, ${stateData.abbreviation || stateData.name}`,
             content: seo.content || `Looking for ${treatment.name} in ${city.name}? Browse our verified directory of dental professionals offering this service in your area.`,
@@ -557,14 +557,14 @@ serve(async (req) => {
           const cityData = Array.isArray(item.cities) ? item.cities[0] : item.cities;
           const stateData = cityData?.states ? (Array.isArray(cityData.states) ? cityData.states[0] : cityData.states) : null;
           const seo = seoMap.get(path) || seoMap.get(`/clinic/${item.slug}`) || {};
-          const locationStr = cityData && stateData 
+          const locationStr = cityData && stateData
             ? `${cityData.name}, ${stateData.abbreviation || stateData.name}`
             : 'your area';
           pageData = {
             path,
             pageType: 'clinic',
             title: seo.title || item.name,
-            metaTitle: seo.meta_title || `${item.name} | Dental Clinic in ${locationStr} | AppointPanda`,
+            metaTitle: seo.meta_title || `${item.name} | Dental Clinic in ${locationStr} | DubaiDentist.ae`,
             metaDescription: seo.meta_description || item.description || `${item.name} is a dental clinic in ${locationStr}. ${item.rating ? `Rated ${item.rating}/5` : ''} ${item.review_count ? `with ${item.review_count} reviews` : ''}. Book your appointment online.`,
             h1: seo.h1 || item.name,
             content: seo.content || item.description || `${item.name} offers quality dental care in ${locationStr}. ${item.address ? `Located at ${item.address}.` : ''} ${item.phone ? `Call ${item.phone} or book online.` : 'Book your appointment online today.'}`,
@@ -650,7 +650,7 @@ serve(async (req) => {
     const newCachedCount = cachedPaths.size + successCount;
     const newRemaining = totalCount - newCachedCount;
     const isDone = newRemaining <= 0;
-    
+
     await updateProgress(supabase, pageType, {
       current_offset: newCachedCount,
       status: isDone ? 'complete' : 'running',
@@ -677,9 +677,9 @@ serve(async (req) => {
   } catch (err) {
     const error = err as Error;
     console.error("Generate static pages error:", error);
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: error.message,
-      stack: error.stack 
+      stack: error.stack
     }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

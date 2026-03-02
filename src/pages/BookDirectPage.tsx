@@ -146,7 +146,7 @@ export default function BookDirectPage() {
           {/* Trust indicators */}
           <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              Powered by AppointPanda
+              Powered by DubaiDentist.ae
             </p>
             <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">

@@ -172,7 +172,7 @@ END $body$;
         return all;
     }
 
-    let sql = `-- AppointPanda Data Export\n`;
+    let sql = `-- DubaiDentist.ae Data Export\n`;
     sql += `-- Generated: ${new Date().toISOString()}\n`;
     sql += `-- Run this AFTER all schema migrations\n\n`;
     sql += `BEGIN;\n\n`;

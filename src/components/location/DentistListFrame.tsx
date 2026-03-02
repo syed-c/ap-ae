@@ -6,10 +6,10 @@ import { MobileDentistSlider } from "@/components/lists/MobileDentistSlider";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  ChevronDown, 
-  ChevronUp, 
-  Users, 
+import {
+  ChevronDown,
+  ChevronUp,
+  Users,
   MapPin,
   X
 } from "lucide-react";
@@ -45,16 +45,16 @@ export const DentistListFrame = ({
   initialCount = 6,
 }: DentistListFrameProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   const displayProfiles = isExpanded ? profiles : profiles.slice(0, initialCount);
   const hasMoreProfiles = profiles.length > initialCount;
   const remainingCount = profiles.length - initialCount;
 
   if (isLoading) {
     return (
-      <div 
+      <div
         className="bg-card border border-border rounded-3xl overflow-hidden"
-        itemScope 
+        itemScope
         itemType="https://schema.org/ItemList"
         aria-busy="true"
       >
@@ -104,14 +104,14 @@ export const DentistListFrame = ({
           <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-bold text-foreground mb-2">No dentists found</h3>
           <p className="text-muted-foreground mb-4">
-            {emptyMessage || (hasActiveFilters 
+            {emptyMessage || (hasActiveFilters
               ? "Try adjusting your filters to see more results."
               : `We're still adding dentists in ${locationName}. Check back soon!`
             )}
           </p>
           {hasActiveFilters && onClearFilters && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="rounded-xl"
               onClick={onClearFilters}
             >
@@ -138,7 +138,7 @@ export const DentistListFrame = ({
           </span>
         </div>
       </div>
-      
+
       {/* SEO: Semantic HTML list always in DOM for bots/crawlers */}
       <noscript>
         <div itemScope itemType="https://schema.org/ItemList">
@@ -156,7 +156,7 @@ export const DentistListFrame = ({
                 <meta itemProp="bestRating" content="5" />
                 <meta itemProp="worstRating" content="1" />
               </span>}
-              {profile.slug && <a itemProp="url" href={`https://www.appointpanda.ae/clinic/${profile.slug}/`}>View Profile</a>}
+              {profile.slug && <a itemProp="url" href={`https://www.DubaiDentist.ae.ae/clinic/${profile.slug}/`}>View Profile</a>}
             </div>
           ))}
         </div>
@@ -179,7 +179,7 @@ export const DentistListFrame = ({
               <meta itemProp="bestRating" content="5" />
               <meta itemProp="worstRating" content="1" />
             </span>}
-            {profile.slug && <a itemProp="url" href={`https://www.appointpanda.ae/clinic/${profile.slug}/`}>{profile.name}</a>}
+            {profile.slug && <a itemProp="url" href={`https://www.DubaiDentist.ae.ae/clinic/${profile.slug}/`}>{profile.name}</a>}
           </div>
         ))}
       </div>
@@ -190,7 +190,7 @@ export const DentistListFrame = ({
         <div className="md:hidden p-4">
           <MobileDentistSlider profiles={displayProfiles} />
         </div>
-        
+
         {/* Desktop: Scrollable list */}
         <div className="hidden md:block">
           <AnimatePresence mode="wait">
@@ -201,7 +201,7 @@ export const DentistListFrame = ({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <ScrollArea 
+              <ScrollArea
                 className="w-full"
                 style={{ maxHeight: isExpanded ? 'none' : `${maxHeight}px` }}
               >
@@ -213,8 +213,8 @@ export const DentistListFrame = ({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.03 }}
                     >
-                      <article 
-                        itemScope 
+                      <article
+                        itemScope
                         itemType="https://schema.org/Dentist"
                         className="contents"
                       >
@@ -230,14 +230,14 @@ export const DentistListFrame = ({
               </ScrollArea>
             </motion.div>
           </AnimatePresence>
-          
+
           {/* Gradient fade at bottom when collapsed */}
           {!isExpanded && hasMoreProfiles && (
             <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-card to-transparent pointer-events-none" />
           )}
         </div>
       </div>
-      
+
       {/* Expand/Collapse Footer */}
       {hasMoreProfiles && (
         <div className="p-4 border-t border-border bg-muted/30">

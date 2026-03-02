@@ -89,13 +89,13 @@ interface CalendarBookingFormProps {
 // Format time range display (1-hour intervals)
 const formatTimeRange = (hour: number): string => {
   const endHour = hour + 1;
-  
+
   const formatHour = (h: number) => {
     if (h < 12) return `${h}:00 AM`;
     if (h === 12) return `12:00 PM`;
     return `${h - 12}:00 PM`;
   };
-  
+
   return `${formatHour(hour)} - ${formatHour(endHour)}`;
 };
 
@@ -178,7 +178,7 @@ export function CalendarBookingForm({
     setIsSubmitting(true);
     try {
       const targetClinicId = profileType === "clinic" ? profileId : clinicId || null;
-      
+
       // Check if this is a returning patient by phone or email
       let isReturningPatient = false;
       if (targetClinicId) {
@@ -188,7 +188,7 @@ export function CalendarBookingForm({
           .eq("clinic_id", targetClinicId)
           .or(`patient_phone.eq.${data.patient_phone}${data.patient_email ? `,patient_email.eq.${data.patient_email}` : ""}`)
           .limit(1);
-        
+
         isReturningPatient = (existingAppointments?.length || 0) > 0;
       }
 
@@ -333,7 +333,7 @@ export function CalendarBookingForm({
 
           <p className="text-xs text-center text-muted-foreground">
             <Heart className="h-3 w-3 inline mr-1 text-destructive" />
-            Thank you for choosing AppointPanda
+            Thank you for choosing DubaiDentist.ae
           </p>
         </div>
       </div>
@@ -366,8 +366,8 @@ export function CalendarBookingForm({
                     currentStep > index + 1
                       ? "bg-primary text-primary-foreground"
                       : currentStep === index + 1
-                      ? "bg-primary/20 text-primary ring-2 ring-primary"
-                      : "bg-muted text-muted-foreground"
+                        ? "bg-primary/20 text-primary ring-2 ring-primary"
+                        : "bg-muted text-muted-foreground"
                   )}
                 >
                   {currentStep > index + 1 ? <CheckCircle className="h-4 w-4" /> : index + 1}

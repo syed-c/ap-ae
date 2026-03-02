@@ -100,12 +100,12 @@ serve(async (req) => {
     const products = await stripe.products.list({
       limit: 100,
     });
-    
+
     let product = products.data.find((p: Stripe.Product) => p.metadata?.plan_slug === planSlug);
-    
+
     if (!product) {
       product = await stripe.products.create({
-        name: `${plan.name} Plan - AppointPanda`,
+        name: `${plan.name} Plan - DubaiDentist.ae`,
         description: plan.description || `${plan.name} subscription plan`,
         metadata: {
           plan_id: plan.id,
@@ -118,7 +118,7 @@ serve(async (req) => {
     // Apply 50% promotion discount
     const originalMonthlyPrice = plan.price_monthly || plan.price_aed || 0;
     const discountedPrice = Math.round(originalMonthlyPrice * 0.5); // 50% off
-    
+
     const prices = await stripe.prices.list({
       product: product.id,
       active: true,
@@ -149,8 +149,8 @@ serve(async (req) => {
     }
 
     // Create checkout session
-    const baseUrl = successUrl?.split('/')[0] + '//' + successUrl?.split('/')[2] || 'https://appointpanda.ae';
-    
+    const baseUrl = successUrl?.split('/')[0] + '//' + successUrl?.split('/')[2] || 'https://DubaiDentist.ae.ae';
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [
@@ -181,11 +181,11 @@ serve(async (req) => {
     });
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         url: session.url,
         sessionId: session.id,
       }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }
@@ -196,7 +196,7 @@ serve(async (req) => {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ error: message }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       }

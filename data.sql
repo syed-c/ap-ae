@@ -1,4 +1,4 @@
--- AppointPanda Data Export
+-- DubaiDentist.ae Data Export
 -- Generated: 2026-02-28T00:45:06.425Z
 -- Run this AFTER all schema migrations
 

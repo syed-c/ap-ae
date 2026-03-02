@@ -18,8 +18,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { 
-  FileText, Search, Plus, Edit, Eye, EyeOff, Globe, ExternalLink, MapPin, 
+import {
+  FileText, Search, Plus, Edit, Eye, EyeOff, Globe, ExternalLink, MapPin,
   Stethoscope, Building2, BookOpen, Save, Type, AlignLeft, Image, Map,
   Loader2, Trash2, ArrowUp, ArrowDown, HelpCircle
 } from 'lucide-react';
@@ -42,7 +42,7 @@ export default function PagesTab() {
   const [filters, setFilters] = useState({ type: 'all', search: '', stateId: 'all' });
   const [displayLimit, setDisplayLimit] = useState(50);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  
+
   // Fetch only ACTIVE states
   const { data: states, isLoading: statesLoading } = useQuery({
     queryKey: ['admin-states-active'],
@@ -65,10 +65,10 @@ export default function PagesTab() {
         .from('states')
         .select('id')
         .eq('is_active', true);
-      
+
       const activeStateIds = (activeStates || []).map(s => s.id);
       if (activeStateIds.length === 0) return [];
-      
+
       const { data, error } = await supabase
         .from('cities')
         .select('*, state:states(id, name, slug, abbreviation)')
@@ -83,7 +83,7 @@ export default function PagesTab() {
   const { data: treatments, isLoading: treatmentsLoading } = useTreatments();
   const { data: clinics, isLoading: clinicsLoading } = useAdminClinics();
   const { data: blogPosts, isLoading: blogLoading } = useAdminBlogPosts();
-  
+
   // Use page_content table
   const { data: pageContents } = useAllPageContent({});
   const upsertPageContent = useUpsertPageContent();
@@ -124,7 +124,7 @@ export default function PagesTab() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editingPage, setEditingPage] = useState<PageItem | null>(null);
   const [activeEditTab, setActiveEditTab] = useState('seo');
-  
+
   // Create page form state
   const [createForm, setCreateForm] = useState({
     pageType: '' as string,
@@ -196,7 +196,7 @@ export default function PagesTab() {
     { id: 'terms', type: 'static' as const, name: 'Terms of Service', url: '/terms', published: true, indexed: true },
     { id: 'insurance', type: 'static' as const, name: 'Insurance', url: '/insurance', published: true, indexed: true },
     { id: 'how-it-works', type: 'static' as const, name: 'How It Works', url: '/how-it-works', published: true, indexed: true },
-    
+
     // State pages
     ...(states || []).map(state => ({
       id: `state-${state.id}`,
@@ -209,7 +209,7 @@ export default function PagesTab() {
       stateSlug: state.slug,
       stateId: state.id,
     })),
-    
+
     // City pages (with state prefix)
     ...(cities || []).map(city => ({
       id: `city-${city.id}`,
@@ -223,7 +223,7 @@ export default function PagesTab() {
       citySlug: city.slug,
       stateId: city.state?.id,
     })),
-    
+
     // Treatment/Service pages
     ...(treatments || []).map(treatment => ({
       id: `treatment-${treatment.id}`,
@@ -234,9 +234,9 @@ export default function PagesTab() {
       indexed: treatment.is_active,
       data: treatment,
     })),
-    
+
     // Service + Location pages
-    ...((cities || []).flatMap(city => 
+    ...((cities || []).flatMap(city =>
       (treatments || []).map(treatment => ({
         id: `service-location-${city.id}-${treatment.id}`,
         type: 'service-location' as const,
@@ -250,7 +250,7 @@ export default function PagesTab() {
         stateId: city.state?.id,
       }))
     )),
-    
+
     // Clinic pages
     ...(clinics || []).map(clinic => ({
       id: `clinic-${clinic.id}`,
@@ -261,7 +261,7 @@ export default function PagesTab() {
       indexed: clinic.is_active ?? true,
       data: clinic,
     })),
-    
+
     // Blog pages
     ...(blogPosts || []).map(post => ({
       id: `blog-${post.id}`,
@@ -277,7 +277,7 @@ export default function PagesTab() {
   // Filter pages - including state filter
   const filteredPages = useMemo(() => allPages.filter(page => {
     const matchesType = filters.type === 'all' || page.type === filters.type;
-    const matchesSearch = !filters.search || 
+    const matchesSearch = !filters.search ||
       page.name.toLowerCase().includes(filters.search.toLowerCase()) ||
       page.url.toLowerCase().includes(filters.search.toLowerCase());
     // State filter: applies to city, service-location, and state pages
@@ -316,14 +316,14 @@ export default function PagesTab() {
   const openEditPage = (page: PageItem) => {
     setEditingPage(page);
     setActiveEditTab('seo');
-    
+
     // Find existing page content from page_content table
     const existingContent = pageContents?.find(p => p.page_slug === page.url);
-    
+
     // Find matching seo_page for real live content
     const seoSlug = page.url.startsWith('/') ? page.url.slice(1) : page.url;
     const seoPage = seoPages?.find(p => p.slug === seoSlug || p.slug === page.url);
-    
+
     if (existingContent) {
       // Load from page_content CMS overrides
       setEditForm({
@@ -408,13 +408,13 @@ export default function PagesTab() {
         is_published: true,
       });
     }
-    
+
     setEditDialogOpen(true);
   };
 
   const handleSavePage = async () => {
     if (!editingPage) return;
-    
+
     try {
       await upsertPageContent.mutateAsync({
         page_slug: editingPage.url,
@@ -442,7 +442,7 @@ export default function PagesTab() {
         featured_image: editForm.featured_image || null,
         is_published: editForm.is_published ?? true,
       });
-      
+
       setEditDialogOpen(false);
       setEditingPage(null);
     } catch (error) {
@@ -611,7 +611,7 @@ export default function PagesTab() {
           { key: 'clinic', label: 'Clinics', icon: Building2, color: 'bg-teal-100 text-teal-600' },
           { key: 'blog', label: 'Blog', icon: BookOpen, color: 'bg-amber-100 text-amber-600' },
         ].map(item => (
-          <Card 
+          <Card
             key={item.key}
             className={`card-modern cursor-pointer hover:border-primary/50 transition-colors ${filters.type === item.key ? 'border-primary ring-1 ring-primary' : ''}`}
             onClick={() => { setFilters({ ...filters, type: item.key }); setDisplayLimit(50); }}
@@ -679,7 +679,7 @@ export default function PagesTab() {
       <Card className="card-modern">
         <CardHeader>
           <CardTitle className="text-lg">
-            {filters.type === 'all' ? 'All Pages' : `${filters.type.charAt(0).toUpperCase() + filters.type.slice(1)} Pages`} 
+            {filters.type === 'all' ? 'All Pages' : `${filters.type.charAt(0).toUpperCase() + filters.type.slice(1)} Pages`}
             <span className="text-muted-foreground font-normal ml-2">({filteredPages.length})</span>
           </CardTitle>
         </CardHeader>
@@ -760,8 +760,8 @@ export default function PagesTab() {
           </Table>
           {filteredPages.length > displayLimit && (
             <div className="p-4 text-center border-t">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleLoadMore}
                 disabled={isLoadingMore}
               >
@@ -785,7 +785,7 @@ export default function PagesTab() {
               Add Custom Page
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Page Type</Label>
@@ -878,11 +878,11 @@ export default function PagesTab() {
               Edit Page: {editingPage?.name}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="p-3 rounded-xl bg-muted/50 mb-4">
             <p className="text-sm text-muted-foreground">URL: <code className="text-primary font-mono">{editingPage?.url}</code></p>
           </div>
-          
+
           <Tabs value={activeEditTab} onValueChange={setActiveEditTab} className="w-full">
             <TabsList className="grid w-full grid-cols-5 mb-4">
               <TabsTrigger value="seo" className="flex items-center gap-2"><Search className="h-4 w-4" />SEO</TabsTrigger>
@@ -891,7 +891,7 @@ export default function PagesTab() {
               <TabsTrigger value="faqs" className="flex items-center gap-2"><HelpCircle className="h-4 w-4" />FAQs</TabsTrigger>
               <TabsTrigger value="media" className="flex items-center gap-2"><Image className="h-4 w-4" />Media</TabsTrigger>
             </TabsList>
-            
+
             {/* SEO Tab */}
             <TabsContent value="seo" className="space-y-4">
               <div className="space-y-2">
@@ -902,7 +902,7 @@ export default function PagesTab() {
                   <span className={(editForm.meta_title?.length || 0) > 60 ? 'text-destructive' : 'text-muted-foreground'}>{editForm.meta_title?.length || 0}/60</span>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Meta Description</Label>
                 <Textarea value={editForm.meta_description || ''} onChange={(e) => setEditForm({ ...editForm, meta_description: e.target.value })} placeholder="Meta description for SEO (max 160 chars)" rows={3} />
@@ -911,13 +911,13 @@ export default function PagesTab() {
                   <span className={(editForm.meta_description?.length || 0) > 160 ? 'text-destructive' : 'text-muted-foreground'}>{editForm.meta_description?.length || 0}/160</span>
                 </div>
               </div>
-              
+
               {/* SEO Preview */}
               <div className="p-4 rounded-xl border bg-card">
                 <p className="text-xs text-muted-foreground mb-2">Google Preview</p>
                 <div className="space-y-1">
                   <p className="text-blue-600 text-lg hover:underline cursor-pointer truncate">{editForm.meta_title || editForm.h1 || 'Page Title'}</p>
-                  <p className="text-green-700 text-sm truncate">appointpanda.ae{editingPage?.url}</p>
+                  <p className="text-green-700 text-sm truncate">DubaiDentist.ae.ae{editingPage?.url}</p>
                   <p className="text-sm text-muted-foreground line-clamp-2">{editForm.meta_description || 'No meta description set...'}</p>
                 </div>
               </div>
@@ -930,7 +930,7 @@ export default function PagesTab() {
                 <Switch checked={editForm.noindex || false} onCheckedChange={(v) => setEditForm({ ...editForm, noindex: v })} />
               </div>
             </TabsContent>
-            
+
             {/* Hero Tab */}
             <TabsContent value="hero" className="space-y-4">
               <div className="space-y-2">
@@ -951,7 +951,7 @@ export default function PagesTab() {
                 <Input value={editForm.hero_image || ''} onChange={(e) => setEditForm({ ...editForm, hero_image: e.target.value })} placeholder="https://example.com/hero-image.jpg" />
               </div>
             </TabsContent>
-            
+
             {/* Content Tab */}
             <TabsContent value="content" className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -1057,7 +1057,7 @@ export default function PagesTab() {
                 </Button>
               )}
             </TabsContent>
-            
+
             {/* Media Tab */}
             <TabsContent value="media" className="space-y-4">
               <div className="space-y-2">
@@ -1105,7 +1105,7 @@ export default function PagesTab() {
               </div>
             </TabsContent>
           </Tabs>
-          
+
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleSavePage} disabled={upsertPageContent.isPending}>

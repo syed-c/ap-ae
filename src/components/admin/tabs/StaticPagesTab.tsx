@@ -193,10 +193,10 @@ export default function StaticPagesTab() {
       // Immediately refetch stats to show updated numbers
       refetchStats();
       queryClient.invalidateQueries({ queryKey: ["static-pages-cache"] });
-      
+
       // Log progress for visibility
       console.log(`Batch result: ${data.generated} generated, ${data.currentOffset}/${data.totalCount}, ${data.remaining} remaining`);
-      
+
       // If auto-running and not done, continue
       if (autoRunRef.current && !data.done && autoRunTypeRef.current === data.pageType) {
         setTimeout(() => {
@@ -276,7 +276,7 @@ export default function StaticPagesTab() {
     if (!testPath) return;
     setTestLoading(true);
     setTestResult(null);
-    
+
     try {
       // Use direct fetch for test mode
       const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/serve-static?path=${encodeURIComponent(testPath)}&test=1`;
@@ -285,10 +285,10 @@ export default function StaticPagesTab() {
           'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}`,
         },
       });
-      
+
       const html = await res.text();
       const cacheStatus = res.headers.get('x-static-cache') || 'unknown';
-      
+
       setTestResult({ html, status: cacheStatus });
     } catch (err) {
       toast.error(`Test failed: ${err}`);
@@ -367,9 +367,9 @@ export default function StaticPagesTab() {
             <span className="text-3xl font-bold">{statsLoading ? "..." : stats?.cached || 0}</span>
             <span className="text-lg text-muted-foreground">/ {statsLoading ? "..." : stats?.totalPossible || 0} pages</span>
           </div>
-          <Progress 
-            value={stats?.totalPossible ? Math.round(((stats?.cached || 0) / stats.totalPossible) * 100) : 0} 
-            className="h-3" 
+          <Progress
+            value={stats?.totalPossible ? Math.round(((stats?.cached || 0) / stats.totalPossible) * 100) : 0}
+            className="h-3"
           />
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
@@ -397,8 +397,8 @@ export default function StaticPagesTab() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
-            <Input 
-              placeholder="/ca/los-angeles/" 
+            <Input
+              placeholder="/ca/los-angeles/"
               value={testPath}
               onChange={(e) => setTestPath(e.target.value)}
               className="flex-1"
@@ -408,7 +408,7 @@ export default function StaticPagesTab() {
               Test
             </Button>
           </div>
-          
+
           {testResult && (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -448,8 +448,8 @@ export default function StaticPagesTab() {
               <RotateCcw className="mr-2 h-4 w-4" />
               Reset All Progress
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => refetchStats()}
               disabled={statsLoading}
             >
@@ -533,7 +533,7 @@ export default function StaticPagesTab() {
                   <TableRow key={page.id}>
                     <TableCell className="font-mono text-sm">
                       <a
-                        href={`https://www.appointpanda.ae${page.path}`}
+                        href={`https://www.DubaiDentist.ae.ae${page.path}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
@@ -588,7 +588,7 @@ export default function StaticPagesTab() {
               Pages will be regenerated on the next crawl or manual generation.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">What to purge:</label>
@@ -607,20 +607,20 @@ export default function StaticPagesTab() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
               <p className="text-sm text-destructive">
                 ⚠️ This action cannot be undone. Bots will see minimal HTML until pages are regenerated.
               </p>
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setPurgeDialogOpen(false)}>
               Cancel
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={() => purgeCacheMutation.mutate(purgeType === "stale" ? undefined : purgeType)}
               disabled={purgeCacheMutation.isPending}
             >

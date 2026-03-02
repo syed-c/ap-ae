@@ -23,15 +23,15 @@ export function validateMetadata(
 ): MetadataValidation {
   const titleLen = title?.length || 0;
   const descLen = description?.length || 0;
-  
+
   return {
     title: {
       isValid: titleLen >= config.titleMin && titleLen <= config.titleMax,
-      message: titleLen < config.titleMin 
+      message: titleLen < config.titleMin
         ? `Title too short (${titleLen}/${config.titleMin} min)`
-        : titleLen > config.titleMax 
-        ? `Title too long (${titleLen}/${config.titleMax} max)`
-        : `Good length (${titleLen} chars)`,
+        : titleLen > config.titleMax
+          ? `Title too long (${titleLen}/${config.titleMax} max)`
+          : `Good length (${titleLen} chars)`,
       length: titleLen,
     },
     description: {
@@ -39,8 +39,8 @@ export function validateMetadata(
       message: descLen < config.descMin
         ? `Description too short (${descLen}/${config.descMin} min)`
         : descLen > config.descMax
-        ? `Description too long (${descLen}/${config.descMax} max)`
-        : `Good length (${descLen} chars)`,
+          ? `Description too long (${descLen}/${config.descMax} max)`
+          : `Good length (${descLen} chars)`,
       length: descLen,
     },
     h1: {
@@ -53,30 +53,30 @@ export function validateMetadata(
 // Check for duplicate metadata across all pages
 export function useCheckDuplicateMetadata() {
   return useMutation({
-    mutationFn: async ({ 
-      title, 
-      description, 
-      excludeSlug 
-    }: { 
-      title: string; 
-      description: string; 
+    mutationFn: async ({
+      title,
+      description,
+      excludeSlug
+    }: {
+      title: string;
+      description: string;
       excludeSlug?: string;
     }) => {
       const { data: pages, error } = await supabase
         .from('seo_pages')
         .select('slug, meta_title, meta_description');
-      
+
       if (error) throw error;
-      
+
       const titleLower = title.trim().toLowerCase();
       const descLower = description.trim().toLowerCase();
-      
+
       const duplicateTitles: string[] = [];
       const duplicateDescriptions: string[] = [];
-      
+
       for (const page of pages || []) {
         if (excludeSlug && page.slug === excludeSlug) continue;
-        
+
         if (page.meta_title?.trim().toLowerCase() === titleLower) {
           duplicateTitles.push(page.slug);
         }
@@ -84,7 +84,7 @@ export function useCheckDuplicateMetadata() {
           duplicateDescriptions.push(page.slug);
         }
       }
-      
+
       return {
         hasDuplicateTitle: duplicateTitles.length > 0,
         hasDuplicateDescription: duplicateDescriptions.length > 0,
@@ -99,7 +99,7 @@ export function useCheckDuplicateMetadata() {
 // Full SEO validation before publishing
 export function useValidateBeforePublish() {
   const checkDuplicates = useCheckDuplicateMetadata();
-  
+
   return useMutation({
     mutationFn: async ({
       slug,
@@ -117,10 +117,10 @@ export function useValidateBeforePublish() {
       const errors: string[] = [];
       const warnings: string[] = [];
       let score = 100;
-      
+
       // Validate metadata lengths
       const metadata = validateMetadata(title, description, h1);
-      
+
       if (!metadata.title.isValid) {
         if (metadata.title.length < 40) {
           errors.push(`Title too short: ${metadata.title.length} chars (min 40)`);
@@ -130,7 +130,7 @@ export function useValidateBeforePublish() {
           score -= 5;
         }
       }
-      
+
       if (!metadata.description.isValid) {
         if (metadata.description.length < 120) {
           errors.push(`Description too short: ${metadata.description.length} chars (min 120)`);
@@ -140,12 +140,12 @@ export function useValidateBeforePublish() {
           score -= 5;
         }
       }
-      
+
       if (!metadata.h1.isValid) {
         errors.push(metadata.h1.message);
         score -= 15;
       }
-      
+
       // Check for duplicates
       try {
         const duplicateResult = await checkDuplicates.mutateAsync({
@@ -153,12 +153,12 @@ export function useValidateBeforePublish() {
           description,
           excludeSlug: slug,
         });
-        
+
         if (duplicateResult.hasDuplicateTitle) {
           errors.push(`Duplicate title found on: ${duplicateResult.duplicateTitles.slice(0, 3).join(', ')}`);
           score -= 30;
         }
-        
+
         if (duplicateResult.hasDuplicateDescription) {
           warnings.push(`Similar description on: ${duplicateResult.duplicateDescriptions.slice(0, 3).join(', ')}`);
           score -= 10;
@@ -166,7 +166,7 @@ export function useValidateBeforePublish() {
       } catch (e) {
         warnings.push('Could not check for duplicates');
       }
-      
+
       // Content quality checks
       if (content) {
         const wordCount = content.split(/\s+/).filter(Boolean).length;
@@ -175,12 +175,12 @@ export function useValidateBeforePublish() {
           score -= 10;
         }
       }
-      
+
       // Keyword in title check (basic)
       if (title && !title.toLowerCase().includes('dent')) {
         warnings.push('Consider including dental-related keywords in title');
       }
-      
+
       return {
         isValid: errors.length === 0,
         errors,
@@ -192,7 +192,7 @@ export function useValidateBeforePublish() {
 }
 
 // Canonical URL generator
-export function generateCanonicalUrl(slug: string, baseUrl = 'https://www.appointpanda.ae'): string {
+export function generateCanonicalUrl(slug: string, baseUrl = 'https://www.DubaiDentist.ae.ae'): string {
   // Ensure slug starts with /
   const cleanSlug = slug.startsWith('/') ? slug : `/${slug}`;
   // Remove trailing slash for consistency (except root)

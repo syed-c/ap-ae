@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 const PrivacyPage = () => {
   const { data: siteSettings } = useSiteSettings();
   const { data: seoContent } = useSeoPageContent("privacy");
-  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@appointpanda.ae';
+  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@DubaiDentist.ae.ae';
 
   const sections = [
     {
@@ -116,10 +116,10 @@ Data processed through our platform is stored within UAE-compliant infrastructur
       title: "11. Contact Us",
       content: `If you have any questions about this Privacy Policy or wish to exercise your data rights under UAE law, please contact us at:
 
-AppointPanda
+DubaiDentist.ae
 Dubai, United Arab Emirates
 Email: ${supportEmail}
-Data Protection Inquiries: privacy@appointpanda.ae`
+Data Protection Inquiries: privacy@DubaiDentist.ae.ae`
     }
   ];
 
@@ -132,10 +132,10 @@ Data Protection Inquiries: privacy@appointpanda.ae`
   return (
     <PageLayout>
       <SEOHead
-        title={seoContent?.meta_title || "Privacy Policy | AppointPanda Data Protection"}
-        description={seoContent?.meta_description || "Learn how AppointPanda collects, uses, and protects your personal information. Read our comprehensive privacy policy for patients and dental professionals."}
+        title={seoContent?.meta_title || "Privacy Policy | DubaiDentist.ae Data Protection"}
+        description={seoContent?.meta_description || "Learn how DubaiDentist.ae collects, uses, and protects your personal information. Read our comprehensive privacy policy for patients and dental professionals."}
         canonical="/privacy/"
-        keywords={['privacy policy', 'data protection', 'dental privacy', 'appointpanda privacy']}
+        keywords={['privacy policy', 'data protection', 'dental privacy', 'DubaiDentist.ae privacy']}
       />
 
       {/* Dark Hero Section */}
@@ -143,19 +143,19 @@ Data Protection Inquiries: privacy@appointpanda.ae`
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.15),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.1),transparent_50%)]" />
         <div className="absolute top-20 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-        
+
         <div className="container relative py-16 md:py-24">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
               <Lock className="h-4 w-4 text-primary" />
               <span className="text-sm font-bold text-primary">Your Privacy Matters</span>
             </div>
-            
+
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
               Privacy{" "}
               <span className="text-gradient">Policy</span>
             </h1>
-            
+
             <p className="text-lg text-dark-section-foreground/70 max-w-xl mx-auto mb-8">
               Your privacy is important to us. This policy explains how we collect, use, and protect your personal information.
             </p>
@@ -189,7 +189,7 @@ Data Protection Inquiries: privacy@appointpanda.ae`
             </div>
 
             <p className="text-muted-foreground mb-8 leading-relaxed p-4 rounded-xl bg-muted/50">
-              AppointPanda ("we", "us", or "our") is committed to protecting your privacy in accordance with the UAE Federal Decree-Law No. 45 of 2021 on the Protection of Personal Data (PDPL) and applicable regulations of Dubai Health Authority (DHA), Department of Health Abu Dhabi (DoH), and MOHAP. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services within the United Arab Emirates.
+              DubaiDentist.ae ("we", "us", or "our") is committed to protecting your privacy in accordance with the UAE Federal Decree-Law No. 45 of 2021 on the Protection of Personal Data (PDPL) and applicable regulations of Dubai Health Authority (DHA), Department of Health Abu Dhabi (DoH), and MOHAP. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services within the United Arab Emirates.
             </p>
 
             <div className="space-y-8">

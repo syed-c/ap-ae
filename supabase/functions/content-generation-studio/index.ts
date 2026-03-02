@@ -14,10 +14,10 @@ const corsHeaders = {
 // Those are managed by Meta Optimizer and FAQ Studio respectively.
 
 const CONTENT_STUDIO_ALLOWED_FIELDS = [
-  'h1', 'page_intro', 'h2_sections', 'content', 
+  'h1', 'page_intro', 'h2_sections', 'content',
   'internal_links_intro', 'word_count', 'is_thin_content',
   'last_content_edit_source', 'updated_at', 'is_optimized',
-  'optimized_at', 'metadata_hash', 'is_duplicate', 
+  'optimized_at', 'metadata_hash', 'is_duplicate',
   'similarity_score', 'similar_to_slug', 'last_generated_at'
 ];
 
@@ -108,7 +108,7 @@ serve(async (req) => {
       .select("role")
       .eq("user_id", userId);
 
-    const isAdmin = (roles ?? []).some((r) => 
+    const isAdmin = (roles ?? []).some((r) =>
       ["super_admin", "district_manager", "content_team", "seo_team"].includes(r.role)
     );
     if (!isAdmin) {
@@ -131,7 +131,7 @@ serve(async (req) => {
           await new Promise(r => setTimeout(r, delay));
           console.log(`content-generation-studio: Retry attempt ${attempt + 1}/${maxRetries}`);
         }
-        
+
         try {
           const response = await fetch("https://api.aimlapi.com/v1/chat/completions", {
             method: "POST",
@@ -143,12 +143,12 @@ serve(async (req) => {
           });
 
           if (response.ok) return response;
-          
+
           if (response.status >= 500 || response.status === 429) {
             lastError = new Error(`AI gateway returned ${response.status}`);
             continue;
           }
-          
+
           return response;
         } catch (networkError) {
           lastError = networkError instanceof Error ? networkError : new Error(String(networkError));
@@ -157,13 +157,13 @@ serve(async (req) => {
       throw lastError || new Error("AI gateway failed after retries");
     }
 
-    // Master system prompt for AppointPanda content (non-clinic pages)
-    const PLATFORM_SYSTEM_PROMPT = `You are generating SEO content ONLY for AppointPanda, a dental listing and appointment platform.
+    // Master system prompt for DubaiDentist.ae content (non-clinic pages)
+    const PLATFORM_SYSTEM_PROMPT = `You are generating SEO content ONLY for DubaiDentist.ae, a dental listing and appointment platform.
 
 === CRITICAL BUSINESS CONTEXT ===
-- AppointPanda helps users find, compare, and book dentists and dental clinics
+- DubaiDentist.ae helps users find, compare, and book dentists and dental clinics
 - We are NOT a dental clinic - we are a directory/booking platform
-- ALL content must be written in AppointPanda's first-party voice: "we", "our platform", "AppointPanda helps patients..."
+- ALL content must be written in DubaiDentist.ae's first-party voice: "we", "our platform", "DubaiDentist.ae helps patients..."
 
 You must NEVER write as:
 - a dentist or dental clinic
@@ -204,7 +204,7 @@ You must NEVER write as:
 
 === CALL TO ACTION ===
 End with calm, helpful CTA encouraging users to:
-- Explore dentists on AppointPanda
+- Explore dentists on DubaiDentist.ae
 - Book appointments through our platform`;
 
     // CLINIC-SPECIFIC system prompt - focuses on the clinic itself for branded SEO
@@ -213,7 +213,7 @@ End with calm, helpful CTA encouraging users to:
 === CRITICAL BUSINESS CONTEXT ===
 - This content is for the clinic's profile page to help it RANK for the clinic name
 - Write as a neutral, informative third-party describing THIS clinic
-- DO NOT mention "AppointPanda", "our platform", or any directory references
+- DO NOT mention "DubaiDentist.ae", "our platform", or any directory references
 - Focus 100% on the CLINIC: its services, location, team, patient experience
 - Goal: When someone searches the clinic name on Google, this page should rank
 
@@ -263,13 +263,13 @@ End with calm, helpful CTA encouraging users to:
 - Do NOT invent specific facts (founding year, staff names, awards)
 - Do NOT make up patient testimonials
 - Do NOT claim specific certifications unless provided
-- Do NOT mention AppointPanda or any booking platform`;
+- Do NOT mention DubaiDentist.ae or any booking platform`;
 
     // Generate unique anti-duplication seed based on slug and random factors
     function generateUniquenessSeed(slug: string, pageType: string): string {
       const timestamp = Date.now();
       const randomId = Math.random().toString(36).substring(2, 8);
-      
+
       // Opening style variations
       const openingStyles = [
         "Start with a compelling question that addresses the reader's immediate concern.",
@@ -281,7 +281,7 @@ End with calm, helpful CTA encouraging users to:
         "Start with a comparison or contrast that highlights key differences.",
         "Open with an engaging anecdote about dental care experiences."
       ];
-      
+
       // Structure variations
       const structureStyles = [
         "Use a problem-solution framework throughout.",
@@ -293,10 +293,10 @@ End with calm, helpful CTA encouraging users to:
         "Use a comparison framework highlighting options.",
         "Organize chronologically from initial visit to ongoing care."
       ];
-      
+
       const selectedOpening = openingStyles[timestamp % openingStyles.length];
       const selectedStructure = structureStyles[(timestamp + 3) % structureStyles.length];
-      
+
       return `
 === UNIQUENESS DIRECTIVE (ID: ${randomId}) ===
 This content MUST be completely different from all other pages. Use these specific instructions:
@@ -318,42 +318,42 @@ MANDATORY DIFFERENTIATION:
     // Generate content for a page
     async function generateContent(pageData: any, wordCount: number, clinicData?: any) {
       const { page_type, slug, title, content: existingContent } = pageData;
-      
+
       // Determine if this is a clinic page (uses different voice/strategy)
       const isClinicPage = page_type === "clinic" || page_type === "dentist";
-      
+
       // Generate uniqueness seed
       const uniquenessSeed = generateUniquenessSeed(slug, page_type);
-      
+
       // Build context based on page type
       let pageContext = "";
       const parts = slug.split("/").filter(Boolean);
-      
+
       switch (page_type) {
         case "state":
           const stateName = title || parts[0]?.toUpperCase() || "this state";
           pageContext = `This is a STATE directory page for ${stateName}.
-Context: Show all dental providers in ${stateName}. Explain how AppointPanda helps patients find dentists across the state.
-Include: Overview of dental care landscape, how to find a dentist, what AppointPanda offers, popular services.`;
+Context: Show all dental providers in ${stateName}. Explain how DubaiDentist.ae helps patients find dentists across the state.
+Include: Overview of dental care landscape, how to find a dentist, what DubaiDentist.ae offers, popular services.`;
           break;
-          
+
         case "city":
           const cityName = title || parts[1] || parts[0] || "this city";
           const stateAbbr = parts[0]?.toUpperCase() || "";
           pageContext = `This is a CITY directory page for ${cityName}, ${stateAbbr}.
-Context: Show dentists in ${cityName}. Explain how AppointPanda helps local residents find dental care.
+Context: Show dentists in ${cityName}. Explain how DubaiDentist.ae helps local residents find dental care.
 Include: Local dental care overview, finding the right dentist, services available, cost considerations.
 LOCAL SPECIFICITY: Mention specific aspects of ${cityName} - its neighborhoods, community character, or regional healthcare landscape.`;
           break;
-          
+
         case "treatment":
         case "service":
           const serviceName = title || slug.replace(/-/g, " ");
           pageContext = `This is a SERVICE/TREATMENT page for ${serviceName}.
 Context: Explain what ${serviceName} is, who needs it, what to expect.
-Include: What is this treatment, who is it for, process overview, cost considerations, how AppointPanda helps find providers.`;
+Include: What is this treatment, who is it for, process overview, cost considerations, how DubaiDentist.ae helps find providers.`;
           break;
-          
+
         case "service_location":
         case "city_treatment":
           const treatmentName = title || parts[parts.length - 1]?.replace(/-/g, " ") || "dental treatment";
@@ -361,10 +361,10 @@ Include: What is this treatment, who is it for, process overview, cost considera
           const locationState = parts[0]?.toUpperCase() || "";
           pageContext = `This is a SERVICE + LOCATION page for ${treatmentName} in ${locationCity}, ${locationState}.
 Context: Explain ${treatmentName} and how to find providers offering it in ${locationCity}.
-Include: What is ${treatmentName}, local availability, cost in this area, how to choose a provider, AppointPanda's role.
+Include: What is ${treatmentName}, local availability, cost in this area, how to choose a provider, DubaiDentist.ae's role.
 IMPORTANT: Make this unique - combine local ${locationCity} context with ${treatmentName} specifics. Don't just merge generic content.`;
           break;
-          
+
         case "clinic":
         case "dentist":
           // For clinic pages, extract clinic name and location for branded SEO
@@ -373,7 +373,7 @@ IMPORTANT: Make this unique - combine local ${locationCity} context with ${treat
           const clinicState = clinicData?.state || "";
           const clinicAddress = clinicData?.address || "";
           const clinicServices = clinicData?.services?.join(", ") || "general dental services";
-          
+
           pageContext = `This is a CLINIC PROFILE page for: ${clinicName}
 ${clinicCity ? `Location: ${clinicCity}${clinicState ? `, ${clinicState}` : ""}` : ""}
 ${clinicAddress ? `Address: ${clinicAddress}` : ""}
@@ -389,24 +389,24 @@ Content Focus:
 - DO NOT create fake testimonials
 - Focus on what patients searching for this clinic would want to know`;
           break;
-          
+
         case "static":
           pageContext = `This is a STATIC page (About, Features, Policy, etc.).
 Context: Write informative content appropriate for the page's purpose.
-Include: Clear explanation of the topic, how it relates to AppointPanda, user benefits.`;
+Include: Clear explanation of the topic, how it relates to DubaiDentist.ae, user benefits.`;
           break;
-          
+
         default:
-          pageContext = `This is a general page on AppointPanda.
+          pageContext = `This is a general page on DubaiDentist.ae.
 Context: Write helpful, informative content for dental patients.
-Include: Clear explanations, how AppointPanda helps, relevant information for the topic.`;
+Include: Clear explanations, how DubaiDentist.ae helps, relevant information for the topic.`;
       }
 
       // Select the appropriate system prompt
       const systemPrompt = isClinicPage ? CLINIC_SYSTEM_PROMPT : PLATFORM_SYSTEM_PROMPT;
-      
+
       // Build user prompt - include uniqueness seed for differentiation
-      const userPrompt = isClinicPage 
+      const userPrompt = isClinicPage
         ? `Generate SEO-optimized content for this CLINIC profile page:
 
 PAGE URL: /${slug}
@@ -420,7 +420,7 @@ ${existingContent.slice(0, 500)}...` : "No existing content - create from scratc
 
 ${uniquenessSeed}
 
-Generate comprehensive, unique content that helps this clinic rank for its name. Remember: NO AppointPanda mentions, write about the clinic only.`
+Generate comprehensive, unique content that helps this clinic rank for its name. Remember: NO DubaiDentist.ae mentions, write about the clinic only.`
         : `Generate SEO-optimized content for this page:
 
 PAGE URL: /${slug}
@@ -449,8 +449,8 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
             type: "function",
             function: {
               name: "generate_page_content",
-              description: isClinicPage 
-                ? "Generate BODY CONTENT ONLY for a dental clinic profile page (no meta tags, no FAQs)" 
+              description: isClinicPage
+                ? "Generate BODY CONTENT ONLY for a dental clinic profile page (no meta tags, no FAQs)"
                 : "Generate BODY CONTENT ONLY for SEO page (no meta tags, no FAQs - those are handled separately)",
               parameters: {
                 type: "object",
@@ -500,7 +500,7 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
       }
 
       const aiJson = await response.json();
-      
+
       // Extract from tool call
       if (aiJson.choices?.[0]?.message?.tool_calls?.[0]) {
         const toolCall = aiJson.choices[0].message.tool_calls[0];
@@ -512,7 +512,7 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
           }
         }
       }
-      
+
       // Fallback: try parsing content
       const content = aiJson.choices?.[0]?.message?.content;
       if (content) {
@@ -529,15 +529,15 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
     // NOTE: FAQs are NOT included here - they are managed separately by FAQ Studio
     function buildContentMarkdown(generated: any): string {
       let markdown = "";
-      
+
       if (generated.intro_paragraph) {
         markdown += generated.intro_paragraph + "\n\n";
       }
-      
+
       if (generated.h2_sections && Array.isArray(generated.h2_sections)) {
         for (const section of generated.h2_sections) {
           markdown += `## ${section.heading}\n\n${section.content}\n\n`;
-          
+
           if (section.h3_subsections && Array.isArray(section.h3_subsections)) {
             for (const subsection of section.h3_subsections) {
               markdown += `### ${subsection.heading}\n\n${subsection.content}\n\n`;
@@ -545,19 +545,19 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
           }
         }
       }
-      
+
       // FAQs REMOVED - FAQ Studio is responsible for FAQs (strict tool separation)
       // The FAQ section will be rendered from the dedicated `faqs` JSONB column
-      
+
       if (generated.closing_paragraph) {
         markdown += generated.closing_paragraph + "\n";
       }
-      
+
       // Add internal links intro if provided
       if (generated.internal_links_intro) {
         markdown += "\n" + generated.internal_links_intro + "\n";
       }
-      
+
       return markdown;
     }
 
@@ -593,36 +593,36 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
         .neq('id', pageId)
         .not('content', 'is', null)
         .limit(100);
-      
+
       let maxSimilarity = 0;
       let similarSlug: string | null = null;
-      
+
       // Normalize content for comparison
       const normalizeText = (text: string) => text.toLowerCase()
         .replace(/[^a-z0-9\s]/g, '')
         .split(/\s+/)
         .filter(w => w.length > 3);
-      
+
       const words1 = new Set(normalizeText(content));
-      
+
       // Also check opening sentences (first 100 words) for intro uniqueness
       const intro1 = normalizeText(content.slice(0, 500));
-      
+
       for (const candidate of candidates || []) {
         if (!candidate.content) continue;
-        
+
         const words2 = new Set(normalizeText(candidate.content));
         const intro2 = normalizeText(candidate.content.slice(0, 500));
-        
+
         if (words1.size === 0 || words2.size === 0) continue;
-        
+
         // Calculate word overlap similarity
         let shared = 0;
         for (const word of words1) {
           if (words2.has(word)) shared++;
         }
         const wordSimilarity = shared / Math.max(words1.size, words2.size);
-        
+
         // Calculate intro overlap (stricter check for opening)
         let introShared = 0;
         const introSet1 = new Set(intro1);
@@ -630,16 +630,16 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
           if (introSet1.has(word)) introShared++;
         }
         const introSimilarity = intro2.length > 0 ? introShared / Math.max(intro1.length, intro2.length) : 0;
-        
+
         // Combined similarity (weight intro more heavily as it's often most duplicated)
         const combinedSimilarity = (wordSimilarity * 0.6) + (introSimilarity * 0.4);
-        
+
         if (combinedSimilarity > maxSimilarity) {
           maxSimilarity = combinedSimilarity;
           similarSlug = candidate.slug;
         }
       }
-      
+
       // Stricter threshold: 70% instead of 80%
       return {
         isUnique: maxSimilarity < 0.70,
@@ -657,15 +657,15 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
         .eq("seo_page_id", pageId)
         .order("version_number", { ascending: false })
         .limit(1);
-      
+
       const nextVersion = (versions?.[0]?.version_number || 0) + 1;
-      
+
       // Mark existing versions as not current
       await supabaseAdmin
         .from("seo_content_versions")
         .update({ is_current: false })
         .eq("seo_page_id", pageId);
-      
+
       // Insert new version
       await supabaseAdmin.from("seo_content_versions").insert({
         seo_page_id: pageId,
@@ -711,21 +711,21 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
         }
 
         const wordCount = config?.word_count || 700;
-        
+
         // For clinic pages, fetch additional clinic data for better content
         let clinicData = null;
         if (page.page_type === "clinic" || page.page_type === "dentist") {
           // Try to extract clinic ID from slug (e.g., /clinic/clinic-slug)
           const slugParts = page.slug.split("/").filter(Boolean);
           const clinicSlug = slugParts[slugParts.length - 1];
-          
+
           // Fetch clinic data for richer content
           const { data: clinic } = await supabaseAdmin
             .from("clinics")
             .select("id, name, city, state, address, services, description")
             .eq("slug", clinicSlug)
             .single();
-          
+
           if (clinic) {
             clinicData = {
               name: clinic.name,
@@ -737,9 +737,9 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
             };
           }
         }
-        
+
         const generated = await generateContent(page, wordCount, clinicData);
-        
+
         // Build full content
         const fullContent = buildContentMarkdown(generated);
         const actualWordCount = countWords(fullContent);
@@ -768,11 +768,11 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
 
           // Check uniqueness before saving
           const uniquenessResult = await checkContentUniqueness(fullContent, page_id, page.page_type);
-          
+
           // Update the page with uniqueness info
           // STRICT SEPARATION: Content Studio does NOT write to meta_title, meta_description, or faqs
           const contentHash = hashContent(fullContent);
-          
+
           // Build update object - ONLY body content fields
           const updateData: Record<string, any> = {
             // meta_title REMOVED - Meta Optimizer responsibility
@@ -794,7 +794,7 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
             last_generated_at: now,
             last_content_edit_source: 'content_studio',
           };
-          
+
           // Validate we're not writing to blocked fields
           const validation = validateContentStudioWrite(Object.keys(updateData));
           if (!validation.valid) {
@@ -804,7 +804,7 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
               delete updateData[blocked];
             }
           }
-          
+
           const { error: updateError } = await supabaseAdmin
             .from("seo_pages")
             .update(updateData)
@@ -1054,8 +1054,8 @@ CRITICAL: This content MUST be 100% unique. Do not reuse any phrases, structures
 
   } catch (error) {
     console.error("content-generation-studio error:", error);
-    return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : "Internal server error" 
+    return new Response(JSON.stringify({
+      error: error instanceof Error ? error.message : "Internal server error"
     }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

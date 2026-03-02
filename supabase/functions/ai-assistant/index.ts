@@ -33,9 +33,9 @@ serve(async (req) => {
       throw new Error("AIMLAPI_KEY is not configured");
     }
 
-    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
-                     req.headers.get("x-real-ip") || 
-                     "unknown";
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "unknown";
 
     const { messages, clinicId, sessionId, visitorId }: ChatRequest = await req.json();
 
@@ -203,17 +203,17 @@ CURRENT CLINIC CONTEXT (user is viewing this clinic):
     // ─── DETECT USER INTENT FOR SMART RESPONSES ──────────────────────
     const lastMsg = lastUserMessage?.content?.toLowerCase() || "";
     let intentHint = "";
-    
+
     // Search-like queries — help user navigate
     if (lastMsg.match(/find|search|looking for|need|want|where|recommend/i)) {
       // Try to find matching clinics based on the query
       let searchResults = "";
-      
+
       // Check if user mentions a city
       const matchedCity = cities?.find(c => lastMsg.includes(c.name.toLowerCase()));
       // Check if user mentions a treatment
       const matchedTreatment = treatments?.find(t => lastMsg.includes(t.name.toLowerCase()));
-      
+
       if (matchedCity || matchedTreatment) {
         let clinicQuery = supabase
           .from("clinics")
@@ -221,12 +221,12 @@ CURRENT CLINIC CONTEXT (user is viewing this clinic):
           .eq("is_active", true)
           .order("rating", { ascending: false })
           .limit(5);
-        
+
         if (matchedCity) {
           const cityData = cities?.find(c => c.name === matchedCity.name);
           // We can't easily filter by city name in this query, but we can try
         }
-        
+
         const { data: matchedClinics } = await clinicQuery;
         if (matchedClinics && matchedClinics.length > 0) {
           searchResults = matchedClinics.map(c => {
@@ -239,7 +239,7 @@ CURRENT CLINIC CONTEXT (user is viewing this clinic):
     }
 
     // ─── BUILD SYSTEM PROMPT ─────────────────────────────────────────
-    const systemPrompt = `You are Panda 🐼, AppointPanda's smart dental assistant for the UAE.
+    const systemPrompt = `You are Panda 🐼, DubaiDentist.ae's smart dental assistant for the UAE.
 
 === PERSONALITY ===
 - Warm, concise, human-like. Like a friendly receptionist, not a robot.

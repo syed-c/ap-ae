@@ -14,8 +14,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { ACTIVE_STATES } from '@/lib/constants/activeStates';
-import { 
-  Sparkles, 
+import {
+  Sparkles,
   Search,
   FileText,
   RefreshCw,
@@ -128,32 +128,32 @@ export default function MetaOptimizerTab() {
 
         if (error) throw error;
         const batch = (data || []) as unknown as SeoPage[];
-        
+
         // Filter: keep all pages from active emirates + non-location pages
         const filteredBatch = batch.filter(page => {
           const slug = page.slug || '';
           const slugParts = slug.split('/').filter(Boolean);
           if (slugParts.length === 0) return true; // Keep root pages
-          
+
           const firstPart = slugParts[0].toLowerCase();
-          
+
           // Keep if first part is an active emirate slug
           if (activeStateSlugs.includes(firstPart as typeof activeStateSlugs[number])) return true;
-          
+
           // Keep non-location pages: services, blog, clinic, dentist, insurance, static pages
-          const nonLocationPrefixes = ['services', 'blog', 'clinic', 'dentist', 'insurance', 
+          const nonLocationPrefixes = ['services', 'blog', 'clinic', 'dentist', 'insurance',
             'about', 'contact', 'faq', 'privacy', 'terms', 'pricing', 'sitemap', 'how-it-works'];
           if (nonLocationPrefixes.includes(firstPart)) return true;
-          
+
           // Keep pages whose page_type is static, blog, service, clinic, dentist, treatment
           const keepTypes = ['static', 'blog', 'blog-post', 'blog-index', 'service', 'treatment',
             'clinic', 'dentist', 'insurance-index', 'insurance-detail', 'home'];
           if (page.page_type && keepTypes.includes(page.page_type)) return true;
-          
+
           // Filter out pages from inactive/legacy US state slugs (2-letter codes not matching emirates)
           return false;
         });
-        
+
         all.push(...filteredBatch);
         if (batch.length < pageSize) break;
         from += pageSize;
@@ -210,9 +210,9 @@ export default function MetaOptimizerTab() {
     // Search filter
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      if (!page.slug.toLowerCase().includes(q) && 
-          !(page.title || '').toLowerCase().includes(q) &&
-          !(page.meta_title || '').toLowerCase().includes(q)) {
+      if (!page.slug.toLowerCase().includes(q) &&
+        !(page.title || '').toLowerCase().includes(q) &&
+        !(page.meta_title || '').toLowerCase().includes(q)) {
         return false;
       }
     }
@@ -222,7 +222,7 @@ export default function MetaOptimizerTab() {
 
   // Toggle selection
   const toggleSelection = (pageId: string) => {
-    setSelectedPages(prev => 
+    setSelectedPages(prev =>
       prev.includes(pageId) ? prev.filter(id => id !== pageId) : [...prev, pageId]
     );
   };
@@ -289,9 +289,9 @@ export default function MetaOptimizerTab() {
 
       if (result.success) {
         fixed++;
-        addLog({ 
-          page: page?.slug || pageId, 
-          action: 'completed', 
+        addLog({
+          page: page?.slug || pageId,
+          action: 'completed',
           message: `✓ Optimized successfully`,
           oldMeta,
           newMeta: result.newMeta
@@ -504,10 +504,10 @@ export default function MetaOptimizerTab() {
                 <Zap className="h-4 w-4 mr-1" />
                 Select Incomplete
               </Button>
-              <Button 
-                variant="default" 
-                size="sm" 
-                onClick={batchOptimize} 
+              <Button
+                variant="default"
+                size="sm"
+                onClick={batchOptimize}
                 disabled={isOptimizing || selectedPages.length === 0}
                 className="bg-primary hover:bg-primary/90"
               >
@@ -608,17 +608,17 @@ export default function MetaOptimizerTab() {
                         <TableCell>{getMetaStatus(page)}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               className="h-7 w-7"
                               onClick={() => setPreviewPage(page)}
                             >
                               <Eye className="h-3.5 w-3.5" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               className="h-7 w-7"
                               onClick={() => {
                                 setEditPage(page);
@@ -663,14 +663,13 @@ export default function MetaOptimizerTab() {
               ) : (
                 <div className="space-y-2">
                   {logs.map((log, i) => (
-                    <div 
-                      key={i} 
-                      className={`text-xs p-2 rounded-lg border ${
-                        log.action === 'error' ? 'bg-red-50 border-red-200' :
-                        log.action === 'completed' ? 'bg-green-50 border-green-200' :
-                        log.action === 'skipped' ? 'bg-yellow-50 border-yellow-200' :
-                        'bg-slate-50 border-slate-200'
-                      }`}
+                    <div
+                      key={i}
+                      className={`text-xs p-2 rounded-lg border ${log.action === 'error' ? 'bg-red-50 border-red-200' :
+                          log.action === 'completed' ? 'bg-green-50 border-green-200' :
+                            log.action === 'skipped' ? 'bg-yellow-50 border-yellow-200' :
+                              'bg-slate-50 border-slate-200'
+                        }`}
                     >
                       <div className="flex items-start gap-2">
                         {log.action === 'completed' && <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0 mt-0.5" />}
@@ -711,7 +710,7 @@ export default function MetaOptimizerTab() {
                 {previewPage?.meta_title || previewPage?.title || 'No Title Set'}
               </p>
               <p className="text-green-700 text-sm">
-                https://www.appointpanda.ae{previewPage?.slug?.startsWith('/') ? previewPage.slug : `/${previewPage?.slug}`}
+                https://www.DubaiDentist.ae.ae{previewPage?.slug?.startsWith('/') ? previewPage.slug : `/${previewPage?.slug}`}
               </p>
               <p className="text-gray-600 text-sm mt-1 line-clamp-2">
                 {previewPage?.meta_description || 'No description set. This page needs a meta description for better SEO.'}
@@ -776,7 +775,7 @@ export default function MetaOptimizerTab() {
             <div className="p-4 bg-slate-50 border rounded-lg">
               <p className="text-xs text-muted-foreground mb-2">Google Preview:</p>
               <p className="text-blue-700 font-medium truncate">{editTitle || 'No Title'}</p>
-              <p className="text-green-700 text-sm">https://www.appointpanda.ae{editPage?.slug?.startsWith('/') ? editPage.slug : `/${editPage?.slug}`}</p>
+              <p className="text-green-700 text-sm">https://www.DubaiDentist.ae.ae{editPage?.slug?.startsWith('/') ? editPage.slug : `/${editPage?.slug}`}</p>
               <p className="text-gray-600 text-sm mt-1 line-clamp-2">{editDescription || 'No description'}</p>
             </div>
           </div>

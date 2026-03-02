@@ -163,17 +163,17 @@ export default function DentistSidebar({
           'h-4 w-4 flex-shrink-0 transition-colors',
           isActive ? 'text-white' : 'text-slate-500 group-hover:text-primary'
         )} />
-        
+
         {!collapsed && (
           <>
             <span className="flex-1 text-left truncate">{item.label}</span>
-            
+
             {showBadgeCount && (
               <Badge className="h-5 min-w-5 px-1 text-[10px] font-bold bg-coral text-white border-0">
                 {pendingCount > 9 ? '9+' : pendingCount}
               </Badge>
             )}
-            
+
             {item.badge === 'AI' && (
               <Badge className="h-4 px-1 text-[9px] font-bold bg-gradient-to-r from-purple-500 to-indigo-500 text-white border-0">
                 AI
@@ -228,7 +228,7 @@ export default function DentistSidebar({
           <Sparkles className="h-4 w-4 text-white" />
         </div>
         {!collapsed && (
-          <span className="font-bold text-sm text-slate-800">AppointPanda</span>
+          <span className="font-bold text-sm text-slate-800">DubaiDentist.ae</span>
         )}
       </div>
 
@@ -301,7 +301,7 @@ export default function DentistSidebar({
             </>
           )}
         </button>
-        
+
         {/* User + Sign Out - Compact */}
         <div className={cn('p-2 border-t border-slate-100', collapsed && 'flex flex-col items-center')}>
           <div className={cn('flex items-center gap-2', collapsed && 'flex-col')}>
@@ -318,7 +318,7 @@ export default function DentistSidebar({
               </div>
             )}
           </div>
-          
+
           <Button
             variant="ghost"
             size="sm"

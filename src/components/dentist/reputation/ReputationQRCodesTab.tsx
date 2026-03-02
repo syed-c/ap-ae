@@ -247,7 +247,7 @@ export default function ReputationQRCodesTab({
             <h2>${settings.customCTA}</h2>
             <p>${settings.customFooter}</p>
           </div>
-          ${settings.showBranding ? '<div class="footer">Powered by AppointPanda</div>' : ''}
+          ${settings.showBranding ? '<div class="footer">Powered by DubaiDentist.ae</div>' : ''}
         </div>
         <script>window.onload = function() { setTimeout(function() { window.print(); window.close(); }, 500); }</script>
       </body>
@@ -356,9 +356,8 @@ export default function ReputationQRCodesTab({
                     <button
                       key={style.id}
                       onClick={() => updateSettings({ selectedStyle: style.id })}
-                      className={`h-8 w-8 rounded-full bg-gradient-to-br ${style.gradient} transition-all ${
-                        settings.selectedStyle === style.id ? 'ring-2 ring-offset-2 ring-primary scale-110' : 'opacity-70 hover:opacity-100'
-                      }`}
+                      className={`h-8 w-8 rounded-full bg-gradient-to-br ${style.gradient} transition-all ${settings.selectedStyle === style.id ? 'ring-2 ring-offset-2 ring-primary scale-110' : 'opacity-70 hover:opacity-100'
+                        }`}
                       title={style.name}
                     />
                   ))}
@@ -375,7 +374,7 @@ export default function ReputationQRCodesTab({
                       <p className="text-sm opacity-90 mb-2">{settings.customSubtitle}</p>
                       {settings.showStars && (
                         <div className="flex justify-center gap-1">
-                          {[1,2,3,4,5].map(i => (
+                          {[1, 2, 3, 4, 5].map(i => (
                             <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                           ))}
                         </div>
@@ -396,7 +395,7 @@ export default function ReputationQRCodesTab({
                     </div>
                     {settings.showBranding && (
                       <div className="border-t border-slate-100 py-3 text-center bg-slate-50">
-                        <span className="text-xs text-slate-400">Powered by <span className="font-semibold text-primary">AppointPanda</span></span>
+                        <span className="text-xs text-slate-400">Powered by <span className="font-semibold text-primary">DubaiDentist.ae</span></span>
                       </div>
                     )}
                   </Card>
@@ -460,7 +459,7 @@ export default function ReputationQRCodesTab({
                       <Switch checked={settings.showStars} onCheckedChange={(checked) => updateSettings({ showStars: checked })} />
                     </div>
                     <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                      <Label>Show AppointPanda Branding</Label>
+                      <Label>Show DubaiDentist.ae Branding</Label>
                       <Switch checked={settings.showBranding} onCheckedChange={(checked) => updateSettings({ showBranding: checked })} />
                     </div>
                     <div className="space-y-2">

@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useSchemaSettings } from '@/hooks/useSchemaSettings';
 import { withTrailingSlash } from '@/lib/url/withTrailingSlash';
 
-const BASE_URL = 'https://www.appointpanda.ae';
+const BASE_URL = 'https://www.DubaiDentist.ae.ae';
 
 // Organization Schema
 export interface OrganizationSchemaProps {
@@ -103,7 +103,7 @@ const generateOrganizationSchema = (settings?: {
   socialProfiles?: string[];
 }) => {
   const org = settings || {
-    name: 'AppointPanda',
+    name: 'DubaiDentist.ae',
     url: BASE_URL,
     logo: `${BASE_URL}/logo.png`,
     description: 'Find and book appointments with top-rated dental professionals across the UAE.',
@@ -121,7 +121,7 @@ const generateOrganizationSchema = (settings?: {
   if (org.email) schema.email = org.email;
   if (org.phone) schema.telephone = org.phone;
   if (org.foundingDate) schema.foundingDate = org.foundingDate;
-  
+
   if (org.founders && org.founders.length > 0) {
     schema.founder = org.founders.map(name => ({
       '@type': 'Person',
@@ -164,28 +164,28 @@ const generateLocalBusinessSchema = (props: LocalBusinessSchemaProps) => ({
   priceRange: props.priceRange || '$$',
   address: props.address
     ? {
-        '@type': 'PostalAddress',
-        streetAddress: props.address,
-        addressLocality: props.city,
-        addressCountry: props.country || 'AE',
-      }
+      '@type': 'PostalAddress',
+      streetAddress: props.address,
+      addressLocality: props.city,
+      addressCountry: props.country || 'AE',
+    }
     : undefined,
   geo: props.geo
     ? {
-        '@type': 'GeoCoordinates',
-        latitude: props.geo.lat,
-        longitude: props.geo.lng,
-      }
+      '@type': 'GeoCoordinates',
+      latitude: props.geo.lat,
+      longitude: props.geo.lng,
+    }
     : undefined,
   aggregateRating:
     props.rating
       ? {
-          '@type': 'AggregateRating',
-          ratingValue: props.rating,
-          reviewCount: props.reviewCount || 0,
-          bestRating: 5,
-          worstRating: 1,
-        }
+        '@type': 'AggregateRating',
+        ratingValue: props.rating,
+        reviewCount: props.reviewCount || 0,
+        bestRating: 5,
+        worstRating: 1,
+      }
       : undefined,
   openingHoursSpecification: props.openingHours?.map((h) => ({
     '@type': 'OpeningHoursSpecification',
@@ -205,10 +205,10 @@ const generatePersonSchema = (props: PersonSchemaProps) => ({
   url: `${BASE_URL}${withTrailingSlash(props.url)}`,
   worksFor: props.worksFor
     ? {
-        '@type': 'Dentist',
-        name: props.worksFor.name,
-        url: `${BASE_URL}${withTrailingSlash(props.worksFor.url)}`,
-      }
+      '@type': 'Dentist',
+      name: props.worksFor.name,
+      url: `${BASE_URL}${withTrailingSlash(props.worksFor.url)}`,
+    }
     : undefined,
   hasCredential: props.qualifications?.map((q) => ({
     '@type': 'EducationalOccupationalCredential',
@@ -227,11 +227,11 @@ const generateArticleSchema = (props: ArticleSchemaProps) => ({
   dateModified: props.dateModified || props.datePublished,
   author: {
     '@type': 'Person',
-    name: props.author || 'AppointPanda Team',
+    name: props.author || 'DubaiDentist.ae Team',
   },
   publisher: {
     '@type': 'Organization',
-    name: 'AppointPanda',
+    name: 'DubaiDentist.ae',
     logo: {
       '@type': 'ImageObject',
       url: `${BASE_URL}/logo.png`,
@@ -281,22 +281,22 @@ const generateServiceSchema = (props: ServiceSchemaProps) => ({
   url: `${BASE_URL}${withTrailingSlash(props.url)}`,
   provider: props.provider
     ? {
-        '@type': 'Organization',
-        name: props.provider,
-      }
+      '@type': 'Organization',
+      name: props.provider,
+    }
     : {
-        '@type': 'Organization',
-        name: 'AppointPanda',
-      },
+      '@type': 'Organization',
+      name: 'DubaiDentist.ae',
+    },
   areaServed: props.areaServed
     ? {
-        '@type': 'City',
-        name: props.areaServed,
-      }
+      '@type': 'City',
+      name: props.areaServed,
+    }
     : {
-        '@type': 'Country',
-        name: 'United Arab Emirates',
-      },
+      '@type': 'Country',
+      name: 'United Arab Emirates',
+    },
   serviceType: 'Dental Service',
 });
 

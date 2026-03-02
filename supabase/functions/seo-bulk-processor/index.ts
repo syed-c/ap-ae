@@ -57,12 +57,12 @@ serve(async (req) => {
 
       for (let i = 0; i < page_ids.length; i++) {
         const pageId = page_ids[i];
-        
+
         // Add delay between requests to avoid rate limiting (skip first request)
         if (i > 0) {
           await delay(RATE_LIMIT_DELAY_MS);
         }
-        
+
         try {
           // Fetch current page data
           const { data: page, error: pageError } = await supabase
@@ -127,7 +127,7 @@ serve(async (req) => {
           if (shouldApply) {
             // Apply changes to seo_pages
             const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
-            
+
             if (config.regenerateMetaTitle && generatedContent.meta_title) {
               updateData.meta_title = generatedContent.meta_title;
             }
@@ -177,7 +177,7 @@ serve(async (req) => {
           // Update job progress
           await supabase
             .from("seo_fix_jobs")
-            .update({ 
+            .update({
               processed_pages: successful + failed,
               successful_pages: successful,
               failed_pages: failed,
@@ -195,11 +195,11 @@ serve(async (req) => {
             status: "failed",
             error_message: errorMsg,
           });
-          
+
           // Update job progress even on failure
           await supabase
             .from("seo_fix_jobs")
-            .update({ 
+            .update({
               processed_pages: successful + failed,
               successful_pages: successful,
               failed_pages: failed,
@@ -283,13 +283,13 @@ async function generateSeoContentWithRetry(
   apiKey: string
 ): Promise<Record<string, unknown>> {
   let lastError: Error | null = null;
-  
+
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
       return await generateSeoContent(page, config, customPrompt, apiKey);
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
+
       // Check if it's a rate limit error
       if (lastError.message.includes("429") || lastError.message.includes("rate limit")) {
         // Exponential backoff: 3s, 6s, 12s
@@ -298,12 +298,12 @@ async function generateSeoContentWithRetry(
         await delay(backoffTime);
         continue;
       }
-      
+
       // For non-rate-limit errors, throw immediately
       throw lastError;
     }
   }
-  
+
   // All retries exhausted, return fallback content
   console.warn("All retries exhausted, using fallback content");
   return generateFallbackContent(page, config);
@@ -357,7 +357,7 @@ async function generateSeoContent(
   if (config.regenerateIntro) tasksToGenerate.push("intro_text (2-3 sentences, engaging opener)");
   if (config.regenerateFaq) tasksToGenerate.push("faq_items (array of {question, answer} objects, 3-6 FAQs)");
 
-  const systemPrompt = `You are an SEO expert for AppointPanda, a dental appointment booking platform.
+  const systemPrompt = `You are an SEO expert for DubaiDentist.ae, a dental appointment booking platform.
 Write content that is:
 - Unique and not templated/repetitive
 - Written in first-person plural ("we", "our team")
@@ -433,10 +433,10 @@ function generateFallbackContent(
   const result: Record<string, unknown> = {};
 
   if (config.regenerateMetaTitle) {
-    result.meta_title = `${titleCase} | Find Dentists Near You | AppointPanda`;
+    result.meta_title = `${titleCase} | Find Dentists Near You | DubaiDentist.ae`;
   }
   if (config.regenerateMetaDescription) {
-    result.meta_description = `Book ${titleCase.toLowerCase()} appointments with top-rated dentists. Compare prices, read reviews, and schedule online with AppointPanda.`;
+    result.meta_description = `Book ${titleCase.toLowerCase()} appointments with top-rated dentists. Compare prices, read reviews, and schedule online with DubaiDentist.ae.`;
   }
   if (config.regenerateH1) {
     result.h1 = `${titleCase} - Expert Dental Care`;
