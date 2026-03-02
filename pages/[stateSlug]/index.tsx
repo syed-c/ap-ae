@@ -35,104 +35,100 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         return { notFound: true };
     }
 
-    // 2. Prefetch Cities
-    await queryClient.prefetchQuery({
-        queryKey: ['cities-by-state', normalizedStateSlug],
-        queryFn: async () => {
-            const { data } = await supabase
-                .from('cities')
-                .select(`*, state:states(*)`)
-                .eq('state_id', stateData.id)
-                .eq('is_active', true)
-                .order('name');
-            return data || [];
-        }
-    });
+    // 2. Parallelizing independent queries
+    await Promise.all([
+        queryClient.prefetchQuery({
+            queryKey: ['cities-by-state', normalizedStateSlug],
+            queryFn: async () => {
+                const { data } = await supabase
+                    .from('cities')
+                    .select(`*, state:states(*)`)
+                    .eq('state_id', stateData.id)
+                    .eq('is_active', true)
+                    .order('name');
+                return data || [];
+            }
+        }),
+        queryClient.prefetchQuery({
+            queryKey: ['seo-page-content', normalizedStateSlug],
+            queryFn: async () => {
+                const withTrailingSlash = (s: string) => (s.endsWith("/") ? s : `${s}/`);
+                const withoutTrailingSlash = (s: string) => s.replace(/\/+$/g, "");
 
-    // 3. Prefetch SEO Content
-    await queryClient.prefetchQuery({
-        queryKey: ['seo-page-content', normalizedStateSlug],
-        queryFn: async () => {
-            const withTrailingSlash = (s: string) => (s.endsWith("/") ? s : `${s}/`);
-            const withoutTrailingSlash = (s: string) => s.replace(/\/+$/g, "");
+                const candidates = Array.from(new Set([
+                    normalizedStateSlug,
+                    `/${normalizedStateSlug}`,
+                    withTrailingSlash(normalizedStateSlug),
+                    withTrailingSlash(`/${normalizedStateSlug}`),
+                    withoutTrailingSlash(normalizedStateSlug),
+                    `/${withoutTrailingSlash(normalizedStateSlug)}`,
+                ].filter(Boolean)));
 
-            const candidates = Array.from(new Set([
-                normalizedStateSlug,
-                `/${normalizedStateSlug}`,
-                withTrailingSlash(normalizedStateSlug),
-                withTrailingSlash(`/${normalizedStateSlug}`),
-                withoutTrailingSlash(normalizedStateSlug),
-                `/${withoutTrailingSlash(normalizedStateSlug)}`,
-            ].filter(Boolean)));
+                // Try optimized
+                const { data: optimizedData } = await supabase
+                    .from("seo_pages")
+                    .select("*")
+                    .in("slug", candidates)
+                    .eq("is_optimized", true)
+                    .not("content", "is", null)
+                    .order("updated_at", { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
 
-            // Try optimized
-            const { data: optimizedData } = await supabase
-                .from("seo_pages")
-                .select("*")
-                .in("slug", candidates)
-                .eq("is_optimized", true)
-                .not("content", "is", null)
-                .order("updated_at", { ascending: false })
-                .limit(1)
-                .maybeSingle();
+                if (optimizedData && optimizedData.content) return optimizedData;
 
-            if (optimizedData && optimizedData.content) return optimizedData;
+                // Try any
+                const { data: anyData } = await supabase
+                    .from("seo_pages")
+                    .select("*")
+                    .in("slug", candidates)
+                    .not("content", "is", null)
+                    .order("updated_at", { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
 
-            // Try any
-            const { data: anyData } = await supabase
-                .from("seo_pages")
-                .select("*")
-                .in("slug", candidates)
-                .not("content", "is", null)
-                .order("updated_at", { ascending: false })
-                .limit(1)
-                .maybeSingle();
+                if (anyData) return anyData;
 
-            if (anyData) return anyData;
+                // Try meta only
+                const { data: metaOnlyData } = await supabase
+                    .from("seo_pages")
+                    .select("*")
+                    .in("slug", candidates)
+                    .or("meta_title.not.is.null,meta_description.not.is.null")
+                    .order("is_optimized", { ascending: false })
+                    .order("updated_at", { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
 
-            // Try meta only
-            const { data: metaOnlyData } = await supabase
-                .from("seo_pages")
-                .select("*")
-                .in("slug", candidates)
-                .or("meta_title.not.is.null,meta_description.not.is.null")
-                .order("is_optimized", { ascending: false })
-                .order("updated_at", { ascending: false })
-                .limit(1)
-                .maybeSingle();
-
-            return metaOnlyData || null;
-        }
-    });
-
-    // 4. Prefetch Treatments
-    await queryClient.prefetchQuery({
-        queryKey: ["treatments"],
-        queryFn: async () => {
-            const { data } = await supabase
-                .from("treatments")
-                .select("*")
-                .eq("is_active", true)
-                .order("display_order")
-                .limit(8);
-            return data || [];
-        },
-    });
-
-    // 5. Prefetch Pinned Profiles
-    await queryClient.prefetchQuery({
-        queryKey: ['pinned-profiles', 'state', normalizedStateSlug, 'undefined'],
-        queryFn: async () => {
-            const { data } = await supabase
-                .from('pinned_profiles')
-                .select('*')
-                .eq('entity_type', 'state')
-                .eq('entity_slug', normalizedStateSlug)
-                .eq('is_active', true)
-                .order('display_order');
-            return data || [];
-        }
-    });
+                return metaOnlyData || null;
+            }
+        }),
+        queryClient.prefetchQuery({
+            queryKey: ["treatments"],
+            queryFn: async () => {
+                const { data } = await supabase
+                    .from("treatments")
+                    .select("*")
+                    .eq("is_active", true)
+                    .order("display_order")
+                    .limit(8);
+                return data || [];
+            },
+        }),
+        queryClient.prefetchQuery({
+            queryKey: ['pinned-profiles', 'state', normalizedStateSlug, 'undefined'],
+            queryFn: async () => {
+                const { data } = await supabase
+                    .from('pinned_profiles')
+                    .select('*')
+                    .eq('entity_type', 'state')
+                    .eq('entity_slug', normalizedStateSlug)
+                    .eq('is_active', true)
+                    .order('display_order');
+                return data || [];
+            }
+        })
+    ]);
 
     const pinnedProfiles = queryClient.getQueryData<any>(['pinned-profiles', 'state', normalizedStateSlug, 'undefined']);
     const pinnedIds = pinnedProfiles?.map((p: any) => p.profile_id) || [];
