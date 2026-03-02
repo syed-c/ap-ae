@@ -156,7 +156,7 @@ export const DentistListFrame = ({
                 <meta itemProp="bestRating" content="5" />
                 <meta itemProp="worstRating" content="1" />
               </span>}
-              {profile.slug && <a itemProp="url" href={`https://www.DubaiDentist.ae.ae/clinic/${profile.slug}/`}>View Profile</a>}
+              {profile.slug && <a itemProp="url" href={`https://www.AppointPanda.ae/clinic/${profile.slug}/`}>View Profile</a>}
             </div>
           ))}
         </div>
@@ -179,7 +179,7 @@ export const DentistListFrame = ({
               <meta itemProp="bestRating" content="5" />
               <meta itemProp="worstRating" content="1" />
             </span>}
-            {profile.slug && <a itemProp="url" href={`https://www.DubaiDentist.ae.ae/clinic/${profile.slug}/`}>{profile.name}</a>}
+            {profile.slug && <a itemProp="url" href={`https://www.AppointPanda.ae/clinic/${profile.slug}/`}>{profile.name}</a>}
           </div>
         ))}
       </div>

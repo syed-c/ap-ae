@@ -32,8 +32,8 @@ async function getEmailSettings(supabase: any): Promise<EmailSettings | null> {
   }
 
   return {
-    from_email: 'no-reply@DubaiDentist.ae.com',
-    from_name: 'DubaiDentist.ae'
+    from_email: 'no-reply@AppointPanda.com',
+    from_name: 'AppointPanda'
   };
 }
 
@@ -183,10 +183,10 @@ function generateNotificationEmailHTML(
           <tr>
             <td style="background-color: #1e293b; border-radius: 0 0 16px 16px; padding: 28px 32px; text-align: center;">
               <p style="color: #94a3b8; font-size: 13px; margin: 0 0 8px 0;">
-                This is an automated notification from DubaiDentist.ae
+                This is an automated notification from AppointPanda
               </p>
               <p style="color: #64748b; font-size: 12px; margin: 0;">
-                &copy; ${new Date().getFullYear()} DubaiDentist.ae. All rights reserved
+                &copy; ${new Date().getFullYear()} AppointPanda. All rights reserved
               </p>
             </td>
           </tr>
@@ -283,7 +283,7 @@ serve(async (req) => {
     const emailSettings = await getEmailSettings(supabase);
 
     // Generate dashboard URL
-    const dashboardUrl = 'https://www.DubaiDentist.ae.com/dashboard?tab=my-intake-forms';
+    const dashboardUrl = 'https://www.AppointPanda.com/dashboard?tab=my-intake-forms';
 
     // Generate and send email
     const emailHtml = generateNotificationEmailHTML(

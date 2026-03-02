@@ -917,7 +917,7 @@ export default function PagesTab() {
                 <p className="text-xs text-muted-foreground mb-2">Google Preview</p>
                 <div className="space-y-1">
                   <p className="text-blue-600 text-lg hover:underline cursor-pointer truncate">{editForm.meta_title || editForm.h1 || 'Page Title'}</p>
-                  <p className="text-green-700 text-sm truncate">DubaiDentist.ae.ae{editingPage?.url}</p>
+                  <p className="text-green-700 text-sm truncate">AppointPanda.ae{editingPage?.url}</p>
                   <p className="text-sm text-muted-foreground line-clamp-2">{editForm.meta_description || 'No meta description set...'}</p>
                 </div>
               </div>

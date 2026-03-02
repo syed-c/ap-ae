@@ -182,7 +182,7 @@ const AISearchPage = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
-        title="Smart Dental Search | Find Dentists by Budget & Location | DubaiDentist.ae"
+        title="Smart Dental Search | Find Dentists by Budget & Location | AppointPanda"
         description="Tell us what you need, your budget, and location. Our AI finds the perfect dentist match instantly."
         canonical="/search/"
         keywords={["budget dental search", "affordable dentist", "find dentist near me", "dental care finder"]}

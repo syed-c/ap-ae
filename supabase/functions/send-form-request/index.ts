@@ -34,8 +34,8 @@ async function getEmailSettings(supabase: any): Promise<EmailSettings> {
   }
 
   return {
-    from_email: 'no-reply@DubaiDentist.ae.ae',
-    from_name: 'DubaiDentist.ae'
+    from_email: 'no-reply@AppointPanda.ae',
+    from_name: 'AppointPanda'
   };
 }
 
@@ -184,7 +184,7 @@ serve(async (req) => {
     const { submissionId, templateName, deliveryMethod, patientEmail, patientPhone, patientName, customMessage, clinicName } = body;
 
     // Generate the form URL
-    const baseUrl = `https://www.DubaiDentist.ae.com/form/${submissionId}`;
+    const baseUrl = `https://www.AppointPanda.com/form/${submissionId}`;
     const { data: submissionRow } = await supabase
       .from('patient_form_submissions')
       .select('access_token')

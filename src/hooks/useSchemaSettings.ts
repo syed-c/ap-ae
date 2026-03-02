@@ -35,9 +35,9 @@ export interface SchemaSettings {
 
 // Default settings as fallback
 const defaultOrganization: OrganizationSettings = {
-  name: 'DubaiDentist.ae',
-  url: 'https://www.DubaiDentist.ae.ae',
-  logo: 'https://www.DubaiDentist.ae.ae/logo.png',
+  name: 'AppointPanda',
+  url: 'https://www.AppointPanda.ae',
+  logo: 'https://www.AppointPanda.ae/logo.png',
   description: 'Find and book appointments with top-rated dental professionals across the UAE.',
   email: '',
   phone: '',

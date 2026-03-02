@@ -192,7 +192,7 @@ export function useValidateBeforePublish() {
 }
 
 // Canonical URL generator
-export function generateCanonicalUrl(slug: string, baseUrl = 'https://www.DubaiDentist.ae.ae'): string {
+export function generateCanonicalUrl(slug: string, baseUrl = 'https://www.AppointPanda.ae'): string {
   // Ensure slug starts with /
   const cleanSlug = slug.startsWith('/') ? slug : `/${slug}`;
   // Remove trailing slash for consistency (except root)

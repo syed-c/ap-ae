@@ -18,7 +18,7 @@ const FAQPage = () => {
   const { data: siteSettings } = useSiteSettings();
   const { data: counts } = useRealCounts();
   const { data: seoContent } = useSeoPageContent("faq");
-  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@DubaiDentist.ae.ae';
+  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@AppointPanda.ae';
   const supportPhone = siteSettings?.contactDetails?.support_phone || '+971 4 123 4567';
 
   const categories = [
@@ -29,7 +29,7 @@ const FAQPage = () => {
       faqs: [
         {
           q: "How do I find a DHA-licensed dentist in Dubai?",
-          a: "Use our search feature to filter by emirate, area, or treatment type. All dentists on DubaiDentist.ae are licensed by DHA (Dubai), DOH (Abu Dhabi), or MOHAP. Dentists with the 'Verified' badge have completed our additional credential verification."
+          a: "Use our search feature to filter by emirate, area, or treatment type. All dentists on AppointPanda are licensed by DHA (Dubai), DOH (Abu Dhabi), or MOHAP. Dentists with the 'Verified' badge have completed our additional credential verification."
         },
         {
           q: "What is the average cost of dental treatment in Dubai (AED)?",
@@ -45,15 +45,15 @@ const FAQPage = () => {
         },
         {
           q: "Can I book same-day emergency dental appointments in Dubai?",
-          a: "Yes, many clinics on DubaiDentist.ae offer same-day emergency appointments. Search for 'Emergency Dental Care' and filter by your area. Clinics in Dubai, Abu Dhabi, and Sharjah typically have extended hours for emergencies."
+          a: "Yes, many clinics on AppointPanda offer same-day emergency appointments. Search for 'Emergency Dental Care' and filter by your area. Clinics in Dubai, Abu Dhabi, and Sharjah typically have extended hours for emergencies."
         },
         {
           q: "Are dental treatments covered under my employment visa insurance?",
           a: "Most UAE employment visa insurance plans include basic dental coverage (check-ups, cleaning, extractions). Coverage for cosmetic procedures varies by plan. Check with your insurer or use our insurance filter to find clinics that accept your specific provider."
         },
         {
-          q: "Is DubaiDentist.ae free for patients?",
-          a: "Yes, DubaiDentist.ae is completely free for patients. You can search for dentists, read reviews, compare AED pricing, and request appointments without any charges."
+          q: "Is AppointPanda free for patients?",
+          a: "Yes, AppointPanda is completely free for patients. You can search for dentists, read reviews, compare AED pricing, and request appointments without any charges."
         },
       ]
     },
@@ -63,7 +63,7 @@ const FAQPage = () => {
       color: "from-gold/20 to-amber-500/10",
       faqs: [
         {
-          q: "How do I list my clinic on DubaiDentist.ae?",
+          q: "How do I list my clinic on AppointPanda?",
           a: "Visit our 'List Your Practice' page and fill out the registration form with your DHA/DOH/MOHAP license number. Our team will verify your credentials and contact you within 24-48 hours. Basic listings are free."
         },
         {
@@ -94,8 +94,8 @@ const FAQPage = () => {
           a: "DHA (Dubai Health Authority) licenses and regulates healthcare practitioners in Dubai. DOH (Department of Health) does the same for Abu Dhabi. MOHAP (Ministry of Health and Prevention) covers the remaining 5 emirates — Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain. All maintain rigorous standards."
         },
         {
-          q: "What areas does DubaiDentist.ae cover?",
-          a: "DubaiDentist.ae covers dental practices across all 7 UAE Emirates — Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain. Within Dubai alone, we cover areas including Jumeirah, Marina, Downtown, Deira, Bur Dubai, JLT, DIFC, Business Bay, Mirdif, Al Barsha, Karama, and Satwa."
+          q: "What areas does AppointPanda cover?",
+          a: "AppointPanda covers dental practices across all 7 UAE Emirates — Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain. Within Dubai alone, we cover areas including Jumeirah, Marina, Downtown, Deira, Bur Dubai, JLT, DIFC, Business Bay, Mirdif, Al Barsha, Karama, and Satwa."
         },
         {
           q: "Are dental clinics in UAE JCI accredited?",
@@ -116,7 +116,7 @@ const FAQPage = () => {
   return (
     <PageLayout>
       <SEOHead
-        title={seoContent?.meta_title || "FAQ | Dental Care Questions in Dubai & UAE | DubaiDentist.ae"}
+        title={seoContent?.meta_title || "FAQ | Dental Care Questions in Dubai & UAE | AppointPanda"}
         description={seoContent?.meta_description || "Find answers about DHA-licensed dentists, dental costs in AED, UAE insurance coverage, and booking appointments in Dubai, Abu Dhabi & Sharjah."}
         canonical="/faq/"
         keywords={['dental FAQ UAE', 'dentist dubai questions', 'DHA licensed dentist', 'dental cost AED', 'UAE dental insurance']}
@@ -228,7 +228,7 @@ const FAQPage = () => {
             Ready to find your dentist in UAE?
           </h2>
           <p className="text-dark-section-foreground/70 mb-8 max-w-xl mx-auto">
-            Join thousands of patients across Dubai, Abu Dhabi & Sharjah who've found their perfect dental care provider through DubaiDentist.ae.
+            Join thousands of patients across Dubai, Abu Dhabi & Sharjah who've found their perfect dental care provider through AppointPanda.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button asChild size="lg" className="rounded-2xl font-bold shadow-glow">

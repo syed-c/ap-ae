@@ -83,11 +83,11 @@ function generateTitle(pageType: string, data: Record<string, any>): string {
       break;
 
     case "static":
-      title = `${name} | DubaiDentist.ae`;
+      title = `${name} | AppointPanda`;
       break;
 
     default:
-      title = `${name || "Dental Care"} | DubaiDentist.ae`;
+      title = `${name || "Dental Care"} | AppointPanda`;
   }
 
   return truncateTitle(title, 60);
@@ -155,21 +155,21 @@ function generateDescription(pageType: string, data: Record<string, any>): strin
         "/services": "Browse dental services from cleanings to implants. Find providers in your area.",
         "/blog": "Expert dental health tips and oral care advice from verified professionals.",
         "/insurance": "Find dentists that accept your insurance. Compare in-network providers.",
-        "/about": "DubaiDentist.ae connects patients with verified dental professionals.",
-        "/contact": "Get in touch with DubaiDentist.ae. Questions about booking or listings?",
-        "/faq": "FAQs about DubaiDentist.ae. Learn how to find dentists and book appointments.",
+        "/about": "AppointPanda connects patients with verified dental professionals.",
+        "/contact": "Get in touch with AppointPanda. Questions about booking or listings?",
+        "/faq": "FAQs about AppointPanda. Learn how to find dentists and book appointments.",
         "/how-it-works": "Book a dentist in 3 easy steps. Search, compare, and schedule online.",
-        "/pricing": "Transparent pricing for dental practices. List your clinic on DubaiDentist.ae.",
-        "/privacy": "Learn how DubaiDentist.ae protects your personal information and data.",
-        "/terms": "Terms of service for DubaiDentist.ae platform users.",
-        "/sitemap": "Browse all pages on DubaiDentist.ae. Find dentists by location or service.",
+        "/pricing": "Transparent pricing for dental practices. List your clinic on AppointPanda.",
+        "/privacy": "Learn how AppointPanda protects your personal information and data.",
+        "/terms": "Terms of service for AppointPanda platform users.",
+        "/sitemap": "Browse all pages on AppointPanda. Find dentists by location or service.",
       };
-      desc = staticDescs[slug] || `${name} - DubaiDentist.ae helps you find trusted dentists online.`;
+      desc = staticDescs[slug] || `${name} - AppointPanda helps you find trusted dentists online.`;
       break;
     }
 
     default:
-      desc = `Find trusted dental care with DubaiDentist.ae. ${closer}`;
+      desc = `Find trusted dental care with AppointPanda. ${closer}`;
   }
 
   return truncateDesc(desc, 155);
@@ -214,10 +214,10 @@ function generateH1(pageType: string, data: Record<string, any>): string {
         "/services": "Dental Services & Treatments",
         "/blog": "Dental Health Insights",
         "/insurance": "Dental Insurance Guide",
-        "/about": "About DubaiDentist.ae",
+        "/about": "About AppointPanda",
         "/contact": "Contact Us",
         "/faq": "Frequently Asked Questions",
-        "/how-it-works": "How DubaiDentist.ae Works",
+        "/how-it-works": "How AppointPanda Works",
         "/pricing": "Pricing for Practices",
         "/privacy": "Privacy Policy",
         "/terms": "Terms of Service",
@@ -585,7 +585,7 @@ serve(async (req) => {
           h1: h1,
           og_title: title,
           og_description: description,
-          canonical_url: `https://www.DubaiDentist.ae.com${page.slug}`,
+          canonical_url: `https://www.AppointPanda.com${page.slug}`,
           metadata_hash: metaHash,
           is_indexed: true,
           last_generated_at: now,

@@ -70,7 +70,7 @@ export function VerifiedExplanation({ className = "" }: VerifiedExplanationProps
         </div>
         <h3 className="font-bold text-foreground mb-3">Our Verification Process</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Every verified dentist on DubaiDentist.ae undergoes a thorough vetting process including license verification,
+          Every verified dentist on AppointPanda undergoes a thorough vetting process including license verification,
           identity confirmation, and credential checks with the relevant health authorities (DHA, DOH, MOH).
         </p>
         <Link

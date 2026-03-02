@@ -11,7 +11,7 @@ export default function SeoOperationsCenterTab() {
   const [activeTab, setActiveTab] = useState('operations');
 
   const handleInspectPage = (page: SeoPage) => {
-    window.open(`https://www.DubaiDentist.ae.ae${page.slug}`, '_blank');
+    window.open(`https://www.AppointPanda.ae${page.slug}`, '_blank');
   };
 
   return (

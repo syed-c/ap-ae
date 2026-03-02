@@ -485,7 +485,7 @@ export default function ReviewRequestPage() {
           {/* Footer */}
           <div className="text-center mt-6">
             <p className="text-xs text-muted-foreground">
-              Request ID: {request.short_code || request.id.slice(0, 8)} • Powered by <span className="font-semibold text-primary">DubaiDentist.ae</span>
+              Request ID: {request.short_code || request.id.slice(0, 8)} • Powered by <span className="font-semibold text-primary">AppointPanda</span>
             </p>
           </div>
         </div>

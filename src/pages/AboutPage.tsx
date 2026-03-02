@@ -42,7 +42,7 @@ const AboutPage = () => {
   ];
 
   const milestones = [
-    { year: "2024", title: "Founded", description: "DubaiDentist.ae was launched to connect patients with verified dental professionals across the UAE." },
+    { year: "2024", title: "Founded", description: "AppointPanda was launched to connect patients with verified dental professionals across the UAE." },
     { year: "2025", title: "UAE Coverage", description: "Expanded to cover all 7 Emirates with deep area mapping in Dubai and Sharjah." },
     { year: "2026", title: "Market Leader", description: "Becoming the UAE's most trusted dental directory with DHA-aligned verification standards." },
   ];
@@ -50,10 +50,10 @@ const AboutPage = () => {
   return (
     <PageLayout>
       <SEOHead
-        title={seoContent?.meta_title || "About DubaiDentist.ae | UAE's Trusted Dental Directory"}
-        description={seoContent?.meta_description || "Learn about DubaiDentist.ae, the UAE's trusted platform connecting patients with verified dental professionals across all Emirates."}
+        title={seoContent?.meta_title || "About AppointPanda | UAE's Trusted Dental Directory"}
+        description={seoContent?.meta_description || "Learn about AppointPanda, the UAE's trusted platform connecting patients with verified dental professionals across all Emirates."}
         canonical="/about/"
-        keywords={['about DubaiDentist.ae', 'dental directory', 'find dentist', 'dental care platform']}
+        keywords={['about AppointPanda', 'dental directory', 'find dentist', 'dental care platform']}
       />
 
       {/* Dark Hero Section */}
@@ -119,7 +119,7 @@ const AboutPage = () => {
               Connecting Patients with <span className="text-primary">Trusted Dentists</span>
             </h2>
             <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-              We believe everyone deserves access to quality dental care. DubaiDentist.ae was founded with a simple mission:
+              We believe everyone deserves access to quality dental care. AppointPanda was founded with a simple mission:
               to connect patients across the UAE with trusted, verified dental professionals aligned with DHA and MOHAP standards.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-6">
@@ -216,7 +216,7 @@ const AboutPage = () => {
             Ready to find your dentist?
           </h2>
           <p className="text-dark-section-foreground/70 mb-8 max-w-xl mx-auto">
-            Join thousands of patients who've found their perfect dental care provider through DubaiDentist.ae.
+            Join thousands of patients who've found their perfect dental care provider through AppointPanda.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button asChild size="lg" className="rounded-2xl font-bold shadow-glow">

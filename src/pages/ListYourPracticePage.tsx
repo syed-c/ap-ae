@@ -96,7 +96,7 @@ const ListYourPracticePage = () => {
     try {
       localStorage.setItem('gmb_listing_flow', 'true');
       // Always use production domain for OAuth callback
-      const redirectTo = 'https://www.DubaiDentist.ae.ae/auth/callback?listing=true';
+      const redirectTo = 'https://www.AppointPanda.ae/auth/callback?listing=true';
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -301,8 +301,8 @@ const ListYourPracticePage = () => {
   return (
     <PageLayout>
       <SEOHead
-        title="List Your Dental Practice | Join DubaiDentist.ae Directory"
-        description="List your dental practice for free on DubaiDentist.ae. Reach thousands of patients, get verified, collect reviews, and grow your practice with our dental directory."
+        title="List Your Dental Practice | Join AppointPanda Directory"
+        description="List your dental practice for free on AppointPanda. Reach thousands of patients, get verified, collect reviews, and grow your practice with our dental directory."
         canonical="/list-your-practice/"
         keywords={['list dental practice', 'dental directory listing', 'dentist marketing', 'dental practice growth']}
       />
@@ -611,8 +611,8 @@ const ListYourPracticePage = () => {
                                   <label
                                     key={treatment.id}
                                     className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${selectedServices.includes(treatment.id)
-                                        ? 'border-primary bg-primary/5'
-                                        : 'border-border hover:border-primary/30'
+                                      ? 'border-primary bg-primary/5'
+                                      : 'border-border hover:border-primary/30'
                                       }`}
                                   >
                                     <Checkbox

@@ -326,7 +326,7 @@ export default function GMBBusinessSelection() {
     }
 
     // Always use production domain for OAuth callback
-    const redirectTo = `https://www.DubaiDentist.ae.ae/auth/callback?${isRelinkFlow ? 'relink=true' : 'listing=true'}`;
+    const redirectTo = `https://www.AppointPanda.ae/auth/callback?${isRelinkFlow ? 'relink=true' : 'listing=true'}`;
 
     // IMPORTANT: Always use signInWithOAuth (not linkIdentity) for GMB flows
     // signInWithOAuth ensures we get a fresh provider_token with business.manage scope
@@ -436,7 +436,7 @@ export default function GMBBusinessSelection() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Select Your Practice</h1>
           <p className="text-muted-foreground">
-            Choose the Google Business Profile you want to list on DubaiDentist.ae
+            Choose the Google Business Profile you want to list on AppointPanda
           </p>
         </div>
 

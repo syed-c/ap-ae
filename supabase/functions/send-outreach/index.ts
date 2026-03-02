@@ -192,7 +192,7 @@ serve(async (req) => {
         }
 
         let htmlContent = '';
-        let subject = 'Test Email from DubaiDentist.ae';
+        let subject = 'Test Email from AppointPanda';
 
         if (templateId) {
           const { data: template } = await supabase
@@ -239,7 +239,7 @@ serve(async (req) => {
                 </div>
                 <div style="text-align: center; margin-top: 30px;">
                   <p style="font-size: 12px; color: #9ca3af;">
-                    Sent from DubaiDentist.ae • Powered by your SMTP server
+                    Sent from AppointPanda • Powered by your SMTP server
                   </p>
                 </div>
               </div>
@@ -251,8 +251,8 @@ serve(async (req) => {
         // Replace variables with test data
         const testVariables = {
           clinic_name: 'Test Dental Clinic',
-          claim_link: 'https://DubaiDentist.ae.ae/claim-profile?test=true',
-          unsubscribe_link: 'https://DubaiDentist.ae.ae/unsubscribe?test=true',
+          claim_link: 'https://AppointPanda.ae/claim-profile?test=true',
+          unsubscribe_link: 'https://AppointPanda.ae/unsubscribe?test=true',
           dentist_name: 'Dr. Test User',
           patient_name: 'Test Patient',
         };
@@ -338,7 +338,7 @@ serve(async (req) => {
         let htmlContent = template.html_content;
         let subject = message.subject;
 
-        const siteUrl = Deno.env.get('SITE_URL') || 'https://DubaiDentist.ae.ae';
+        const siteUrl = Deno.env.get('SITE_URL') || 'https://AppointPanda.ae';
         const variables = {
           clinic_name: clinic?.name || 'Your Clinic',
           claim_link: `${siteUrl}/claim-profile?clinic_id=${message.clinic_id}`,
@@ -543,7 +543,7 @@ serve(async (req) => {
           );
         }
 
-        const siteUrl = Deno.env.get('SITE_URL') || 'https://DubaiDentist.ae.ae';
+        const siteUrl = Deno.env.get('SITE_URL') || 'https://AppointPanda.ae';
         let successCount = 0;
         let failCount = 0;
         const errors: string[] = [];

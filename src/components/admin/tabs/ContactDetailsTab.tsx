@@ -260,7 +260,7 @@ export default function ContactDetailsTab() {
                     type="email"
                     value={contactDetails.support_email}
                     onChange={(e) => updateContact('support_email', e.target.value)}
-                    placeholder="support@DubaiDentist.ae.ae"
+                    placeholder="support@AppointPanda.ae"
                   />
                   <p className="text-xs text-muted-foreground">For customer inquiries and help requests</p>
                 </div>
@@ -274,7 +274,7 @@ export default function ContactDetailsTab() {
                     type="email"
                     value={contactDetails.booking_email}
                     onChange={(e) => updateContact('booking_email', e.target.value)}
-                    placeholder="bookings@DubaiDentist.ae.ae"
+                    placeholder="bookings@AppointPanda.ae"
                   />
                   <p className="text-xs text-muted-foreground">For appointment-related questions</p>
                 </div>
@@ -288,7 +288,7 @@ export default function ContactDetailsTab() {
                     type="email"
                     value={contactDetails.sales_email}
                     onChange={(e) => updateContact('sales_email', e.target.value)}
-                    placeholder="sales@DubaiDentist.ae.ae"
+                    placeholder="sales@AppointPanda.ae"
                   />
                   <p className="text-xs text-muted-foreground">For pricing and subscription inquiries</p>
                 </div>
@@ -302,7 +302,7 @@ export default function ContactDetailsTab() {
                     type="email"
                     value={contactDetails.partnerships_email}
                     onChange={(e) => updateContact('partnerships_email', e.target.value)}
-                    placeholder="partners@DubaiDentist.ae.ae"
+                    placeholder="partners@AppointPanda.ae"
                   />
                   <p className="text-xs text-muted-foreground">For business partnerships and collaborations</p>
                 </div>
@@ -483,7 +483,7 @@ export default function ContactDetailsTab() {
                   <Input
                     value={socialLinks.facebook}
                     onChange={(e) => updateSocial('facebook', e.target.value)}
-                    placeholder="https://facebook.com/DubaiDentist.ae"
+                    placeholder="https://facebook.com/AppointPanda"
                   />
                 </div>
 
@@ -495,7 +495,7 @@ export default function ContactDetailsTab() {
                   <Input
                     value={socialLinks.instagram}
                     onChange={(e) => updateSocial('instagram', e.target.value)}
-                    placeholder="https://instagram.com/DubaiDentist.ae"
+                    placeholder="https://instagram.com/AppointPanda"
                   />
                 </div>
 
@@ -507,7 +507,7 @@ export default function ContactDetailsTab() {
                   <Input
                     value={socialLinks.twitter}
                     onChange={(e) => updateSocial('twitter', e.target.value)}
-                    placeholder="https://twitter.com/DubaiDentist.ae"
+                    placeholder="https://twitter.com/AppointPanda"
                   />
                 </div>
 
@@ -519,7 +519,7 @@ export default function ContactDetailsTab() {
                   <Input
                     value={socialLinks.linkedin}
                     onChange={(e) => updateSocial('linkedin', e.target.value)}
-                    placeholder="https://linkedin.com/company/DubaiDentist.ae"
+                    placeholder="https://linkedin.com/company/AppointPanda"
                   />
                 </div>
 
@@ -531,7 +531,7 @@ export default function ContactDetailsTab() {
                   <Input
                     value={socialLinks.youtube}
                     onChange={(e) => updateSocial('youtube', e.target.value)}
-                    placeholder="https://youtube.com/@DubaiDentist.ae"
+                    placeholder="https://youtube.com/@AppointPanda"
                   />
                 </div>
 
@@ -543,7 +543,7 @@ export default function ContactDetailsTab() {
                   <Input
                     value={socialLinks.tiktok}
                     onChange={(e) => updateSocial('tiktok', e.target.value)}
-                    placeholder="https://tiktok.com/@DubaiDentist.ae"
+                    placeholder="https://tiktok.com/@AppointPanda"
                   />
                 </div>
               </div>

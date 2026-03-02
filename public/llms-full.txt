@@ -1,9 +1,9 @@
-# DubaiDentist.ae - Complete AI Knowledge Base
-# https://www.DubaiDentist.ae.ae
+# AppointPanda - Complete AI Knowledge Base
+# https://www.AppointPanda.ae
 # Last updated: 2026-02-19
 
 ## Overview
-DubaiDentist.ae is the premier dental directory in the United Arab Emirates, designed to connect patients with qualified dental professionals. Our platform aggregates 1,170+ verified dental clinics and dentists from across the UAE, making it easy for anyone to find dental care in their local area.
+AppointPanda is the premier dental directory in the United Arab Emirates, designed to connect patients with qualified dental professionals. Our platform aggregates 1,170+ verified dental clinics and dentists from across the UAE, making it easy for anyone to find dental care in their local area.
 
 ## Mission
 Our mission is to simplify the process of finding quality dental care in the UAE by providing:
@@ -71,45 +71,45 @@ Participating practices offer:
 ## URL Structure Guide
 
 ### Emirate Pages
-Format: `https://www.DubaiDentist.ae.ae/{emirate-slug}/`
+Format: `https://www.AppointPanda.ae/{emirate-slug}/`
 Examples:
-- https://www.DubaiDentist.ae.ae/dubai/
-- https://www.DubaiDentist.ae.ae/abu-dhabi/
-- https://www.DubaiDentist.ae.ae/sharjah/
+- https://www.AppointPanda.ae/dubai/
+- https://www.AppointPanda.ae/abu-dhabi/
+- https://www.AppointPanda.ae/sharjah/
 
 ### Area Pages
-Format: `https://www.DubaiDentist.ae.ae/{emirate-slug}/{area-slug}/`
+Format: `https://www.AppointPanda.ae/{emirate-slug}/{area-slug}/`
 Examples:
-- https://www.DubaiDentist.ae.ae/dubai/jumeirah/
-- https://www.DubaiDentist.ae.ae/dubai/al-barsha/
-- https://www.DubaiDentist.ae.ae/dubai/business-bay/
-- https://www.DubaiDentist.ae.ae/dubai/dubai-marina/
-- https://www.DubaiDentist.ae.ae/abu-dhabi/khalifa-city/
-- https://www.DubaiDentist.ae.ae/sharjah/al-jubail/
+- https://www.AppointPanda.ae/dubai/jumeirah/
+- https://www.AppointPanda.ae/dubai/al-barsha/
+- https://www.AppointPanda.ae/dubai/business-bay/
+- https://www.AppointPanda.ae/dubai/dubai-marina/
+- https://www.AppointPanda.ae/abu-dhabi/khalifa-city/
+- https://www.AppointPanda.ae/sharjah/al-jubail/
 
 ### Service Pages
-Format: `https://www.DubaiDentist.ae.ae/services/{service-slug}/`
+Format: `https://www.AppointPanda.ae/services/{service-slug}/`
 Examples:
-- https://www.DubaiDentist.ae.ae/services/invisalign/
-- https://www.DubaiDentist.ae.ae/services/dental-implants/
-- https://www.DubaiDentist.ae.ae/services/teeth-whitening/
-- https://www.DubaiDentist.ae.ae/services/veneers/
-- https://www.DubaiDentist.ae.ae/services/root-canal/
-- https://www.DubaiDentist.ae.ae/services/braces/
-- https://www.DubaiDentist.ae.ae/services/teeth-cleaning/
-- https://www.DubaiDentist.ae.ae/services/dental-crowns/
-- https://www.DubaiDentist.ae.ae/services/wisdom-tooth-removal/
-- https://www.DubaiDentist.ae.ae/services/emergency-dentist/
+- https://www.AppointPanda.ae/services/invisalign/
+- https://www.AppointPanda.ae/services/dental-implants/
+- https://www.AppointPanda.ae/services/teeth-whitening/
+- https://www.AppointPanda.ae/services/veneers/
+- https://www.AppointPanda.ae/services/root-canal/
+- https://www.AppointPanda.ae/services/braces/
+- https://www.AppointPanda.ae/services/teeth-cleaning/
+- https://www.AppointPanda.ae/services/dental-crowns/
+- https://www.AppointPanda.ae/services/wisdom-tooth-removal/
+- https://www.AppointPanda.ae/services/emergency-dentist/
 
 ### Service + Location Pages
-Format: `https://www.DubaiDentist.ae.ae/{emirate-slug}/{area-slug}/{service-slug}/`
+Format: `https://www.AppointPanda.ae/{emirate-slug}/{area-slug}/{service-slug}/`
 Examples:
-- https://www.DubaiDentist.ae.ae/dubai/jumeirah/invisalign/
-- https://www.DubaiDentist.ae.ae/dubai/al-barsha/dental-implants/
-- https://www.DubaiDentist.ae.ae/abu-dhabi/khalifa-city/teeth-whitening/
+- https://www.AppointPanda.ae/dubai/jumeirah/invisalign/
+- https://www.AppointPanda.ae/dubai/al-barsha/dental-implants/
+- https://www.AppointPanda.ae/abu-dhabi/khalifa-city/teeth-whitening/
 
 ### Clinic Profiles
-Format: `https://www.DubaiDentist.ae.ae/clinic/{clinic-slug}/`
+Format: `https://www.AppointPanda.ae/clinic/{clinic-slug}/`
 These pages include:
 - Clinic overview and description
 - Team members (dentists and staff)
@@ -121,7 +121,7 @@ These pages include:
 - Online booking options
 
 ### Dentist Profiles
-Format: `https://www.DubaiDentist.ae.ae/dentist/{dentist-slug}/`
+Format: `https://www.AppointPanda.ae/dentist/{dentist-slug}/`
 These pages include:
 - Professional bio
 - DHA/MOHAP credentials and education
@@ -131,19 +131,19 @@ These pages include:
 - Associated clinic
 
 ### Insurance Pages
-Format: `https://www.DubaiDentist.ae.ae/insurance/{insurance-slug}/`
+Format: `https://www.AppointPanda.ae/insurance/{insurance-slug}/`
 Examples:
-- https://www.DubaiDentist.ae.ae/insurance/daman/
-- https://www.DubaiDentist.ae.ae/insurance/cigna/
-- https://www.DubaiDentist.ae.ae/insurance/bupa-global/
-- https://www.DubaiDentist.ae.ae/insurance/metlife/
+- https://www.AppointPanda.ae/insurance/daman/
+- https://www.AppointPanda.ae/insurance/cigna/
+- https://www.AppointPanda.ae/insurance/bupa-global/
+- https://www.AppointPanda.ae/insurance/metlife/
 
 Insurance + Emirate combinations:
-- https://www.DubaiDentist.ae.ae/insurance/daman/dubai/
-- https://www.DubaiDentist.ae.ae/insurance/cigna/abu-dhabi/
+- https://www.AppointPanda.ae/insurance/daman/dubai/
+- https://www.AppointPanda.ae/insurance/cigna/abu-dhabi/
 
 ### Blog
-Format: `https://www.DubaiDentist.ae.ae/blog/{post-slug}/`
+Format: `https://www.AppointPanda.ae/blog/{post-slug}/`
 Topics covered:
 - Dental health tips for UAE residents
 - Treatment guides with AED cost ranges
@@ -153,8 +153,8 @@ Topics covered:
 
 ## Frequently Asked Questions
 
-**Q: Is DubaiDentist.ae free for patients?**
-A: Yes, searching for and contacting dentists on DubaiDentist.ae is completely free for patients.
+**Q: Is AppointPanda free for patients?**
+A: Yes, searching for and contacting dentists on AppointPanda is completely free for patients.
 
 **Q: How do I book an appointment?**
 A: Click on any dentist or clinic profile and use the booking widget or WhatsApp button to schedule your visit.
@@ -180,26 +180,26 @@ Dentists and dental practices can:
 - Receive patient bookings via the platform
 - Respond to reviews
 
-Learn more at: https://www.DubaiDentist.ae.ae/list-your-practice/
+Learn more at: https://www.AppointPanda.ae/list-your-practice/
 
 ## Technical Information
 
 ### Sitemap
-- Main sitemap: https://www.DubaiDentist.ae.ae/sitemap.xml
-- Static pages: https://www.DubaiDentist.ae.ae/sitemap-static.xml
-- Emirates: https://www.DubaiDentist.ae.ae/sitemap-states.xml
-- Areas: https://www.DubaiDentist.ae.ae/sitemap-cities.xml
-- Services: https://www.DubaiDentist.ae.ae/sitemap-services.xml
-- Service + Location: https://www.DubaiDentist.ae.ae/sitemap-service-locations-1.xml
-- Clinics: https://www.DubaiDentist.ae.ae/sitemap-profiles-1.xml
-- Insurance: https://www.DubaiDentist.ae.ae/sitemap-insurance.xml
+- Main sitemap: https://www.AppointPanda.ae/sitemap.xml
+- Static pages: https://www.AppointPanda.ae/sitemap-static.xml
+- Emirates: https://www.AppointPanda.ae/sitemap-states.xml
+- Areas: https://www.AppointPanda.ae/sitemap-cities.xml
+- Services: https://www.AppointPanda.ae/sitemap-services.xml
+- Service + Location: https://www.AppointPanda.ae/sitemap-service-locations-1.xml
+- Clinics: https://www.AppointPanda.ae/sitemap-profiles-1.xml
+- Insurance: https://www.AppointPanda.ae/sitemap-insurance.xml
 
 ### Robots.txt
-Located at: https://www.DubaiDentist.ae.ae/robots.txt
+Located at: https://www.AppointPanda.ae/robots.txt
 
 ### LLMs.txt
-- Summary: https://www.DubaiDentist.ae.ae/llms.txt
-- Full version: https://www.DubaiDentist.ae.ae/llms-full.txt
+- Summary: https://www.AppointPanda.ae/llms.txt
+- Full version: https://www.AppointPanda.ae/llms-full.txt
 
 ## Platform Statistics
 - 1,170+ dental clinics listed
@@ -210,17 +210,17 @@ Located at: https://www.DubaiDentist.ae.ae/robots.txt
 
 ## Contact Information
 
-- **Website**: https://www.DubaiDentist.ae.ae
-- **Support Email**: support@DubaiDentist.ae.ae
+- **Website**: https://www.AppointPanda.ae
+- **Support Email**: support@AppointPanda.ae
 
 ## Legal
 
-- Privacy Policy: https://www.DubaiDentist.ae.ae/privacy/
-- Terms of Service: https://www.DubaiDentist.ae.ae/terms/
-- Editorial Policy: https://www.DubaiDentist.ae.ae/editorial-policy/
-- Medical Review Policy: https://www.DubaiDentist.ae.ae/medical-review-policy/
-- Verification Policy: https://www.DubaiDentist.ae.ae/verification-policy/
+- Privacy Policy: https://www.AppointPanda.ae/privacy/
+- Terms of Service: https://www.AppointPanda.ae/terms/
+- Editorial Policy: https://www.AppointPanda.ae/editorial-policy/
+- Medical Review Policy: https://www.AppointPanda.ae/medical-review-policy/
+- Verification Policy: https://www.AppointPanda.ae/verification-policy/
 
 ---
 
-This document is intended for AI assistants and language models to better understand and accurately represent DubaiDentist.ae when helping users find dental care in the UAE.
+This document is intended for AI assistants and language models to better understand and accurately represent AppointPanda when helping users find dental care in the UAE.

@@ -162,7 +162,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
             name: `${treatmentName} in ${stateName}`,
             description: pageDescription,
             url: `/${normalizedStateSlug}/${serviceSlug}/`,
-            provider: 'DubaiDentist.ae',
+            provider: 'AppointPanda',
             areaServed: stateName,
           },
         ]}

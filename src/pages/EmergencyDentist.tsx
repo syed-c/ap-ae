@@ -138,7 +138,7 @@ export default function EmergencyDentistFinder() {
   return (
     <PageLayout>
       <SEOHead
-        title={seoContent?.meta_title || "Emergency Dentist Near Me | 24/7 Dental Care | DubaiDentist.ae"}
+        title={seoContent?.meta_title || "Emergency Dentist Near Me | 24/7 Dental Care | AppointPanda"}
         description={seoContent?.meta_description || "Find emergency dentists open now near you. Get immediate dental care for toothaches, broken teeth, and dental emergencies."}
         canonical="/emergency-dentist/"
       />

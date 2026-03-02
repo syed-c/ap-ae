@@ -333,7 +333,7 @@ serve(async (req) => {
           body: new URLSearchParams({
             To: formattedPhone,
             From: twilioPhone,
-            Body: `Welcome to DubaiDentist.ae! Your practice "${clinicName}" has been approved. Log in at www.DubaiDentist.ae.com/auth with your email and temp password sent to your inbox.`,
+            Body: `Welcome to AppointPanda! Your practice "${clinicName}" has been approved. Log in at www.AppointPanda.com/auth with your email and temp password sent to your inbox.`,
           }),
         });
       } catch (smsError) {

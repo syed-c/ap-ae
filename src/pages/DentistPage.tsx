@@ -104,7 +104,7 @@ const DentistPage = () => {
   // Handle share functionality
   const handleShare = async () => {
     const url = window.location.href;
-    const title = `${dentist?.name || 'Dentist'} - DubaiDentist.ae`;
+    const title = `${dentist?.name || 'Dentist'} - AppointPanda`;
 
     if (navigator.share) {
       try {

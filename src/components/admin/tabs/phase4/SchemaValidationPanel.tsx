@@ -64,9 +64,9 @@ export function SchemaValidationPanel() {
       requiredFields: [
         { field: '@context', present: true, value: 'https://schema.org' },
         { field: '@type', present: true, value: 'Organization' },
-        { field: 'name', present: true, value: 'DubaiDentist.ae' },
-        { field: 'url', present: true, value: 'https://www.DubaiDentist.ae.ae' },
-        { field: 'logo', present: true, value: 'https://www.DubaiDentist.ae.ae/logo.png' }
+        { field: 'name', present: true, value: 'AppointPanda' },
+        { field: 'url', present: true, value: 'https://www.AppointPanda.ae' },
+        { field: 'logo', present: true, value: 'https://www.AppointPanda.ae/logo.png' }
       ],
       recommendedFields: [
         { field: 'description', present: true },

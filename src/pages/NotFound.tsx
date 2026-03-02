@@ -22,7 +22,7 @@ const NotFound = () => {
     meta.setAttribute('content', 'noindex, nofollow');
 
     // Update title for 404
-    document.title = 'Page Not Found | DubaiDentist.ae';
+    document.title = 'Page Not Found | AppointPanda';
 
     return;
   }, [location.pathname, navigate]);

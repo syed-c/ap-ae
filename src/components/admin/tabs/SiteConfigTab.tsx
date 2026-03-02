@@ -157,7 +157,7 @@ export default function SiteConfigTab() {
   const [footerSections, setFooterSections] = useState<FooterSection[]>([]);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [footerText, setFooterText] = useState({
-    copyright: '© 2025 DubaiDentist.ae. All rights reserved.',
+    copyright: '© 2025 AppointPanda. All rights reserved.',
     legal: 'Licensed Dental Professionals Only.',
   });
 
@@ -240,7 +240,7 @@ export default function SiteConfigTab() {
       const legal = siteConfig['legal'] as any;
       if (legal) {
         setFooterText({
-          copyright: legal.copyright_text || '© 2025 DubaiDentist.ae. All rights reserved.',
+          copyright: legal.copyright_text || '© 2025 AppointPanda. All rights reserved.',
           legal: legal.footer_text || 'Licensed Dental Professionals Only.',
         });
       }

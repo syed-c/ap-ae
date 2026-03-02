@@ -99,7 +99,7 @@ const JOB_PRESETS = [
     description: 'Generate weekly report on review funnel performance',
     rule_type: 'review_report',
     trigger_config: { schedule: 'weekly', day: 'monday', time: '08:00' },
-    action_config: { send_email: true, recipients: ['admin@DubaiDentist.ae.ae'] },
+    action_config: { send_email: true, recipients: ['admin@AppointPanda.ae'] },
   },
   {
     name: 'Verification Expiry Reminder',

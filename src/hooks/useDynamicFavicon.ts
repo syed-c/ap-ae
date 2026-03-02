@@ -5,11 +5,11 @@ import { useSiteSettings } from './useSiteSettings';
  * Hook to dynamically update the favicon based on branding settings
  * 
  * IMPORTANT FOR SEO/GOOGLE INDEXING:
- * The favicon.png in /public must be the correct DubaiDentist.ae icon.
+ * The favicon.png in /public must be the correct AppointPanda icon.
  * This hook provides runtime updates but Google indexes the static HTML.
  * 
  * The branding settings in the database should point to:
- * https://www.DubaiDentist.ae.ae/favicon.png (our domain, NOT external URLs)
+ * https://www.AppointPanda.ae/favicon.png (our domain, NOT external URLs)
  */
 export function useDynamicFavicon() {
   const { data: settings } = useSiteSettings();

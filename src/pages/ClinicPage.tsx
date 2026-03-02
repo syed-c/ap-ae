@@ -817,7 +817,7 @@ const ClinicPage = () => {
       {/* AI Discovery Meta for AI crawlers */}
       <AIDiscoveryMeta
         pageTitle={clinic.name}
-        aiSummary={`${clinic.name} is a dental clinic${clinic.city?.name ? ` in ${clinic.city.name}` : ""}, UAE. ${clinic.rating ? `Rated ${clinic.rating}/5 by ${clinic.review_count || 0} patients.` : ""} Book appointments online through DubaiDentist.ae.`}
+        aiSummary={`${clinic.name} is a dental clinic${clinic.city?.name ? ` in ${clinic.city.name}` : ""}, UAE. ${clinic.rating ? `Rated ${clinic.rating}/5 by ${clinic.review_count || 0} patients.` : ""} Book appointments online through AppointPanda.`}
         entityType="clinic"
         location={{
           city: clinic.city?.name,

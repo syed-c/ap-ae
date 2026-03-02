@@ -379,7 +379,7 @@ const ClaimProfilePage = () => {
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', 'https://www.DubaiDentist.ae.ae/claim-profile');
+    canonical.setAttribute('href', 'https://www.AppointPanda.ae/claim-profile');
 
     return () => {
       meta?.setAttribute('content', 'index, follow');
@@ -553,8 +553,8 @@ const ClaimProfilePage = () => {
                     onClick={() => handleChooseMethod("otp")}
                     disabled={!clinicDomain && !hasClaimEmails}
                     className={`w-full p-5 rounded-xl border-2 transition-all text-left group ${(clinicDomain || hasClaimEmails)
-                        ? "border-border hover:border-primary/50"
-                        : "border-border/50 opacity-60 cursor-not-allowed"
+                      ? "border-border hover:border-primary/50"
+                      : "border-border/50 opacity-60 cursor-not-allowed"
                       }`}
                   >
                     <div className="flex items-start gap-4">

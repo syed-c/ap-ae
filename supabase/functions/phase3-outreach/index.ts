@@ -26,10 +26,10 @@ interface OutreachRequest {
 // Email templates
 const EMAIL_TEMPLATES = {
   claim: {
-    subject: "You're Listed on DubaiDentist.ae - Claim Your Free Profile",
+    subject: "You're Listed on AppointPanda - Claim Your Free Profile",
     body: `Hi Dr. {{last_name}},
 
-I'm reaching out because {{practice_name}} is currently listed on DubaiDentist.ae with basic information, but you haven't claimed your profile yet.
+I'm reaching out because {{practice_name}} is currently listed on AppointPanda with basic information, but you haven't claimed your profile yet.
 
 When you claim and complete your profile (takes 5 minutes), you'll receive:
 
@@ -44,19 +44,19 @@ Your profile: {{profile_url}}
 Claim it here: {{claim_url}}
 
 Best,
-The DubaiDentist.ae Team
+The AppointPanda Team
 
 ---
-DubaiDentist.ae - Connecting Patients with Great Dentists
+AppointPanda - Connecting Patients with Great Dentists
 Unsubscribe: {{unsubscribe_url}}`,
   },
   followup: {
-    subject: "{{practice_name}} - Get More Patients From DubaiDentist.ae",
+    subject: "{{practice_name}} - Get More Patients From AppointPanda",
     body: `Dr. {{last_name}},
 
-I wanted to follow up about your DubaiDentist.ae profile.
+I wanted to follow up about your AppointPanda profile.
 
-Last month, {{monthly_searches}} patients in {{city}} used DubaiDentist.ae to find dentists for dental care.
+Last month, {{monthly_searches}} patients in {{city}} used AppointPanda to find dentists for dental care.
 
 Here's what dentists with claimed profiles get:
 - 5x more profile views
@@ -69,16 +69,16 @@ Complete your profile: {{claim_url}}
 Takes 5 minutes, no credit card needed.
 
 Best,
-The DubaiDentist.ae Team
+The AppointPanda Team
 
 ---
 Unsubscribe: {{unsubscribe_url}}`,
   },
   final: {
-    subject: "Final reminder: Claim your DubaiDentist.ae profile",
+    subject: "Final reminder: Claim your AppointPanda profile",
     body: `Dr. {{last_name}},
 
-This is my final reminder about claiming your free DubaiDentist.ae profile for {{practice_name}}.
+This is my final reminder about claiming your free AppointPanda profile for {{practice_name}}.
 
 Your profile is currently showing basic information only. Claimed profiles receive:
 
@@ -92,7 +92,7 @@ Claim your profile now: {{claim_url}}
 If you have questions, just reply to this email.
 
 Best,
-The DubaiDentist.ae Team
+The AppointPanda Team
 
 ---
 Unsubscribe: {{unsubscribe_url}}`,

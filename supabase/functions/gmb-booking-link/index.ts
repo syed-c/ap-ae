@@ -18,7 +18,7 @@ const corsHeaders = {
  * - status: Returns current booking link status
  */
 
-const BOOKING_BASE_URL = 'https://www.DubaiDentist.ae.com';
+const BOOKING_BASE_URL = 'https://www.AppointPanda.com';
 
 interface PlaceActionLink {
   name?: string;

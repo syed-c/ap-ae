@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const BASE_URL = "https://www.DubaiDentist.ae.ae";
+const BASE_URL = "https://www.AppointPanda.ae";
 const DEFAULT_BATCH_SIZE = 50;
 
 interface PageData {
@@ -53,7 +53,7 @@ function generateHtml(page: PageData): string {
   <meta property="og:description" content="${escapeHtml(page.metaDescription)}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="${BASE_URL}${page.path}">
-  <meta property="og:site_name" content="DubaiDentist.ae">
+  <meta property="og:site_name" content="AppointPanda">
   
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escapeHtml(page.metaTitle)}">
@@ -93,7 +93,7 @@ function generateHtml(page: PageData): string {
   </main>
   
   <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #eee; color: #666;">
-    <p>&copy; ${new Date().getFullYear()} DubaiDentist.ae. All rights reserved.</p>
+    <p>&copy; ${new Date().getFullYear()} AppointPanda. All rights reserved.</p>
     <p>
       <a href="/about">About</a> | 
       <a href="/contact">Contact</a> | 
@@ -468,7 +468,7 @@ serve(async (req) => {
             path,
             pageType: 'state',
             title: seo.title || `Dentists in ${item.name}`,
-            metaTitle: seo.meta_title || `Find Dentists in ${item.name} (${item.abbreviation}) | DubaiDentist.ae`,
+            metaTitle: seo.meta_title || `Find Dentists in ${item.name} (${item.abbreviation}) | AppointPanda`,
             metaDescription: seo.meta_description || `Find and book appointments with top-rated dentists in ${item.name}. Compare verified clinics, read reviews, and schedule your visit today.`,
             h1: seo.h1 || `Find Dentists in ${item.name}`,
             content: seo.content || `Browse our directory of verified dental professionals in ${item.name}. Find the right dentist for your needs and book an appointment online.`,
@@ -491,7 +491,7 @@ serve(async (req) => {
             path,
             pageType: 'city',
             title: seo.title || `Dentists in ${item.name}, ${stateData.abbreviation || stateData.name}`,
-            metaTitle: seo.meta_title || `Dentists in ${item.name}, ${stateData.abbreviation || stateData.name} | DubaiDentist.ae`,
+            metaTitle: seo.meta_title || `Dentists in ${item.name}, ${stateData.abbreviation || stateData.name} | AppointPanda`,
             metaDescription: seo.meta_description || `Find top-rated dentists in ${item.name}, ${stateData.name}. Compare clinics, read patient reviews, and book appointments online.`,
             h1: seo.h1 || `Dentists in ${item.name}, ${stateData.abbreviation || stateData.name}`,
             content: seo.content || `Looking for a dentist in ${item.name}? Browse our verified directory of dental professionals offering a range of services from routine checkups to cosmetic dentistry.`,
@@ -513,7 +513,7 @@ serve(async (req) => {
             path,
             pageType: 'service',
             title: seo.title || item.name,
-            metaTitle: seo.meta_title || `${item.name} | Find Dental Specialists | DubaiDentist.ae`,
+            metaTitle: seo.meta_title || `${item.name} | Find Dental Specialists | AppointPanda`,
             metaDescription: seo.meta_description || `Find dentists offering ${item.name}. Compare providers, read reviews, and book your appointment online.`,
             h1: seo.h1 || item.name,
             content: seo.content || item.description || `Find experienced dental professionals offering ${item.name}. Browse our directory to compare providers and book your appointment.`,
@@ -536,7 +536,7 @@ serve(async (req) => {
             path,
             pageType: 'service_location',
             title: seo.title || `${treatment.name} in ${city.name}, ${stateData.abbreviation || stateData.name}`,
-            metaTitle: seo.meta_title || `${treatment.name} in ${city.name}, ${stateData.abbreviation || stateData.name} | DubaiDentist.ae`,
+            metaTitle: seo.meta_title || `${treatment.name} in ${city.name}, ${stateData.abbreviation || stateData.name} | AppointPanda`,
             metaDescription: seo.meta_description || `Find ${treatment.name} specialists in ${city.name}, ${stateData.name}. Compare providers, read reviews, and book your appointment.`,
             h1: seo.h1 || `${treatment.name} in ${city.name}, ${stateData.abbreviation || stateData.name}`,
             content: seo.content || `Looking for ${treatment.name} in ${city.name}? Browse our verified directory of dental professionals offering this service in your area.`,
@@ -564,7 +564,7 @@ serve(async (req) => {
             path,
             pageType: 'clinic',
             title: seo.title || item.name,
-            metaTitle: seo.meta_title || `${item.name} | Dental Clinic in ${locationStr} | DubaiDentist.ae`,
+            metaTitle: seo.meta_title || `${item.name} | Dental Clinic in ${locationStr} | AppointPanda`,
             metaDescription: seo.meta_description || item.description || `${item.name} is a dental clinic in ${locationStr}. ${item.rating ? `Rated ${item.rating}/5` : ''} ${item.review_count ? `with ${item.review_count} reviews` : ''}. Book your appointment online.`,
             h1: seo.h1 || item.name,
             content: seo.content || item.description || `${item.name} offers quality dental care in ${locationStr}. ${item.address ? `Located at ${item.address}.` : ''} ${item.phone ? `Call ${item.phone} or book online.` : 'Book your appointment online today.'}`,

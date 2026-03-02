@@ -420,7 +420,7 @@ export default function StructuredDataTab() {
   const testStructuredData = async (url: string) => {
     setTesting(true);
     try {
-      const fullUrl = url.startsWith('http') ? url : `https://www.DubaiDentist.ae.ae${url}`;
+      const fullUrl = url.startsWith('http') ? url : `https://www.AppointPanda.ae${url}`;
       const pageType = detectPageType(url);
       const expectedSchemas = PAGE_TYPES.find(p => p.id === pageType)?.schemaTypes || [];
 
@@ -473,12 +473,12 @@ export default function StructuredDataTab() {
   };
 
   const openRichResultsTest = (url: string) => {
-    const fullUrl = url.startsWith('http') ? url : `https://www.DubaiDentist.ae.ae${url}`;
+    const fullUrl = url.startsWith('http') ? url : `https://www.AppointPanda.ae${url}`;
     window.open(`https://search.google.com/test/rich-results?url=${encodeURIComponent(fullUrl)}`, '_blank');
   };
 
   const openSchemaValidator = (url: string) => {
-    const fullUrl = url.startsWith('http') ? url : `https://www.DubaiDentist.ae.ae${url}`;
+    const fullUrl = url.startsWith('http') ? url : `https://www.AppointPanda.ae${url}`;
     window.open(`https://validator.schema.org/?url=${encodeURIComponent(fullUrl)}`, '_blank');
   };
 
@@ -622,7 +622,7 @@ export default function StructuredDataTab() {
                             id="org-name"
                             value={orgSettings.name}
                             onChange={(e) => setOrgSettings({ ...orgSettings, name: e.target.value })}
-                            placeholder="DubaiDentist.ae"
+                            placeholder="AppointPanda"
                           />
                         </div>
                         <div className="space-y-2">
@@ -631,7 +631,7 @@ export default function StructuredDataTab() {
                             id="org-url"
                             value={orgSettings.url}
                             onChange={(e) => setOrgSettings({ ...orgSettings, url: e.target.value })}
-                            placeholder="https://www.DubaiDentist.ae.ae"
+                            placeholder="https://www.AppointPanda.ae"
                           />
                         </div>
                         <div className="space-y-2">
@@ -640,7 +640,7 @@ export default function StructuredDataTab() {
                             id="org-logo"
                             value={orgSettings.logo}
                             onChange={(e) => setOrgSettings({ ...orgSettings, logo: e.target.value })}
-                            placeholder="https://www.DubaiDentist.ae.ae/logo.png"
+                            placeholder="https://www.AppointPanda.ae/logo.png"
                           />
                           <p className="text-xs text-muted-foreground">Recommended: 112x112 to 600x600 pixels</p>
                         </div>
@@ -678,7 +678,7 @@ export default function StructuredDataTab() {
                               type="email"
                               value={orgSettings.email}
                               onChange={(e) => setOrgSettings({ ...orgSettings, email: e.target.value })}
-                              placeholder="contact@DubaiDentist.ae.ae"
+                              placeholder="contact@AppointPanda.ae"
                             />
                           </div>
                           <div className="space-y-2">
@@ -784,7 +784,7 @@ export default function StructuredDataTab() {
                             <Input
                               value={newSocialUrl}
                               onChange={(e) => setNewSocialUrl(e.target.value)}
-                              placeholder="https://facebook.com/DubaiDentist.ae"
+                              placeholder="https://facebook.com/AppointPanda"
                               onKeyDown={(e) => e.key === 'Enter' && addSocialProfile()}
                             />
                             <Button variant="outline" onClick={addSocialProfile}>
@@ -1267,7 +1267,7 @@ export default function StructuredDataTab() {
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://www.DubaiDentist.ae.ae"
+      "item": "https://www.AppointPanda.ae"
     },
     {
       "@type": "ListItem",
@@ -1357,7 +1357,7 @@ export default function StructuredDataTab() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.open('https://www.DubaiDentist.ae.ae/sitemap.xml', '_blank')}
+                    onClick={() => window.open('https://www.AppointPanda.ae/sitemap.xml', '_blank')}
                   >
                     <ExternalLink className="h-3 w-3 mr-1" />
                     View Live Sitemap

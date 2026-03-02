@@ -64,7 +64,7 @@ interface SupportTicket {
 export default function SupportTicketsTab() {
   const { user } = useAuth();
   const { data: siteSettings } = useSiteSettings();
-  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@DubaiDentist.ae.ae';
+  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@AppointPanda.ae';
   const queryClient = useQueryClient();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [formData, setFormData] = useState({

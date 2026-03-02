@@ -58,14 +58,14 @@ export interface SiteSettings {
 // Default settings are only used when database values are not available
 // These should match the values stored in global_settings table
 const DEFAULT_SITE_SETTINGS: SiteSettings = {
-  siteName: 'DubaiDentist.ae',
-  siteUrl: 'https://www.DubaiDentist.ae.ae/',
+  siteName: 'AppointPanda',
+  siteUrl: 'https://www.AppointPanda.ae/',
   siteTagline: 'UAE Dental Directory',
   contactDetails: {
-    support_email: 'support@DubaiDentist.ae.ae',
-    booking_email: 'bookings@DubaiDentist.ae.ae',
-    sales_email: 'sales@DubaiDentist.ae.ae',
-    partnerships_email: 'partners@DubaiDentist.ae.ae',
+    support_email: 'support@AppointPanda.ae',
+    booking_email: 'bookings@AppointPanda.ae',
+    sales_email: 'sales@AppointPanda.ae',
+    partnerships_email: 'partners@AppointPanda.ae',
     support_phone: '+971 4 123 4567',
     booking_phone: '+971 4 123 4567',
     sales_phone: '+971 4 123 4567',
@@ -77,16 +77,16 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
     country: 'United Arab Emirates',
   },
   socialLinks: {
-    facebook: 'https://facebook.com/DubaiDentist.ae',
-    instagram: 'https://instagram.com/DubaiDentist.ae',
-    twitter: 'https://twitter.com/DubaiDentist.ae',
-    linkedin: 'https://linkedin.com/company/DubaiDentist.ae',
+    facebook: 'https://facebook.com/AppointPanda',
+    instagram: 'https://instagram.com/AppointPanda',
+    twitter: 'https://twitter.com/AppointPanda',
+    linkedin: 'https://linkedin.com/company/AppointPanda',
     youtube: '',
     tiktok: '',
   },
   footerSections: [],
   legalText: 'Licensed Dental Professionals Only.',
-  copyrightText: '© 2026 DubaiDentist.ae. All rights reserved by Quick Commerce LLC FZ.',
+  copyrightText: '© 2026 AppointPanda. All rights reserved by Quick Commerce LLC FZ.',
   branding: {
     logo_url: '',
     logo_dark_url: '',

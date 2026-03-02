@@ -57,7 +57,7 @@ export const AIExplainerSection = ({ className, variant = "default" }: AIExplain
               <span className="text-sm font-bold text-primary">AI-Powered</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-black text-foreground mb-3">
-              How DubaiDentist.ae <span className="text-primary">Finds Your Match</span>
+              How AppointPanda <span className="text-primary">Finds Your Match</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               This isn't a directory. It's a smarter way to find the right dentist — powered by AI that understands what you actually need.

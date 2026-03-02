@@ -239,7 +239,7 @@ CURRENT CLINIC CONTEXT (user is viewing this clinic):
     }
 
     // ─── BUILD SYSTEM PROMPT ─────────────────────────────────────────
-    const systemPrompt = `You are Panda 🐼, DubaiDentist.ae's smart dental assistant for the UAE.
+    const systemPrompt = `You are Panda 🐼, AppointPanda's smart dental assistant for the UAE.
 
 === PERSONALITY ===
 - Warm, concise, human-like. Like a friendly receptionist, not a robot.

@@ -1417,9 +1417,9 @@ export default function ContentGenerationStudioTab() {
                         <div
                           key={i}
                           className={`text-xs font-mono p-1.5 rounded ${log.action === 'completed' ? 'bg-green-500/10 text-green-700' :
-                              log.action === 'error' ? 'bg-red-500/10 text-red-700' :
-                                log.action === 'skipped' ? 'bg-amber-500/10 text-amber-700' :
-                                  'bg-muted'
+                            log.action === 'error' ? 'bg-red-500/10 text-red-700' :
+                              log.action === 'skipped' ? 'bg-amber-500/10 text-amber-700' :
+                                'bg-muted'
                             }`}
                         >
                           <span className="opacity-60">[{format(log.timestamp, 'HH:mm:ss')}]</span>{' '}
@@ -1709,7 +1709,7 @@ export default function ContentGenerationStudioTab() {
                     {editContent.meta_title || editContent.h1 || 'Page Title'}
                   </p>
                   <p className="text-green-700 text-sm truncate">
-                    DubaiDentist.ae.ae/{editingPage?.slug}
+                    AppointPanda.ae/{editingPage?.slug}
                   </p>
                   <p className="text-sm text-muted-foreground line-clamp-2">
                     {editContent.meta_description || 'No meta description set...'}

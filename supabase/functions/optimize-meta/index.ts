@@ -47,7 +47,7 @@ STRICT RULES:
 4. Follow Google E-E-A-T guidelines
 5. Be specific and relevant to the page content
 6. Include location for local pages
-7. For DubaiDentist.ae: We are a dental directory helping patients find dentists
+7. For AppointPanda: We are a dental directory helping patients find dentists
 
 OUTPUT FORMAT (JSON only, no markdown):
 {
@@ -314,20 +314,20 @@ function generateFallbackTitle(page: any): string {
 
   if (page.page_type === "city" && parts.length >= 2) {
     const city = parts[1].replace(/-/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
-    return `Find Top Dentists in ${city} | DubaiDentist.ae`;
+    return `Find Top Dentists in ${city} | AppointPanda`;
   }
 
   if (page.page_type === "service-location" && parts.length >= 3) {
     const city = parts[1].replace(/-/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
     const service = parts[2].replace(/-/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
-    return `${service} in ${city} | DubaiDentist.ae`;
+    return `${service} in ${city} | AppointPanda`;
   }
 
   if (page.title) {
-    return page.title.length > 50 ? page.title.substring(0, 47) + "..." : page.title + " | DubaiDentist.ae";
+    return page.title.length > 50 ? page.title.substring(0, 47) + "..." : page.title + " | AppointPanda";
   }
 
-  return "Find Trusted Dentists Near You | DubaiDentist.ae";
+  return "Find Trusted Dentists Near You | AppointPanda";
 }
 
 function generateFallbackDescription(page: any): string {
@@ -345,5 +345,5 @@ function generateFallbackDescription(page: any): string {
     return `Looking for ${service.toLowerCase()} in ${city}? Find qualified dentists, read reviews, and book your appointment online today.`;
   }
 
-  return "Find trusted dentists near you. Compare reviews, services, and book appointments online with DubaiDentist.ae.";
+  return "Find trusted dentists near you. Compare reviews, services, and book appointments online with AppointPanda.";
 }

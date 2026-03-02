@@ -1,4 +1,4 @@
-# DubaiDentist.ae Robots.txt
+# AppointPanda Robots.txt
 # Last updated: 2026-01-20
 # 
 # IMPORTANT: All indexable pages must be allowed.
@@ -126,11 +126,11 @@ Disallow: /*?fbclid=*
 Disallow: /*?gclid=*
 
 # Sitemap
-Sitemap: https://www.DubaiDentist.ae.ae/sitemap.xml
+Sitemap: https://www.AppointPanda.ae/sitemap.xml
 
 # Crawl-delay for non-Google bots (reduce server load)
 # Note: Googlebot ignores Crawl-delay
 
 # LLMs.txt for AI assistants
-# See: https://www.DubaiDentist.ae.ae/llms.txt
-# Full version: https://www.DubaiDentist.ae.ae/llms-full.txt
+# See: https://www.AppointPanda.ae/llms.txt
+# Full version: https://www.AppointPanda.ae/llms-full.txt

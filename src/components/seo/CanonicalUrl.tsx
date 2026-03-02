@@ -11,11 +11,11 @@ import { useLocation } from 'react-router-dom';
 interface CanonicalUrlProps {
   /** Override the auto-generated canonical URL */
   href?: string;
-  /** Base domain (defaults to DubaiDentist.ae.com) */
+  /** Base domain (defaults to AppointPanda.com) */
   baseDomain?: string;
 }
 
-const BASE_URL = 'https://www.DubaiDentist.ae.ae';
+const BASE_URL = 'https://www.AppointPanda.ae';
 
 export function CanonicalUrl({ href, baseDomain }: CanonicalUrlProps) {
   const location = useLocation();

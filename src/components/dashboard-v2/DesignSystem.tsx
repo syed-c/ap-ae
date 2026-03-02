@@ -1,5 +1,5 @@
 /**
- * DubaiDentist.ae Premium Design System v2
+ * AppointPanda Premium Design System v2
  * A collection of reusable components with consistent styling
  */
 

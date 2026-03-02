@@ -122,7 +122,7 @@ Deno.serve(async (req) => {
             { name: "outreach_campaigns", orderBy: "created_at" },
         ];
 
-        let sql = `-- DubaiDentist.ae Data Export\n`;
+        let sql = `-- AppointPanda Data Export\n`;
         sql += `-- Generated: ${new Date().toISOString()}\n`;
         sql += `-- Run this AFTER all schema migrations\n\n`;
         sql += `BEGIN;\n\n`;
@@ -139,7 +139,7 @@ Deno.serve(async (req) => {
             headers: {
                 ...corsHeaders,
                 "Content-Type": "text/plain; charset=utf-8",
-                "Content-Disposition": "attachment; filename=DubaiDentist.ae-data-export.sql",
+                "Content-Disposition": "attachment; filename=AppointPanda-data-export.sql",
             },
         });
     } catch (error) {

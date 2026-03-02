@@ -31,9 +31,9 @@ USING (
 -- Insert default organization schema settings
 INSERT INTO public.schema_settings (setting_key, setting_value) VALUES
 ('organization', jsonb_build_object(
-  'name', 'DubaiDentist.ae',
-  'url', 'https://www.DubaiDentist.ae.com',
-  'logo', 'https://www.DubaiDentist.ae.com/logo.png',
+  'name', 'AppointPanda',
+  'url', 'https://www.AppointPanda.com',
+  'logo', 'https://www.AppointPanda.com/logo.png',
   'description', 'Find and book appointments with top-rated dental professionals across the United States.',
   'email', '',
   'phone', '',

@@ -24,7 +24,7 @@ function escapeHtml(input: string): string {
 }
 
 function isInternalHref(href: string): boolean {
-  return href.startsWith("/") || href.includes("DubaiDentist.ae.ae");
+  return href.startsWith("/") || href.includes("AppointPanda.ae");
 }
 
 function normalizeHref(rawHref: string): string | null {
@@ -43,7 +43,7 @@ function normalizeHref(rawHref: string): string | null {
     try {
       const url = new URL(href);
       // if it's our domain, convert to internal path (keeps SPA routing + canonical)
-      if (url.hostname.includes("DubaiDentist.ae.ae")) {
+      if (url.hostname.includes("AppointPanda.ae")) {
         return withTrailingSlash(url.pathname + url.search + url.hash);
       }
       return url.toString();

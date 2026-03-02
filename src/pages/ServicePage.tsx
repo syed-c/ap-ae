@@ -135,7 +135,7 @@ const ServicePage = () => {
         name={`${treatmentName} in UAE`}
         description={treatment?.description || `Professional ${treatmentName} services across the UAE`}
         url={`/services/${serviceSlug}/`}
-        provider="DubaiDentist.ae Partner Clinics"
+        provider="AppointPanda Partner Clinics"
         areaServed="United Arab Emirates"
       />
       <StructuredData type="faq" questions={faqs.map(f => ({ question: f.q, answer: f.a }))} />

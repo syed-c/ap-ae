@@ -338,7 +338,7 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
             <h2>${settings.customCTA}</h2>
             <p>${settings.customFooter}</p>
           </div>
-          ${settings.showBranding ? '<div class="footer">Powered by DubaiDentist.ae</div>' : ''}
+          ${settings.showBranding ? '<div class="footer">Powered by AppointPanda</div>' : ''}
         </div>
         <script>
           window.onload = function() { setTimeout(function() { window.print(); window.close(); }, 500); }
@@ -435,7 +435,7 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                   {/* Footer */}
                   {settings.showBranding && (
                     <div className="border-t border-slate-100 py-3 text-center bg-slate-50">
-                      <span className="text-xs text-slate-400">Powered by <span className="font-semibold text-primary">DubaiDentist.ae</span></span>
+                      <span className="text-xs text-slate-400">Powered by <span className="font-semibold text-primary">AppointPanda</span></span>
                     </div>
                   )}
                 </Card>
@@ -578,8 +578,8 @@ const QRCodeGenerator = forwardRef<HTMLDivElement, QRCodeGeneratorProps>(functio
                         key={style.id}
                         onClick={() => updateSettings({ selectedStyle: style.id })}
                         className={`p-3 rounded-xl border-2 transition-all ${settings.selectedStyle === style.id
-                            ? 'border-primary ring-2 ring-primary/20'
-                            : 'border-border hover:border-muted-foreground'
+                          ? 'border-primary ring-2 ring-primary/20'
+                          : 'border-border hover:border-muted-foreground'
                           }`}
                       >
                         <div className={`h-8 rounded-lg bg-gradient-to-r ${style.gradient} mb-2`} />

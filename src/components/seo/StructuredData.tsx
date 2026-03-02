@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useSchemaSettings } from '@/hooks/useSchemaSettings';
 import { withTrailingSlash } from '@/lib/url/withTrailingSlash';
 
-const BASE_URL = 'https://www.DubaiDentist.ae.ae';
+const BASE_URL = 'https://www.AppointPanda.ae';
 
 // Organization Schema
 export interface OrganizationSchemaProps {
@@ -103,7 +103,7 @@ const generateOrganizationSchema = (settings?: {
   socialProfiles?: string[];
 }) => {
   const org = settings || {
-    name: 'DubaiDentist.ae',
+    name: 'AppointPanda',
     url: BASE_URL,
     logo: `${BASE_URL}/logo.png`,
     description: 'Find and book appointments with top-rated dental professionals across the UAE.',
@@ -227,11 +227,11 @@ const generateArticleSchema = (props: ArticleSchemaProps) => ({
   dateModified: props.dateModified || props.datePublished,
   author: {
     '@type': 'Person',
-    name: props.author || 'DubaiDentist.ae Team',
+    name: props.author || 'AppointPanda Team',
   },
   publisher: {
     '@type': 'Organization',
-    name: 'DubaiDentist.ae',
+    name: 'AppointPanda',
     logo: {
       '@type': 'ImageObject',
       url: `${BASE_URL}/logo.png`,
@@ -286,7 +286,7 @@ const generateServiceSchema = (props: ServiceSchemaProps) => ({
     }
     : {
       '@type': 'Organization',
-      name: 'DubaiDentist.ae',
+      name: 'AppointPanda',
     },
   areaServed: props.areaServed
     ? {

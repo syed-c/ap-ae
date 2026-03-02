@@ -30,7 +30,7 @@ interface AIDiscoveryMetaProps {
   url: string;
 }
 
-const BASE_URL = "https://www.DubaiDentist.ae.ae";
+const BASE_URL = "https://www.AppointPanda.ae";
 
 export function AIDiscoveryMeta({
   pageTitle,

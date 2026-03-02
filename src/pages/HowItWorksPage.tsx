@@ -104,7 +104,7 @@ const HowItWorksPage = () => {
     <PageLayout>
       <SEOHead
         title="How It Works | Find Dentists or List Your Practice"
-        description="Learn how DubaiDentist.ae works. Patients can search, compare, and book dental appointments. Dentists can list their practice and reach more patients."
+        description="Learn how AppointPanda works. Patients can search, compare, and book dental appointments. Dentists can list their practice and reach more patients."
         canonical="/how-it-works/"
         keywords={['how to find dentist', 'book dental appointment', 'list dental practice', 'dental directory']}
       />
@@ -126,7 +126,7 @@ const HowItWorksPage = () => {
 
             <h1 className="font-display text-4xl md:text-6xl font-bold mb-6">
               How{" "}
-              <span className="text-gradient">DubaiDentist.ae</span>{" "}
+              <span className="text-gradient">AppointPanda</span>{" "}
               Works
             </h1>
 
@@ -282,7 +282,7 @@ const HowItWorksPage = () => {
             Ready to get started?
           </h2>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
-            Join thousands of patients and dentists already using DubaiDentist.ae.
+            Join thousands of patients and dentists already using AppointPanda.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button asChild size="lg" variant="secondary" className="rounded-2xl font-bold">

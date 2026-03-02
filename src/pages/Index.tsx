@@ -70,7 +70,7 @@ const popularAreas = [
 const uaeFaqs = [
   {
     q: "How do I find a DHA-licensed dentist in Dubai?",
-    a: "Use our search to filter by emirate or area. All dentists on DubaiDentist.ae are licensed by DHA (Dubai), DOH (Abu Dhabi), or MOHAP. Look for the 'Verified' badge for extra assurance."
+    a: "Use our search to filter by emirate or area. All dentists on AppointPanda are licensed by DHA (Dubai), DOH (Abu Dhabi), or MOHAP. Look for the 'Verified' badge for extra assurance."
   },
   {
     q: "What is the average cost of dental treatment in Dubai (AED)?",
@@ -86,7 +86,7 @@ const uaeFaqs = [
   },
   {
     q: "Can I book same-day emergency dental appointments in Dubai?",
-    a: "Yes, many clinics on DubaiDentist.ae offer same-day emergency appointments. Use our search and filter by 'Emergency Dental Care' to find available clinics near you."
+    a: "Yes, many clinics on AppointPanda offer same-day emergency appointments. Use our search and filter by 'Emergency Dental Care' to find available clinics near you."
   },
 ];
 
@@ -215,13 +215,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title={seoContent?.meta_title || "Find the Best Dentists in Dubai & UAE | DubaiDentist.ae"}
+        title={seoContent?.meta_title || "Find the Best Dentists in Dubai & UAE | AppointPanda"}
         description={seoContent?.meta_description || "Search verified DHA & DOH licensed dentists across Dubai, Abu Dhabi, Sharjah & all 7 Emirates. Compare reviews, check AED pricing & book appointments online."}
         canonical="/"
         keywords={['dentist in dubai', 'dental clinics UAE', 'DHA licensed dentist', 'dentist abu dhabi', 'best dentist sharjah', 'dental implants dubai', 'teeth whitening UAE']}
       />
       <StructuredData type="organization" />
-      <SyncStructuredData data={{ type: 'webSite', name: 'DubaiDentist.ae', url: 'https://www.DubaiDentist.ae.ae', searchUrl: 'https://www.DubaiDentist.ae.ae/search' }} />
+      <SyncStructuredData data={{ type: 'webSite', name: 'AppointPanda', url: 'https://www.AppointPanda.ae', searchUrl: 'https://www.AppointPanda.ae/search' }} />
       <Navbar />
 
       {/* ══════════════════════════════════════════
@@ -462,7 +462,7 @@ const Index = () => {
           >
             <span className="inline-flex items-center gap-2 bg-primary/20 rounded-full px-5 py-2.5 mb-5 border border-primary/30">
               <Stethoscope className="h-4 w-4 text-primary" />
-              <span className="text-sm font-bold text-primary">Why DubaiDentist.ae</span>
+              <span className="text-sm font-bold text-primary">Why AppointPanda</span>
             </span>
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white" style={{ fontFamily: headingFont }}>
               The UAE's Trusted{" "}

@@ -139,14 +139,14 @@ serve(async (req) => {
       throw lastError || new Error("AI gateway failed after retries");
     }
 
-    // DubaiDentist.ae Master SEO Prompt - First-party platform voice
-    const DubaiDentist.ae_SYSTEM_PROMPT = `You are generating SEO content ONLY for DubaiDentist.ae, a dental listing and appointment platform.
+    // AppointPanda Master SEO Prompt - First-party platform voice
+    const AppointPanda_SYSTEM_PROMPT = `You are generating SEO content ONLY for AppointPanda, a dental listing and appointment platform.
 
 === CRITICAL BUSINESS CONTEXT (NON-NEGOTIABLE) ===
-- DubaiDentist.ae helps users find, compare, and book dentists and dental clinics
+- AppointPanda helps users find, compare, and book dentists and dental clinics
 - We are NOT a dental clinic - we are a directory/booking platform
 - We are NOT writing content for third parties
-- ALL content must be written in DubaiDentist.ae's first-party voice: "we", "our platform", "DubaiDentist.ae helps patients..."
+- ALL content must be written in AppointPanda's first-party voice: "we", "our platform", "AppointPanda helps patients..."
 
 You must NEVER write as:
 - a dentist or dental clinic
@@ -191,15 +191,15 @@ Trustworthiness: No exaggerated claims, no "best dentist" language, no guarantee
 - Strong internal consistency between title, H1, and content
 
 === PLATFORM POSITIONING (VERY IMPORTANT) ===
-Because this content is for DubaiDentist.ae:
+Because this content is for AppointPanda:
 - Explain how our platform helps users: find dentists, compare clinics, explore services, book appointments
-- Mention DubaiDentist.ae naturally
+- Mention AppointPanda naturally
 - Keep tone helpful, not promotional
 - Never sound like an advertisement
 
 === CALL TO ACTION ===
 End with a calm, helpful CTA such as:
-- Encouraging users to explore dentists on DubaiDentist.ae
+- Encouraging users to explore dentists on AppointPanda
 - Inviting users to book appointments through our platform
 
 === OUTPUT FORMAT ===
@@ -208,7 +208,7 @@ End with a calm, helpful CTA such as:
 - H1 (clear page intent)
 - Structured content using H2/H3
 - FAQ section (3-5 questions)
-- Soft closing paragraph mentioning DubaiDentist.ae
+- Soft closing paragraph mentioning AppointPanda
 
 DO NOT: Mention prompts or instructions, explain your process, copy content between pages.`;
 
@@ -226,8 +226,8 @@ DO NOT: Mention prompts or instructions, explain your process, copy content betw
     }) {
       const prompt = buildSeoPrompt(pageData);
 
-      // Build system prompt with DubaiDentist.ae-specific instructions
-      let systemContent = DubaiDentist.ae_SYSTEM_PROMPT;
+      // Build system prompt with AppointPanda-specific instructions
+      let systemContent = AppointPanda_SYSTEM_PROMPT;
 
       // Add issue-specific focus
       if (pageData.issueType) {
@@ -238,15 +238,15 @@ DO NOT: Mention prompts or instructions, explain your process, copy content betw
 - Keep under 60 characters
 - Include primary keyword at the beginning
 - Add location for local pages
-- Use format: [Primary Keyword] in [Location] | DubaiDentist.ae
+- Use format: [Primary Keyword] in [Location] | AppointPanda
 - Make titles compelling and click-worthy
-- Write from DubaiDentist.ae's perspective (e.g., "Find Dentists in..." not "Best Dentist...")`,
+- Write from AppointPanda's perspective (e.g., "Find Dentists in..." not "Best Dentist...")`,
           meta_description: `
 
 === FOCUS: META DESCRIPTIONS ===
 - Keep under 155 characters
 - Start with an action verb (Discover, Find, Book, Compare)
-- Include clear value proposition from DubaiDentist.ae's perspective
+- Include clear value proposition from AppointPanda's perspective
 - Add call-to-action (book now, compare clinics, read reviews)
 - Include location for local pages`,
           h1: `
@@ -264,18 +264,18 @@ DO NOT: Mention prompts or instructions, explain your process, copy content betw
 - Create 4-6 meaningful H2 sections
 - H2s should organize content logically
 - Include keywords naturally in H2s
-- Suggested H2s: About [Service/Location], What to Expect, How DubaiDentist.ae Helps, Cost Considerations, FAQs
+- Suggested H2s: About [Service/Location], What to Expect, How AppointPanda Helps, Cost Considerations, FAQs
 - VARY H2 headings between pages - no templated repetition`,
           content: `
 
 === FOCUS: RICH CONTENT (Fix Thin Content) ===
 - Minimum 400-600 words
-- Include compelling introduction mentioning DubaiDentist.ae's role
+- Include compelling introduction mentioning AppointPanda's role
 - Add service/treatment descriptions
 - Include location-specific information
 - Add 3-5 FAQs with detailed answers
 - Use proper formatting (headings, paragraphs, lists)
-- Include how DubaiDentist.ae helps patients in this area
+- Include how AppointPanda helps patients in this area
 - End with platform CTA`,
         };
         systemContent += issueInstructions[pageData.issueType] || "";
@@ -412,29 +412,29 @@ DO NOT: Mention prompts or instructions, explain your process, copy content betw
 
       switch (page_type) {
         case "state":
-          context = `Generate unique SEO content for DubaiDentist.ae's ${name} state directory page.
+          context = `Generate unique SEO content for AppointPanda's ${name} state directory page.
 
 PAGE CONTEXT:
 - This is a STATE-level page showing all dental providers in ${name}
 - Users land here to explore dentists across ${name}
 
 CONTENT DIRECTION:
-- Explain how DubaiDentist.ae helps patients find dentists across ${name}
+- Explain how AppointPanda helps patients find dentists across ${name}
 - Mention major cities in ${name} where we list providers
 - Discuss dental care landscape in ${name} (licensing, common needs)
 - Include ${name}-specific details to make content unique
-- H2 sections should cover: Overview of Dental Care in ${name}, How to Find a Dentist in ${name}, What DubaiDentist.ae Offers, Popular Dental Services, FAQs`;
+- H2 sections should cover: Overview of Dental Care in ${name}, How to Find a Dentist in ${name}, What AppointPanda Offers, Popular Dental Services, FAQs`;
           break;
 
         case "city":
-          context = `Generate unique SEO content for DubaiDentist.ae's ${name}, ${stateAbbr || stateName || ""} city directory page.
+          context = `Generate unique SEO content for AppointPanda's ${name}, ${stateAbbr || stateName || ""} city directory page.
 
 PAGE CONTEXT:
 - This is a CITY-level page showing dentists in ${name}
 - Users are looking for local dental care options
 
 CONTENT DIRECTION:
-- Explain how DubaiDentist.ae helps ${name} residents find dentists
+- Explain how AppointPanda helps ${name} residents find dentists
 - Reference ${name} neighborhoods, landmarks, or local context when helpful
 - Discuss how residents typically approach dental care locally
 - Include what makes dental care in ${name} accessible through our platform
@@ -443,7 +443,7 @@ CONTENT DIRECTION:
           break;
 
         case "treatment":
-          context = `Generate unique SEO content for DubaiDentist.ae's ${name} service page.
+          context = `Generate unique SEO content for AppointPanda's ${name} service page.
 
 PAGE CONTEXT:
 - This is a TREATMENT/SERVICE page about ${name}
@@ -453,13 +453,13 @@ CONTENT DIRECTION:
 - Explain ${name} clearly - what it is, why patients may need it, general benefits
 - Describe what patients can expect during the procedure
 - Mention cost and insurance considerations carefully (use "may", "can", "often", "depends")
-- Explain how DubaiDentist.ae helps patients find ${name} specialists
-- H2 sections should cover: About ${name}, What to Expect, Benefits, Cost Considerations, How DubaiDentist.ae Helps, FAQs
+- Explain how AppointPanda helps patients find ${name} specialists
+- H2 sections should cover: About ${name}, What to Expect, Benefits, Cost Considerations, How AppointPanda Helps, FAQs
 - Use cautious language - no guarantees or promises`;
           break;
 
         case "city_treatment":
-          context = `Generate unique SEO content for DubaiDentist.ae's ${name} providers in ${cityName}, ${stateAbbr || ""} page.
+          context = `Generate unique SEO content for AppointPanda's ${name} providers in ${cityName}, ${stateAbbr || ""} page.
 
 PAGE CONTEXT:
 - This is a SERVICE + LOCATION page combining treatment info with local context
@@ -468,45 +468,45 @@ PAGE CONTEXT:
 CONTENT DIRECTION:
 - Explain ${name} clearly and specifically for ${cityName} residents
 - Reference ${cityName} naturally - don't force location keywords
-- Explain how DubaiDentist.ae helps ${cityName} patients find ${name} providers
+- Explain how AppointPanda helps ${cityName} patients find ${name} providers
 - Include local considerations for this treatment
 - H2 sections should cover: ${name} in ${cityName}, What to Know, Finding Specialists, Cost in ${cityName} Area, FAQs
 - NEVER invent statistics about ${cityName}`;
           break;
 
         case "clinic":
-          context = `Generate unique SEO content for a dental clinic profile on DubaiDentist.ae: ${name}.
+          context = `Generate unique SEO content for a dental clinic profile on AppointPanda: ${name}.
 
 PAGE CONTEXT:
 - This is a CLINIC PROFILE page
 - Users want to learn about this specific practice
 
 CONTENT DIRECTION:
-- Write from DubaiDentist.ae's perspective as the directory hosting this profile
+- Write from AppointPanda's perspective as the directory hosting this profile
 - Describe the practice overview based on available information
 - Explain what patients can expect
-- Mention how DubaiDentist.ae helps patients book with this clinic
+- Mention how AppointPanda helps patients book with this clinic
 - Keep tone informative, not promotional for the clinic`;
           break;
 
         case "blog":
-          context = `Generate unique SEO content for DubaiDentist.ae's dental health blog post: "${name}".
+          context = `Generate unique SEO content for AppointPanda's dental health blog post: "${name}".
 
 PAGE CONTEXT:
-- This is a BLOG POST on DubaiDentist.ae's dental health blog
+- This is a BLOG POST on AppointPanda's dental health blog
 - Educational content for patients
 
 CONTENT DIRECTION:
-- Write from DubaiDentist.ae's first-party voice
+- Write from AppointPanda's first-party voice
 - Provide educational value and practical tips
 - Demonstrate dental expertise without giving medical instructions
-- Include how DubaiDentist.ae can help readers find appropriate dental care
+- Include how AppointPanda can help readers find appropriate dental care
 - End with a soft CTA to explore dentists on our platform`;
           break;
 
         default:
-          context = `Generate unique SEO content for DubaiDentist.ae's page about ${name}.
-Page type: ${page_type}. Write from DubaiDentist.ae's first-party platform voice.`;
+          context = `Generate unique SEO content for AppointPanda's page about ${name}.
+Page type: ${page_type}. Write from AppointPanda's first-party platform voice.`;
       }
 
       return `${context}
@@ -519,7 +519,7 @@ REQUIREMENTS:
 2. Location/service-specific information woven naturally throughout
 3. Proper H1 > H2 > H3 hierarchy (one H1, 4-6 H2s, H3s only where logical)
 4. Include 3-5 FAQs that match real user search intent
-5. Mention DubaiDentist.ae naturally in the content
+5. Mention AppointPanda naturally in the content
 6. End with a soft, helpful CTA encouraging platform use`;
     }
 
@@ -1134,7 +1134,7 @@ Provide:
       // Build the service-location specific prompt with comprehensive UAE-focused instructions
       let serviceLocationPrompt = `You are a senior healthcare SEO content writer and local search strategist.
 
-You are writing a SERVICE-LOCATION PAGE for DubaiDentist.ae, a dental directory platform (NOT a clinic website).
+You are writing a SERVICE-LOCATION PAGE for AppointPanda, a dental directory platform (NOT a clinic website).
 This page helps users find dentists offering a specific treatment in a specific UAE location.
 
 INPUT VARIABLES:
@@ -1150,11 +1150,11 @@ You MUST use this angle as your primary narrative approach. This ensures each pa
 ${siblingContext}
 
 IMPORTANT CONTEXT:
-- DubaiDentist.ae does NOT provide treatment.
+- AppointPanda does NOT provide treatment.
 - It connects patients with licensed dentists and clinics.
 - Content must guide, educate, and help patients choose — not advertise one clinic.
 - The goal is to rank organically on Google using helpful content principles and E-E-A-T.
-- Write from DubaiDentist.ae's first-party voice: "we", "our platform", "DubaiDentist.ae helps patients..."
+- Write from AppointPanda's first-party voice: "we", "our platform", "AppointPanda helps patients..."
 
 GOOGLE & QUALITY REQUIREMENTS (MANDATORY):
 - Google Helpful Content System compliance
@@ -1185,7 +1185,7 @@ STRUCTURE TO GENERATE (vary the order and naming of sections — do NOT use iden
 - Cost of ${serviceName} in ${stateAbbr || 'UAE'} — Explain price ranges generally, factors affecting price, DO NOT invent exact numbers
 - Safety & Regulations in UAE — DHA/MOHAP standards, why licensed dentists matter
 - Questions Patients Usually Ask — 5-7 natural FAQs (informational, not promotional)
-- How Our Directory Helps — How DubaiDentist.ae helps compare clinics, not promote one
+- How Our Directory Helps — How AppointPanda helps compare clinics, not promote one
 - Closing — Encourage informed decision without call-to-action pressure
 
 SEO RULES:

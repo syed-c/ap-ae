@@ -333,7 +333,7 @@ export function CalendarBookingForm({
 
           <p className="text-xs text-center text-muted-foreground">
             <Heart className="h-3 w-3 inline mr-1 text-destructive" />
-            Thank you for choosing DubaiDentist.ae
+            Thank you for choosing AppointPanda
           </p>
         </div>
       </div>

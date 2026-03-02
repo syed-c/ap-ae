@@ -10,18 +10,18 @@ import { Button } from "@/components/ui/button";
 const TermsPage = () => {
   const { data: siteSettings } = useSiteSettings();
   const { data: seoContent } = useSeoPageContent("terms");
-  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@DubaiDentist.ae.ae';
+  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@AppointPanda.ae';
 
   const sections = [
     {
       title: "1. Acceptance of Terms",
-      content: `By accessing or using DubaiDentist.ae ("the Platform"), you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our services.
+      content: `By accessing or using AppointPanda ("the Platform"), you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our services.
 
 These terms apply to all users of the Platform, including patients, dental professionals, and clinic administrators.`
     },
     {
       title: "2. Description of Services",
-      content: `DubaiDentist.ae provides an online platform that connects patients with dental professionals across the United Arab Emirates. Our services include:
+      content: `AppointPanda provides an online platform that connects patients with dental professionals across the United Arab Emirates. Our services include:
 
 • Directory of dental clinics and professionals
 • Clinic and dentist profile pages
@@ -67,7 +67,7 @@ Verified listings are subject to additional terms and verification requirements.
     },
     {
       title: "6. Intellectual Property",
-      content: `All content on the Platform, including text, graphics, logos, and software, is the property of DubaiDentist.ae or its licensors and is protected by intellectual property laws.
+      content: `All content on the Platform, including text, graphics, logos, and software, is the property of AppointPanda or its licensors and is protected by intellectual property laws.
 
 You may not:
 • Copy, modify, or distribute our content without permission
@@ -99,7 +99,7 @@ We are not responsible for any damages arising from your use of the Platform or 
     },
     {
       title: "9. Limitation of Liability",
-      content: `TO THE MAXIMUM EXTENT PERMITTED BY LAW, DubaiDentist.ae SHALL NOT BE LIABLE FOR:
+      content: `TO THE MAXIMUM EXTENT PERMITTED BY LAW, AppointPanda SHALL NOT BE LIABLE FOR:
 
 • Indirect, incidental, or consequential damages
 • Loss of profits, data, or business opportunities
@@ -109,7 +109,7 @@ Our total liability shall not exceed the amount you paid us in the past 12 month
     },
     {
       title: "10. Indemnification",
-      content: `You agree to indemnify and hold harmless DubaiDentist.ae, its officers, directors, employees, and agents from any claims, damages, or expenses arising from:
+      content: `You agree to indemnify and hold harmless AppointPanda, its officers, directors, employees, and agents from any claims, damages, or expenses arising from:
 
 • Your use of the Platform
 • Your violation of these terms
@@ -134,7 +134,7 @@ Any disputes arising from these terms shall be subject to the exclusive jurisdic
       title: "13. Contact Information",
       content: `For questions about these terms, please contact us:
 
-DubaiDentist.ae
+AppointPanda
 Dubai, United Arab Emirates
 Email: ${supportEmail}`
     }
@@ -150,10 +150,10 @@ Email: ${supportEmail}`
   return (
     <PageLayout>
       <SEOHead
-        title={seoContent?.meta_title || "Terms and Conditions | DubaiDentist.ae Service Agreement"}
-        description={seoContent?.meta_description || "Read DubaiDentist.ae's terms and conditions. Understand the rules, policies, and guidelines for using our dental directory platform for patients and professionals."}
+        title={seoContent?.meta_title || "Terms and Conditions | AppointPanda Service Agreement"}
+        description={seoContent?.meta_description || "Read AppointPanda's terms and conditions. Understand the rules, policies, and guidelines for using our dental directory platform for patients and professionals."}
         canonical="/terms/"
-        keywords={['terms and conditions', 'service agreement', 'dental directory terms', 'DubaiDentist.ae terms']}
+        keywords={['terms and conditions', 'service agreement', 'dental directory terms', 'AppointPanda terms']}
       />
 
       {/* Dark Hero Section */}
@@ -175,7 +175,7 @@ Email: ${supportEmail}`
             </h1>
 
             <p className="text-lg text-dark-section-foreground/70 max-w-xl mx-auto mb-8">
-              Please read these terms carefully before using DubaiDentist.ae. By using our platform, you agree to these terms.
+              Please read these terms carefully before using AppointPanda. By using our platform, you agree to these terms.
             </p>
 
             <div className="flex flex-wrap justify-center gap-3">

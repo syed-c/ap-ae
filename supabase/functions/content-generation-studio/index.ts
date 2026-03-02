@@ -157,13 +157,13 @@ serve(async (req) => {
       throw lastError || new Error("AI gateway failed after retries");
     }
 
-    // Master system prompt for DubaiDentist.ae content (non-clinic pages)
-    const PLATFORM_SYSTEM_PROMPT = `You are generating SEO content ONLY for DubaiDentist.ae, a dental listing and appointment platform.
+    // Master system prompt for AppointPanda content (non-clinic pages)
+    const PLATFORM_SYSTEM_PROMPT = `You are generating SEO content ONLY for AppointPanda, a dental listing and appointment platform.
 
 === CRITICAL BUSINESS CONTEXT ===
-- DubaiDentist.ae helps users find, compare, and book dentists and dental clinics
+- AppointPanda helps users find, compare, and book dentists and dental clinics
 - We are NOT a dental clinic - we are a directory/booking platform
-- ALL content must be written in DubaiDentist.ae's first-party voice: "we", "our platform", "DubaiDentist.ae helps patients..."
+- ALL content must be written in AppointPanda's first-party voice: "we", "our platform", "AppointPanda helps patients..."
 
 You must NEVER write as:
 - a dentist or dental clinic
@@ -204,7 +204,7 @@ You must NEVER write as:
 
 === CALL TO ACTION ===
 End with calm, helpful CTA encouraging users to:
-- Explore dentists on DubaiDentist.ae
+- Explore dentists on AppointPanda
 - Book appointments through our platform`;
 
     // CLINIC-SPECIFIC system prompt - focuses on the clinic itself for branded SEO
@@ -213,7 +213,7 @@ End with calm, helpful CTA encouraging users to:
 === CRITICAL BUSINESS CONTEXT ===
 - This content is for the clinic's profile page to help it RANK for the clinic name
 - Write as a neutral, informative third-party describing THIS clinic
-- DO NOT mention "DubaiDentist.ae", "our platform", or any directory references
+- DO NOT mention "AppointPanda", "our platform", or any directory references
 - Focus 100% on the CLINIC: its services, location, team, patient experience
 - Goal: When someone searches the clinic name on Google, this page should rank
 
@@ -263,7 +263,7 @@ End with calm, helpful CTA encouraging users to:
 - Do NOT invent specific facts (founding year, staff names, awards)
 - Do NOT make up patient testimonials
 - Do NOT claim specific certifications unless provided
-- Do NOT mention DubaiDentist.ae or any booking platform`;
+- Do NOT mention AppointPanda or any booking platform`;
 
     // Generate unique anti-duplication seed based on slug and random factors
     function generateUniquenessSeed(slug: string, pageType: string): string {
@@ -333,15 +333,15 @@ MANDATORY DIFFERENTIATION:
         case "state":
           const stateName = title || parts[0]?.toUpperCase() || "this state";
           pageContext = `This is a STATE directory page for ${stateName}.
-Context: Show all dental providers in ${stateName}. Explain how DubaiDentist.ae helps patients find dentists across the state.
-Include: Overview of dental care landscape, how to find a dentist, what DubaiDentist.ae offers, popular services.`;
+Context: Show all dental providers in ${stateName}. Explain how AppointPanda helps patients find dentists across the state.
+Include: Overview of dental care landscape, how to find a dentist, what AppointPanda offers, popular services.`;
           break;
 
         case "city":
           const cityName = title || parts[1] || parts[0] || "this city";
           const stateAbbr = parts[0]?.toUpperCase() || "";
           pageContext = `This is a CITY directory page for ${cityName}, ${stateAbbr}.
-Context: Show dentists in ${cityName}. Explain how DubaiDentist.ae helps local residents find dental care.
+Context: Show dentists in ${cityName}. Explain how AppointPanda helps local residents find dental care.
 Include: Local dental care overview, finding the right dentist, services available, cost considerations.
 LOCAL SPECIFICITY: Mention specific aspects of ${cityName} - its neighborhoods, community character, or regional healthcare landscape.`;
           break;
@@ -351,7 +351,7 @@ LOCAL SPECIFICITY: Mention specific aspects of ${cityName} - its neighborhoods, 
           const serviceName = title || slug.replace(/-/g, " ");
           pageContext = `This is a SERVICE/TREATMENT page for ${serviceName}.
 Context: Explain what ${serviceName} is, who needs it, what to expect.
-Include: What is this treatment, who is it for, process overview, cost considerations, how DubaiDentist.ae helps find providers.`;
+Include: What is this treatment, who is it for, process overview, cost considerations, how AppointPanda helps find providers.`;
           break;
 
         case "service_location":
@@ -361,7 +361,7 @@ Include: What is this treatment, who is it for, process overview, cost considera
           const locationState = parts[0]?.toUpperCase() || "";
           pageContext = `This is a SERVICE + LOCATION page for ${treatmentName} in ${locationCity}, ${locationState}.
 Context: Explain ${treatmentName} and how to find providers offering it in ${locationCity}.
-Include: What is ${treatmentName}, local availability, cost in this area, how to choose a provider, DubaiDentist.ae's role.
+Include: What is ${treatmentName}, local availability, cost in this area, how to choose a provider, AppointPanda's role.
 IMPORTANT: Make this unique - combine local ${locationCity} context with ${treatmentName} specifics. Don't just merge generic content.`;
           break;
 
@@ -393,13 +393,13 @@ Content Focus:
         case "static":
           pageContext = `This is a STATIC page (About, Features, Policy, etc.).
 Context: Write informative content appropriate for the page's purpose.
-Include: Clear explanation of the topic, how it relates to DubaiDentist.ae, user benefits.`;
+Include: Clear explanation of the topic, how it relates to AppointPanda, user benefits.`;
           break;
 
         default:
-          pageContext = `This is a general page on DubaiDentist.ae.
+          pageContext = `This is a general page on AppointPanda.
 Context: Write helpful, informative content for dental patients.
-Include: Clear explanations, how DubaiDentist.ae helps, relevant information for the topic.`;
+Include: Clear explanations, how AppointPanda helps, relevant information for the topic.`;
       }
 
       // Select the appropriate system prompt
@@ -420,7 +420,7 @@ ${existingContent.slice(0, 500)}...` : "No existing content - create from scratc
 
 ${uniquenessSeed}
 
-Generate comprehensive, unique content that helps this clinic rank for its name. Remember: NO DubaiDentist.ae mentions, write about the clinic only.`
+Generate comprehensive, unique content that helps this clinic rank for its name. Remember: NO AppointPanda mentions, write about the clinic only.`
         : `Generate SEO-optimized content for this page:
 
 PAGE URL: /${slug}

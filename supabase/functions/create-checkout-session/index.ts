@@ -105,7 +105,7 @@ serve(async (req) => {
 
     if (!product) {
       product = await stripe.products.create({
-        name: `${plan.name} Plan - DubaiDentist.ae`,
+        name: `${plan.name} Plan - AppointPanda`,
         description: plan.description || `${plan.name} subscription plan`,
         metadata: {
           plan_id: plan.id,
@@ -149,7 +149,7 @@ serve(async (req) => {
     }
 
     // Create checkout session
-    const baseUrl = successUrl?.split('/')[0] + '//' + successUrl?.split('/')[2] || 'https://DubaiDentist.ae.ae';
+    const baseUrl = successUrl?.split('/')[0] + '//' + successUrl?.split('/')[2] || 'https://AppointPanda.ae';
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,

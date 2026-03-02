@@ -80,8 +80,8 @@ export function Navbar() {
 
       {/* Main Navigation */}
       <nav className={`sticky top-0 z-50 transition-all duration-200 ${isScrolled
-          ? 'bg-card/98 backdrop-blur-sm border-b border-border shadow-sm'
-          : 'bg-card border-b border-border/60'
+        ? 'bg-card/98 backdrop-blur-sm border-b border-border shadow-sm'
+        : 'bg-card border-b border-border/60'
         }`}>
         <div className="container">
           <div className="flex items-center justify-between h-14 lg:h-16">
@@ -90,7 +90,7 @@ export function Navbar() {
               {logoUrl ? (
                 <img
                   src={logoUrl}
-                  alt={siteSettings?.siteName || 'DubaiDentist.ae'}
+                  alt={siteSettings?.siteName || 'AppointPanda'}
                   className="h-8 w-auto max-w-[160px] object-contain"
                 />
               ) : (

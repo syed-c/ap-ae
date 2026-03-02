@@ -93,7 +93,7 @@ export default function GMBBookingLinkCard({
     }
   };
 
-  const bookingUrl = `https://www.DubaiDentist.ae.ae/book/${clinicId}`;
+  const bookingUrl = `https://www.AppointPanda.ae/book/${clinicId}`;
 
   if (!isGmbConnected) {
     return (

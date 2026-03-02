@@ -228,7 +228,7 @@ export default function DentistSidebar({
           <Sparkles className="h-4 w-4 text-white" />
         </div>
         {!collapsed && (
-          <span className="font-bold text-sm text-slate-800">DubaiDentist.ae</span>
+          <span className="font-bold text-sm text-slate-800">AppointPanda</span>
         )}
       </div>
 

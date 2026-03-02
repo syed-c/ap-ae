@@ -159,7 +159,7 @@ const SitemapPage = () => {
     <PageLayout>
       <SEOHead
         title="Sitemap"
-        description="Navigate all pages on DubaiDentist.ae - Find dentists, dental services, locations, clinics, and helpful resources across the UAE."
+        description="Navigate all pages on AppointPanda - Find dentists, dental services, locations, clinics, and helpful resources across the UAE."
         canonical="/sitemap"
       />
 

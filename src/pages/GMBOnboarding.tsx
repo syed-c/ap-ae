@@ -312,7 +312,7 @@ export default function GMBOnboarding() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-coral bg-clip-text text-transparent mb-2">
-            DubaiDentist.ae
+            AppointPanda
           </h1>
           <p className="text-muted-foreground">Your dental practice dashboard</p>
         </div>
@@ -508,7 +508,7 @@ export default function GMBOnboarding() {
 
               {/* US-Only Notice */}
               <p className="text-xs text-center text-muted-foreground pt-2">
-                DubaiDentist.ae is currently available for dental practices in California, Massachusetts, and Connecticut.
+                AppointPanda is currently available for dental practices in California, Massachusetts, and Connecticut.
               </p>
             </CardContent>
           </Card>

@@ -9,7 +9,7 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const ListYourPracticeSuccessPage = () => {
   const { data: siteSettings } = useSiteSettings();
-  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@DubaiDentist.ae.ae';
+  const supportEmail = siteSettings?.contactDetails?.support_email || 'support@AppointPanda.ae';
   // Set noindex for success pages - they should not be indexed
   useEffect(() => {
     let meta = document.querySelector('meta[name="robots"]');

@@ -14,8 +14,8 @@ export interface SEOHeadProps {
   modifiedAt?: string;
 }
 
-const SITE_NAME = 'DubaiDentist.ae';
-const BASE_URL = 'https://www.DubaiDentist.ae.ae';
+const SITE_NAME = 'AppointPanda';
+const BASE_URL = 'https://www.AppointPanda.ae';
 const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.png`;
 
 export const SEOHead = ({

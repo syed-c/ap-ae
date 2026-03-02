@@ -81,7 +81,7 @@ const HomeV2 = () => {
     {
       name: "Ahmed R.",
       location: "Al Majaz, Sharjah",
-      text: "I was nervous about finding a new dentist after moving to Sharjah. DubaiDentist.ae made it so easy to compare clinics.",
+      text: "I was nervous about finding a new dentist after moving to Sharjah. AppointPanda made it so easy to compare clinics.",
       rating: 5,
     },
     {
@@ -238,7 +238,7 @@ const HomeV2 = () => {
             >
               <div className="relative">
                 <div className="absolute -inset-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl -z-10" />
-                <img src={pandaMascot} alt="DubaiDentist.ae mascot" className="w-64 md:w-80 h-auto rounded-2xl" loading="lazy" />
+                <img src={pandaMascot} alt="AppointPanda mascot" className="w-64 md:w-80 h-auto rounded-2xl" loading="lazy" />
               </div>
             </motion.div>
 
@@ -246,7 +246,7 @@ const HomeV2 = () => {
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}>
               <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3">Why Choose Us</span>
               <h2 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-6">
-                Why Patients Trust <span className="text-primary">DubaiDentist.ae</span>
+                Why Patients Trust <span className="text-primary">AppointPanda</span>
               </h2>
               <div className="space-y-4">
                 {[
@@ -439,7 +439,7 @@ const HomeV2 = () => {
             </motion.div>
             <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
               <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3">
-                Grow Your Practice with <span className="text-primary">DubaiDentist.ae</span>
+                Grow Your Practice with <span className="text-primary">AppointPanda</span>
               </h2>
               <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
                 Join dental professionals across the UAE who trust our platform to reach patients, manage bookings, and build their reputation.
@@ -473,12 +473,12 @@ const HomeV2 = () => {
           <div className="max-w-3xl mx-auto">
             <motion.div {...fadeUp} className="text-center mb-8">
               <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3">
-                About <span className="text-primary">DubaiDentist.ae</span>
+                About <span className="text-primary">AppointPanda</span>
               </h2>
             </motion.div>
             <div className="prose prose-sm max-w-none text-muted-foreground space-y-3">
               <p>
-                DubaiDentist.ae is the UAE's leading dental directory platform, built to help patients across Dubai, Sharjah, Abu Dhabi, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain find trusted dental professionals. Whether you need teeth cleaning, implants, Invisalign, or emergency care, we connect you with verified clinics — all with transparent AED pricing and real patient reviews.
+                AppointPanda is the UAE's leading dental directory platform, built to help patients across Dubai, Sharjah, Abu Dhabi, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain find trusted dental professionals. Whether you need teeth cleaning, implants, Invisalign, or emergency care, we connect you with verified clinics — all with transparent AED pricing and real patient reviews.
               </p>
               <p>
                 Every clinic listed is verified against DHA, DoH, and MOHAP standards. Our platform covers {realCounts?.clinics?.toLocaleString() || '500'}+ dental practices offering {treatments?.length || '15'}+ services including cosmetic dentistry, orthodontics, pediatric care, and oral surgery.
@@ -512,9 +512,9 @@ const HomeV2 = () => {
             </motion.div>
             <div className="space-y-3">
               {[
-                { q: "How do I find a dentist near me in Dubai?", a: "Use DubaiDentist.ae's search to select your emirate and area. Browse verified clinic profiles with real patient reviews, AED pricing, and available services." },
-                { q: "Is DubaiDentist.ae free for patients?", a: "Yes, DubaiDentist.ae is completely free for patients. Search, compare, and book appointments across all seven UAE Emirates at no cost." },
-                { q: "Are the dentists on DubaiDentist.ae verified?", a: "All clinics are verified against DHA, DoH, and MOHAP standards. Look for the verified badge on clinic profiles." },
+                { q: "How do I find a dentist near me in Dubai?", a: "Use AppointPanda's search to select your emirate and area. Browse verified clinic profiles with real patient reviews, AED pricing, and available services." },
+                { q: "Is AppointPanda free for patients?", a: "Yes, AppointPanda is completely free for patients. Search, compare, and book appointments across all seven UAE Emirates at no cost." },
+                { q: "Are the dentists on AppointPanda verified?", a: "All clinics are verified against DHA, DoH, and MOHAP standards. Look for the verified badge on clinic profiles." },
                 { q: "Can I search by dental insurance provider?", a: "Yes. Use our insurance search to find dentists who accept your plan — including Daman, Oman Insurance, AXA, and MetLife." },
                 { q: "How accurate are the prices shown?", a: "Prices shown are estimated ranges in AED. Final costs require an in-person consultation. We encourage confirming pricing directly with your chosen clinic." },
               ].map((faq, i) => (

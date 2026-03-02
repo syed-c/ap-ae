@@ -599,7 +599,7 @@ const CityPage = () => {
       {/* AI Discovery Meta */}
       <AIDiscoveryMeta
         pageTitle={pageTitle}
-        aiSummary={`Find ${profiles?.length || 0}+ verified dental clinics in ${cityName}, ${stateName}, UAE. Compare ratings, read patient reviews, and book appointments online through DubaiDentist.ae.`}
+        aiSummary={`Find ${profiles?.length || 0}+ verified dental clinics in ${cityName}, ${stateName}, UAE. Compare ratings, read patient reviews, and book appointments online through AppointPanda.`}
         entityType="location"
         location={{ city: cityName, country: "UAE" }}
         url={`/${normalizedStateSlug}/${citySlug}/`}

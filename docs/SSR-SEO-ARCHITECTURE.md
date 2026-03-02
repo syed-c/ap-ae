@@ -163,7 +163,7 @@ Located at: `public/robots.txt`
 ## Sitemap
 
 ### XML Sitemap Index
-URL: `https://www.DubaiDentist.ae.com/sitemap.xml`
+URL: `https://www.AppointPanda.com/sitemap.xml`
 
 Child sitemaps:
 - `sitemap-static.xml` - Static pages
@@ -175,7 +175,7 @@ Child sitemaps:
 - `sitemap-posts.xml` - Blog posts
 
 ### HTML Sitemap
-URL: `https://www.DubaiDentist.ae.com/sitemap`
+URL: `https://www.AppointPanda.com/sitemap`
 
 Visual sitemap with category cards and statistics.
 
@@ -209,10 +209,10 @@ Enter any URL to see:
 
 ```bash
 # Simulate Googlebot
-curl -A "Googlebot" https://www.DubaiDentist.ae.com/california
+curl -A "Googlebot" https://www.AppointPanda.com/california
 
 # Check if HTML contains content
-curl -A "Googlebot" https://www.DubaiDentist.ae.com/clinic/smile-dental | grep "<h1>"
+curl -A "Googlebot" https://www.AppointPanda.com/clinic/smile-dental | grep "<h1>"
 ```
 
 ## Maintenance

@@ -533,7 +533,7 @@ export default function StaticPagesTab() {
                   <TableRow key={page.id}>
                     <TableCell className="font-mono text-sm">
                       <a
-                        href={`https://www.DubaiDentist.ae.ae${page.path}`}
+                        href={`https://www.AppointPanda.ae${page.path}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"

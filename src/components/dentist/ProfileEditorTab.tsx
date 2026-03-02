@@ -442,7 +442,7 @@ export default function ProfileEditorTab() {
       localStorage.setItem('gmb_restore_session', 'true');
 
       // Always use production domain for OAuth callback
-      const redirectTo = 'https://www.DubaiDentist.ae.ae/auth/callback?gmb=true';
+      const redirectTo = 'https://www.AppointPanda.ae/auth/callback?gmb=true';
 
       // Use signInWithOAuth to get the GMB token
       // The callback handler will capture the token and restore the original user session

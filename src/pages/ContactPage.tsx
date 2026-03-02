@@ -141,7 +141,7 @@ const ContactPage = () => {
     {
       icon: Headphones,
       title: "General Support",
-      description: "Questions about using DubaiDentist.ae",
+      description: "Questions about using AppointPanda",
       phone: supportPhone,
       email: supportEmail,
       color: "from-primary/20 to-teal/10"
@@ -174,10 +174,10 @@ const ContactPage = () => {
   return (
     <PageLayout>
       <SEOHead
-        title={seoContent?.meta_title || "Contact Us | Get in Touch with DubaiDentist.ae"}
-        description={seoContent?.meta_description || "Have questions about finding a dentist or listing your practice? Contact the DubaiDentist.ae team. We're here to help with dental appointments and practice listings."}
+        title={seoContent?.meta_title || "Contact Us | Get in Touch with AppointPanda"}
+        description={seoContent?.meta_description || "Have questions about finding a dentist or listing your practice? Contact the AppointPanda team. We're here to help with dental appointments and practice listings."}
         canonical="/contact/"
-        keywords={['contact DubaiDentist.ae', 'dental help', 'dentist questions', 'dental support']}
+        keywords={['contact AppointPanda', 'dental help', 'dentist questions', 'dental support']}
       />
 
       {/* Dark Hero Section */}
@@ -260,8 +260,8 @@ const ContactPage = () => {
                   type="button"
                   onClick={() => setUserType('patient')}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all ${userType === 'patient'
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'text-muted-foreground hover:text-foreground'
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'text-muted-foreground hover:text-foreground'
                     }`}
                 >
                   <User className="h-4 w-4" />
@@ -271,8 +271,8 @@ const ContactPage = () => {
                   type="button"
                   onClick={() => setUserType('dentist')}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all ${userType === 'dentist'
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'text-muted-foreground hover:text-foreground'
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'text-muted-foreground hover:text-foreground'
                     }`}
                 >
                   <Stethoscope className="h-4 w-4" />
@@ -282,8 +282,8 @@ const ContactPage = () => {
 
               <div className="flex items-center gap-4 mb-6">
                 <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center ${userType === 'patient'
-                    ? 'bg-gradient-to-br from-primary/20 to-teal/10'
-                    : 'bg-gradient-to-br from-purple/20 to-indigo-500/10'
+                  ? 'bg-gradient-to-br from-primary/20 to-teal/10'
+                  : 'bg-gradient-to-br from-purple/20 to-indigo-500/10'
                   }`}>
                   {userType === 'patient' ? (
                     <Send className="h-6 w-6 md:h-7 md:w-7 text-primary" />

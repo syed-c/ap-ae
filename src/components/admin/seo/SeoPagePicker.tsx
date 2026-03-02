@@ -368,7 +368,7 @@ export function SeoPagePicker({ selectedPages, onSelectionChange, onInspectPage 
                             <Eye className="h-3 w-3" />
                           </Button>
                         )}
-                        <a href={`https://www.DubaiDentist.ae.ae${page.slug}`} target="_blank" rel="noopener noreferrer">
+                        <a href={`https://www.AppointPanda.ae${page.slug}`} target="_blank" rel="noopener noreferrer">
                           <Button variant="ghost" size="icon" className="h-6 w-6">
                             <ExternalLink className="h-3 w-3" />
                           </Button>

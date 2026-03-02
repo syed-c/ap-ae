@@ -16,20 +16,20 @@ export interface SiteBranding {
 }
 
 // Default branding configuration - using local domain paths for SEO (Google indexes domain URLs)
-// IMPORTANT: All assets use www.DubaiDentist.ae.ae domain URLs to ensure Google indexes the correct favicon
+// IMPORTANT: All assets use www.AppointPanda.ae domain URLs to ensure Google indexes the correct favicon
 const DEFAULT_BRANDING: SiteBranding = {
-  siteName: 'DubaiDentist.ae',
-  domain: 'DubaiDentist.ae.ae',
-  siteUrl: 'https://www.DubaiDentist.ae.ae',
-  logoUrl: 'https://www.DubaiDentist.ae.ae/logo.png',
-  logoDarkUrl: 'https://www.DubaiDentist.ae.ae/logo-dark.png',
+  siteName: 'AppointPanda',
+  domain: 'AppointPanda.ae',
+  siteUrl: 'https://www.AppointPanda.ae',
+  logoUrl: 'https://www.AppointPanda.ae/logo.png',
+  logoDarkUrl: 'https://www.AppointPanda.ae/logo-dark.png',
   // Favicon with cache-busting version to force Google re-indexing
-  faviconUrl: 'https://www.DubaiDentist.ae.ae/favicon.png?v=5',
-  supportEmail: 'support@DubaiDentist.ae.ae',
-  fromEmail: 'no-reply@DubaiDentist.ae.ae',
-  fromName: 'DubaiDentist.ae',
+  faviconUrl: 'https://www.AppointPanda.ae/favicon.png?v=5',
+  supportEmail: 'support@AppointPanda.ae',
+  fromEmail: 'no-reply@AppointPanda.ae',
+  fromName: 'AppointPanda',
   primaryColor: '#0d9488',
-  copyrightText: `© ${new Date().getFullYear()} DubaiDentist.ae. All rights reserved by Quick Commerce LLC FZ.`,
+  copyrightText: `© ${new Date().getFullYear()} AppointPanda. All rights reserved by Quick Commerce LLC FZ.`,
 };
 
 /**

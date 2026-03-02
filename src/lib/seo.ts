@@ -1,9 +1,9 @@
 // SEO utility functions and constants
 
 export const SITE_CONFIG = {
-  name: 'DubaiDentist.ae',
-  domain: 'DubaiDentist.ae.ae',
-  baseUrl: 'https://www.DubaiDentist.ae.ae',
+  name: 'AppointPanda',
+  domain: 'AppointPanda.ae',
+  baseUrl: 'https://www.AppointPanda.ae',
   defaultCountry: 'ae',
   defaultCity: 'dubai',
 };
@@ -97,7 +97,7 @@ export const generateDentistMeta = (dentistName: string, specialty?: string, cli
 
 export const generateBlogPostMeta = (title: string, excerpt?: string) => ({
   title,
-  description: excerpt || `Read ${title} on DubaiDentist.ae's dental health blog. Expert advice and tips from Dubai's top dental professionals.`,
+  description: excerpt || `Read ${title} on AppointPanda's dental health blog. Expert advice and tips from Dubai's top dental professionals.`,
   keywords: [
     'dental health',
     'oral hygiene',

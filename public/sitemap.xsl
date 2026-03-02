@@ -10,7 +10,7 @@
       <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <title>Sitemap • DubaiDentist.ae</title>
+        <title>Sitemap • AppointPanda</title>
         <style>
           :root {
             --bg: #0b1220;
@@ -40,7 +40,7 @@
       <body>
         <div class="wrap">
           <div class="top">
-            <h1>DubaiDentist.ae Sitemap</h1>
+            <h1>AppointPanda Sitemap</h1>
             <div class="pill"><span class="dot"/>XML + clickable view</div>
           </div>
 

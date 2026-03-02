@@ -103,7 +103,7 @@ ${existingContent.slice(0, 1500)}`;
 Generate JSON with EXACTLY this structure:
 {
   "h1": "Find Dentists in ${state.name}",
-  "meta_title": "Dentists in ${state.name} | Find Local Dental Care | DubaiDentist.ae",
+  "meta_title": "Dentists in ${state.name} | Find Local Dental Care | AppointPanda",
   "meta_description": "Looking for a dentist in ${state.name}? Browse verified dental professionals, read patient reviews, and book appointments online.",
   "intro": "Two paragraphs introducing dental care options in ${state.name}. Be specific about the state's healthcare landscape without making false claims.",
   "service_overview": "A paragraph about general dental services available in the state.",
@@ -259,7 +259,7 @@ ${existingContent.slice(0, 2000)}`;
 Generate JSON with EXACTLY this structure:
 {
   "h1": "Dentists in ${city.name}, ${city.state?.abbreviation}",
-  "meta_title": "Dentists in ${city.name}, ${city.state?.abbreviation} | DubaiDentist.ae",
+  "meta_title": "Dentists in ${city.name}, ${city.state?.abbreviation} | AppointPanda",
   "meta_description": "Find dentists in ${city.name}, ${city.state?.abbreviation}. Browse verified dental professionals, read reviews, and book appointments.",
   "intro": "Two paragraphs about dental care in ${city.name}. Make it specific to this city - mention what makes dental care here accessible or unique. DO NOT copy from other cities.",
   "service_overview": "A paragraph about dental services available in ${city.name}.",

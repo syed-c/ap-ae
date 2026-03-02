@@ -110,10 +110,10 @@ export default function MessagingControlTab() {
     date: 'January 15, 2026',
     time: '10:30 AM',
     treatment: 'Teeth Cleaning',
-    review_link: 'https://DubaiDentist.ae.ae/review/abc123',
-    booking_link: 'https://DubaiDentist.ae.ae/book/abc123',
-    reschedule_link: 'https://DubaiDentist.ae.ae/reschedule/abc123',
-    cancel_link: 'https://DubaiDentist.ae.ae/cancel/abc123',
+    review_link: 'https://AppointPanda.ae/review/abc123',
+    booking_link: 'https://AppointPanda.ae/book/abc123',
+    reschedule_link: 'https://AppointPanda.ae/reschedule/abc123',
+    cancel_link: 'https://AppointPanda.ae/cancel/abc123',
   };
 
   const renderPreviewContent = (template: string) => {
@@ -609,8 +609,8 @@ export default function MessagingControlTab() {
             <div className="flex justify-center">
               <div
                 className={`bg-muted rounded-2xl p-4 ${previewMode === 'mobile'
-                    ? 'w-80 min-h-96'
-                    : 'w-full min-h-48'
+                  ? 'w-80 min-h-96'
+                  : 'w-full min-h-48'
                   }`}
               >
                 <div className="flex items-center gap-2 mb-4 pb-2 border-b">

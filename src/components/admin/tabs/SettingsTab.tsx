@@ -199,7 +199,7 @@ export default function SettingsTab() {
               <div className="space-y-2">
                 <Label>Site Name</Label>
                 <Input
-                  value={(getSettingValue('platform')?.site_name as string) || 'DubaiDentist.ae'}
+                  value={(getSettingValue('platform')?.site_name as string) || 'AppointPanda'}
                   onChange={(e) => updateFormValue('platform', 'site_name', e.target.value)}
                 />
               </div>
@@ -208,7 +208,7 @@ export default function SettingsTab() {
                 <Input
                   value={(getSettingValue('platform')?.site_url as string) || ''}
                   onChange={(e) => updateFormValue('platform', 'site_url', e.target.value)}
-                  placeholder="https://DubaiDentist.ae.ae"
+                  placeholder="https://AppointPanda.ae"
                 />
               </div>
               <div className="space-y-2">
@@ -216,7 +216,7 @@ export default function SettingsTab() {
                 <Input
                   value={(getSettingValue('platform')?.support_email as string) || ''}
                   onChange={(e) => updateFormValue('platform', 'support_email', e.target.value)}
-                  placeholder="support@DubaiDentist.ae.ae"
+                  placeholder="support@AppointPanda.ae"
                 />
               </div>
               <div className="space-y-2">
@@ -499,9 +499,9 @@ export default function SettingsTab() {
                 <Input
                   value={(getSettingValue('legal')?.copyright_text as string) || ''}
                   onChange={(e) => updateFormValue('legal', 'copyright_text', e.target.value)}
-                  placeholder="© 2026 DubaiDentist.ae. All rights reserved by Quick Commerce LLC."
+                  placeholder="© 2026 AppointPanda. All rights reserved by Quick Commerce LLC."
                 />
-                <p className="text-xs text-muted-foreground">Displays in the footer bottom bar (e.g., "© 2026 DubaiDentist.ae...")</p>
+                <p className="text-xs text-muted-foreground">Displays in the footer bottom bar (e.g., "© 2026 AppointPanda...")</p>
               </div>
               <div className="space-y-2">
                 <Label>Footer Legal Text</Label>
@@ -806,7 +806,7 @@ export default function SettingsTab() {
                   <Input
                     value={(getSettingValue('smtp')?.from_name as string) || ''}
                     onChange={(e) => updateFormValue('smtp', 'from_name', e.target.value)}
-                    placeholder="DubaiDentist.ae"
+                    placeholder="AppointPanda"
                   />
                 </div>
                 <div className="space-y-2">
@@ -814,7 +814,7 @@ export default function SettingsTab() {
                   <Input
                     value={(getSettingValue('smtp')?.from_email as string) || ''}
                     onChange={(e) => updateFormValue('smtp', 'from_email', e.target.value)}
-                    placeholder="noreply@DubaiDentist.ae.ae"
+                    placeholder="noreply@AppointPanda.ae"
                   />
                 </div>
               </div>
@@ -869,7 +869,7 @@ export default function SettingsTab() {
                   <Input
                     value={(getSettingValue('google_oauth')?.callback_url as string) || `${window.location.origin}/auth/callback`}
                     onChange={(e) => updateFormValue('google_oauth', 'callback_url', e.target.value)}
-                    placeholder="https://www.DubaiDentist.ae.ae/auth/callback"
+                    placeholder="https://www.AppointPanda.ae/auth/callback"
                   />
                   <Button
                     variant="outline"
@@ -884,7 +884,7 @@ export default function SettingsTab() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Set your production callback URL (e.g., <strong>https://www.DubaiDentist.ae.ae/auth/callback</strong>). Add this URL as an authorized redirect URI in your{' '}
+                  Set your production callback URL (e.g., <strong>https://www.AppointPanda.ae/auth/callback</strong>). Add this URL as an authorized redirect URI in your{' '}
                   <a
                     href="https://console.cloud.google.com/apis/credentials"
                     target="_blank"

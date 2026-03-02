@@ -214,7 +214,7 @@ const FAQS = [
   },
   {
     question: 'Do I need new software?',
-    answer: 'No. DubaiDentist.ae works alongside your existing systems. We provide a dashboard for reputation and leads — we don\'t replace your PMS, scheduling, or billing software.'
+    answer: 'No. AppointPanda works alongside your existing systems. We provide a dashboard for reputation and leads — we don\'t replace your PMS, scheduling, or billing software.'
   },
   {
     question: 'Who owns the website content?',
@@ -298,7 +298,7 @@ export default function PricingPage() {
   return (
     <>
       <SEOHead
-        title="Pricing | Dental Growth Platform | DubaiDentist.ae"
+        title="Pricing | Dental Growth Platform | AppointPanda"
         description="Monthly dental practice growth plans. Verified listings, reputation management, lead tracking, SEO. No contracts, cancel anytime."
       />
       <div className="min-h-screen flex flex-col bg-background">
@@ -632,7 +632,7 @@ export default function PricingPage() {
                   Actual results depend on your profile quality, response time, reviews, and local market conditions.
                 </p>
                 <p>
-                  <strong>Data Protection:</strong> DubaiDentist.ae tracks contact intent only and follows UAE data protection standards.
+                  <strong>Data Protection:</strong> AppointPanda tracks contact intent only and follows UAE data protection standards.
                   All patient treatment data remains in your practice management system.
                 </p>
                 <p>
@@ -650,7 +650,7 @@ export default function PricingPage() {
                 Ready to Take Control of Your Online Presence?
               </h2>
               <p className="text-primary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
-                Join dental practices across Dubai, Abu Dhabi, and Sharjah who trust DubaiDentist.ae for verified visibility and reputation growth.
+                Join dental practices across Dubai, Abu Dhabi, and Sharjah who trust AppointPanda for verified visibility and reputation growth.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
