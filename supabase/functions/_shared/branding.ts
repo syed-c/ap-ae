@@ -27,7 +27,7 @@ const DEFAULT_BRANDING: SiteBranding = {
   faviconUrl: 'https://www.DubaiDentist.ae.ae/favicon.png?v=5',
   supportEmail: 'support@DubaiDentist.ae.ae',
   fromEmail: 'no-reply@DubaiDentist.ae.ae',
-  fromName: 'Appoint Panda',
+  fromName: 'DubaiDentist.ae',
   primaryColor: '#0d9488',
   copyrightText: `© ${new Date().getFullYear()} DubaiDentist.ae. All rights reserved by Quick Commerce LLC FZ.`,
 };

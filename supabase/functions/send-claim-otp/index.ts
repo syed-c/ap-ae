@@ -46,7 +46,7 @@ async function getSmtpSettings(supabaseClient: any): Promise<SMTPSettings | null
     port: parseInt(smtp.port?.toString() || '587'),
     user: smtp.username,
     pass: smtp.password,
-    from: smtp.from_email ? `${smtp.from_name || 'Appoint Panda'} <${smtp.from_email}>` : 'Appoint Panda <no-reply@DubaiDentist.ae.ae>',
+    from: smtp.from_email ? `${smtp.from_name || 'DubaiDentist.ae'} <${smtp.from_email}>` : 'DubaiDentist.ae <no-reply@DubaiDentist.ae.ae>',
     secure: smtp.port === 465,
   };
 }
@@ -233,7 +233,7 @@ const handler = async (req: Request): Promise<Response> => {
           <tr>
             <td style="padding: 30px 40px; background-color: #f4f4f5; text-align: center;">
               <p style="margin: 0; color: #6b7280; font-size: 12px;">
-                © 2024 Appoint Panda. All rights reserved.
+                © 2024 DubaiDentist.ae. All rights reserved.
               </p>
             </td>
           </tr>
@@ -249,7 +249,7 @@ const handler = async (req: Request): Promise<Response> => {
       const smtpResult = await sendEmailViaSMTP(
         smtpSettings,
         emailToSend,
-        `Your Verification Code: ${otp} - Appoint Panda`,
+        `Your Verification Code: ${otp} - DubaiDentist.ae`,
         emailHtml
       );
 
@@ -278,9 +278,9 @@ const handler = async (req: Request): Promise<Response> => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Appoint Panda <no-reply@DubaiDentist.ae.ae>",
+          from: "DubaiDentist.ae <no-reply@DubaiDentist.ae.ae>",
           to: [emailToSend],
-          subject: `Your Verification Code: ${otp} - Appoint Panda`,
+          subject: `Your Verification Code: ${otp} - DubaiDentist.ae`,
           html: emailHtml,
         }),
       });

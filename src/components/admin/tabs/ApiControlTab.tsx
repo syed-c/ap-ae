@@ -106,7 +106,7 @@ export default function ApiControlTab() {
     mutationFn: async ({ key, value }: { key: string; value: Record<string, unknown> }) => {
       const existing = settings?.find(s => s.key === key);
       const jsonValue = value as unknown as { [key: string]: string | number | boolean | null };
-      
+
       if (existing) {
         const { error } = await supabase
           .from('global_settings')
@@ -119,7 +119,7 @@ export default function ApiControlTab() {
           .insert([{ key, value: jsonValue }]);
         if (error) throw error;
       }
-      
+
       await createAuditLog({
         action: 'UPDATE_API_SETTINGS',
         entityType: 'api_integration',
@@ -142,13 +142,13 @@ export default function ApiControlTab() {
       const existing = settings?.find(s => s.key === key);
       const currentValue = (existing?.value as Record<string, unknown>) || {};
       const newValue = { ...currentValue, enabled };
-      
+
       if (existing) {
         const { error } = await supabase
           .from('global_settings')
-          .update({ 
-            value: newValue as { [key: string]: string | number | boolean | null }, 
-            updated_at: new Date().toISOString() 
+          .update({
+            value: newValue as { [key: string]: string | number | boolean | null },
+            updated_at: new Date().toISOString()
           })
           .eq('id', existing.id);
         if (error) throw error;
@@ -158,7 +158,7 @@ export default function ApiControlTab() {
           .insert([{ key, value: { enabled } as { [key: string]: boolean } }]);
         if (error) throw error;
       }
-      
+
       await createAuditLog({
         action: enabled ? 'ENABLE_API' : 'DISABLE_API',
         entityType: 'api_integration',
@@ -178,9 +178,9 @@ export default function ApiControlTab() {
     if (testResults[key]) {
       return testResults[key].status;
     }
-    
+
     const setting = settings?.find(s => s.key === key);
-    
+
     // Special handling for AIMLAPI - it uses secure secrets
     if (key === 'aimlapi') {
       if (setting) {
@@ -195,20 +195,20 @@ export default function ApiControlTab() {
       // AIMLAPI_KEY is configured in secrets, so default to connected
       return 'connected';
     }
-    
+
     if (!setting) return 'not_configured';
     const value = setting.value as Record<string, unknown>;
-    
+
     // Check stored test status
     if (value.last_test_status) {
       return value.last_test_status as APIStatus['status'];
     }
-    
+
     // Special handling for Stripe - uses secure secrets
     if (key === 'stripe' && value.uses_secrets && value.secret_key_configured) {
       return 'connected';
     }
-    
+
     if (!value.api_key && !value.enabled && !value.client_id && !value.access_token && !value.account_sid) {
       return 'not_configured';
     }
@@ -236,11 +236,11 @@ export default function ApiControlTab() {
 
   const getStatusBadge = (status: APIStatus['status'], apiKey?: string) => {
     const isCurrentlyTesting = apiKey && isTesting[apiKey];
-    
+
     if (isCurrentlyTesting) {
       return <Badge className="bg-primary/20 text-primary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Testing...</Badge>;
     }
-    
+
     switch (status) {
       case 'connected': return <Badge className="bg-teal/20 text-teal"><CheckCircle className="h-3 w-3 mr-1" />Connected</Badge>;
       case 'error': return <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" />Error</Badge>;
@@ -248,7 +248,7 @@ export default function ApiControlTab() {
       default: return <Badge variant="secondary">Not Configured</Badge>;
     }
   };
-  
+
   // Test connection for an API
   const handleTestConnection = async (apiKey: string) => {
     const currentSettings = getApiSetting(apiKey);
@@ -268,7 +268,7 @@ export default function ApiControlTab() {
   const renderSettingsDialog = () => {
     if (!editingApi) return null;
     const currentSettings = getApiSetting(editingApi);
-    
+
     switch (editingApi) {
       case 'aimlapi':
         return (
@@ -284,7 +284,7 @@ export default function ApiControlTab() {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div className="p-4 rounded-lg bg-teal/10 border border-teal/20">
                 <div className="flex items-center gap-2 mb-2">
@@ -295,9 +295,9 @@ export default function ApiControlTab() {
                   API key is securely stored in Lovable Cloud secrets and used by all edge functions for AI processing.
                 </p>
               </div>
-              
+
               <Separator />
-              
+
               <div className="space-y-3">
                 <Label className="font-medium">Supported Models</Label>
                 <div className="grid grid-cols-2 gap-2 text-sm">
@@ -307,7 +307,7 @@ export default function ApiControlTab() {
                   <div className="p-2 rounded bg-muted/50">claude-3-5-sonnet</div>
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 <Label className="font-medium">Used By</Label>
                 <div className="flex flex-wrap gap-2">
@@ -319,7 +319,7 @@ export default function ApiControlTab() {
                   <Badge variant="secondary">AI Reply Generator</Badge>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Switch
                   checked={apiForm.aimlapi_enabled === 'true' || (apiForm.aimlapi_enabled === undefined && ((currentSettings.enabled as boolean) ?? true))}
@@ -328,7 +328,7 @@ export default function ApiControlTab() {
                 <Label>Enable AI/ML API Integration</Label>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingApi(null)}>Cancel</Button>
               <Button onClick={() => updateApiSetting.mutate({
@@ -345,7 +345,7 @@ export default function ApiControlTab() {
             </div>
           </div>
         );
-        
+
       case 'whatsapp':
         return (
           <div className="space-y-6">
@@ -360,7 +360,7 @@ export default function ApiControlTab() {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Access Token</Label>
@@ -383,7 +383,7 @@ export default function ApiControlTab() {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Phone Number ID</Label>
                 <Input
@@ -392,7 +392,7 @@ export default function ApiControlTab() {
                   placeholder="Your WhatsApp Phone Number ID"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Business Account ID</Label>
                 <Input
@@ -401,7 +401,7 @@ export default function ApiControlTab() {
                   placeholder="Your WhatsApp Business Account ID"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Verify Token (for webhook)</Label>
                 <Input
@@ -410,9 +410,9 @@ export default function ApiControlTab() {
                   placeholder="Webhook verification token"
                 />
               </div>
-              
+
               <Separator />
-              
+
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Link className="h-4 w-4" />
@@ -424,8 +424,8 @@ export default function ApiControlTab() {
                     readOnly
                     className="bg-muted"
                   />
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="icon"
                     onClick={() => copyToClipboard(`${webhookBaseUrl}/whatsapp-webhook`)}
                   >
@@ -436,7 +436,7 @@ export default function ApiControlTab() {
                   Add this URL to your WhatsApp Business Platform webhook settings
                 </p>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Switch
                   checked={apiForm.whatsapp_enabled === 'true' || (apiForm.whatsapp_enabled === undefined && (currentSettings.enabled as boolean))}
@@ -445,7 +445,7 @@ export default function ApiControlTab() {
                 <Label>Enable WhatsApp Integration</Label>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingApi(null)}>Cancel</Button>
               <Button onClick={() => updateApiSetting.mutate({
@@ -464,7 +464,7 @@ export default function ApiControlTab() {
             </div>
           </div>
         );
-        
+
       case 'sms':
         return (
           <div className="space-y-6">
@@ -479,7 +479,7 @@ export default function ApiControlTab() {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Account SID</Label>
@@ -489,7 +489,7 @@ export default function ApiControlTab() {
                   placeholder="Your Twilio Account SID"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Auth Token</Label>
                 <div className="relative">
@@ -511,7 +511,7 @@ export default function ApiControlTab() {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Default Sender Number</Label>
                 <Input
@@ -523,7 +523,7 @@ export default function ApiControlTab() {
                   Your Twilio phone number (or use Messaging Service SID)
                 </p>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Messaging Service SID (Optional)</Label>
                 <Input
@@ -532,7 +532,7 @@ export default function ApiControlTab() {
                   placeholder="MGxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                 />
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Switch
                   checked={apiForm.sms_enabled === 'true' || (apiForm.sms_enabled === undefined && (currentSettings.enabled as boolean))}
@@ -541,7 +541,7 @@ export default function ApiControlTab() {
                 <Label>Enable SMS Integration</Label>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingApi(null)}>Cancel</Button>
               <Button onClick={() => updateApiSetting.mutate({
@@ -560,7 +560,7 @@ export default function ApiControlTab() {
             </div>
           </div>
         );
-        
+
       case 'smtp':
         return (
           <div className="space-y-6">
@@ -575,7 +575,7 @@ export default function ApiControlTab() {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -595,7 +595,7 @@ export default function ApiControlTab() {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Username</Label>
                 <Input
@@ -604,7 +604,7 @@ export default function ApiControlTab() {
                   placeholder="your-email@example.com"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Password</Label>
                 <div className="relative">
@@ -626,7 +626,7 @@ export default function ApiControlTab() {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>From Email</Label>
                 <Input
@@ -635,16 +635,16 @@ export default function ApiControlTab() {
                   placeholder="noreply@yourdomain.com"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>From Name</Label>
                 <Input
                   value={apiForm.smtp_from_name ?? (currentSettings.from_name as string) ?? ''}
                   onChange={(e) => setApiForm({ ...apiForm, smtp_from_name: e.target.value })}
-                  placeholder="Appoint Panda"
+                  placeholder="DubaiDentist.ae"
                 />
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Switch
                   checked={apiForm.smtp_enabled === 'true' || (apiForm.smtp_enabled === undefined && (currentSettings.enabled as boolean))}
@@ -653,7 +653,7 @@ export default function ApiControlTab() {
                 <Label>Enable Email Integration</Label>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingApi(null)}>Cancel</Button>
               <Button onClick={() => updateApiSetting.mutate({
@@ -674,7 +674,7 @@ export default function ApiControlTab() {
             </div>
           </div>
         );
-        
+
       case 'google_oauth':
         return (
           <div className="space-y-6">
@@ -689,7 +689,7 @@ export default function ApiControlTab() {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Client ID</Label>
@@ -699,7 +699,7 @@ export default function ApiControlTab() {
                   placeholder="xxx.apps.googleusercontent.com"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Client Secret</Label>
                 <div className="relative">
@@ -721,9 +721,9 @@ export default function ApiControlTab() {
                   </Button>
                 </div>
               </div>
-              
+
               <Separator />
-              
+
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Link className="h-4 w-4" />
@@ -735,8 +735,8 @@ export default function ApiControlTab() {
                     readOnly
                     className="bg-muted"
                   />
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="icon"
                     onClick={() => copyToClipboard(`${window.location.origin}/auth/callback`)}
                   >
@@ -747,7 +747,7 @@ export default function ApiControlTab() {
                   Add this URL as an authorized redirect URI in your Google Cloud Console OAuth credentials
                 </p>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Switch
                   checked={apiForm.google_oauth_enabled === 'true' || (apiForm.google_oauth_enabled === undefined && (currentSettings.enabled as boolean))}
@@ -756,7 +756,7 @@ export default function ApiControlTab() {
                 <Label>Enable Google OAuth Integration</Label>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingApi(null)}>Cancel</Button>
               <Button onClick={() => {
@@ -776,7 +776,7 @@ export default function ApiControlTab() {
             </div>
           </div>
         );
-        
+
       case 'stripe':
         return (
           <div className="space-y-6">
@@ -791,7 +791,7 @@ export default function ApiControlTab() {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <div className="p-4 rounded-lg bg-teal/10 border border-teal/20">
                 <div className="flex items-center gap-2 mb-2">
@@ -802,7 +802,7 @@ export default function ApiControlTab() {
                   Secret key is configured securely and used by edge functions for payment processing.
                 </p>
               </div>
-              
+
               <div className="p-4 rounded-lg bg-teal/10 border border-teal/20">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="h-4 w-4 text-teal" />
@@ -812,9 +812,9 @@ export default function ApiControlTab() {
                   Webhook secret is configured for secure event verification.
                 </p>
               </div>
-              
+
               <Separator />
-              
+
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Link className="h-4 w-4" />
@@ -826,8 +826,8 @@ export default function ApiControlTab() {
                     readOnly
                     className="bg-muted"
                   />
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="icon"
                     onClick={() => copyToClipboard(`${webhookBaseUrl}/stripe-webhook`)}
                   >
@@ -838,7 +838,7 @@ export default function ApiControlTab() {
                   Add this URL in your Stripe Dashboard → Developers → Webhooks
                 </p>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Switch
                   checked={apiForm.stripe_enabled === 'true' || (apiForm.stripe_enabled === undefined && (currentSettings.enabled as boolean))}
@@ -847,7 +847,7 @@ export default function ApiControlTab() {
                 <Label>Enable Stripe Payments</Label>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingApi(null)}>Cancel</Button>
               <Button onClick={() => updateApiSetting.mutate({
@@ -865,7 +865,7 @@ export default function ApiControlTab() {
             </div>
           </div>
         );
-      
+
       default:
         // Generic API settings
         return (
@@ -892,7 +892,7 @@ export default function ApiControlTab() {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Endpoint URL (Optional)</Label>
                 <Input
@@ -901,7 +901,7 @@ export default function ApiControlTab() {
                   placeholder="https://api.example.com"
                 />
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Switch
                   checked={apiForm[`${editingApi}_enabled`] === 'true' || (apiForm[`${editingApi}_enabled`] === undefined && (currentSettings.enabled as boolean))}
@@ -910,7 +910,7 @@ export default function ApiControlTab() {
                 <Label>Enable Integration</Label>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setEditingApi(null)}>Cancel</Button>
               <Button onClick={() => updateApiSetting.mutate({
@@ -970,8 +970,8 @@ export default function ApiControlTab() {
                 readOnly
                 className="w-80 bg-background text-sm"
               />
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="icon"
                 onClick={() => copyToClipboard(`${window.location.origin}/auth/callback`)}
               >
@@ -1109,8 +1109,8 @@ export default function ApiControlTab() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center gap-1 justify-end">
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               size="sm"
                               onClick={() => handleTestConnection(api.key)}
                               disabled={isTesting[api.key]}
@@ -1121,8 +1121,8 @@ export default function ApiControlTab() {
                                 <Play className="h-4 w-4" />
                               )}
                             </Button>
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="sm"
                               onClick={() => setEditingApi(api.key)}
                             >
@@ -1156,10 +1156,9 @@ export default function ApiControlTab() {
                         <CardDescription>
                           {api.key}
                           {testResult && (
-                            <span className={`ml-2 text-xs ${
-                              testResult.status === 'connected' ? 'text-teal' : 
-                              testResult.status === 'error' ? 'text-coral' : 'text-muted-foreground'
-                            }`}>
+                            <span className={`ml-2 text-xs ${testResult.status === 'connected' ? 'text-teal' :
+                                testResult.status === 'error' ? 'text-coral' : 'text-muted-foreground'
+                              }`}>
                               — {testResult.message}
                             </span>
                           )}
@@ -1168,7 +1167,7 @@ export default function ApiControlTab() {
                     </div>
                     <div className="flex items-center gap-2">
                       {getStatusBadge(api.status, api.key)}
-                      <Button 
+                      <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleTestConnection(api.key)}
@@ -1181,7 +1180,7 @@ export default function ApiControlTab() {
                         )}
                         Test
                       </Button>
-                      <Button 
+                      <Button
                         size="sm"
                         onClick={() => setEditingApi(api.key)}
                       >

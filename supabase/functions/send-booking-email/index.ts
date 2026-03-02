@@ -42,7 +42,7 @@ async function getEmailSettings(supabase: any): Promise<EmailSettings | null> {
   // Default sender should be on your verified domain.
   return {
     from_email: 'no-reply@DubaiDentist.ae.ae',
-    from_name: 'Appoint Panda',
+    from_name: 'DubaiDentist.ae',
   };
 }
 
@@ -67,7 +67,7 @@ async function sendEmailViaResend(
   try {
     const cleanHtml = minifyHtml(html);
 
-    const fromName = (settings.from_name || 'Appoint Panda').trim() || 'Appoint Panda';
+    const fromName = (settings.from_name || 'DubaiDentist.ae').trim() || 'DubaiDentist.ae';
     const fromEmail = (settings.from_email || '').trim() || 'no-reply@DubaiDentist.ae.ae';
 
     const send = async () => {

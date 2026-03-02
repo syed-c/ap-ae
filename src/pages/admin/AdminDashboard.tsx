@@ -347,7 +347,7 @@ export default function AdminDashboard() {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   // Define roles that can access admin dashboard
   const ADMIN_ROLES = ['super_admin', 'district_manager', 'seo_team', 'content_team', 'marketing_team', 'support_team'];
   const isAdmin = roles.some(role => ADMIN_ROLES.includes(role));
@@ -371,7 +371,7 @@ export default function AdminDashboard() {
       document.head.appendChild(meta);
     }
     meta.setAttribute('content', 'noindex, nofollow');
-    
+
     return () => {
       meta?.setAttribute('content', 'index, follow');
     };
@@ -380,7 +380,7 @@ export default function AdminDashboard() {
   // Auto-refresh roles if user has no roles (may happen after fresh signup)
   useEffect(() => {
     if (isAdmin) return;
-    
+
     if (!isLoading && user && roles.length === 0 && roleCheckAttempts < 2) {
       const timer = setTimeout(() => {
         refreshRoles();
@@ -392,15 +392,15 @@ export default function AdminDashboard() {
 
   // Get global tab visibility settings
   const { isTabVisible } = useTabVisibility();
-  
+
   // Get user-specific tab access permissions
   const { canAccessTab, hasFullAccess } = useUserTabAccess();
 
   // Determine which tab groups to show and filter by visibility + user permissions
   const rawTabGroups = isAdmin ? adminTabGroups : dentistTabGroups;
   const dashboardType = isAdmin ? 'admin' : 'dentist';
-  
-  const tabGroups = useMemo(() => 
+
+  const tabGroups = useMemo(() =>
     rawTabGroups.map(group => ({
       ...group,
       tabs: group.tabs.filter(tab => {
@@ -503,8 +503,8 @@ export default function AdminDashboard() {
             We're finalizing your account setup. This should only take a moment.
           </p>
           <div className="mt-6 flex gap-2 justify-center">
-            <Button 
-              variant="default" 
+            <Button
+              variant="default"
               onClick={() => window.location.reload()}
             >
               Refresh Page
@@ -520,7 +520,7 @@ export default function AdminDashboard() {
       </div>
     );
   }
-  
+
   // Still loading roles - show loading spinner instead of "Setting Up Account" prematurely
   // SuperAdmins bypass this entirely
   if (!isAdmin && !isDentist && roleCheckAttempts < 2) {
@@ -536,7 +536,7 @@ export default function AdminDashboard() {
 
   // Check if this is a dentist accessing their dashboard - redirect to V2
   const isDentistRoute = location.pathname.startsWith('/dashboard') && isDentist && !isAdmin;
-  
+
   // For dentists, use the redesigned V2 dashboard
   if (isDentistRoute) {
     return (
@@ -646,7 +646,7 @@ export default function AdminDashboard() {
       case 'settings': return <SettingsTab />;
       case 'geo-expansion': return <GeoExpansionTab />;
       // Default to Overview for admin route, DentistDashboard only for dentist route
-      default: 
+      default:
         // If on admin route, always show OverviewTab as fallback
         if (location.pathname.startsWith('/admin')) {
           return <OverviewTab />;
@@ -682,7 +682,7 @@ export default function AdminDashboard() {
               <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/30">
                 <span className="text-white font-extrabold text-sm">AP</span>
               </div>
-              <span className="font-display font-bold text-lg text-white">Appoint Panda</span>
+              <span className="font-display font-bold text-lg text-white">DubaiDentist.ae</span>
             </div>
           )}
           <Button
@@ -718,8 +718,8 @@ export default function AdminDashboard() {
                           isActive
                             ? 'bg-white text-slate-900 font-semibold shadow-lg shadow-white/20'
                             : tab.highlight
-                            ? 'text-primary bg-primary/10 hover:bg-primary/20'
-                            : 'text-white/70 hover:bg-white/10 hover:text-white'
+                              ? 'text-primary bg-primary/10 hover:bg-primary/20'
+                              : 'text-white/70 hover:bg-white/10 hover:text-white'
                         )}
                       >
                         {/* Active indicator bar */}

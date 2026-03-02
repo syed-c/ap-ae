@@ -436,7 +436,7 @@ export default function GMBBusinessSelection() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Select Your Practice</h1>
           <p className="text-muted-foreground">
-            Choose the Google Business Profile you want to list on Appoint Panda
+            Choose the Google Business Profile you want to list on DubaiDentist.ae
           </p>
         </div>
 
@@ -445,16 +445,16 @@ export default function GMBBusinessSelection() {
             <Card
               key={business.id}
               className={`cursor-pointer transition-all ${selectedBusiness?.id === business.id
-                  ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
-                  : 'hover:border-primary/30'
+                ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
+                : 'hover:border-primary/30'
                 }`}
               onClick={() => setSelectedBusiness(business)}
             >
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${selectedBusiness?.id === business.id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
                     }`}>
                     {selectedBusiness?.id === business.id ? (
                       <CheckCircle className="h-6 w-6" />

@@ -6,11 +6,11 @@ import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { createAuditLog } from '@/lib/audit';
-import { 
-  setGmbProviderToken, 
-  getOriginalSession, 
+import {
+  setGmbProviderToken,
+  getOriginalSession,
   clearOriginalSession,
-  clearGmbProviderToken 
+  clearGmbProviderToken
 } from '@/lib/gmbAuth';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -44,7 +44,7 @@ export default function AuthCallback() {
       document.head.appendChild(meta);
     }
     meta.setAttribute('content', 'noindex, nofollow');
-    
+
     return () => {
       meta?.setAttribute('content', 'index, follow');
     };
@@ -118,7 +118,7 @@ export default function AuthCallback() {
     const handleListingFlow = async (accessToken: string) => {
       try {
         setMessage('Preparing business discovery...');
-        
+
         // Just verify the user is authenticated, don't create anything yet
         // The actual business discovery will happen on the GMBBusinessSelection page
         return true;
@@ -166,7 +166,7 @@ export default function AuthCallback() {
           searchParams.get('listing') === 'true' || localStorage.getItem('gmb_listing_flow') === 'true';
         const isRelinkFlow =
           searchParams.get('relink') === 'true' || localStorage.getItem('gmb_relink_flow') === 'true';
-        
+
         // Check if we need to restore the original user's session after getting GMB token
         const shouldRestoreSession = localStorage.getItem('gmb_restore_session') === 'true';
         const originalSession = getOriginalSession();
@@ -228,16 +228,16 @@ export default function AuthCallback() {
         // Capture the GMB provider token
         const providerToken = providerTokenFromExchange ?? gmbOAuthSession.provider_token ?? null;
         console.log('Provider token available:', !!providerToken);
-        
+
         if (providerToken) {
           setGmbProviderToken(providerToken);
-          
+
           // Store the token server-side for persistence
           if (isGmbCallback || isListingFlow || isRelinkFlow) {
             try {
               const { error: storeError } = await supabase.functions.invoke('gmb-store-token', {
                 headers: { Authorization: `Bearer ${gmbOAuthSession.access_token}` },
-                body: { 
+                body: {
                   providerToken,
                   scopes: 'openid email profile https://www.googleapis.com/auth/business.manage'
                 },
@@ -257,21 +257,21 @@ export default function AuthCallback() {
         // restore the original user's session instead of keeping the GMB Google account logged in
         let session = gmbOAuthSession;
         let restoredOriginalUser = false;
-        
+
         if (shouldRestoreSession && originalSession && (isRelinkFlow || isGmbCallback)) {
           setMessage('Restoring your session...');
           console.log('Restoring original user session after GMB OAuth');
-          
+
           try {
             // Don't sign out first - just try to refresh the original session directly
             // This is more reliable than sign out + set session
             const { data: refreshedSession, error: refreshError } = await supabase.auth.refreshSession({
               refresh_token: originalSession.refreshToken,
             });
-            
+
             if (refreshError || !refreshedSession?.session) {
               console.warn('Failed to refresh original session, trying setSession...', refreshError);
-              
+
               // Try setSession as fallback (might work if token is still valid)
               const { data: restoredSession, error: restoreError } = await supabase.auth.setSession({
                 access_token: originalSession.accessToken,
@@ -299,7 +299,7 @@ export default function AuthCallback() {
             // User can still complete the GMB flow, they just might be logged in as a different account
             console.warn('Continuing with current session after restore failure');
           }
-          
+
           // Clean up stored session regardless of outcome
           clearOriginalSession();
           localStorage.removeItem('gmb_restore_session');
@@ -316,7 +316,7 @@ export default function AuthCallback() {
             isListingFlow,
             restoredOriginalUser,
           },
-        }).catch(() => {});
+        }).catch(() => { });
 
         // Read current roles
         let roles = await readRoles(session.user.id);
@@ -326,7 +326,7 @@ export default function AuthCallback() {
         // GMB sync flow (existing dentist linking GMB to their clinic)
         let gmbSuccess = false;
         let shouldSelectGmbBusiness = false;
-        
+
         if (isGmbCallback && !restoredOriginalUser) {
           gmbSuccess = await handleGmbTransfer(session.access_token);
           if (!gmbSuccess) {
@@ -370,7 +370,7 @@ export default function AuthCallback() {
         const isDentist = roles.includes('dentist');
 
         // Route decision
-        
+
         // If this is a GMB relink or listing flow, always go to GMB selection
         // regardless of whether we restored the original user or not
         if (isRelinkFlow || isListingFlow || shouldSelectGmbBusiness) {
@@ -403,23 +403,23 @@ export default function AuthCallback() {
               const { data: bootstrapData, error: bootstrapError } = await supabase.functions.invoke('dentist-onboarding-bootstrap', {
                 headers: { Authorization: `Bearer ${session.access_token}` },
               });
-              
+
               if (bootstrapError) {
                 console.error('Bootstrap error:', bootstrapError);
               } else {
                 console.log('Bootstrap complete:', bootstrapData);
               }
-              
+
               // Wait a moment for role to propagate
               await sleep(500);
-              
+
               // Refresh roles after bootstrap
               await refreshRoles();
-              
+
               // Re-read roles to confirm
               const newRoles = await readRoles(session.user.id);
               console.log('New roles after bootstrap:', newRoles);
-              
+
               // Check if user needs to add a clinic
               if (bootstrapData?.needsClinic) {
                 // New user without clinic - redirect to GMB business selection
@@ -464,7 +464,7 @@ export default function AuthCallback() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-coral bg-clip-text text-transparent">
-            Appoint Panda
+            DubaiDentist.ae
           </CardTitle>
           <CardDescription>
             {status === 'processing' && 'Completing authentication...'}

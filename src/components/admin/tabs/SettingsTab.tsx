@@ -199,7 +199,7 @@ export default function SettingsTab() {
               <div className="space-y-2">
                 <Label>Site Name</Label>
                 <Input
-                  value={(getSettingValue('platform')?.site_name as string) || 'Appoint Panda'}
+                  value={(getSettingValue('platform')?.site_name as string) || 'DubaiDentist.ae'}
                   onChange={(e) => updateFormValue('platform', 'site_name', e.target.value)}
                 />
               </div>
@@ -806,7 +806,7 @@ export default function SettingsTab() {
                   <Input
                     value={(getSettingValue('smtp')?.from_name as string) || ''}
                     onChange={(e) => updateFormValue('smtp', 'from_name', e.target.value)}
-                    placeholder="Appoint Panda"
+                    placeholder="DubaiDentist.ae"
                   />
                 </div>
                 <div className="space-y-2">

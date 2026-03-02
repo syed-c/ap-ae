@@ -116,7 +116,7 @@ export default function GMBOnboarding() {
       document.head.appendChild(meta);
     }
     meta.setAttribute('content', 'noindex, nofollow');
-    
+
     return () => {
       meta?.setAttribute('content', 'index, follow');
     };
@@ -247,7 +247,7 @@ export default function GMBOnboarding() {
       .eq('user_id', user!.id);
 
     const hasDentistRole = (rolesData ?? []).some((r) => r.role === 'dentist');
-    
+
     if (!hasDentistRole) {
       // Call bootstrap function to create role
       try {
@@ -275,7 +275,7 @@ export default function GMBOnboarding() {
       .eq('user_id', user!.id);
 
     const hasDentistRole = (rolesData ?? []).some((r) => r.role === 'dentist');
-    
+
     if (!hasDentistRole) {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -312,7 +312,7 @@ export default function GMBOnboarding() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-coral bg-clip-text text-transparent mb-2">
-            Appoint Panda
+            DubaiDentist.ae
           </h1>
           <p className="text-muted-foreground">Your dental practice dashboard</p>
         </div>
@@ -329,12 +329,12 @@ export default function GMBOnboarding() {
                 {listingCreated
                   ? 'Your practice has been successfully listed!'
                   : isNewSignup && skippedGmb
-                  ? "Let's set up your practice profile manually."
-                  : isNewSignup
-                  ? "You've successfully signed up. Let's set up your practice profile."
-                  : gmbConnected
-                  ? 'Your Google Business Profile is now connected!'
-                  : "Welcome back! Let's complete your practice setup."}
+                    ? "Let's set up your practice profile manually."
+                    : isNewSignup
+                      ? "You've successfully signed up. Let's set up your practice profile."
+                      : gmbConnected
+                        ? 'Your Google Business Profile is now connected!'
+                        : "Welcome back! Let's complete your practice setup."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -508,7 +508,7 @@ export default function GMBOnboarding() {
 
               {/* US-Only Notice */}
               <p className="text-xs text-center text-muted-foreground pt-2">
-                Appoint Panda is currently available for dental practices in California, Massachusetts, and Connecticut.
+                DubaiDentist.ae is currently available for dental practices in California, Massachusetts, and Connecticut.
               </p>
             </CardContent>
           </Card>
