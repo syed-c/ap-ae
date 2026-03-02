@@ -1,0 +1,58 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import https from 'https';
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+    const targetHost = 'eneuthbghipsdvsqilmb.supabase.co';
+    const targetIp = '104.18.38.10'; // Stable Cloudflare IP
+
+    // Remove the /api/img prefix from the URL
+    const targetPath = req.url?.replace('/api/img', '') || '';
+
+    const options: https.RequestOptions = {
+        hostname: targetIp,
+        port: 443,
+        path: targetPath,
+        method: 'GET', // Images are always GET
+        headers: {
+            ...req.headers,
+            host: targetHost,
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        },
+        rejectUnauthorized: false,
+        servername: targetHost,
+    };
+
+    delete options.headers?.['x-vercel-id'];
+    delete options.headers?.['x-vercel-forwarded-for'];
+    delete options.headers?.['x-forwarded-for'];
+    delete options.headers?.['connection'];
+
+    const proxy = https.request(options, (targetRes) => {
+        res.status(targetRes.statusCode || 200);
+
+        Object.entries(targetRes.headers).forEach(([key, value]) => {
+            if (value) res.setHeader(key, value);
+        });
+
+        // Add aggressive caching for images to reduce proxy load and improve speed
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+
+        targetRes.pipe(res);
+    });
+
+    proxy.on('error', (err) => {
+        console.error('[Proxy Image Error]', err.message);
+        if (!res.headersSent) {
+            res.status(502).json({ error: 'Image Proxy failed', message: err.message });
+        }
+    });
+
+    req.pipe(proxy);
+}
+
+export const config = {
+    api: {
+        bodyParser: false,
+        externalResolver: true,
+    },
+};
