@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { proxyImageUrl } from '@/lib/proxyImageUrl';
 
 interface LazyImageProps {
   src: string;
@@ -16,13 +17,13 @@ interface LazyImageProps {
  * LazyImage component that uses native lazy loading and Intersection Observer
  * for optimal performance. Images load only when they enter the viewport.
  */
-export function LazyImage({ 
-  src, 
-  alt, 
-  className, 
-  width, 
-  height, 
-  priority = false 
+export function LazyImage({
+  src,
+  alt,
+  className,
+  width,
+  height,
+  priority = false
 }: LazyImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(priority);
@@ -48,16 +49,16 @@ export function LazyImage({
     return () => observer.disconnect();
   }, [priority]);
 
-  // Optimize Unsplash images with quality and size parameters
-  const optimizedSrc = src.includes('unsplash.com') 
+  // Optimize Unsplash images or proxy Supabase images
+  const finalSrc = proxyImageUrl(src) || (src.includes('unsplash.com')
     ? `${src.split('?')[0]}?auto=format&fit=crop&q=75&w=${width || 400}`
-    : src;
+    : src);
 
   return (
     <img
       ref={imgRef}
-      src={isInView ? optimizedSrc : undefined}
-      data-src={optimizedSrc}
+      src={isInView ? finalSrc : undefined}
+      data-src={finalSrc}
       alt={alt}
       width={width}
       height={height}

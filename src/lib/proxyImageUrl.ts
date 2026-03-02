@@ -12,10 +12,11 @@ export function proxyImageUrl(url: string | null | undefined): string | null {
     // Always use proxy in the browser to bypass DNS poisoning/blocking
     if (typeof window === 'undefined') return url;
 
-    // Match any Supabase storage URL
-    const match = url.match(/https?:\/\/[a-z0-9]+\.supabase\.co\/(storage\/.*)/);
+    // Match any Supabase storage URL and capture the project ID
+    const match = url.match(/https?:\/\/([a-z0-9]+)\.supabase\.co\/(storage\/.*)/);
     if (match) {
-        return `/api/img/${match[1]}`;
+        // Return /api/img/project-id/storage/v1/object/public/...
+        return `/api/img/${match[1]}/${match[2]}`;
     }
 
     return url;

@@ -13,6 +13,7 @@
 
 import { useState, useRef, useEffect, memo } from 'react';
 import { cn } from '@/lib/utils';
+import { proxyImageUrl } from '@/lib/proxyImageUrl';
 
 interface OptimizedImageProps {
   src: string;
@@ -29,7 +30,7 @@ interface OptimizedImageProps {
 }
 
 // Low quality placeholder generator (10x10 pixel base64)
-const generatePlaceholder = (color = '#e5e7eb') => 
+const generatePlaceholder = (color = '#e5e7eb') =>
   `data:image/svg+xml;base64,${btoa(`<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect fill="${color}" width="10" height="10"/></svg>`)}`;
 
 const OptimizedImage = memo(({
@@ -120,7 +121,7 @@ const OptimizedImage = memo(({
       {isInView && !hasError && (
         <img
           ref={imgRef}
-          src={src}
+          src={proxyImageUrl(src) || src}
           alt={alt}
           width={width}
           height={height}

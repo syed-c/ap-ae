@@ -3,18 +3,24 @@ import https from 'https';
 import dns from 'dns';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    const targetHost = 'eneuthbghipsdvsqilmb.supabase.co';
-    const targetIp = '104.18.38.10';
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
-
     const { path: queryPath } = req.query;
     const pathSegments = Array.isArray(queryPath) ? queryPath : [];
-    const pathStr = pathSegments.join('/') || '';
 
+    if (pathSegments.length < 2) {
+        return res.status(400).json({ error: 'Invalid path format. Expected /api/img/[project-id]/storage/...' });
+    }
+
+    const projectId = pathSegments[0];
+    const realPathSegments = pathSegments.slice(1);
+    const targetHost = `${projectId}.supabase.co`;
+    const targetIp = '104.18.38.10'; // Bypasses UAE DNS poisoning
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
+
+    // Build the target path
     const queryString = req.url?.split('?')[1];
-    const targetPath = `/${pathStr}${queryString ? '?' + queryString : ''}`;
+    const targetPath = `/${realPathSegments.join('/')}${queryString ? '?' + queryString : ''}`;
 
-    console.log(`[Proxy Image] GET ${targetPath}`);
+    console.log(`[Proxy Image] Routing to ${targetHost}${targetPath}`);
 
     const options: https.RequestOptions = {
         hostname: targetHost,
@@ -62,8 +68,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     });
 
     proxy.on('error', (err) => {
-        console.error(`[Proxy Image Error] GET ${targetPath}:`, err.message);
-        if (!res.headersSent) res.status(502).json({ error: 'Image proxy failed' });
+        console.error(`[Proxy Image Error] GET ${targetHost}${targetPath}:`, err.message);
+        if (!res.headersSent) res.status(502).json({ error: 'Image proxy unavailable' });
     });
 
     proxy.end();
