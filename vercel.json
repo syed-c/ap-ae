@@ -169,6 +169,14 @@
       "destination": "/llms-full.txt"
     },
     {
+      "source": "/api/sb/:path*",
+      "destination": "https://eneuthbghipsdvsqilmb.supabase.co/:path*"
+    },
+    {
+      "source": "/api/img/:path*",
+      "destination": "https://eneuthbghipsdvsqilmb.supabase.co/:path*"
+    },
+    {
       "source": "/:path*",
       "has": [
         {
