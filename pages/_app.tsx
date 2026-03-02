@@ -1,6 +1,6 @@
 import '@/index.css';
 import type { AppProps } from 'next/app';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, HydrationBoundary } from '@tanstack/react-query';
 import { useState } from 'react';
 import { AuthProvider } from '@/hooks/useAuth';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -28,20 +28,22 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <AnalyticsProvider>
-            <MetaTagInjector />
-            <Toaster />
-            <Sonner />
-            <VisitorTracker />
-            <DynamicFavicon />
-            <CriticalResourceLoader delay={3000} />
-            <PandaBot />
-            <Component {...pageProps} />
-          </AnalyticsProvider>
-        </TooltipProvider>
-      </AuthProvider>
+      <HydrationBoundary state={pageProps.dehydratedState}>
+        <AuthProvider>
+          <TooltipProvider>
+            <AnalyticsProvider>
+              <MetaTagInjector />
+              <Toaster />
+              <Sonner />
+              <VisitorTracker />
+              <DynamicFavicon />
+              <CriticalResourceLoader delay={3000} />
+              <PandaBot />
+              <Component {...pageProps} />
+            </AnalyticsProvider>
+          </TooltipProvider>
+        </AuthProvider>
+      </HydrationBoundary>
     </QueryClientProvider>
   );
 }
