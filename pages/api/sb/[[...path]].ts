@@ -13,6 +13,16 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const queryString = req.url?.split('?')[1];
     const targetPath = `/${pathStr}${queryString ? '?' + queryString : ''}`;
 
+    // 1. Handle CORS Preflight
+    if (req.method === 'OPTIONS') {
+        res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] || '*');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Max-Age', '86400');
+        return res.status(204).end();
+    }
+
     const options: https.RequestOptions = {
         hostname: targetHost,
         port: 443,
@@ -33,24 +43,31 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         rejectUnauthorized: false,
     };
 
-    // Forward ONLY necessary request headers
+    // 2. Forward Request Headers
     const FORWARD_REQ_HEADERS = [
         'apikey', 'authorization', 'content-type', 'accept',
-        'x-client-info', 'prefer', 'range', 'user-agent'
+        'x-client-info', 'prefer', 'range', 'user-agent',
+        'x-supabase-api-version'
     ];
 
     FORWARD_REQ_HEADERS.forEach(h => {
         if (req.headers[h]) options.headers![h] = req.headers[h] as string;
     });
 
+    // 3. Normalize Security Headers for Supabase CSRF
+    if (req.headers['origin']) options.headers!['origin'] = `https://${targetHost}`;
+    if (req.headers['referer']) options.headers!['referer'] = `https://${targetHost}/`;
+
     const proxy = https.request(options, (targetRes) => {
+        // Suppress automatic header setting by pipe
         res.status(targetRes.statusCode || 200);
 
-        // Copy ONLY necessary response headers to avoid Vercel/Cloudflare conflicts
+        // 4. Surgical Response Header Forwarding
         const FORWARD_RES_HEADERS = [
             'content-type', 'content-length', 'cache-control', 'etag',
             'last-modified', 'content-range', 'x-content-range',
-            'preference-applied', 'location', 'sb-gateway-version', 'sb-project-ref'
+            'preference-applied', 'location', 'sb-gateway-version', 'sb-project-ref',
+            'content-encoding', 'link', 'x-total-count'
         ];
 
         Object.entries(targetRes.headers).forEach(([key, value]) => {
@@ -59,7 +76,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             }
         });
 
-        // Add standard CORS headers (same-origin, but helps with browser quirks)
+        // 5. Final CORS Response Headers (Force unique)
         res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
 
