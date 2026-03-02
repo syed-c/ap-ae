@@ -13,8 +13,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const queryString = req.url?.split('?')[1];
     const targetPath = `/${pathStr}${queryString ? '?' + queryString : ''}`;
 
-    console.log(`[Proxy SB] ${req.method} ${targetPath}`);
-
     const options: https.RequestOptions = {
         hostname: targetHost,
         port: 443,
@@ -22,7 +20,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         method: req.method,
         headers: {
             'host': targetHost,
-            'user-agent': req.headers['user-agent'] || 'AppointPanda/1.0',
         },
         lookup: (hostname, lookupOptions, cb) => {
             if (hostname === targetHost) {
@@ -36,37 +33,33 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         rejectUnauthorized: false,
     };
 
-    // Forward most headers except sensitive/hop-by-hop ones
-    const EXCLUDED_HEADERS = [
-        'host', 'connection', 'keep-alive', 'te', 'trailers',
-        'transfer-encoding', 'upgrade', 'cookie'
+    // Forward ONLY necessary request headers
+    const FORWARD_REQ_HEADERS = [
+        'apikey', 'authorization', 'content-type', 'accept',
+        'x-client-info', 'prefer', 'range', 'user-agent'
     ];
 
-    Object.entries(req.headers).forEach(([key, value]) => {
-        if (!EXCLUDED_HEADERS.includes(key.toLowerCase()) && value) {
-            options.headers![key] = value as string;
-        }
+    FORWARD_REQ_HEADERS.forEach(h => {
+        if (req.headers[h]) options.headers![h] = req.headers[h] as string;
     });
-
-    // Ensure referer and origin are mapped to the target if they are from our domain
-    if (options.headers!['origin']) options.headers!['origin'] = `https://${targetHost}`;
-    if (options.headers!['referer']) options.headers!['referer'] = `https://${targetHost}/`;
 
     const proxy = https.request(options, (targetRes) => {
         res.status(targetRes.statusCode || 200);
 
-        // Copy all response headers except sensitive ones
-        const EXCLUDED_RES_HEADERS = [
-            'set-cookie', 'access-control-allow-origin', 'access-control-allow-credentials'
+        // Copy ONLY necessary response headers to avoid Vercel/Cloudflare conflicts
+        const FORWARD_RES_HEADERS = [
+            'content-type', 'content-length', 'cache-control', 'etag',
+            'last-modified', 'content-range', 'x-content-range',
+            'preference-applied', 'location', 'sb-gateway-version', 'sb-project-ref'
         ];
 
         Object.entries(targetRes.headers).forEach(([key, value]) => {
-            if (!EXCLUDED_RES_HEADERS.includes(key.toLowerCase()) && value) {
+            if (FORWARD_RES_HEADERS.includes(key.toLowerCase()) && value) {
                 res.setHeader(key, value);
             }
         });
 
-        // Add CORS headers for safety
+        // Add standard CORS headers (same-origin, but helps with browser quirks)
         res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
 
