@@ -14,12 +14,13 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         path: targetPath,
         method: req.method,
         headers: {
-            // ONLY forward essential Supabase headers
             'apikey': req.headers['apikey'] as string,
             'authorization': req.headers['authorization'] as string,
             'content-type': req.headers['content-type'] as string,
             'accept': req.headers['accept'] as string,
             'x-client-info': req.headers['x-client-info'] as string,
+            'prefer': req.headers['prefer'] as string,
+            'range': req.headers['range'] as string,
             'host': targetHost,
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
         },
@@ -27,40 +28,40 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         servername: targetHost,
     };
 
-    // Remove undefined headers if they weren't in the original request
+    // Clean up undefined headers
     Object.keys(options.headers || {}).forEach(key => {
-        if (!options.headers?.[key]) delete options.headers[key];
+        if (!options.headers?.[key]) delete options.headers![key];
     });
 
-    // Remove headers that can conflict or cause infinite loops
-    delete options.headers?.['x-vercel-id'];
-    delete options.headers?.['x-vercel-forwarded-for'];
-    delete options.headers?.['x-forwarded-for'];
-    delete options.headers?.['connection'];
-    delete options.headers?.['content-length']; // Streaming handles this
-
     const proxy = https.request(options, (targetRes) => {
-        // Forward the status code
         res.status(targetRes.statusCode || 200);
 
-        // Forward all headers from Supabase to the browser
+        // Whitelist safe response headers
+        const SAFE_RESPONSE_HEADERS = [
+            'content-type', 'content-length', 'cache-control', 'etag',
+            'last-modified', 'content-range', 'x-content-range',
+            'access-control-allow-origin', 'preference-applied'
+        ];
+
         Object.entries(targetRes.headers).forEach(([key, value]) => {
-            if (value) res.setHeader(key, value);
+            if (SAFE_RESPONSE_HEADERS.includes(key.toLowerCase()) && value) {
+                res.setHeader(key, value);
+            }
         });
 
-        // Fast streaming of the response
         targetRes.pipe(res);
     });
 
     proxy.on('error', (err) => {
         console.error('[Proxy SB Error]', err.message);
-        if (!res.headersSent) {
-            res.status(502).json({ error: 'Proxy failed', message: err.message });
-        }
+        if (!res.headersSent) res.status(502).json({ error: 'Proxy failed' });
     });
 
-    // Fast streaming of the request body (important for POST/PATCH)
-    req.pipe(proxy);
+    if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'DELETE') {
+        req.pipe(proxy);
+    } else {
+        proxy.end();
+    }
 }
 
 export const config = {

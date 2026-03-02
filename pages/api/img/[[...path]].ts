@@ -27,12 +27,20 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const proxy = https.request(options, (targetRes) => {
         res.status(targetRes.statusCode || 200);
 
+        const SAFE_RESPONSE_HEADERS = [
+            'content-type', 'content-length', 'cache-control', 'etag', 'last-modified'
+        ];
+
         Object.entries(targetRes.headers).forEach(([key, value]) => {
-            if (value) res.setHeader(key, value);
+            if (SAFE_RESPONSE_HEADERS.includes(key.toLowerCase()) && value) {
+                res.setHeader(key, value);
+            }
         });
 
-        // Add aggressive caching for images to reduce proxy load and improve speed
-        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        // Ensure browser caching
+        if (!targetRes.headers['cache-control']) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        }
 
         targetRes.pipe(res);
     });
@@ -40,11 +48,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     proxy.on('error', (err) => {
         console.error('[Proxy Image Error]', err.message);
         if (!res.headersSent) {
-            res.status(502).json({ error: 'Image Proxy failed', message: err.message });
+            res.status(502).json({ error: 'Image Proxy failed' });
         }
     });
 
-    req.pipe(proxy);
+    proxy.end();
 }
 
 export const config = {
