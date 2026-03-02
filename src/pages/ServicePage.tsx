@@ -1,6 +1,7 @@
 'use client';
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,7 +41,7 @@ import {
 const MIN_PROFILE_COUNT = 2;
 
 const ServicePage = () => {
-  const { serviceSlug: serviceSlugParam } = useParams();
+  const { serviceSlug: serviceSlugParam } = useRouter().query as { serviceSlug?: string };
   const serviceSlug = serviceSlugParam || "";
 
   const seoSlug = `services/${serviceSlug}`;
@@ -268,7 +269,7 @@ const ServicePage = () => {
                     className="bg-card border border-border rounded-2xl p-4 hover:border-primary/30 transition-all"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <Link to={`/${range.state?.slug}`} className="flex items-center gap-2 hover:text-primary transition-colors">
+                      <Link href={`/${range.state?.slug}`} className="flex items-center gap-2 hover:text-primary transition-colors">
                         <MapPin className="h-4 w-4 text-primary" />
                         <span className="font-bold text-foreground">{range.state?.name}</span>
                       </Link>
@@ -289,7 +290,7 @@ const ServicePage = () => {
 
             <div className="text-center">
               <Link
-                to={`/cost/${serviceSlug}`}
+                href={`/cost/${serviceSlug}`}
                 className="inline-flex items-center gap-2 text-primary font-bold hover:underline"
               >
                 <BarChart3 className="h-4 w-4" />
@@ -344,7 +345,7 @@ const ServicePage = () => {
                   <span key={state.id}>
                     {i > 0 && (i === states.length - 1 ? ', and ' : ', ')}
                     <Link
-                      to={`/${state.slug}`}
+                      href={`/${state.slug}`}
                       className="text-primary font-bold hover:underline"
                     >
                       {treatmentName} in {state.name}
@@ -366,7 +367,7 @@ const ServicePage = () => {
                       <span key={range.id}>
                         {i > 0 && <span className="text-muted-foreground mx-2">·</span>}
                         <Link
-                          to={`/compare/${serviceSlug}/${range.state?.slug}-vs-${nextRange.state?.slug}`}
+                          href={`/compare/${serviceSlug}/${range.state?.slug}-vs-${nextRange.state?.slug}`}
                           className="text-primary font-bold hover:underline text-sm"
                         >
                           {range.state?.name} vs {nextRange.state?.name}

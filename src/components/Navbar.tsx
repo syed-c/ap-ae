@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { Menu, X, ChevronDown, Search, User, Phone, Shield, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRoutePrefetch } from "@/hooks/useRoutePrefetch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,11 +19,10 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
   const { data: states } = useStates();
   const { data: cities } = useCities();
   const { data: siteSettings } = useSiteSettings();
-  const { onMouseEnter, onMouseLeave } = useRoutePrefetch();
 
   const { data: treatments } = useQuery({
     queryKey: ['navbar-treatments'],
@@ -60,19 +59,19 @@ export function Navbar() {
       <div className="bg-foreground text-background hidden lg:block">
         <div className="container flex items-center justify-between h-8">
           <div className="flex items-center gap-5 text-[11px] font-medium">
-            <Link to="/emergency-dentist" className="flex items-center gap-1 text-background/70 hover:text-background transition-colors" onMouseEnter={() => onMouseEnter('/emergency-dentist')} onMouseLeave={onMouseLeave}>
+            <Link href="/emergency-dentist" className="flex items-center gap-1 text-background/70 hover:text-background transition-colors">
               <Phone className="h-3 w-3" />
               Emergency
             </Link>
-            <Link to="/insurance" className="flex items-center gap-1 text-background/70 hover:text-background transition-colors" onMouseEnter={() => onMouseEnter('/insurance')} onMouseLeave={onMouseLeave}>
+            <Link href="/insurance" className="flex items-center gap-1 text-background/70 hover:text-background transition-colors">
               <Shield className="h-3 w-3" />
               Insurance
             </Link>
-            <Link to="/blog" className="text-background/70 hover:text-background transition-colors" onMouseEnter={() => onMouseEnter('/blog')} onMouseLeave={onMouseLeave}>Blog</Link>
-            <Link to="/faq" className="text-background/70 hover:text-background transition-colors" onMouseEnter={() => onMouseEnter('/faq')} onMouseLeave={onMouseLeave}>FAQ</Link>
-            <Link to="/contact" className="text-background/70 hover:text-background transition-colors" onMouseEnter={() => onMouseEnter('/contact')} onMouseLeave={onMouseLeave}>Contact</Link>
+            <Link href="/blog" className="text-background/70 hover:text-background transition-colors">Blog</Link>
+            <Link href="/faq" className="text-background/70 hover:text-background transition-colors">FAQ</Link>
+            <Link href="/contact" className="text-background/70 hover:text-background transition-colors">Contact</Link>
           </div>
-          <Link to="/list-your-practice" className="text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors">
+          <Link href="/list-your-practice" className="text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors">
             Are you a dentist? List your practice →
           </Link>
         </div>
@@ -86,7 +85,7 @@ export function Navbar() {
         <div className="container">
           <div className="flex items-center justify-between h-14 lg:h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2 shrink-0">
+            <Link href="/" className="flex items-center gap-2 shrink-0">
               {logoUrl ? (
                 <img
                   src={logoUrl}
@@ -112,7 +111,7 @@ export function Navbar() {
 
             {/* Center: Search trigger (desktop) */}
             <button
-              onClick={() => navigate("/search")}
+              onClick={() => router.push("/search")}
               className="hidden lg:flex items-center gap-2 bg-muted/60 hover:bg-muted border border-border/60 rounded-lg px-4 py-2 text-sm text-muted-foreground transition-colors min-w-[280px] xl:min-w-[360px]"
             >
               <Search className="h-4 w-4 text-muted-foreground/60" />
@@ -128,12 +127,12 @@ export function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-52 rounded-lg p-1.5 bg-card border border-border shadow-lg z-50">
                   <DropdownMenuItem asChild className="rounded-md font-semibold text-foreground cursor-pointer">
-                    <Link to="/services">All Services</Link>
+                    <Link href="/services">All Services</Link>
                   </DropdownMenuItem>
                   <div className="h-px bg-border my-1" />
                   {(treatments || []).map((item) => (
                     <DropdownMenuItem key={item.slug} asChild className="rounded-md font-medium text-foreground/80 cursor-pointer">
-                      <Link to={`/services/${item.slug}`}>{item.name}</Link>
+                      <Link href={`/services/${item.slug}`}>{item.name}</Link>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -147,7 +146,7 @@ export function Navbar() {
                 <DropdownMenuContent align="start" className="w-52 rounded-lg p-1.5 bg-card border border-border shadow-lg z-50">
                   {states?.map((state) => (
                     <DropdownMenuItem key={state.slug} asChild className="rounded-md font-semibold text-foreground cursor-pointer">
-                      <Link to={`/${state.slug}`}>{state.name}</Link>
+                      <Link href={`/${state.slug}`}>{state.name}</Link>
                     </DropdownMenuItem>
                   ))}
                   {states && states.length > 0 && topAreas.length > 0 && (
@@ -156,17 +155,15 @@ export function Navbar() {
                   <p className="px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 mt-1">Popular Areas</p>
                   {topAreas.map((area) => (
                     <DropdownMenuItem key={area.slug} asChild className="rounded-md font-medium text-foreground/80 cursor-pointer">
-                      <Link to={`/${area.stateSlug}/${area.slug}`}>{area.name}</Link>
+                      <Link href={`/${area.stateSlug}/${area.slug}`}>{area.name}</Link>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
 
               <Link
-                to="/pricing"
+                href="/pricing"
                 className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
-                onMouseEnter={() => onMouseEnter('/pricing')}
-                onMouseLeave={onMouseLeave}
               >
                 Pricing
               </Link>
@@ -175,15 +172,15 @@ export function Navbar() {
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center gap-2">
               <Button variant="ghost" size="sm" className="text-sm font-medium text-foreground/70 hover:text-foreground" asChild>
-                <Link to="/list-your-practice">For Dentists</Link>
+                <Link href="/list-your-practice">For Dentists</Link>
               </Button>
               <Button variant="ghost" size="icon" className="rounded-lg text-foreground/60 hover:text-foreground h-9 w-9" asChild>
-                <Link to="/auth"><User className="h-4 w-4" /></Link>
+                <Link href="/auth"><User className="h-4 w-4" /></Link>
               </Button>
               <Button
                 size="sm"
                 className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-9 px-4"
-                onClick={() => navigate("/search")}
+                onClick={() => router.push("/search")}
               >
                 Find Dentist
               </Button>
@@ -203,7 +200,7 @@ export function Navbar() {
             <div className="lg:hidden py-4 border-t border-border animate-fade-in bg-card">
               {/* Mobile Search */}
               <button
-                onClick={() => { setMobileMenuOpen(false); navigate("/search"); }}
+                onClick={() => { setMobileMenuOpen(false); router.push("/search"); }}
                 className="flex items-center gap-2 w-full bg-muted/60 border border-border/60 rounded-lg px-4 py-3 text-sm text-muted-foreground mb-3"
               >
                 <Search className="h-4 w-4" />
@@ -211,14 +208,14 @@ export function Navbar() {
               </button>
 
               <div className="space-y-0.5">
-                <Link to="/services" className="flex items-center justify-between px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/services" className="flex items-center justify-between px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>
                   Services <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </Link>
                 <p className="px-3 pt-3 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Locations</p>
                 {states?.map((state) => (
                   <Link
                     key={state.slug}
-                    to={`/${state.slug}`}
+                    href={`/${state.slug}`}
                     className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg"
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -226,19 +223,19 @@ export function Navbar() {
                   </Link>
                 ))}
                 <div className="h-px bg-border my-2" />
-                <Link to="/insurance" className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Insurance</Link>
-                <Link to="/pricing" className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Pricing</Link>
-                <Link to="/emergency-dentist" className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Emergency Dentist</Link>
+                <Link href="/insurance" className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Insurance</Link>
+                <Link href="/pricing" className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Pricing</Link>
+                <Link href="/emergency-dentist" className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Emergency Dentist</Link>
                 <div className="h-px bg-border my-2" />
-                <Link to="/blog" className="block px-3 py-2.5 text-sm text-foreground/70 hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
-                <Link to="/faq" className="block px-3 py-2.5 text-sm text-foreground/70 hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
-                <Link to="/contact" className="block px-3 py-2.5 text-sm text-foreground/70 hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+                <Link href="/blog" className="block px-3 py-2.5 text-sm text-foreground/70 hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
+                <Link href="/faq" className="block px-3 py-2.5 text-sm text-foreground/70 hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
+                <Link href="/contact" className="block px-3 py-2.5 text-sm text-foreground/70 hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
               </div>
               <div className="mt-4 space-y-2">
                 <Button variant="outline" className="w-full rounded-lg font-semibold border-border text-foreground" asChild>
-                  <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
+                  <Link href="/auth" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
                 </Button>
-                <Button className="w-full rounded-lg bg-primary text-primary-foreground font-semibold" onClick={() => { setMobileMenuOpen(false); navigate("/search"); }}>
+                <Button className="w-full rounded-lg bg-primary text-primary-foreground font-semibold" onClick={() => { setMobileMenuOpen(false); router.push("/search"); }}>
                   Find Dentist
                 </Button>
               </div>

@@ -104,12 +104,12 @@ function DynamicFavicon() {
 
 function LegacyClinicRedirect() {
   const { clinicSlug } = useParams();
-  return <Navigate to={clinicSlug ? `/clinic/${clinicSlug}/` : "/"} replace />;
+  return <Navigate href={clinicSlug ? `/clinic/${clinicSlug}/` : "/"} replace />;
 }
 
 function LegacyDentistRedirect() {
   const { dentistSlug } = useParams();
-  return <Navigate to={dentistSlug ? `/dentist/${dentistSlug}/` : "/"} replace />;
+  return <Navigate href={dentistSlug ? `/dentist/${dentistSlug}/` : "/"} replace />;
 }
 
 // Loading fallback for lazy-loaded routes - optimized for CLS

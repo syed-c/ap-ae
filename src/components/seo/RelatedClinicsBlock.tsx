@@ -6,7 +6,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Building2, Star, ArrowRight } from "lucide-react";
 
 interface RelatedClinicsBlockProps {
@@ -61,7 +61,7 @@ export function RelatedClinicsBlock({
         {relatedClinics.map((clinic) => (
           <Link
             key={clinic.id}
-            to={`/clinic/${clinic.slug}/`}
+            href={`/clinic/${clinic.slug}/`}
             className="flex items-center justify-between p-3 rounded-xl border border-border hover:border-primary/30 hover:bg-accent/30 transition-all group"
           >
             <div className="min-w-0">
@@ -83,7 +83,7 @@ export function RelatedClinicsBlock({
       </div>
       {citySlug && stateSlug && (
         <Link
-          to={`/${stateSlug}/${citySlug}/`}
+          href={`/${stateSlug}/${citySlug}/`}
           className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline mt-4"
         >
           View all clinics in {cityName} <ArrowRight className="h-3 w-3" />

@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useRouter } from "next/router";
 import { MapPin, Search, Stethoscope, Shield, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -193,8 +193,8 @@ export function SearchBox({
   stateSlug: propStateSlug,
   showInsurance = true,
 }: SearchBoxProps) {
-  const navigate = useNavigate();
-  const { stateSlug: routeStateSlug, citySlug: routeCitySlug } = useParams();
+  const router = useRouter();
+  const { stateSlug: routeStateSlug, citySlug: routeCitySlug } = useRouter().query as { stateSlug?: string; citySlug?: string };
   const [city, setCity] = useState<string>(defaultCity ?? "");
   const [_cityLabel, setCityLabel] = useState<string>("");
   const [treatment, setTreatment] = useState<string>(defaultTreatment ?? "");
@@ -263,20 +263,20 @@ export function SearchBox({
         params.set('city', citySlug);
         params.set('state', targetStateSlug);
         if (treatment) params.set('treatment', treatment);
-        navigate(`/insurance/${insurance}?${params.toString()}`);
+        router.push(`/insurance/${insurance}?${params.toString()}`);
         return;
       }
       if (treatment) {
-        navigate(`/${targetStateSlug}/${citySlug}/${treatment}`);
+        router.push(`/${targetStateSlug}/${citySlug}/${treatment}`);
       } else {
-        navigate(`/${targetStateSlug}/${citySlug}`);
+        router.push(`/${targetStateSlug}/${citySlug}`);
       }
     } else if (insurance) {
-      navigate(`/insurance/${insurance}`);
+      router.push(`/insurance/${insurance}`);
     } else if (stateContext) {
-      navigate(`/${stateContext}`);
+      router.push(`/${stateContext}`);
     } else {
-      navigate('/search');
+      router.push('/search');
     }
   };
 

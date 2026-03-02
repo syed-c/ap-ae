@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { 
   Sparkles, 
@@ -295,7 +295,7 @@ const OptimizedContentLayout = ({
             {popularTreatments.slice(0, 8).map((t) => (
               <Link
                 key={t.slug}
-                to={withTrailingSlash(citySlug ? `/${stateSlug}/${citySlug}/${t.slug}` : `/services/${t.slug}`)}
+                href={withTrailingSlash(citySlug ? `/${stateSlug}/${citySlug}/${t.slug}` : `/services/${t.slug}`)}
                 className="bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium hover:bg-primary/20 transition-colors"
               >
                 {t.name}
@@ -321,7 +321,7 @@ const OptimizedContentLayout = ({
             {nearbyLocations.map((loc) => (
               <Link
                 key={loc.slug}
-                to={withTrailingSlash(`/${stateSlug}/${loc.slug}`)}
+                href={withTrailingSlash(`/${stateSlug}/${loc.slug}`)}
                 className="flex items-center gap-1 bg-muted hover:bg-muted/80 rounded-full px-4 py-2 text-sm font-medium transition-colors"
               >
                 <MapPin className="h-3 w-3" />

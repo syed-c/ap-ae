@@ -1,6 +1,6 @@
 'use client';
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Search, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { buildInsuranceUrl } from "@/lib/url/buildProfileUrl";
@@ -42,7 +42,7 @@ export function InsuranceSearch({ insurances }: InsuranceSearchProps) {
           {filtered.map((ins) => (
             <Link
               key={ins.id}
-              to={buildInsuranceUrl(ins.slug)}
+              href={buildInsuranceUrl(ins.slug)}
               className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
               onClick={() => setQuery("")}
             >

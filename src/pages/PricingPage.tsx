@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useRouter } from "next/router";
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -249,8 +249,8 @@ const FREE_VS_PAID = [
 ];
 
 export default function PricingPage() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const router = useRouter();
+  const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const { user } = useAuth();
   const { data: userClinic } = useDentistClinic();
   const checkout = useStripeCheckout();
@@ -268,7 +268,7 @@ export default function PricingPage() {
 
   const handleSelectPlan = (plan: typeof PLANS[0]) => {
     if (!user) {
-      navigate('/auth?redirect=/pricing');
+      router.push('/auth?redirect=/pricing');
       return;
     }
     if (userClinic?.id) {
@@ -278,7 +278,7 @@ export default function PricingPage() {
         { onSettled: () => setCheckingOutPlan(null) }
       );
     } else {
-      navigate('/list-your-practice');
+      router.push('/list-your-practice');
     }
   };
 
@@ -348,7 +348,7 @@ export default function PricingPage() {
                   View Monthly Plans
                   <ArrowRight className="h-4 w-4" />
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate('/contact')}>
+                <Button size="lg" variant="outline" onClick={() => router.push('/contact')}>
                   Book a Demo
                 </Button>
               </div>
@@ -657,7 +657,7 @@ export default function PricingPage() {
                   size="lg"
                   variant="secondary"
                   className="gap-2"
-                  onClick={() => navigate('/list-your-practice')}
+                  onClick={() => router.push('/list-your-practice')}
                 >
                   Get Verified Now
                   <BadgeCheck className="h-4 w-4" />
@@ -666,7 +666,7 @@ export default function PricingPage() {
                   size="lg"
                   variant="outline"
                   className="bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-                  onClick={() => navigate('/contact')}
+                  onClick={() => router.push('/contact')}
                 >
                   Book a Demo
                 </Button>

@@ -1,11 +1,12 @@
 /**
  * AIDiscoveryMeta - Invisible structured data for AI search engines
- * 
+ *
+ * Uses next/head (SSR-native) instead of react-helmet-async.
  * Adds Speakable schema, enhanced FAQ JSON-LD, and conversational
  * context that AI agents like ChatGPT/Gemini/Perplexity use to
  * surface content in AI-generated answers.
  */
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 
 interface AIDiscoveryMetaProps {
   /** Page title for speakable content */
@@ -85,17 +86,19 @@ export function AIDiscoveryMeta({
   }
 
   return (
-    <Helmet>
+    <Head>
       {schemas.map((schema, i) => (
-        <script key={i} type="application/ld+json">
-          {JSON.stringify(schema)}
-        </script>
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
       ))}
       {/* AI-friendly meta tags */}
       <meta name="ai-summary" content={aiSummary} />
       {keyFacts?.length && (
         <meta name="ai-key-facts" content={keyFacts.join(" | ")} />
       )}
-    </Helmet>
+    </Head>
   );
 }

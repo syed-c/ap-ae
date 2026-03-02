@@ -1,11 +1,10 @@
 /**
  * ResourceHints - Preload, prefetch, and preconnect hints for performance
- * 
- * This component adds resource hints to the document head
- * to optimize loading of critical resources.
+ *
+ * Uses next/head (SSR-native) instead of react-helmet-async.
  */
 
-import { Helmet } from 'react-helmet-async';
+import Head from 'next/head';
 
 interface ResourceHintsProps {
   /** URLs to preload (critical resources for current page) */
@@ -37,7 +36,7 @@ export const ResourceHints = ({
   dnsPrefetchDomains = [],
 }: ResourceHintsProps) => {
   return (
-    <Helmet>
+    <Head>
       {/* Preconnect to critical domains */}
       {preconnectDomains.map((domain) => (
         <link
@@ -73,7 +72,7 @@ export const ResourceHints = ({
       {prefetchUrls.map((url) => (
         <link key={`prefetch-${url}`} rel="prefetch" href={url} />
       ))}
-    </Helmet>
+    </Head>
   );
 };
 

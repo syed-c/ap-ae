@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import {
   Star,
   MapPin,
@@ -46,7 +46,7 @@ export function InsuranceClinicRow({ clinic, insuranceName }: InsuranceClinicRow
 
   return (
     <Link
-      to={buildClinicProfileUrl(clinic)}
+      href={buildClinicProfileUrl(clinic)}
       className="group flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-md transition-all"
     >
       {/* Image */}

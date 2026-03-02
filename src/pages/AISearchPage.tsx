@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useRouter } from "next/router";
 import {
   Search, Sparkles, MapPin, DollarSign, Star, Shield, Clock,
   ArrowRight, Loader2, Building2, CheckCircle, Navigation, MessageCircle, Send
@@ -10,7 +10,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useRealCounts } from "@/hooks/useRealCounts";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { StructuredData } from "@/components/seo/StructuredData";
@@ -51,7 +51,7 @@ interface ConversationMessage {
 }
 
 const AISearchPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const router = useRouter(); const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const initialQuery = searchParams.get("q") || "";
 
   const [query, setQuery] = useState(initialQuery);
@@ -466,7 +466,7 @@ const AISearchPage = () => {
 function ResultCard({ result, index }: { result: SearchResult; index: number }) {
   return (
     <Link
-      to={`/clinic/${result.slug}`}
+      href={`/clinic/${result.slug}`}
       className={cn(
         "block bg-white/5 border border-white/10 rounded-xl md:rounded-2xl p-3 md:p-4 hover:border-primary/50 hover:bg-white/10 transition-all",
         "animate-fade-in-up"

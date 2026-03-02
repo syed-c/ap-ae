@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -103,7 +104,7 @@ interface ClinicProfile {
 
 export default function DentistDashboardTab() {
   const { user, isAdmin, isSuperAdmin } = useAuth();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const router = useRouter(); const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const queryClient = useQueryClient();
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showAddPracticeModal, setShowAddPracticeModal] = useState(false);
@@ -125,7 +126,7 @@ export default function DentistDashboardTab() {
       searchParams.delete('subscription');
       setSearchParams(searchParams, { replace: true });
     }
-  }, [searchParams, setSearchParams, queryClient]);
+  }, [searchParams, router, queryClient]);
 
   const navigateTo = (tab: string) => {
     setSearchParams({ tab });
@@ -292,7 +293,7 @@ export default function DentistDashboardTab() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button asChild size="lg" className="rounded-2xl px-8 bg-primary hover:bg-primary/90">
-              <Link to="/claim-profile">
+              <Link href="/claim-profile">
                 <Shield className="h-5 w-5 mr-2" />
                 Claim Existing Profile
               </Link>

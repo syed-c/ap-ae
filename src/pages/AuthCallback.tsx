@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useRouter } from "next/router";
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,8 +27,8 @@ import { useAuth } from '@/hooks/useAuth';
  * This prevents creating a new user account for the GMB-linked Google account.
  */
 export default function AuthCallback() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const router = useRouter();
+  const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const { refreshRoles } = useAuth();
 
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
@@ -379,22 +379,22 @@ export default function AuthCallback() {
             localStorage.setItem('gmb_relink_flow', 'true');
           }
           console.log('Redirecting to GMB selection page', { isRelinkFlow, isListingFlow, restoredOriginalUser });
-          navigate('/gmb-select', { replace: true, state: { providerToken } });
+          router.push('/gmb-select', { replace: true, state: { providerToken } });
           return;
         }
 
         if (isGmbCallback && gmbSuccess) {
           // Existing dentist successfully completed GMB link → go to dashboard
-          navigate('/dashboard?tab=settings&gmb_connected=true', { replace: true });
+          router.replace('/dashboard?tab=settings&gmb_connected=true');
           return;
         }
 
         // SuperAdmins and Admins go directly to /admin - no delays or onboarding
         if (isSuperAdmin || isAdmin) {
-          navigate('/admin', { replace: true });
+          router.replace('/admin');
         } else if (isDentist) {
           // Dentists go directly to dashboard (no onboarding redirect)
-          navigate('/dashboard?tab=my-dashboard', { replace: true });
+          router.replace('/dashboard?tab=my-dashboard');
         } else {
           // No role yet - bootstrap dentist role if Google provider login
           if (isGoogleProvider) {
@@ -425,20 +425,20 @@ export default function AuthCallback() {
                 // New user without clinic - redirect to GMB business selection
                 // so they can add their practice via GMB or manually
                 localStorage.setItem('gmb_listing_flow', 'true');
-                navigate('/gmb-select', { replace: true, state: { providerToken, isNewUser: true } });
+                router.push('/gmb-select', { replace: true, state: { providerToken, isNewUser: true } });
               } else {
                 // User already has a clinic - go to dashboard
-                navigate('/dashboard?tab=my-dashboard', { replace: true });
+                router.replace('/dashboard?tab=my-dashboard');
               }
             } catch (err) {
               console.error('Failed to bootstrap dentist:', err);
               // Still try to navigate to GMB selection for new users
               localStorage.setItem('gmb_listing_flow', 'true');
-              navigate('/gmb-select', { replace: true, state: { providerToken, isNewUser: true } });
+              router.push('/gmb-select', { replace: true, state: { providerToken, isNewUser: true } });
             }
           } else {
             // Non-Google signup without role - go to onboarding
-            navigate('/onboarding?new=true', { replace: true });
+            router.replace('/onboarding?new=true');
           }
         }
       } catch (err) {
@@ -457,7 +457,7 @@ export default function AuthCallback() {
     };
 
     void handleCallback();
-  }, [searchParams, navigate, refreshRoles]);
+  }, [searchParams, router, refreshRoles]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
@@ -498,10 +498,10 @@ export default function AuthCallback() {
               <p className="text-foreground font-medium">{message}</p>
               {errorDetails && <p className="text-sm text-muted-foreground text-center">{errorDetails}</p>}
               <div className="flex gap-2 mt-4">
-                <Button variant="outline" onClick={() => navigate('/auth')}>
+                <Button variant="outline" onClick={() => router.push('/auth')}>
                   Try Again
                 </Button>
-                <Button onClick={() => navigate('/')}>Go Home</Button>
+                <Button onClick={() => router.push('/')}>Go Home</Button>
               </div>
             </>
           )}

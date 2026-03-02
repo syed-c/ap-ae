@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -224,7 +224,7 @@ export default function ReputationDashboard() {
         <Building2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
         <h2 className="text-2xl font-bold mb-2">No Practice Linked</h2>
         <p className="text-muted-foreground mb-6">Please claim your practice profile first.</p>
-        <Button asChild><Link to="/claim-profile">Claim Your Profile</Link></Button>
+        <Button asChild><Link href="/claim-profile">Claim Your Profile</Link></Button>
       </div>
     );
   }

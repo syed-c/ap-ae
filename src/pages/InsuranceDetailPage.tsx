@@ -1,6 +1,7 @@
 'use client';
 import { useState, useCallback, useMemo } from "react";
-import { useParams, Link, useSearchParams } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -8,9 +9,9 @@ import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { InsuranceInternalLinks } from "@/components/seo/InsuranceInternalLinks";
-import { 
-  useInsuranceClinics, 
-  useInsuranceFilterOptions 
+import {
+  useInsuranceClinics,
+  useInsuranceFilterOptions
 } from "@/hooks/useInsuranceClinics";
 import { InsuranceClinicRow } from "@/components/insurance/InsuranceClinicRow";
 import { InsurancePagination } from "@/components/insurance/InsurancePagination";
@@ -18,7 +19,7 @@ import { InsuranceFilters } from "@/components/insurance/InsuranceFilters";
 import { InsuranceFAQ } from "@/components/insurance/InsuranceFAQ";
 import { buildInsuranceUrl } from "@/lib/url/buildProfileUrl";
 import { withTrailingSlash } from "@/lib/url/withTrailingSlash";
-import { 
+import {
   Shield, Building2, BadgeCheck, Phone, ArrowLeft,
   FileCheck, Sparkles, HeadphonesIcon, MapPin
 } from "lucide-react";
@@ -26,8 +27,13 @@ import {
 const PAGE_SIZE = 20;
 
 const InsuranceDetailPage = () => {
-  const { insuranceSlug, emirateSlug, citySlug: urlCitySlug } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const router = useRouter();
+  const routerSlug = router.query.slug;
+  const slugSegments = Array.isArray(routerSlug) ? routerSlug : [];
+  const insuranceSlug = slugSegments[0] || "";
+  const emirateSlug = slugSegments[1] || "";
+  const urlCitySlug = slugSegments[2] || "";
+  const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const slug = insuranceSlug || "";
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
@@ -118,8 +124,8 @@ const InsuranceDetailPage = () => {
   const handlePageChange = useCallback((page: number) => {
     const params = new URLSearchParams(searchParams);
     if (page === 1) params.delete("page"); else params.set("page", String(page));
-    setSearchParams(params);
-  }, [searchParams, setSearchParams]);
+    router.replace({ pathname: router.pathname, query: Object.fromEntries(params) }, undefined, { shallow: true });
+  }, [searchParams, router]);
 
   const handleCityChange = useCallback((citySlug: string | null, stateSlug: string | null) => {
     const params = new URLSearchParams(searchParams);
@@ -131,30 +137,30 @@ const InsuranceDetailPage = () => {
       params.delete("city");
       params.delete("state");
     }
-    setSearchParams(params);
-  }, [searchParams, setSearchParams]);
+    router.replace({ pathname: router.pathname, query: Object.fromEntries(params) }, undefined, { shallow: true });
+  }, [searchParams, router]);
 
   const handleSortChange = useCallback((sort: "rating" | "reviews" | "name") => {
     setSortBy(sort);
     const params = new URLSearchParams(searchParams);
     params.delete("page");
     params.set("sort", sort);
-    setSearchParams(params);
-  }, [searchParams, setSearchParams]);
+    router.replace({ pathname: router.pathname, query: Object.fromEntries(params) }, undefined, { shallow: true });
+  }, [searchParams, router]);
 
   const handleRatingChange = useCallback((rating: number | undefined) => {
     setMinRating(rating);
     const params = new URLSearchParams(searchParams);
     params.delete("page");
     if (rating) params.set("rating", String(rating)); else params.delete("rating");
-    setSearchParams(params);
-  }, [searchParams, setSearchParams]);
+    router.replace({ pathname: router.pathname, query: Object.fromEntries(params) }, undefined, { shallow: true });
+  }, [searchParams, router]);
 
   const handleClearFilters = useCallback(() => {
     setMinRating(undefined);
     setSortBy("rating");
     setSearchParams({});
-  }, [setSearchParams]);
+  }, [router]);
 
   // Build breadcrumbs
   const breadcrumbs = useMemo(() => {
@@ -179,8 +185,8 @@ const InsuranceDetailPage = () => {
   const locationSuffix = cityData
     ? ` in ${(cityData as any)?.name}`
     : emirateData
-    ? ` in ${emirateData.name}`
-    : "";
+      ? ` in ${emirateData.name}`
+      : "";
 
   if (insuranceLoading) {
     return (
@@ -205,8 +211,8 @@ const InsuranceDetailPage = () => {
             <h1 className="mb-3 text-2xl font-bold">Insurance Not Found</h1>
             <p className="mb-6 text-muted-foreground">This insurance provider doesn't exist or has been removed.</p>
             <div className="flex gap-3 justify-center">
-              <Button asChild><Link to="/insurance/"><Shield className="h-4 w-4 mr-2" />Browse All Insurance</Link></Button>
-              <Button asChild variant="outline"><Link to="/"><ArrowLeft className="h-4 w-4 mr-2" />Home</Link></Button>
+              <Button asChild><Link href="/insurance/"><Shield className="h-4 w-4 mr-2" />Browse All Insurance</Link></Button>
+              <Button asChild variant="outline"><Link href="/"><ArrowLeft className="h-4 w-4 mr-2" />Home</Link></Button>
             </div>
           </div>
         </div>
@@ -236,7 +242,7 @@ const InsuranceDetailPage = () => {
                 {i === breadcrumbs.length - 1 ? (
                   <span className="text-foreground font-medium">{crumb.label}</span>
                 ) : (
-                  <Link to={crumb.href} className="hover:text-primary transition-colors">{crumb.label}</Link>
+                  <Link href={crumb.href} className="hover:text-primary transition-colors">{crumb.label}</Link>
                 )}
               </span>
             ))}
@@ -287,24 +293,22 @@ const InsuranceDetailPage = () => {
               </h3>
               <div className="flex flex-wrap gap-2">
                 <Link
-                  to={buildInsuranceUrl(insurance.slug)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                    !emirateSlug
+                  href={buildInsuranceUrl(insurance.slug)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${!emirateSlug
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted hover:bg-primary/10 hover:text-primary"
-                  }`}
+                    }`}
                 >
                   All Emirates
                 </Link>
                 {availableEmirates.map((em) => (
                   <Link
                     key={em.slug}
-                    to={buildInsuranceUrl(insurance.slug, em.slug)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                      emirateSlug === em.slug
+                    href={buildInsuranceUrl(insurance.slug, em.slug)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${emirateSlug === em.slug
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted hover:bg-primary/10 hover:text-primary"
-                    }`}
+                      }`}
                   >
                     {em.name}
                   </Link>
@@ -405,7 +409,7 @@ const InsuranceDetailPage = () => {
             Contact us and we'll help you find clinics that accept your insurance.
           </p>
           <Button asChild className="rounded-xl font-bold">
-            <Link to="/contact/"><Phone className="h-4 w-4 mr-2" />Contact Us</Link>
+            <Link href="/contact/"><Phone className="h-4 w-4 mr-2" />Contact Us</Link>
           </Button>
         </div>
       </Section>

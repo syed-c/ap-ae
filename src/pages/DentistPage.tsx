@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAnalytics } from "@/hooks/useAnalytics";
@@ -36,7 +37,7 @@ import { TrustSignalStrip, AEDPricingDisplay, CredentialsBadge } from "@/compone
 import { proxyImageUrl } from "@/lib/proxyImageUrl";
 
 const DentistPage = () => {
-  const { dentistSlug } = useParams();
+  const { dentistSlug } = useRouter().query as { dentistSlug?: string };
   const slug = dentistSlug || "";
   const [bookingOpen, setBookingOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -202,7 +203,7 @@ const DentistPage = () => {
               The dentist profile you're looking for doesn't exist.
             </p>
             <Button asChild className="rounded-xl font-bold">
-              <Link to="/search">Find Dentists</Link>
+              <Link href="/search">Find Dentists</Link>
             </Button>
           </div>
         </Section>
@@ -313,7 +314,7 @@ const DentistPage = () => {
                   )}
                   {dentist.clinic && (
                     <Link
-                      to={`/clinic/${dentist.clinic.slug}`}
+                      href={`/clinic/${dentist.clinic.slug}`}
                       className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
                     >
                       <Briefcase className="h-4 w-4 text-primary" />
@@ -441,7 +442,7 @@ const DentistPage = () => {
                   Works At
                 </h3>
                 <Link
-                  to={`/clinic/${dentist.clinic.slug}`}
+                  href={`/clinic/${dentist.clinic.slug}`}
                   className="block p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors"
                 >
                   <p className="font-bold text-lg">{dentist.clinic.name}</p>

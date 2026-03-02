@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Star, MapPin, CheckCircle, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Profile } from "@/hooks/useProfiles";
@@ -42,7 +42,7 @@ function MobileProfileRow({ profile, style }: { profile: Profile; style?: React.
 
   return (
     <Link
-      to={profileLink}
+      href={profileLink}
       className="flex items-center gap-3 bg-muted/50 border border-border rounded-2xl p-3 hover:border-primary/50 transition-all group animate-fade-in-up"
       style={style}
     >
@@ -129,7 +129,7 @@ function DesktopProfileCard({ profile }: { profile: Profile }) {
       {/* Action */}
       <div className="shrink-0">
         <Button asChild variant="outline" size="sm" className="rounded-xl font-bold">
-          <Link to={profileLink}>
+          <Link href={profileLink}>
             View Profile
             <ChevronRight className="h-4 w-4 ml-1" />
           </Link>

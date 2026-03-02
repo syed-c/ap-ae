@@ -10,7 +10,7 @@
  * CANONICAL: All URLs use trailing slash format.
  */
 
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   MapPin,
@@ -138,7 +138,7 @@ export const GeographicLinkBlock = ({
               {topCities.slice(0, 6).map((city) => (
                 <Link
                   key={city.slug}
-                  to={`/${stateSlug}/${city.slug}/`}
+                  href={`/${stateSlug}/${city.slug}/`}
                   className="block text-sm text-foreground hover:text-primary transition-colors"
                 >
                   Dentists in {city.name} →
@@ -156,7 +156,7 @@ export const GeographicLinkBlock = ({
               {services.slice(0, 6).map((service) => (
                 <Link
                   key={service.slug}
-                  to={`/services/${service.slug}/`}
+                  href={`/services/${service.slug}/`}
                   className="block text-sm text-foreground hover:text-primary transition-colors"
                 >
                   {service.name} →
@@ -175,7 +175,7 @@ export const GeographicLinkBlock = ({
                 {neighboringStates.map((state) => (
                   <Link
                     key={state.slug}
-                    to={`/${state.slug}/`}
+                    href={`/${state.slug}/`}
                     className="block text-sm text-foreground hover:text-primary transition-colors"
                   >
                     Dentists in {state.name} →
@@ -213,7 +213,7 @@ export const GeographicLinkBlock = ({
               {services.slice(0, 6).map((service) => (
                 <Link
                   key={service.slug}
-                  to={`/${stateSlug}/${citySlug}/${service.slug}/`}
+                  href={`/${stateSlug}/${citySlug}/${service.slug}/`}
                   className="block text-sm text-foreground hover:text-primary transition-colors"
                 >
                   {service.name} →
@@ -231,7 +231,7 @@ export const GeographicLinkBlock = ({
               {nearbyCities.slice(0, 6).map((city) => (
                 <Link
                   key={city.slug}
-                  to={`/${stateSlug}/${city.slug}/`}
+                  href={`/${stateSlug}/${city.slug}/`}
                   className="block text-sm text-foreground hover:text-primary transition-colors"
                 >
                   Dentists in {city.name} →
@@ -247,7 +247,7 @@ export const GeographicLinkBlock = ({
             </h4>
             <nav className="space-y-1.5">
               <Link
-                to={`/${stateSlug}/`}
+                href={`/${stateSlug}/`}
                 className="block text-sm text-foreground hover:text-primary transition-colors"
               >
                 All cities in {stateName} →
@@ -255,7 +255,7 @@ export const GeographicLinkBlock = ({
               {neighboringStates.slice(0, 2).map((state) => (
                 <Link
                   key={state.slug}
-                  to={`/${state.slug}/`}
+                  href={`/${state.slug}/`}
                   className="block text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   Dentists in {state.name} →
@@ -292,7 +292,7 @@ export const GeographicLinkBlock = ({
               {nearbyCities.slice(0, 5).map((city) => (
                 <Link
                   key={city.slug}
-                  to={`/${stateSlug}/${city.slug}/${serviceSlug}/`}
+                  href={`/${stateSlug}/${city.slug}/${serviceSlug}/`}
                   className="block text-sm text-foreground hover:text-primary transition-colors"
                 >
                   {serviceName} in {city.name} →
@@ -310,14 +310,14 @@ export const GeographicLinkBlock = ({
               {relatedServices.map((service) => (
                 <Link
                   key={service.slug}
-                  to={`/${stateSlug}/${citySlug}/${service.slug}/`}
+                  href={`/${stateSlug}/${citySlug}/${service.slug}/`}
                   className="block text-sm text-foreground hover:text-primary transition-colors"
                 >
                   {service.name} →
                 </Link>
               ))}
               <Link
-                to={`/${stateSlug}/${citySlug}/`}
+                href={`/${stateSlug}/${citySlug}/`}
                 className="block text-sm text-primary hover:underline font-medium mt-2"
               >
                 All services in {cityName} →
@@ -332,19 +332,19 @@ export const GeographicLinkBlock = ({
             </h4>
             <nav className="space-y-1.5">
               <Link
-                to={`/${stateSlug}/${citySlug}/`}
+                href={`/${stateSlug}/${citySlug}/`}
                 className="block text-sm text-foreground hover:text-primary transition-colors"
               >
                 All dentists in {cityName} →
               </Link>
               <Link
-                to={`/${stateSlug}/`}
+                href={`/${stateSlug}/`}
                 className="block text-sm text-foreground hover:text-primary transition-colors"
               >
                 All cities in {stateName} →
               </Link>
               <Link
-                to={`/services/${serviceSlug}/`}
+                href={`/services/${serviceSlug}/`}
                 className="block text-sm text-foreground hover:text-primary transition-colors"
               >
                 {serviceName} nationwide →

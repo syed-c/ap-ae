@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -80,7 +81,7 @@ const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
 export default function ProfileEditorTab() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const router = useRouter(); const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState<Partial<ClinicData>>({});
   const [hours, setHours] = useState<ClinicHours[]>([]);
@@ -109,7 +110,7 @@ export default function ProfileEditorTab() {
       newParams.set('tab', 'my-profile');
       setSearchParams(newParams, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, router]);
 
   // Fetch clinic data
   const { data: clinic, isLoading } = useQuery({
@@ -545,7 +546,7 @@ export default function ProfileEditorTab() {
           Please claim your practice profile first to edit it.
         </p>
         <Button asChild>
-          <Link to="/claim-profile">Claim Your Profile</Link>
+          <Link href="/claim-profile">Claim Your Profile</Link>
         </Button>
       </div>
     );

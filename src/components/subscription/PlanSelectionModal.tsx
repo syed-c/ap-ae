@@ -8,7 +8,7 @@ import { Check, Star, Crown, Zap, Shield, Loader2, ArrowRight, Sparkles, Rocket,
 import { useSubscriptionPlans, useClinicSubscription, getPlanTier } from '@/hooks/useClinicFeatures';
 import { useStripeCheckout } from '@/hooks/useStripeCheckout';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from "next/router";
 import { cn } from '@/lib/utils';
 import { getDiscountedPrice } from './PromotionBanner';
 
@@ -108,7 +108,7 @@ export function PlanSelectionModal({
   featureName,
   requiredPlan,
 }: PlanSelectionModalProps) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { user } = useAuth();
   const { data: plansFromDB, isLoading: plansLoading } = useSubscriptionPlans();
   const { data: currentSubscription } = useClinicSubscription(clinicId);
@@ -133,13 +133,13 @@ export function PlanSelectionModal({
 
   const handleSelectPlan = (planSlug: string) => {
     if (!user) {
-      navigate('/auth?redirect=/pricing');
+      router.push('/auth?redirect=/pricing');
       onOpenChange(false);
       return;
     }
 
     if (!clinicId) {
-      navigate('/list-your-practice');
+      router.push('/list-your-practice');
       onOpenChange(false);
       return;
     }
@@ -313,7 +313,7 @@ export function PlanSelectionModal({
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground mb-3">
             Need help choosing?{' '}
-            <Button variant="link" className="p-0 h-auto" onClick={() => { onOpenChange(false); navigate('/pricing'); }}>
+            <Button variant="link" className="p-0 h-auto" onClick={() => { onOpenChange(false); router.push('/pricing'); }}>
               View full comparison
             </Button>
           </p>

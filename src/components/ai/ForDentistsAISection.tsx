@@ -1,7 +1,7 @@
 import { Sparkles, Target, Users, TrendingUp, Zap, BarChart3, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 interface ForDentistsAISectionProps {
   className?: string;
@@ -45,7 +45,7 @@ export const ForDentistsAISection = ({ className, variant = "full" }: ForDentist
           AI helps bring the right patients — not random traffic. Patients who match your services, budget, and availability. Less back-and-forth. Better conversions.
         </p>
         <Button asChild size="sm" className="rounded-xl font-bold">
-          <Link to="/list-your-practice">Learn More</Link>
+          <Link href="/list-your-practice">Learn More</Link>
         </Button>
       </div>
     );
@@ -94,7 +94,7 @@ export const ForDentistsAISection = ({ className, variant = "full" }: ForDentist
           {/* CTA */}
           <div className="text-center">
             <Button asChild size="lg" className="rounded-2xl font-bold px-8">
-              <Link to="/list-your-practice">
+              <Link href="/list-your-practice">
                 List Your Practice
                 <Sparkles className="h-4 w-4 ml-2" />
               </Link>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
 import { Search, Sparkles, Loader2, MapPin, Banknote, Shield, AlertCircle, ArrowRight, X, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,7 @@ export function AISmartSearch({
   contextState,
   contextService,
 }: AISmartSearchProps) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [typingIndicator, setTypingIndicator] = useState("");
@@ -73,7 +73,7 @@ export function AISmartSearch({
     onSuccess: (data) => {
       // Auto-redirect if single strong match
       if (data.redirectTo && data.results.length === 1) {
-        navigate(data.redirectTo);
+        router.push(data.redirectTo);
       }
     },
   });
@@ -133,10 +133,10 @@ export function AISmartSearch({
     if (onResultClick) {
       onResultClick(result);
     } else {
-      navigate(`/clinic/${result.slug}`);
+      router.push(`/clinic/${result.slug}`);
     }
     setShowResults(false);
-  }, [navigate, onResultClick]);
+  }, [router, onResultClick]);
 
   const handleExampleClick = useCallback((example: string) => {
     setQuery(example);

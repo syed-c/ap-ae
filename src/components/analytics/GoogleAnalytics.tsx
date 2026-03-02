@@ -2,15 +2,13 @@
 
 /**
  * GoogleAnalytics - GA4 Script Loader Component
- * 
+ *
  * Loads gtag.js and initializes GA4 tracking.
  * Uses measurement ID from environment/settings.
- * 
- * IMPORTANT: This component MUST be inside BrowserRouter for useLocation to work.
  */
 
 import { useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useRouter } from 'next/router';
 
 // Extend Window interface for gtag and dataLayer
 declare global {
@@ -25,7 +23,7 @@ interface GoogleAnalyticsProps {
 }
 
 export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
-  const location = useLocation();
+  const router = useRouter();
   const scriptLoadedRef = useRef(false);
   const initializedRef = useRef(false);
 
@@ -46,7 +44,7 @@ export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
 
     // Initialize dataLayer BEFORE loading the script
     window.dataLayer = window.dataLayer || [];
-    
+
     // Define gtag function - must be before script loads
     function gtag(...args: unknown[]) {
       window.dataLayer.push(args);
@@ -93,18 +91,21 @@ export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
     if (!measurementId || typeof window === 'undefined') return;
     if (!window.gtag || !initializedRef.current) return;
 
+    const pathname = router.pathname;
+    const search = typeof window !== 'undefined' ? window.location.search : '';
+
     // Small delay to ensure page title is updated
     const timeoutId = setTimeout(() => {
       window.gtag('config', measurementId, {
-        page_path: location.pathname + location.search,
+        page_path: pathname + search,
         page_title: document.title,
         page_location: window.location.href,
       });
-      console.log('[GA4] Page view:', location.pathname);
+      console.log('[GA4] Page view:', pathname);
     }, 100);
 
     return () => clearTimeout(timeoutId);
-  }, [location.pathname, location.search, measurementId]);
+  }, [router.pathname, measurementId]);
 
   return null;
 }

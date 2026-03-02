@@ -1,6 +1,6 @@
 import { Sparkles, Search, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 interface AISearchHintProps {
@@ -55,7 +55,7 @@ export const AISearchHint = ({
             <p className="text-sm text-muted-foreground">{getMessage()}</p>
           </div>
           <Button asChild className="rounded-xl font-bold shrink-0">
-            <Link to={searchPath}>
+            <Link href={searchPath}>
               <Search className="h-4 w-4 mr-2" />
               Search Now
             </Link>
@@ -78,7 +78,7 @@ export const AISearchHint = ({
           <h4 className="font-bold text-foreground mb-1">AI Search Tip</h4>
           <p className="text-sm text-muted-foreground mb-3">{getMessage()}</p>
           <Link
-            to={searchPath}
+            href={searchPath}
             className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline"
           >
             Try AI Search

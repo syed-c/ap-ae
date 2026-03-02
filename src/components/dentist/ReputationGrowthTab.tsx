@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -128,7 +128,7 @@ export default function ReputationGrowthTab() {
           Please claim your practice profile first.
         </p>
         <Button asChild>
-          <Link to="/claim-profile">Claim Your Profile</Link>
+          <Link href="/claim-profile">Claim Your Profile</Link>
         </Button>
       </div>
     );

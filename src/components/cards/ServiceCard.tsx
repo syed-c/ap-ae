@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buildServiceUrl } from "@/lib/url/buildProfileUrl";
@@ -26,7 +26,7 @@ export const ServiceCard = ({
   if (variant === "compact") {
     return (
       <Link 
-        to={href}
+        href={href}
         className={cn(
           "treatment-pill flex items-center gap-2 group",
           className
@@ -40,7 +40,7 @@ export const ServiceCard = ({
 
   return (
     <Link 
-      to={href}
+      href={href}
       className={cn(
         "card-modern p-6 card-hover group",
         className

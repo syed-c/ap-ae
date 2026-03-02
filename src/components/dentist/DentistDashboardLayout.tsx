@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, ReactNode } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useRouter } from "next/router";
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -102,7 +102,7 @@ export default function DentistDashboardLayout({
   onTabChange,
 }: DentistDashboardLayoutProps) {
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -138,7 +138,7 @@ export default function DentistDashboardLayout({
 
   const handleLogout = async () => {
     await signOut();
-    navigate('/auth');
+    router.push('/auth');
   };
 
   const renderBadge = (badge: string | null, itemId: string) => {

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from "next/router";
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -20,7 +20,7 @@ interface PandaBotProps {
 }
 
 export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [input, setInput] = useState('');
@@ -71,7 +71,7 @@ export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps)
 
   const handleLinkClick = (url: string) => {
     if (url.startsWith('/')) {
-      navigate(url);
+      router.push(url);
       setIsOpen(false);
     } else if (url.startsWith('http')) {
       window.open(url, '_blank');

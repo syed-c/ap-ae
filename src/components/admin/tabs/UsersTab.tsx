@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from "next/router";
 import { useAdminUsers, useUpdateUserRole, useUpdateUserStatus, AdminUser } from '@/hooks/useAdminUsers';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
@@ -63,7 +63,7 @@ export default function UsersTab() {
   const updateStatus = useUpdateUserStatus();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const router = useRouter();
   
   // Filters
   const [search, setSearch] = useState('');

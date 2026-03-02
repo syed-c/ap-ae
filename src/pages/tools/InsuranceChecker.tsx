@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Shield, CheckCircle, Search, MapPin, Star, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { useSeoPageContent } from '@/hooks/useSeoPageContent';
@@ -242,7 +242,7 @@ export default function InsuranceChecker() {
                   )}
 
                   <Button className="w-full" asChild>
-                    <Link to={`/search?insurance=${selectedInsurance?.name || ''}&state=${selectedState?.abbreviation || ''}`}>
+                    <Link href={`/search?insurance=${selectedInsurance?.name || ''}&state=${selectedState?.abbreviation || ''}`}>
                       <Search className="h-4 w-4 mr-2" />
                       Browse All In-Network Dentists
                     </Link>
@@ -306,7 +306,7 @@ export default function InsuranceChecker() {
                       </TableCell>
                       <TableCell>
                         <Button size="sm" variant="ghost" asChild>
-                          <Link to={`/clinic/${clinic.slug || clinic.id}`}>
+                          <Link href={`/clinic/${clinic.slug || clinic.id}`}>
                             View <ArrowRight className="h-4 w-4 ml-1" />
                           </Link>
                         </Button>

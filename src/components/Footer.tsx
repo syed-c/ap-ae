@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import {
   Facebook, Instagram, Twitter, Linkedin, Youtube,
   Mail, Phone, MapPin, Heart, ChevronRight, Shield, CheckCircle, Lock,
@@ -122,7 +122,7 @@ export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
 
             {/* Brand */}
             <div className="col-span-2 md:col-span-3 lg:col-span-2">
-              <Link to="/" className="inline-flex items-center gap-2 mb-4">
+              <Link href="/" className="inline-flex items-center gap-2 mb-4">
                 <img
                   src="/logo.png"
                   alt={siteSettings?.siteName || 'AppointPanda'}
@@ -172,7 +172,7 @@ export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
               <ul className="space-y-2">
                 {company.map((item) => (
                   <li key={item.path}>
-                    <Link to={item.path} className="text-sm text-background/50 hover:text-primary transition-colors">{item.name}</Link>
+                    <Link href={item.path} className="text-sm text-background/50 hover:text-primary transition-colors">{item.name}</Link>
                   </li>
                 ))}
               </ul>
@@ -184,7 +184,7 @@ export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
               <ul className="space-y-2">
                 {resources.map((item) => (
                   <li key={item.path}>
-                    <Link to={item.path} className="text-sm text-background/50 hover:text-primary transition-colors">{item.name}</Link>
+                    <Link href={item.path} className="text-sm text-background/50 hover:text-primary transition-colors">{item.name}</Link>
                   </li>
                 ))}
               </ul>
@@ -199,7 +199,7 @@ export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
                   <ul className="space-y-1.5">
                     {ACTIVE_STATES.map((emirate) => (
                       <li key={emirate.slug}>
-                        <Link to={`/${emirate.slug}/`} className="text-sm text-background/50 hover:text-primary transition-colors flex items-center gap-1.5">
+                        <Link href={`/${emirate.slug}/`} className="text-sm text-background/50 hover:text-primary transition-colors flex items-center gap-1.5">
                           <MapPin className="h-3 w-3 text-background/20" />
                           {emirate.name}
                         </Link>
@@ -212,7 +212,7 @@ export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
                   <ul className="space-y-1.5">
                     {(areasByEmirate?.['dubai'] || []).slice(0, 8).map((area) => (
                       <li key={area.slug}>
-                        <Link to={`/dubai/${area.slug}/`} className="text-sm text-background/50 hover:text-primary transition-colors">
+                        <Link href={`/dubai/${area.slug}/`} className="text-sm text-background/50 hover:text-primary transition-colors">
                           {area.name}
                         </Link>
                       </li>
@@ -228,7 +228,7 @@ export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
             <nav aria-label="Dental Services" className="flex flex-wrap justify-center gap-x-5 gap-y-2">
               <span className="text-xs font-semibold text-background/30 uppercase">Services:</span>
               {TOP_SERVICES.map((service, idx) => (
-                <Link key={service.slug} to={`/services/${service.slug}/`} className="text-xs text-background/40 hover:text-primary transition-colors">
+                <Link key={service.slug} href={`/services/${service.slug}/`} className="text-xs text-background/40 hover:text-primary transition-colors">
                   {service.name}{idx < TOP_SERVICES.length - 1 && <span className="text-background/15 ml-5">·</span>}
                 </Link>
               ))}
@@ -253,13 +253,13 @@ export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
                 {legal.map((item, idx) => (
                   <span key={item.path}>
                     <span className="text-background/15 mr-3">|</span>
-                    <Link to={item.path} className="hover:text-background/60 transition-colors">{item.name}</Link>
+                    <Link href={item.path} className="hover:text-background/60 transition-colors">{item.name}</Link>
                   </span>
                 ))}
               </div>
 
               <Link
-                to="/list-your-practice/"
+                href="/list-your-practice/"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/25 text-primary text-xs font-semibold hover:bg-primary/20 transition-all"
               >
                 For Dentists: List Your Practice

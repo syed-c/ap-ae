@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
@@ -206,7 +206,7 @@ const FAQPage = () => {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button asChild size="lg" className="rounded-2xl font-bold">
-              <Link to="/contact">
+              <Link href="/contact">
                 Contact Support
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
@@ -232,13 +232,13 @@ const FAQPage = () => {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button asChild size="lg" className="rounded-2xl font-bold shadow-glow">
-              <Link to="/search">
+              <Link href="/search">
                 <Search className="mr-2 h-5 w-5" />
                 Find a Dentist
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="rounded-2xl font-bold border-white/40 text-white bg-white/10 hover:bg-white/20">
-              <Link to="/list-your-practice">List Your Practice</Link>
+              <Link href="/list-your-practice">List Your Practice</Link>
             </Button>
           </div>
         </div>

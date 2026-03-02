@@ -1,5 +1,5 @@
 import { BadgeCheck, Shield, Award, FileCheck, Building2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 interface VerifiedExplanationProps {
   className?: string;
@@ -73,8 +73,7 @@ export function VerifiedExplanation({ className = "" }: VerifiedExplanationProps
           Every verified dentist on AppointPanda undergoes a thorough vetting process including license verification,
           identity confirmation, and credential checks with the relevant health authorities (DHA, DOH, MOH).
         </p>
-        <Link
-          to="/list-your-practice"
+        <Link href="/list-your-practice"
           className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
         >
           Are you a dentist? Get verified →

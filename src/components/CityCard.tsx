@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { ArrowUpRight, Building2, Users } from "lucide-react";
 
 interface CityCardProps {
@@ -21,7 +21,7 @@ export const CityCard = forwardRef<HTMLAnchorElement, CityCardProps>(
     return (
       <Link
         ref={ref}
-        to={stateSlug ? `/${stateSlug}/${slug}` : `/${slug}`}
+        href={stateSlug ? `/${stateSlug}/${slug}` : `/${slug}`}
         className="group relative aspect-[4/3] rounded-2xl overflow-hidden block card-hover"
       >
         <img

@@ -3,7 +3,7 @@
  * Renders when URL is /{emirate}/{service}/ (e.g., /dubai/teeth-whitening/)
  * Shows all clinics offering that service across the entire emirate.
  */
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -256,7 +256,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
             Compare prices, read patient reviews, and book your appointment online. Whether you're in{' '}
             {cityLinks.slice(0, 3).map((c, i) => (
               <span key={c.slug}>
-                <Link to={`/${normalizedStateSlug}/${c.slug}/${serviceSlug}/`} className="text-primary hover:underline font-medium">{c.name}</Link>
+                <Link href={`/${normalizedStateSlug}/${c.slug}/${serviceSlug}/`} className="text-primary hover:underline font-medium">{c.name}</Link>
                 {i < 2 ? (i === 1 ? ', or ' : ', ') : ''}
               </span>
             ))}
@@ -295,7 +295,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
               {cityLinks.map((city, i) => (
                 <span key={city.slug}>
                   <Link
-                    to={`/${normalizedStateSlug}/${city.slug}/${serviceSlug}/`}
+                    href={`/${normalizedStateSlug}/${city.slug}/${serviceSlug}/`}
                     className="text-primary hover:text-primary/80 font-semibold hover:underline transition-colors"
                   >
                     {treatmentName} in {city.name}

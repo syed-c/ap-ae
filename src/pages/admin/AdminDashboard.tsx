@@ -3,7 +3,8 @@
 import { useState, useEffect, useMemo, Suspense } from 'react';
 import { lazyRetry } from '@/utils/lazyRetry';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate, useSearchParams, Link, useLocation, useNavigate } from 'react-router-dom';
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { cn } from '@/lib/utils';
 import { useBookingNotifications, useMarkNotificationRead } from '@/hooks/useAdminAppointments';
 import { supabase } from '@/integrations/supabase/client';
@@ -344,9 +345,8 @@ const adminTabGroups = [
 
 export default function AdminDashboard() {
   const { user, roles, signOut, isLoading, refreshRoles } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const router = useRouter();
+  const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
 
   // Define roles that can access admin dashboard
   const ADMIN_ROLES = ['super_admin', 'district_manager', 'seo_team', 'content_team', 'marketing_team', 'support_team'];
@@ -468,7 +468,8 @@ export default function AdminDashboard() {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    if (typeof window !== 'undefined') router.replace('/auth');
+    return null;
   }
 
   // Route separation:
@@ -477,15 +478,17 @@ export default function AdminDashboard() {
   const tabParam = searchParams.get('tab');
 
   // If a dentist lands on /admin, push them to the dentist dashboard route
-  if (location.pathname.startsWith('/admin') && !isAdmin && isDentist) {
+  if (router.pathname.startsWith('/admin') && !isAdmin && isDentist) {
     const targetTab = tabParam && tabParam.startsWith('my-') ? tabParam : 'my-dashboard';
-    return <Navigate to={`/dashboard?tab=${encodeURIComponent(targetTab)}`} replace />;
+    if (typeof window !== 'undefined') router.replace(`/dashboard?tab=${encodeURIComponent(targetTab)}`);
+    return null;
   }
 
   // If an admin lands on /dashboard, push them to /admin but preserve the tab param
-  if (location.pathname.startsWith('/dashboard') && isAdmin) {
+  if (router.pathname.startsWith('/dashboard') && isAdmin) {
     const preservedTab = tabParam || 'overview';
-    return <Navigate to={`/admin?tab=${preservedTab}`} replace />;
+    if (typeof window !== 'undefined') router.replace(`/admin?tab=${preservedTab}`);
+    return null;
   }
 
   // Access control: admins and dentists only
@@ -535,7 +538,7 @@ export default function AdminDashboard() {
   }
 
   // Check if this is a dentist accessing their dashboard - redirect to V2
-  const isDentistRoute = location.pathname.startsWith('/dashboard') && isDentist && !isAdmin;
+  const isDentistRoute = router.pathname.startsWith('/dashboard') && isDentist && !isAdmin;
 
   // For dentists, use the redesigned V2 dashboard
   if (isDentistRoute) {
@@ -648,7 +651,7 @@ export default function AdminDashboard() {
       // Default to Overview for admin route, DentistDashboard only for dentist route
       default:
         // If on admin route, always show OverviewTab as fallback
-        if (location.pathname.startsWith('/admin')) {
+        if (router.pathname.startsWith('/admin')) {
           return <OverviewTab />;
         }
         return <DentistDashboardTab />;

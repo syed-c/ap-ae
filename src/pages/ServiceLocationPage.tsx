@@ -1,6 +1,7 @@
 'use client';
 import { useState } from "react";
-import { useParams, Link, Navigate } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,7 +41,7 @@ import {
 const MIN_PROFILE_COUNT = 2; // noindex pages with fewer than 2 providers
 
 const ServiceLocationPage = () => {
-  const { stateSlug, citySlug, serviceSlug } = useParams();
+  const { stateSlug, citySlug, serviceSlug } = useRouter().query as { stateSlug?: string; citySlug?: string; serviceSlug?: string };
   const normalizedStateSlug = normalizeStateSlug(stateSlug);
   const service = serviceSlug || "";
 
@@ -121,7 +122,7 @@ const ServiceLocationPage = () => {
 
   // Redirect legacy slugs
   if (stateSlug && normalizedStateSlug && stateSlug !== normalizedStateSlug && citySlug && serviceSlug) {
-    return <Navigate to={`/${normalizedStateSlug}/${citySlug}/${serviceSlug}/`} replace />;
+    return <Navigate href={`/${normalizedStateSlug}/${citySlug}/${serviceSlug}/`} replace />;
   }
 
   const breadcrumbs = [

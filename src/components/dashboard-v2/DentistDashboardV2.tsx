@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useRouter } from "next/router";
 import DentistDashboardLayoutV2 from './DentistDashboardLayoutV2';
 import DashboardOverviewV2 from './DashboardOverviewV2';
 import MyPracticePage from './MyPracticePage';
@@ -31,7 +31,7 @@ import NotificationPreferencesTab from '@/components/dentist/NotificationPrefere
 import FormWorkflowTab from '@/components/dentist/FormWorkflowTab';
 
 export default function DentistDashboardV2() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const router = useRouter(); const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const [activeTab, setActiveTab] = useState(() => {
     return searchParams.get('tab') || 'my-dashboard';
   });

@@ -35,7 +35,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 const WORD_COUNT_OPTIONS = [
   { value: 300, label: '300 words (Standard)' },
@@ -939,7 +939,7 @@ export default function ServiceLocationEnrichmentSection() {
                       </TableCell>
                       <TableCell>
                         <Link
-                          to={item.slug}
+                          href={item.slug}
                           target="_blank"
                           className="text-primary hover:underline text-sm"
                         >

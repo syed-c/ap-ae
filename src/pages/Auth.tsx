@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from "next/router";
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { clearGmbProviderToken } from '@/lib/gmbAuth';
@@ -18,7 +18,7 @@ const passwordSchema = z.string().min(6, 'Password must be at least 6 characters
 
 export default function Auth() {
   const { user, roles, signIn, signUp, isLoading } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [hasRedirected, setHasRedirected] = useState(false);
@@ -56,22 +56,22 @@ export default function Auth() {
 
     // SuperAdmins go directly to /admin - no delays, no onboarding
     if (isSuperAdmin || isAdmin) {
-      navigate('/admin', { replace: true });
+      router.replace('/admin');
     } else if (isDentist) {
       // Dentists go to their dashboard
-      navigate('/dashboard?tab=my-dashboard', { replace: true });
+      router.replace('/dashboard?tab=my-dashboard');
     } else if (roles.length === 0) {
       // User has no roles - might still be loading, or is a new user
       // Send to onboarding
-      navigate('/onboarding?new=true', { replace: true });
+      router.replace('/onboarding?new=true');
     } else if (roles.includes('super_admin') || roles.includes('district_manager')) {
       // Admin users go directly to admin dashboard
-      navigate('/admin', { replace: true });
+      router.replace('/admin');
     } else {
       // Has some other role, default to onboarding
-      navigate('/onboarding?new=true', { replace: true });
+      router.replace('/onboarding?new=true');
     }
-  }, [user, roles, isLoading, navigate, hasRedirected]);
+  }, [user, roles, isLoading, router, hasRedirected]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

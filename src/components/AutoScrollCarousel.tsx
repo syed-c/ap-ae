@@ -4,7 +4,7 @@ import { useRef, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DoctorCard } from "@/components/DoctorCard";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 interface Doctor {
   name: string;
@@ -32,24 +32,24 @@ export function AutoScrollCarousel({ doctors, autoScrollSpeed = 30 }: AutoScroll
     if (!scrollRef.current || doctors.length === 0) return;
 
     const container = scrollRef.current;
-    
+
     const animate = (currentTime: number) => {
       if (!lastTimeRef.current) {
         lastTimeRef.current = currentTime;
       }
-      
+
       if (!isPaused) {
         const deltaTime = (currentTime - lastTimeRef.current) / 1000; // Convert to seconds
         const scrollAmount = autoScrollSpeed * deltaTime;
-        
+
         container.scrollLeft += scrollAmount;
-        
+
         // Reset to beginning when reaching the end (seamless loop)
         if (container.scrollLeft >= container.scrollWidth - container.clientWidth - 10) {
           container.scrollLeft = 0;
         }
       }
-      
+
       lastTimeRef.current = currentTime;
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -97,10 +97,9 @@ export function AutoScrollCarousel({ doctors, autoScrollSpeed = 30 }: AutoScroll
             <DoctorCard {...doctor} variant="homepage" />
           </div>
         ))}
-        
+
         {/* End card - View all */}
-        <Link 
-          to="/search"
+        <Link href="/search"
           className="shrink-0 min-w-[200px] max-w-[200px] rounded-2xl bg-card/10 border border-card/20 flex flex-col items-center justify-center p-4 hover:bg-card/20 transition-colors group"
         >
           <div className="text-center">
@@ -116,7 +115,7 @@ export function AutoScrollCarousel({ doctors, autoScrollSpeed = 30 }: AutoScroll
 
       {/* Navigation controls */}
       <div className="absolute -top-16 right-0 flex items-center gap-2">
-        <Link to="/search" className="text-interface text-card/80 hover:text-primary transition-colors flex items-center gap-1 mr-4">
+        <Link href="/search" className="text-interface text-card/80 hover:text-primary transition-colors flex items-center gap-1 mr-4">
           VIEW ALL
           <ArrowRight className="h-4 w-4" />
         </Link>

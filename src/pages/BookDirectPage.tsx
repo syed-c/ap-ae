@@ -1,4 +1,4 @@
-import { useParams, Navigate } from 'react-router-dom';
+import { useRouter } from "next/router";
 import { useQuery } from '@tanstack/react-query';
 import { cn } from "@/lib/utils";
 import { proxyImageUrl } from "@/lib/proxyImageUrl";

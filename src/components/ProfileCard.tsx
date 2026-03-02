@@ -1,7 +1,7 @@
 'use client';
 import { Star, MapPin, CheckCircle, Clock, Building2, ChevronRight, Calendar, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Profile } from "@/hooks/useProfiles";
 import { useState } from "react";
 import { MultiStepBookingModal } from "./MultiStepBookingModal";
@@ -84,7 +84,7 @@ export function ProfileCard({ profile, variant = "list" }: ProfileCardProps) {
           {/* Mobile action buttons - full width */}
           <div className="flex gap-2 mt-3 pt-3 border-t border-border">
             <Button variant="outline" size="sm" className="flex-1 rounded-xl font-bold text-xs h-9" asChild>
-              <Link to={profileLink}>
+              <Link href={profileLink}>
                 View Profile
               </Link>
             </Button>
@@ -172,7 +172,7 @@ export function ProfileCard({ profile, variant = "list" }: ProfileCardProps) {
 
             <div className="flex items-center gap-2 mt-2">
               <Button variant="outline" size="sm" className="rounded-xl font-bold" asChild>
-                <Link to={profileLink}>
+                <Link href={profileLink}>
                   Profile <ChevronRight className="h-4 w-4 ml-1" />
                 </Link>
               </Button>
@@ -240,7 +240,7 @@ export function ProfileCard({ profile, variant = "list" }: ProfileCardProps) {
               <span className="font-medium">{profile.location}</span>
             </div>
             <div className="flex gap-2">
-              <Link to={profileLink} className="flex-1">
+              <Link href={profileLink} className="flex-1">
                 <Button variant="outline" size="sm" className="w-full rounded-xl font-bold">
                   View Profile
                 </Button>
@@ -303,7 +303,7 @@ export function ProfileCard({ profile, variant = "list" }: ProfileCardProps) {
             <span className="font-medium">{profile.location}</span>
           </div>
           <div className="flex gap-2">
-            <Link to={profileLink} className="flex-1">
+            <Link href={profileLink} className="flex-1">
               <Button variant="outline" size="sm" className="w-full rounded-xl font-bold">
                 View Profile
               </Button>

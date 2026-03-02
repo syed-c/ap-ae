@@ -1,16 +1,14 @@
 /**
  * BreadcrumbSchema - JSON-LD Breadcrumb structured data
- * 
+ *
+ * Uses next/head (SSR-native) instead of react-helmet-async.
  * Implements BreadcrumbList schema for full hierarchy:
  * Home > State > City > Service > Profile
- * 
- * This component works alongside the visual Breadcrumbs component
- * to provide machine-readable navigation structure for search engines.
- * 
+ *
  * CANONICAL: All URLs use trailing slash format (except root /).
  */
 
-import { Helmet } from "react-helmet-async";
+import Head from 'next/head';
 
 interface BreadcrumbItem {
   name: string;
@@ -51,11 +49,12 @@ export const BreadcrumbSchema = ({
   };
 
   return (
-    <Helmet>
-      <script type="application/ld+json">
-        {JSON.stringify(schema)}
-      </script>
-    </Helmet>
+    <Head>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+    </Head>
   );
 };
 

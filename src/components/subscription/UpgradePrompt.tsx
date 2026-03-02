@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Lock, Sparkles, ArrowRight } from 'lucide-react';
 import { useClinicSubscription } from '@/hooks/useClinicFeatures';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from "next/router";
 import { PlanSelectionModal } from './PlanSelectionModal';
 
 interface UpgradePromptProps {
@@ -24,7 +24,7 @@ export default function UpgradePrompt({
   clinicId,
   compact = false,
 }: UpgradePromptProps) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { user } = useAuth();
   const { data: subscription } = useClinicSubscription(clinicId);
   const [showPlanModal, setShowPlanModal] = useState(false);
@@ -33,12 +33,12 @@ export default function UpgradePrompt({
 
   const handleUpgrade = () => {
     if (!user) {
-      navigate('/auth?redirect=/pricing');
+      router.push('/auth?redirect=/pricing');
       return;
     }
 
     if (!clinicId) {
-      navigate('/pricing');
+      router.push('/pricing');
       return;
     }
 
@@ -115,7 +115,7 @@ export default function UpgradePrompt({
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => navigate('/pricing')}
+              onClick={() => router.push('/pricing')}
             >
               Compare all plans
             </Button>

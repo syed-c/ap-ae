@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { useLocation } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { classifyPath } from '@/config/pageRegistry';
 
 export interface SEOHeadProps {
@@ -31,8 +31,8 @@ export const SEOHead = ({
   publishedAt,
   modifiedAt,
 }: SEOHeadProps) => {
-  const location = useLocation();
-  const currentPath = location?.pathname || '/';
+  const router = useRouter();
+  const currentPath = router.asPath || '/';
 
   // Avoid double branding: if title already contains the site name, use it as-is
   const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
@@ -49,11 +49,8 @@ export const SEOHead = ({
 
   // CRITICAL SEO RULE: If the page is classified as indexable in the registry,
   // we MUST NOT output noindex, regardless of what the component is told.
-  // This prevents accidental noindexing of important pages.
   const classification = classifyPath(currentPath);
   const isPageIndexable = classification.indexable;
-
-  // If registry says indexable, override any noindex prop
   const effectiveNoindex = isPageIndexable ? false : noindex;
 
   return (
@@ -66,7 +63,7 @@ export const SEOHead = ({
       {/* Canonical URL - Prevents duplicate content */}
       <link rel="canonical" href={normalizedCanonical} />
 
-      {/* Sitemap reference (helps external tools discover sitemap from any page) */}
+      {/* Sitemap reference */}
       <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />
 
       {/* Keywords */}

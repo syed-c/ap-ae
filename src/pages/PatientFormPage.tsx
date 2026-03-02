@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useRouter } from "next/router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -43,8 +43,8 @@ const FORM_TYPE_ICONS: Record<string, any> = {
 };
 
 export default function PatientFormPage() {
-  const { submissionId } = useParams();
-  const [searchParams] = useSearchParams();
+  const { submissionId } = useRouter().query as { submissionId?: string };
+  const router = useRouter(); const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const token = searchParams.get("token");
   
   const [formData, setFormData] = useState<Record<string, any>>({});

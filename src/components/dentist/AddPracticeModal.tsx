@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from "next/router";
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useStates, useCities } from '@/hooks/useLocations';
@@ -88,7 +88,7 @@ const STEPS = [
 
 export function AddPracticeModal({ open, onOpenChange }: AddPracticeModalProps) {
   const { user, profile } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { data: states = [] } = useStates();
   const { data: allCities = [] } = useCities();

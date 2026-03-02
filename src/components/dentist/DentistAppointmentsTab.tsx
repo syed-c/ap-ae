@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -195,7 +195,7 @@ export default function DentistAppointmentsTab() {
         <h2 className="text-xl font-bold mb-2">No Practice Linked</h2>
         <p className="text-muted-foreground mb-6">Claim your profile to start receiving bookings</p>
         <Button asChild>
-          <Link to="/claim-profile">Claim Your Profile</Link>
+          <Link href="/claim-profile">Claim Your Profile</Link>
         </Button>
       </div>
     );

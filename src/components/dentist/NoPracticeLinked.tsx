@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Building2, Shield, Plus } from 'lucide-react';
 import { AddPracticeModal } from './AddPracticeModal';
@@ -24,7 +24,7 @@ export function NoPracticeLinked({ compact = false }: NoPracticeLinkedProps) {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild>
-              <Link to="/claim-profile">
+              <Link href="/claim-profile">
                 <Shield className="h-4 w-4 mr-2" />
                 Claim Profile
               </Link>
@@ -56,7 +56,7 @@ export function NoPracticeLinked({ compact = false }: NoPracticeLinkedProps) {
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Button asChild size="lg" className="rounded-2xl px-8 bg-gradient-to-r from-primary to-teal hover:from-primary/90 hover:to-teal/90">
-            <Link to="/claim-profile">
+            <Link href="/claim-profile">
               <Shield className="h-5 w-5 mr-2" />
               Claim Existing Profile
             </Link>

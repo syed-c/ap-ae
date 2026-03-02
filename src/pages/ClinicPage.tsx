@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useRouter } from "next/router";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAnalytics } from "@/hooks/useAnalytics";
@@ -55,7 +56,8 @@ import { cn } from "@/lib/utils";
 import { proxyImageUrl } from "@/lib/proxyImageUrl";
 
 const ClinicPage = () => {
-  const { clinicSlug } = useParams();
+  const router = useRouter();
+  const clinicSlug = typeof router.query?.clinicSlug === 'string' ? router.query.clinicSlug : '';
   const slug = clinicSlug || "";
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectedDentistId, setSelectedDentistId] = useState<string | undefined>();
@@ -243,7 +245,7 @@ const ClinicPage = () => {
               The clinic you're looking for doesn't exist or has been removed.
             </p>
             <Button asChild className="rounded-xl font-bold">
-              <Link to="/search">Browse Clinics</Link>
+              <Link href="/search">Browse Clinics</Link>
             </Button>
           </div>
         </Section>
@@ -502,7 +504,7 @@ const ClinicPage = () => {
                 </div>
               </div>
               <Button asChild className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 hover:from-red-600 hover:to-orange-600">
-                <Link to="/pricing">
+                <Link href="/pricing">
                   View Plans
                 </Link>
               </Button>
@@ -642,7 +644,7 @@ const ClinicPage = () => {
                         return (
                           <Link
                             key={ct.id}
-                            to={serviceUrl}
+                            href={serviceUrl}
                             className="px-3 py-2 rounded-xl bg-muted/50 hover:bg-muted hover:text-primary transition-colors max-w-full"
                           >
                             <span className="text-sm font-medium truncate">{ct.treatment?.name}</span>

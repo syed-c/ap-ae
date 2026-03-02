@@ -32,7 +32,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 const WORD_COUNT_OPTIONS = [
   { value: 200, label: '200 words (Standard)' },
@@ -740,7 +740,7 @@ export default function LocationEnrichmentSection() {
                         </TableCell>
                         <TableCell>
                           <Link
-                            to={item.type === 'state' ? `/${item.slug}` : `/${item.stateSlug}/${item.slug}`}
+                            href={item.type === 'state' ? `/${item.slug}` : `/${item.stateSlug}/${item.slug}`}
                             target="_blank"
                             className="text-primary hover:underline text-sm"
                           >

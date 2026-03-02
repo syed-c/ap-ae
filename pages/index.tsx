@@ -1,16 +1,8 @@
-import dynamic from 'next/dynamic';
 import { GetServerSideProps } from 'next';
+import IndexPage from '@/pages/Index';
 
-const App = dynamic(() => import('@/App'));
+export default IndexPage;
 
-export default function Index(props: any) {
-  return <App {...props} />;
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  return {
-    props: {
-      ssrPath: '/',
-    },
-  };
+export const getServerSideProps: GetServerSideProps = async () => {
+  return { props: {} };
 };

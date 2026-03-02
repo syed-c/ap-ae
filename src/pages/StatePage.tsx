@@ -1,6 +1,7 @@
 'use client';
 import { useMemo } from "react";
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useRouter } from "next/router";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -21,7 +22,7 @@ import { usePrerenderReady } from "@/hooks/usePrerenderReady";
 import { usePinnedProfiles, sortWithPinnedFirst } from "@/hooks/usePinnedProfiles";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
 import NotFound from "./NotFound";
-import { 
+import {
   Star, Shield, Clock, Building2, ArrowRight, SlidersHorizontal
 } from "lucide-react";
 import {
@@ -39,27 +40,28 @@ import {
 } from "@/components/ui/sheet";
 
 const StatePage = () => {
-  const { stateSlug } = useParams();
+  const router = useRouter();
+  const stateSlug = typeof router.query?.stateSlug === 'string' ? router.query.stateSlug : '';
 
   const normalizedStateSlug = normalizeStateSlug(stateSlug);
-  
+
   // Check if this is actually a static page route or reserved path
   const staticRoutes = [
-    'about', 'contact', 'faq', 'how-it-works', 'privacy', 'terms', 
-    'auth', 'admin', 'dashboard', 'search', 'services', 'insurance', 
-    'blog', 'claim-profile', 'list-your-practice', 'onboarding', 
+    'about', 'contact', 'faq', 'how-it-works', 'privacy', 'terms',
+    'auth', 'admin', 'dashboard', 'search', 'services', 'insurance',
+    'blog', 'claim-profile', 'list-your-practice', 'onboarding',
     'gmb-select', 'find-dentist', 'clinic', 'dentist', 'sitemap',
     'pricing', 'appointment', 'review', 'rq', 'tools', 'emergency-dentist',
     'editorial-policy', 'medical-review-policy', 'verification-policy',
     'home-v2', 'dashboard-v2', 'form', 'book'
   ];
-  
+
   const isInvalidSlug = !stateSlug || staticRoutes.includes(stateSlug) || stateSlug.includes('/');
 
   // All hooks must be called before any conditional returns
   const { data: state, isLoading: stateLoading } = useStateData(normalizedStateSlug || '');
   const { data: cities, isLoading: citiesLoading } = useCitiesByStateSlug(normalizedStateSlug || '');
-  
+
   // Fetch SEO content from seo_pages table
   const { data: seoContent, isLoading: seoContentLoading, isFetching: seoContentFetching } = useSeoPageContent(normalizedStateSlug || '');
 
@@ -100,20 +102,20 @@ const StatePage = () => {
     queryKey: ['state-profiles', stateSlug, pinnedProfiles?.map(p => p.id).join(',')],
     queryFn: async () => {
       if (!state) return [];
-      
+
       // Get IDs of pinned clinics
       const pinnedIds = (pinnedProfiles || []).map(p => p.id);
-      
+
       // Get city IDs for this state
       const { data: stateCities } = await supabase
         .from('cities')
         .select('id')
         .eq('state_id', state.id);
-      
+
       if (!stateCities?.length) return [];
-      
+
       const stateCityIds = stateCities.map(c => c.id);
-      
+
       // Get clinics in these cities
       const { data: clinics } = await supabase
         .from('clinics')
@@ -126,11 +128,11 @@ const StatePage = () => {
         .eq('is_active', true)
         .order('rating', { ascending: false })
         .limit(50);
-      
+
       // If there are pinned IDs not in the result, fetch them separately
       const resultIds = new Set((clinics || []).map(c => c.id));
       const missingPinnedIds = pinnedIds.filter(id => !resultIds.has(id));
-      
+
       let pinnedClinics: any[] = [];
       if (missingPinnedIds.length > 0) {
         const { data: extraPinned } = await supabase
@@ -144,7 +146,7 @@ const StatePage = () => {
           .eq('is_active', true);
         pinnedClinics = extraPinned || [];
       }
-      
+
       // Combine and dedupe
       const seenIds = new Set<string>();
       const allClinics = [...(clinics || []), ...pinnedClinics].filter(c => {
@@ -152,7 +154,7 @@ const StatePage = () => {
         seenIds.add(c.id);
         return true;
       });
-      
+
       return allClinics.map(c => ({
         id: c.id,
         name: c.name,
@@ -219,7 +221,8 @@ const StatePage = () => {
 
   // Redirect legacy full-name state slugs to canonical abbreviation slugs
   if (stateSlug && normalizedStateSlug && stateSlug !== normalizedStateSlug) {
-    return <Navigate to={`/${normalizedStateSlug}/`} replace />;
+    if (typeof window !== 'undefined') router.replace(`/${normalizedStateSlug}/`);
+    return null;
   }
 
   if (stateLoading) {
@@ -299,7 +302,7 @@ const StatePage = () => {
         type="faq"
         questions={faqs.map(f => ({ question: f.q, answer: f.a }))}
       />
-      
+
       {/* SECTION 1: Hero — Dark theme matching homepage */}
       <section className="relative overflow-hidden min-h-[50vh] flex items-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -310,18 +313,18 @@ const StatePage = () => {
             backgroundSize: '60px 60px',
           }} />
         </div>
-        
+
         <div className="container relative z-10 py-16 md:py-20 px-5 md:px-8">
           <div className="flex justify-center mb-6">
             <Breadcrumbs items={breadcrumbs} className="[&_a]:text-white/60 [&_span]:text-white/40 [&_svg]:text-white/30" />
           </div>
-          
+
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-primary/15 backdrop-blur-md border border-primary/30 rounded-full px-4 py-2 mb-6">
               <Shield className="h-4 w-4 text-primary" />
               <span className="text-sm font-bold text-primary">Licensed Dental Professionals</span>
             </div>
-            
+
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 px-2" style={{ fontFamily: "'Varela Round', system-ui, sans-serif" }}>
               {pageH1.includes(stateName) ? (
                 <>
@@ -332,13 +335,13 @@ const StatePage = () => {
                 <span className="text-white">{pageH1}</span>
               )}
             </h1>
-            
+
             <p className="text-lg md:text-xl text-white/40 mb-8 max-w-2xl mx-auto">
               Discover top-rated dental professionals across {stateName}. Browse by city, compare reviews, and book your appointment online.
             </p>
 
             <div className="flex flex-wrap justify-center gap-3 mb-8">
-              <Link to="/search">
+              <Link href="/search">
                 <Button size="lg" className="h-12 px-6 font-bold rounded-2xl">
                   Find a Dentist <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -451,7 +454,7 @@ const StatePage = () => {
               Areas in <span className="text-primary">{stateName}</span>
             </h2>
           </div>
-          
+
           {citiesLoading ? (
             <div className="flex flex-wrap gap-2">
               {[...Array(8)].map((_, i) => (
@@ -463,7 +466,7 @@ const StatePage = () => {
               {cities.map((city, i) => (
                 <span key={city.id}>
                   <Link
-                    to={`/${normalizedStateSlug}/${city.slug}/`}
+                    href={`/${normalizedStateSlug}/${city.slug}/`}
                     className="text-primary hover:text-primary/80 font-semibold hover:underline transition-colors"
                   >
                     {city.name}
@@ -504,7 +507,7 @@ const StatePage = () => {
               Frequently Asked <span className="text-primary">Questions</span>
             </h2>
           </div>
-          
+
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, i) => (
               <AccordionItem
@@ -549,7 +552,7 @@ const StatePage = () => {
               {treatments.map((treatment, idx) => (
                 <span key={treatment.id} className="inline-flex items-center">
                   <Link
-                    to={`/${normalizedStateSlug}/${treatment.slug}/`}
+                    href={`/${normalizedStateSlug}/${treatment.slug}/`}
                     className="text-primary hover:text-primary/80 font-semibold hover:underline transition-colors"
                   >
                     {treatment.name}

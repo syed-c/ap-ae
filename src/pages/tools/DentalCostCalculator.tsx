@@ -11,7 +11,7 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Calculator, Banknote, Search, TrendingUp, ArrowRight, MapPin, Star } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { useSeoPageContent } from '@/hooks/useSeoPageContent';
@@ -306,7 +306,7 @@ export default function DentalCostCalculator() {
                   )}
 
                   <Button className="w-full" asChild>
-                    <Link to={`/search?treatment=${selectedTreatment?.slug || ''}&state=${selectedState?.abbreviation || ''}`}>
+                    <Link href={`/search?treatment=${selectedTreatment?.slug || ''}&state=${selectedState?.abbreviation || ''}`}>
                       <Search className="h-4 w-4 mr-2" />
                       Find Dentists in Your Budget
                     </Link>
@@ -332,7 +332,7 @@ export default function DentalCostCalculator() {
                     ))}
                   </div>
                   <Button className="w-full" asChild>
-                    <Link to={`/search?treatment=${selectedTreatment?.slug || ''}`}>
+                    <Link href={`/search?treatment=${selectedTreatment?.slug || ''}`}>
                       <Search className="h-4 w-4 mr-2" />
                       Find Dentists for This Treatment
                     </Link>
@@ -344,7 +344,7 @@ export default function DentalCostCalculator() {
                   <p>No pricing data available for this treatment yet.</p>
                   <p className="text-sm mt-2">Try selecting a different treatment.</p>
                   <Button className="mt-4 w-full" variant="outline" asChild>
-                    <Link to="/search">
+                    <Link href="/search">
                       <Search className="h-4 w-4 mr-2" />
                       Browse All Dentists
                     </Link>
@@ -399,7 +399,7 @@ export default function DentalCostCalculator() {
                       </TableCell>
                       <TableCell>
                         <Button size="sm" variant="ghost" asChild>
-                          <Link to={`/clinic/${item.clinic?.slug || item.clinic?.id}`}>
+                          <Link href={`/clinic/${item.clinic?.slug || item.clinic?.id}`}>
                             View <ArrowRight className="h-4 w-4 ml-1" />
                           </Link>
                         </Button>

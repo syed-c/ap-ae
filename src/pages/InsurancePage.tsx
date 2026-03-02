@@ -1,6 +1,6 @@
 'use client';
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -82,7 +82,7 @@ const InsurancePage = () => {
       <div className="bg-gradient-to-b from-muted/50 to-background border-b border-border">
         <div className="container py-12 md:py-16">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-            <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
             <span>/</span>
             <span className="text-foreground font-medium">Insurance</span>
           </nav>
@@ -181,7 +181,7 @@ const InsurancePage = () => {
             {filtered.map((insurance) => (
               <Link
                 key={insurance.id}
-                to={buildInsuranceUrl(insurance.slug)}
+                href={buildInsuranceUrl(insurance.slug)}
                 className="group p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-md transition-all"
               >
                 <div className="flex items-center gap-3 mb-2">
@@ -240,13 +240,13 @@ const InsurancePage = () => {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild className="rounded-xl font-bold" size="sm">
-              <Link to="/contact/">
+              <Link href="/contact/">
                 <Phone className="h-4 w-4 mr-2" />
                 Contact Us
               </Link>
             </Button>
             <Button variant="outline" asChild className="rounded-xl font-bold" size="sm">
-              <Link to="/search/">
+              <Link href="/search/">
                 <Search className="h-4 w-4 mr-2" />
                 Browse Clinics
               </Link>

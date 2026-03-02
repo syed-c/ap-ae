@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DoctorCard } from "@/components/DoctorCard";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 interface Doctor {
   name: string;
@@ -48,10 +48,9 @@ export function DoctorCarousel({ doctors }: DoctorCarouselProps) {
             <DoctorCard {...doctor} variant="homepage" />
           </div>
         ))}
-        
+
         {/* End card - View all */}
-        <Link 
-          to="/search/"
+        <Link href="/search/"
           className="shrink-0 min-w-[200px] max-w-[200px] rounded-2xl bg-card/10 border border-card/20 flex flex-col items-center justify-center p-4 hover:bg-card/20 transition-colors group"
         >
           <div className="text-center">
@@ -67,7 +66,7 @@ export function DoctorCarousel({ doctors }: DoctorCarouselProps) {
 
       {/* Navigation - positioned at header level */}
       <div className="absolute -top-16 right-0 flex items-center gap-2">
-        <Link to="/search/" className="text-interface text-card/80 hover:text-primary transition-colors flex items-center gap-1 mr-4">
+        <Link href="/search/" className="text-interface text-card/80 hover:text-primary transition-colors flex items-center gap-1 mr-4">
           VIEW FULL DIRECTORY
           <ArrowRight className="h-4 w-4" />
         </Link>

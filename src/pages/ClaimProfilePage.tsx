@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -58,7 +59,7 @@ const extractEmailDomain = (email: string): string | null => {
 };
 
 const ClaimProfilePage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const router = useRouter(); const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const prefilledClinic = searchParams.get("clinic");
   const { user } = useAuth();
   const { toast } = useToast();
@@ -99,7 +100,7 @@ const ClaimProfilePage = () => {
       setSearchQuery(prefilledClinic);
       setSearchParams({}, { replace: true });
     }
-  }, [prefilledClinic, setSearchParams]);
+  }, [prefilledClinic, router]);
 
   // Search clinics
   const { data: searchResults, isLoading: searching } = useQuery({
@@ -393,7 +394,7 @@ const ClaimProfilePage = () => {
       <div className="bg-gradient-to-b from-primary/5 to-background pt-8 pb-6">
         <div className="container">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-            <Link to="/" className="hover:text-foreground">Home</Link>
+            <Link href="/" className="hover:text-foreground">Home</Link>
             <span>/</span>
             <span>Claim Profile</span>
           </div>
@@ -494,7 +495,7 @@ const ClaimProfilePage = () => {
                   <div className="text-center py-6">
                     <p className="text-muted-foreground mb-4">No profiles found matching your search.</p>
                     <Button asChild variant="outline" className="rounded-xl font-bold" size="sm">
-                      <Link to="/list-your-practice">
+                      <Link href="/list-your-practice">
                         List Your Practice Instead
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
@@ -509,7 +510,7 @@ const ClaimProfilePage = () => {
                     If your clinic isn't listed yet, you can add it for free.
                   </p>
                   <Button asChild variant="outline" className="rounded-xl font-bold border-gold text-gold hover:bg-gold hover:text-white" size="sm">
-                    <Link to="/list-your-practice">
+                    <Link href="/list-your-practice">
                       List Your Practice
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
@@ -750,7 +751,7 @@ const ClaimProfilePage = () => {
                     <User className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
                     <p className="text-muted-foreground mb-4">Please sign in to continue</p>
                     <Button asChild className="rounded-xl font-bold">
-                      <Link to="/auth?redirect=/claim-profile">Sign In to Continue</Link>
+                      <Link href="/auth?redirect=/claim-profile">Sign In to Continue</Link>
                     </Button>
                   </div>
                 ) : (
@@ -878,7 +879,7 @@ const ClaimProfilePage = () => {
                     <User className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
                     <p className="text-muted-foreground mb-4">Please sign in to submit a request</p>
                     <Button asChild className="rounded-xl font-bold">
-                      <Link to="/auth?redirect=/claim-profile">Sign In to Continue</Link>
+                      <Link href="/auth?redirect=/claim-profile">Sign In to Continue</Link>
                     </Button>
                   </div>
                 ) : (
@@ -983,10 +984,10 @@ const ClaimProfilePage = () => {
                 </p>
                 <div className="flex flex-col gap-3">
                   <Button asChild className="rounded-xl font-bold">
-                    <Link to="/dashboard?tab=my-dashboard">Go to Dashboard</Link>
+                    <Link href="/dashboard?tab=my-dashboard">Go to Dashboard</Link>
                   </Button>
                   <Button asChild variant="outline" className="rounded-xl font-bold">
-                    <Link to={`/clinic/${selectedClinic?.slug}`}>View Your Profile</Link>
+                    <Link href={`/clinic/${selectedClinic?.slug}`}>View Your Profile</Link>
                   </Button>
                 </div>
               </div>
@@ -1004,10 +1005,10 @@ const ClaimProfilePage = () => {
                 </p>
                 <div className="flex flex-col gap-3">
                   <Button asChild className="rounded-xl font-bold">
-                    <Link to="/">Return Home</Link>
+                    <Link href="/">Return Home</Link>
                   </Button>
                   <Button asChild variant="outline" className="rounded-xl font-bold">
-                    <Link to={`/clinic/${selectedClinic?.slug}`}>View Clinic Profile</Link>
+                    <Link href={`/clinic/${selectedClinic?.slug}`}>View Clinic Profile</Link>
                   </Button>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useRouter } from "next/router";
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { getGmbProviderToken, setGmbProviderToken, clearGmbProviderToken } from '@/lib/gmbAuth';
@@ -49,7 +49,7 @@ interface LocationMatchResult {
 }
 
 export default function GMBBusinessSelection() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const location = useLocation();
   const { user, refreshRoles } = useAuth();
   const providerTokenFromNavState = (location.state as any)?.providerToken as string | undefined;
@@ -112,7 +112,7 @@ export default function GMBBusinessSelection() {
     const timer = setTimeout(() => {
       if (!user) {
         console.log('[GMB] No user found, redirecting to auth');
-        navigate('/auth', { replace: true });
+        router.replace('/auth');
         return;
       }
 
@@ -120,7 +120,7 @@ export default function GMBBusinessSelection() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [user, navigate]);
+  }, [user, router]);
 
   const fetchBusinesses = async () => {
     setIsLoading(true);
@@ -236,7 +236,7 @@ export default function GMBBusinessSelection() {
           localStorage.removeItem('gmb_relink_flow');
           clearGmbProviderToken();
 
-          navigate('/dashboard?tab=settings&gmb_connected=true', { replace: true });
+          router.replace('/dashboard?tab=settings&gmb_connected=true');
           return;
         }
       }
@@ -267,13 +267,13 @@ export default function GMBBusinessSelection() {
 
       if (locationMatch?.requiresManualSelection) {
         // Navigate to onboarding with location selection needed flag
-        navigate(
+        router.push(
           `/onboarding?gmb_connected=true&listing_created=true&location_pending=true&detected_city=${encodeURIComponent(locationMatch.cityName || '')}&detected_city_id=${locationMatch.cityId || ''}`,
           { replace: true }
         );
       } else {
         // Location auto-matched, go directly to onboarding
-        navigate('/onboarding?gmb_connected=true&listing_created=true&location_verified=true', { replace: true });
+        router.replace('/onboarding?gmb_connected=true&listing_created=true&location_verified=true');
       }
     } catch (err: any) {
       console.error('Failed to create listing:', err);
@@ -295,10 +295,10 @@ export default function GMBBusinessSelection() {
 
     if (isRelinkFlow) {
       // For relink flow, go back to dashboard settings
-      navigate('/dashboard?tab=settings', { replace: true });
+      router.replace('/dashboard?tab=settings');
     } else {
       // For new listing flow, go to manual onboarding
-      navigate('/onboarding?new=true&skip_gmb=true', { replace: true });
+      router.replace('/onboarding?new=true&skip_gmb=true');
     }
   };
 

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { SEOHead } from "@/components/seo/SEOHead";
@@ -224,7 +224,7 @@ Email: ${supportEmail}`
             <div className="mt-12 pt-8 border-t text-center">
               <p className="text-muted-foreground mb-4">Have questions about our terms?</p>
               <Button asChild variant="outline" className="rounded-2xl font-bold">
-                <Link to="/contact">
+                <Link href="/contact">
                   Contact Us
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>

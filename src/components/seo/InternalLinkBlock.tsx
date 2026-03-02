@@ -10,7 +10,7 @@
  * - Use descriptive anchor text
  */
 
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 interface InternalLink {
@@ -60,7 +60,7 @@ export const InternalLinkBlock = ({
           <li key={`${link.href}-${index}`}>
             {variant === 'grid' ? (
               <Link
-                to={link.href}
+                href={link.href}
                 className="block p-3 bg-card border border-border rounded-lg hover:border-primary/50 hover:bg-accent/30 transition-colors group"
               >
                 <span className="text-sm font-medium text-foreground group-hover:text-primary">
@@ -74,7 +74,7 @@ export const InternalLinkBlock = ({
               </Link>
             ) : variant === 'list' ? (
               <Link
-                to={link.href}
+                href={link.href}
                 className="flex items-start gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 <span className="text-primary">→</span>
@@ -87,7 +87,7 @@ export const InternalLinkBlock = ({
               </Link>
             ) : (
               <Link
-                to={link.href}
+                href={link.href}
                 className="inline-flex items-center px-3 py-1.5 bg-muted rounded-full text-xs font-medium text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
               >
                 {link.label}

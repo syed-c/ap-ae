@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useRouter } from "next/router";
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -53,8 +53,8 @@ interface ProfileCompleteness {
  */
 export default function GMBOnboarding() {
   const { user, roles, refreshRoles, isLoading: authLoading } = useAuth();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const router = useRouter();
+  const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const queryClient = useQueryClient();
 
   const [step, setStep] = useState<'welcome' | 'password' | 'location' | 'complete'>('welcome');
@@ -126,7 +126,7 @@ export default function GMBOnboarding() {
   useEffect(() => {
     if (authLoading || clinicLoading) return;
     if (!user) {
-      navigate('/auth', { replace: true });
+      router.replace('/auth');
       return;
     }
 
@@ -139,18 +139,18 @@ export default function GMBOnboarding() {
 
     // Super admins and district managers should NEVER see onboarding
     if (isAdmin) {
-      navigate('/admin', { replace: true });
+      router.replace('/admin');
       return;
     }
 
     if (isExistingUser && (onboardingComplete || noOnboardingRecord)) {
       if (isDentist) {
-        navigate('/dashboard?tab=my-dashboard', { replace: true });
+        router.replace('/dashboard?tab=my-dashboard');
       } else {
-        navigate('/', { replace: true });
+        router.replace('/');
       }
     }
-  }, [authLoading, clinicLoading, user, onboarding, isNewSignup, gmbConnected, isDentist, isAdmin, navigate]);
+  }, [authLoading, clinicLoading, user, onboarding, isNewSignup, gmbConnected, isDentist, isAdmin, router]);
 
   // Calculate profile completeness
   const completeness: ProfileCompleteness = {
@@ -264,7 +264,7 @@ export default function GMBOnboarding() {
     }
 
     await markOnboardingComplete();
-    navigate('/dashboard?tab=my-dashboard', { replace: true });
+    router.replace('/dashboard?tab=my-dashboard');
   };
 
   const handleCompleteProfile = async () => {
@@ -291,7 +291,7 @@ export default function GMBOnboarding() {
     }
 
     // Don't mark complete yet - they're going to edit profile
-    navigate('/dashboard?tab=my-profile', { replace: true });
+    router.replace('/dashboard?tab=my-profile');
   };
 
   if (authLoading || clinicLoading) {
@@ -600,7 +600,7 @@ export default function GMBOnboarding() {
             queryClient.invalidateQueries({ queryKey: ['user-clinic'] });
             toast.success('Location confirmed! Your clinic is now live.');
             // Navigate without the location_pending flag
-            navigate('/onboarding?gmb_connected=true&listing_created=true&location_verified=true', { replace: true });
+            router.replace('/onboarding?gmb_connected=true&listing_created=true&location_verified=true');
           }}
         />
       )}

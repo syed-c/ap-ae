@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Building2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import ReputationSuiteNew from '@/components/dentist/ReputationSuiteNew';
 
 /**
@@ -67,7 +67,7 @@ export default function DentistReputationHub() {
             or contact support if you believe this is an error.
           </p>
           <Button asChild className="gap-2">
-            <Link to="/claim-profile">Claim Your Practice</Link>
+            <Link href="/claim-profile">Claim Your Practice</Link>
           </Button>
         </CardContent>
       </Card>

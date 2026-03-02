@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { 
   Stethoscope, 
   Users, 
@@ -195,7 +195,7 @@ const StateSEOContent = ({
             {popularTreatments.map((treatment) => (
               <Link
                 key={treatment.slug}
-                to={`/services/${treatment.slug}`}
+                href={`/services/${treatment.slug}`}
                 className="bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium hover:bg-primary/20 transition-colors"
               >
                 {treatment.name}
@@ -352,7 +352,7 @@ const CitySEOContent = ({
             {popularTreatments.slice(0, 8).map((treatment) => (
               <Link
                 key={treatment.slug}
-                to={stateSlug ? `/${stateSlug}/${treatment.slug}` : `/services/${treatment.slug}`}
+                href={stateSlug ? `/${stateSlug}/${treatment.slug}` : `/services/${treatment.slug}`}
                 className="bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium hover:bg-primary/20 transition-colors"
               >
                 {treatment.name}
@@ -418,7 +418,7 @@ const CitySEOContent = ({
           {nearbyLocations.map((location) => (
             <Link
               key={location.slug}
-              to={`/${stateSlug}/${location.slug}`}
+              href={`/${stateSlug}/${location.slug}`}
               className="bg-muted hover:bg-muted/80 text-foreground rounded-full px-4 py-2 text-sm font-medium transition-colors flex items-center gap-1"
             >
               <MapPin className="h-3 w-3" />
@@ -558,7 +558,7 @@ const ServiceLocationSEOContent = ({
             {nearbyLocations.map((location) => (
               <Link
                 key={location.slug}
-                to={`/${stateSlug}/${location.slug}/${treatmentName.toLowerCase().replace(/\s+/g, '-')}`}
+                href={`/${stateSlug}/${location.slug}/${treatmentName.toLowerCase().replace(/\s+/g, '-')}`}
                 className="bg-muted hover:bg-muted/80 text-foreground rounded-full px-4 py-2 text-sm font-medium transition-colors flex items-center gap-1"
               >
                 <MapPin className="h-3 w-3" />

@@ -1,6 +1,6 @@
 'use client';
 import { useState as useReactState, useMemo } from "react";
-import { useParams, Navigate } from "react-router-dom";
+import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,7 +52,7 @@ import {
 const MIN_DENTIST_COUNT = 2; // noindex pages with fewer than 2 dentists
 
 const CityPage = () => {
-  const { stateSlug, citySlug } = useParams();
+  const { stateSlug, citySlug } = useRouter().query as { stateSlug?: string; citySlug?: string };
   const normalizedStateSlug = normalizeStateSlug(stateSlug);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useReactState(false);
   const { filters, setFilters } = useBudgetFilters();
@@ -212,14 +212,14 @@ const CityPage = () => {
   }
 
   if (stateSlug && normalizedStateSlug && stateSlug !== normalizedStateSlug) {
-    return <Navigate to={`/${normalizedStateSlug}/${citySlug}/`} replace />;
+    return <Navigate href={`/${normalizedStateSlug}/${citySlug}/`} replace />;
   }
 
   if (stateSlug === "clinic") {
-    return <Navigate to={`/clinic/${citySlug}/`} replace />;
+    return <Navigate href={`/clinic/${citySlug}/`} replace />;
   }
   if (stateSlug === "dentist") {
-    return <Navigate to={`/dentist/${citySlug}/`} replace />;
+    return <Navigate href={`/dentist/${citySlug}/`} replace />;
   }
 
   if (stateLoading || cityLoading) {

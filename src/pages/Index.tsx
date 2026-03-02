@@ -8,7 +8,8 @@ import { AIExplainerSection, ForDentistsAISection } from "@/components/ai";
 import { AutoScrollCarousel } from "@/components/AutoScrollCarousel";
 import { TypewriterText } from "@/components/TypewriterText";
 import { Button } from "@/components/ui/button";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useTopDentistsPerLocation } from "@/hooks/useProfiles";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -108,7 +109,7 @@ function EmirateCard({ state, index }: { state: any; index: number }) {
   return (
     <Link
       key={`${state.slug}-${index}`}
-      to={`/${state.slug}`}
+      href={`/${state.slug}`}
       className="group flex flex-col items-center gap-3 text-center shrink-0"
     >
       <div className="h-24 w-24 md:h-28 md:w-28 rounded-full border-3 border-primary/30 overflow-hidden group-hover:scale-110 group-hover:border-primary group-hover:shadow-xl group-hover:shadow-primary/20 transition-all duration-300 relative bg-gradient-to-br from-primary/20 via-primary/10 to-teal/10 flex items-center justify-center">
@@ -146,8 +147,8 @@ const staggerItem = {
 };
 
 const Index = () => {
-  const location = useLocation();
-  const legacyPostId = new URLSearchParams(location.search).get("p");
+  const router = useRouter();
+  const legacyPostId = typeof router.query?.p === 'string' ? router.query.p : null;
 
   // Debug: Test Supabase connection
   const { data: testData } = useQuery({
@@ -190,7 +191,8 @@ const Index = () => {
   });
 
   if (legacyPostId) {
-    return <Navigate to="/blog" replace />;
+    if (typeof window !== 'undefined') router.replace('/blog');
+    return null;
   }
 
   const stats = [
@@ -433,7 +435,7 @@ const Index = () => {
             {popularAreas.map((area, i) => (
               <motion.span key={area.slug} variants={staggerItem} className="inline-flex items-center">
                 <Link
-                  to={`/${area.slug}/`}
+                  href={`/${area.slug}/`}
                   className="text-primary hover:text-primary/80 font-semibold hover:underline transition-colors text-sm md:text-base"
                 >
                   {area.name}
@@ -526,7 +528,7 @@ const Index = () => {
             <AutoScrollCarousel doctors={carouselProfiles} autoScrollSpeed={25} />
             <div className="mt-10 text-center">
               <Button asChild size="lg" className="rounded-2xl font-black px-10 h-14 text-base shadow-lg shadow-primary/20" style={{ fontFamily: headingFont }}>
-                <Link to="/search">
+                <Link href="/search">
                   View Full Directory <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -558,7 +560,7 @@ const Index = () => {
                   Find specialists for every dental need across the UAE. AED pricing on all profiles.
                 </p>
               </div>
-              <Link to="/services" className="group inline-flex items-center gap-2 text-primary hover:text-primary/80 font-bold transition-all">
+              <Link href="/services" className="group inline-flex items-center gap-2 text-primary hover:text-primary/80 font-bold transition-all">
                 View All Services <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
@@ -566,7 +568,7 @@ const Index = () => {
               {treatments?.map((treatment) => (
                 <Link
                   key={treatment.id}
-                  to={`/services/${treatment.slug}`}
+                  href={`/services/${treatment.slug}`}
                   className="group relative bg-background/60 border border-border rounded-2xl p-4 md:p-5 hover:border-primary/40 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -626,7 +628,7 @@ const Index = () => {
           </div>
           <div className="text-center mt-8">
             <Button asChild variant="outline" className="rounded-2xl font-black" style={{ fontFamily: headingFont }}>
-              <Link to="/faq">View All FAQs <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              <Link href="/faq">View All FAQs <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>
         </div>
@@ -691,7 +693,7 @@ const Index = () => {
 
           <div className="text-center mt-12">
             <Button asChild size="lg" className="rounded-2xl font-black px-10 h-14 text-base shadow-lg shadow-primary/20" style={{ fontFamily: headingFont }}>
-              <Link to="/search">
+              <Link href="/search">
                 Start Your Search <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -749,12 +751,12 @@ const Index = () => {
 
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button asChild size="lg" className="rounded-2xl font-black px-10 h-14 text-lg bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/30" style={{ fontFamily: headingFont }}>
-                  <Link to="/search">
+                  <Link href="/search">
                     Find a Dentist <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="rounded-2xl font-black px-10 h-14 text-lg border-2 border-white/20 text-white bg-white/5 hover:bg-white/10" style={{ fontFamily: headingFont }}>
-                  <Link to="/list-your-practice">
+                  <Link href="/list-your-practice">
                     <Stethoscope className="mr-2 h-5 w-5" /> I'm a Dentist
                   </Link>
                 </Button>

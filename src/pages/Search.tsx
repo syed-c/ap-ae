@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useRealCounts } from "@/hooks/useRealCounts";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -64,7 +64,7 @@ const Search = () => {
       if (selectedState) {
         query = query.eq("state_id", selectedState);
       }
-      
+
       const { data } = await query.limit(200);
       return data || [];
     },
@@ -76,8 +76,8 @@ const Search = () => {
     if (!cities) return [];
     if (!searchQuery.trim()) return cities;
     const q = searchQuery.toLowerCase();
-    return cities.filter(c => 
-      c.name.toLowerCase().includes(q) || 
+    return cities.filter(c =>
+      c.name.toLowerCase().includes(q) ||
       (c.state as any)?.name?.toLowerCase().includes(q) ||
       (c.state as any)?.abbreviation?.toLowerCase().includes(q)
     );
@@ -107,13 +107,13 @@ const Search = () => {
           <div className="flex justify-center mb-4">
             <Breadcrumbs items={breadcrumbs} />
           </div>
-          
+
           <div className="max-w-3xl mx-auto text-center">
             <Badge variant="outline" className="mb-4 rounded-full px-4 py-1.5 font-bold text-xs border-primary/30 text-primary">
               <ShieldCheck className="h-3.5 w-3.5 mr-1.5" />
               {realCounts?.clinics?.toLocaleString() || 0}+ Verified Providers
             </Badge>
-            
+
             <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-3">
               UAE Dental <span className="text-primary">Directory</span>
             </h1>
@@ -167,11 +167,10 @@ const Search = () => {
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => { setSelectedState(null); setShowAllCities(false); }}
-                className={`shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                  !selectedState 
-                    ? 'bg-primary text-primary-foreground shadow-sm' 
+                className={`shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all ${!selectedState
+                    ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
+                  }`}
               >
                 All Emirates
               </button>
@@ -179,11 +178,10 @@ const Search = () => {
                 <button
                   key={state.id}
                   onClick={() => { setSelectedState(state.id); setShowAllCities(false); }}
-                  className={`shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                    selectedState === state.id
+                  className={`shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all ${selectedState === state.id
                       ? 'bg-primary text-primary-foreground shadow-sm'
                       : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
+                    }`}
                 >
                   {state.abbreviation}
                 </button>
@@ -205,7 +203,7 @@ const Search = () => {
                 <p className="text-sm text-muted-foreground mt-0.5">Select an Emirate to see all areas</p>
               </div>
             </div>
-            
+
             {statesLoading ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />)}
@@ -256,7 +254,7 @@ const Search = () => {
               </p>
             </div>
             {selectedState && (
-              <Link to={`/${states?.find(s => s.id === selectedState)?.slug || ''}/`}>
+              <Link href={`/${states?.find(s => s.id === selectedState)?.slug || ''}/`}>
                 <Button variant="outline" size="sm" className="rounded-xl font-bold gap-1">
                   View Emirate Page <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
@@ -274,7 +272,7 @@ const Search = () => {
                 {displayCities.map(city => (
                   <Link
                     key={city.id}
-                    to={`/${(city.state as any)?.slug || ''}/${city.slug}/`}
+                    href={`/${(city.state as any)?.slug || ''}/${city.slug}/`}
                     className="group bg-card border border-border rounded-2xl p-4 hover:border-primary/40 hover:shadow-md transition-all"
                   >
                     <div className="flex items-center justify-between">
@@ -298,11 +296,11 @@ const Search = () => {
                   </Link>
                 ))}
               </div>
-              
+
               {!showAllCities && filteredCities.length > 24 && (
                 <div className="text-center mt-6">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => setShowAllCities(true)}
                     className="rounded-xl font-bold gap-2"
                   >
@@ -333,22 +331,22 @@ const Search = () => {
             </h2>
             <p className="text-sm text-muted-foreground mt-0.5">Find specialists for specific dental services</p>
           </div>
-          
+
           <div className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
             {treatments?.map(treatment => (
               <Link
                 key={treatment.id}
-                to={`/services/${treatment.slug}/`}
+                href={`/services/${treatment.slug}/`}
                 className="bg-card border border-border rounded-2xl px-4 py-2.5 font-bold text-foreground hover:border-primary hover:text-primary transition-all text-sm"
               >
                 {treatment.name}
               </Link>
             ))}
           </div>
-          
+
           <div className="text-center mt-6">
             <Button asChild variant="outline" className="rounded-xl font-bold gap-1">
-              <Link to="/services/">
+              <Link href="/services/">
                 View All Services <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
@@ -365,10 +363,9 @@ const Search = () => {
             </h2>
             <p className="text-sm text-muted-foreground mt-0.5">Compare costs, check insurance, and find emergency care</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            <Link
-              to="/tools/dental-cost-calculator"
+            <Link href="/tools/dental-cost-calculator"
               className="group bg-card border border-border rounded-2xl p-6 hover:border-primary/50 hover:shadow-md transition-all text-center"
             >
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
@@ -377,9 +374,8 @@ const Search = () => {
               <h3 className="font-bold text-foreground group-hover:text-primary transition-colors mb-1">Dental Cost Calculator</h3>
               <p className="text-xs text-muted-foreground">Compare real prices from verified dentists</p>
             </Link>
-            
-            <Link
-              to="/tools/insurance-checker"
+
+            <Link href="/tools/insurance-checker"
               className="group bg-card border border-border rounded-2xl p-6 hover:border-primary/50 hover:shadow-md transition-all text-center"
             >
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
@@ -388,9 +384,8 @@ const Search = () => {
               <h3 className="font-bold text-foreground group-hover:text-primary transition-colors mb-1">Insurance Checker</h3>
               <p className="text-xs text-muted-foreground">Find dentists who accept your plan</p>
             </Link>
-            
-            <Link
-              to="/emergency-dentist"
+
+            <Link href="/emergency-dentist"
               className="group bg-card border border-border rounded-2xl p-6 hover:border-primary/50 hover:shadow-md transition-all text-center"
             >
               <div className="h-12 w-12 rounded-xl bg-destructive/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-destructive/20 transition-colors">

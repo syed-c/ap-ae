@@ -1,6 +1,6 @@
 'use client';
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
@@ -112,13 +112,13 @@ const ListYourPracticeSuccessPage = () => {
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="rounded-xl font-bold">
-              <Link to="/">
+              <Link href="/">
                 Back to Home
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="rounded-xl font-bold">
-              <Link to="/contact">
+              <Link href="/contact">
                 <Phone className="mr-2 h-4 w-4" />
                 Contact Support
               </Link>

@@ -2,7 +2,7 @@
 import { useState, forwardRef } from "react";
 import { Star, MapPin, CheckCircle, Clock, Building2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { MultiStepBookingModal } from "@/components/MultiStepBookingModal";
 import { LazyImage } from "@/components/common/LazyImage";
 import { buildDentistProfileUrl, buildClinicProfileUrl } from "@/lib/url/buildProfileUrl";
@@ -61,7 +61,7 @@ export const DoctorCard = forwardRef<HTMLDivElement, DoctorCardProps>(({
   if (variant === "homepage") {
     return (
       <div className="relative bg-card rounded-2xl overflow-hidden min-w-[200px] max-w-[200px] card-hover group border border-border/50 shadow-sm">
-        <Link to={profileLink} className="block">
+        <Link href={profileLink} className="block">
           <div className="relative aspect-[4/5] overflow-hidden bg-muted">
             <LazyImage src={image} alt={name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" width={200} height={250} />
             <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
@@ -82,7 +82,7 @@ export const DoctorCard = forwardRef<HTMLDivElement, DoctorCardProps>(({
           </div>
         </Link>
         <div className="px-3 pb-3">
-          <Link to={profileLink} className="block">
+          <Link href={profileLink} className="block">
             <Button variant="outline" size="sm" className="w-full rounded-xl font-bold text-xs h-8">
               View Profile
             </Button>
@@ -134,7 +134,7 @@ export const DoctorCard = forwardRef<HTMLDivElement, DoctorCardProps>(({
               <span className="font-medium">{location}</span>
             </div>
             <div className="flex gap-2">
-              <Link to={profileLink} className="flex-1">
+              <Link href={profileLink} className="flex-1">
                 <Button variant="outline" size="sm" className="w-full rounded-xl font-bold">
                   View Profile
                 </Button>
@@ -231,7 +231,7 @@ export const DoctorCard = forwardRef<HTMLDivElement, DoctorCardProps>(({
             
             <div className="flex items-center gap-2 mt-2">
               <Button variant="outline" size="sm" className="rounded-xl font-bold" asChild>
-                <Link to={profileLink}>
+                <Link href={profileLink}>
                   Profile <ChevronRight className="h-4 w-4 ml-1" />
                 </Link>
               </Button>
@@ -260,7 +260,7 @@ export const DoctorCard = forwardRef<HTMLDivElement, DoctorCardProps>(({
   if (variant === "mini") {
     return (
       <Link 
-        to={profileLink}
+        href={profileLink}
         className="group flex items-center gap-3 p-3 bg-card rounded-xl border border-border hover:shadow-lg hover:border-primary/30 transition-all duration-300 min-w-[260px]"
       >
         <div className="relative shrink-0 bg-muted rounded-lg">
@@ -327,7 +327,7 @@ export const DoctorCard = forwardRef<HTMLDivElement, DoctorCardProps>(({
             <span className="font-medium">{location}</span>
           </div>
           <div className="flex gap-2">
-            <Link to={profileLink} className="flex-1">
+            <Link href={profileLink} className="flex-1">
               <Button variant="outline" size="sm" className="w-full rounded-xl font-bold">
                 View Profile
               </Button>

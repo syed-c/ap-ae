@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Star, MapPin, Briefcase, BadgeCheck, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -78,7 +78,7 @@ export const DentistProfileCard = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <Link to={dentistUrl}>
+                <Link href={dentistUrl}>
                   <h3 className="font-display text-lg font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
                     {name}
                   </h3>
@@ -116,7 +116,7 @@ export const DentistProfileCard = ({
               <Briefcase className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               {clinicUrl ? (
                 <Link 
-                  to={clinicUrl} 
+                  href={clinicUrl} 
                   className="text-foreground hover:text-primary transition-colors font-medium line-clamp-1"
                 >
                   {clinicName}
@@ -164,7 +164,7 @@ export const DentistProfileCard = ({
         {/* Actions */}
         <div className="flex gap-2 mt-5">
           <Button asChild className="flex-1 rounded-xl font-bold">
-            <Link to={dentistUrl}>
+            <Link href={dentistUrl}>
               View Profile
             </Link>
           </Button>
@@ -173,7 +173,7 @@ export const DentistProfileCard = ({
             className="rounded-xl font-bold"
             asChild
           >
-            <Link to={`${dentistUrl}#book`}>
+            <Link href={`${dentistUrl}#book`}>
               <Calendar className="h-4 w-4 mr-2" />
               Book
             </Link>

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { MapPin, Stethoscope, ArrowRight } from "lucide-react";
 import { 
   buildServiceLocationUrl, 
@@ -50,7 +50,7 @@ export function InterlinkingSection({
             {relatedServices.slice(0, 8).map((service) => (
               <Link
                 key={service.slug}
-                to={buildServiceLocationUrl(effectiveStateSlug, currentLocationSlug || citySlug, service.slug)}
+                href={buildServiceLocationUrl(effectiveStateSlug, currentLocationSlug || citySlug, service.slug)}
                 className="bg-card border border-border rounded-xl px-4 py-2 text-sm font-bold hover:border-primary hover:text-primary transition-all"
               >
                 {service.name} in {currentLocationName}
@@ -71,7 +71,7 @@ export function InterlinkingSection({
             {relatedLocations.slice(0, 8).map((location) => (
               <Link
                 key={location.slug}
-                to={buildCityUrl(location.stateSlug || location.parentSlug || effectiveStateSlug, location.slug)}
+                href={buildCityUrl(location.stateSlug || location.parentSlug || effectiveStateSlug, location.slug)}
                 className="bg-card border border-border rounded-xl px-4 py-2 text-sm font-bold hover:border-primary hover:text-primary transition-all"
               >
                 Dentist in {location.name}
@@ -96,7 +96,7 @@ export function InterlinkingSection({
             {relatedLocations.slice(0, 8).map((location) => (
               <Link
                 key={location.slug}
-                to={buildServiceLocationUrl(
+                href={buildServiceLocationUrl(
                   location.stateSlug || location.parentSlug || effectiveStateSlug,
                   location.slug,
                   currentServiceSlug || ""
@@ -121,7 +121,7 @@ export function InterlinkingSection({
             {relatedServices.slice(0, 8).map((service) => (
               <Link
                 key={service.slug}
-                to={buildServiceUrl(service.slug)}
+                href={buildServiceUrl(service.slug)}
                 className="bg-card border border-border rounded-xl px-4 py-2 text-sm font-bold hover:border-primary hover:text-primary transition-all"
               >
                 {service.name}
@@ -146,7 +146,7 @@ export function InterlinkingSection({
             {relatedServices.slice(0, 6).map((service) => (
               <Link
                 key={service.slug}
-                to={buildServiceLocationUrl(effectiveStateSlug, currentLocationSlug || citySlug, service.slug)}
+                href={buildServiceLocationUrl(effectiveStateSlug, currentLocationSlug || citySlug, service.slug)}
                 className="bg-card border border-border rounded-xl px-4 py-2 text-sm font-bold hover:border-primary hover:text-primary transition-all"
               >
                 {service.name} in {currentLocationName}
@@ -167,7 +167,7 @@ export function InterlinkingSection({
             {relatedLocations.slice(0, 6).map((location) => (
               <Link
                 key={location.slug}
-                to={buildServiceLocationUrl(
+                href={buildServiceLocationUrl(
                   location.stateSlug || location.parentSlug || effectiveStateSlug,
                   location.slug,
                   currentServiceSlug || ""
@@ -184,13 +184,13 @@ export function InterlinkingSection({
       {/* Parent Links */}
       <div className="flex flex-wrap gap-4 pt-4 border-t border-border">
         <Link
-          to={buildServiceUrl(currentServiceSlug || "")}
+          href={buildServiceUrl(currentServiceSlug || "")}
           className="text-sm font-bold text-primary hover:underline inline-flex items-center gap-1"
         >
           All {currentServiceName} Clinics <ArrowRight className="h-3 w-3" />
         </Link>
         <Link
-          to={buildCityUrl(effectiveStateSlug, currentLocationSlug || "")}
+          href={buildCityUrl(effectiveStateSlug, currentLocationSlug || "")}
           className="text-sm font-bold text-primary hover:underline inline-flex items-center gap-1"
         >
           All Dentists in {currentLocationName} <ArrowRight className="h-3 w-3" />
@@ -212,7 +212,7 @@ export function InterlinkingSection({
             {relatedServices.slice(0, 6).map((service) => (
               <Link
                 key={service.slug}
-                to={buildServiceUrl(service.slug)}
+                href={buildServiceUrl(service.slug)}
                 className="bg-card border border-border rounded-xl px-4 py-2 text-sm font-bold hover:border-primary hover:text-primary transition-all"
               >
                 {service.name}
@@ -230,7 +230,7 @@ export function InterlinkingSection({
             Location
           </h3>
           <Link
-            to={buildCityUrl(effectiveStateSlug, currentLocationSlug)}
+            href={buildCityUrl(effectiveStateSlug, currentLocationSlug)}
             className="bg-card border border-border rounded-xl px-4 py-2 text-sm font-bold hover:border-primary hover:text-primary transition-all inline-block"
           >
             View all Dentists in {currentLocationName}
@@ -246,7 +246,7 @@ export function InterlinkingSection({
             {nearbyDentists.slice(0, 4).map((dentist) => (
               <Link
                 key={dentist.slug}
-                to={buildDentistProfileUrl(dentist)}
+                href={buildDentistProfileUrl(dentist)}
                 className="bg-card border border-border rounded-xl px-4 py-2 text-sm font-bold hover:border-primary hover:text-primary transition-all"
               >
                 {dentist.name}

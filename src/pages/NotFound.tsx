@@ -1,16 +1,15 @@
 'use client';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Home, ArrowLeft, Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const NotFound = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+    console.error("404 Error: User attempted to access non-existent route:", router.pathname);
 
     // CRITICAL: Set noindex for 404 pages to prevent soft 404 issues in GSC
     let meta = document.querySelector('meta[name="robots"]');
@@ -25,7 +24,7 @@ const NotFound = () => {
     document.title = 'Page Not Found | AppointPanda';
 
     return;
-  }, [location.pathname, navigate]);
+  }, [router.pathname, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-background to-muted/30">
@@ -48,14 +47,14 @@ const NotFound = () => {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button asChild variant="default" className="gap-2">
-            <Link to="/">
+            <Link href="/">
               <Home className="h-4 w-4" />
               Go to Homepage
             </Link>
           </Button>
 
           <Button asChild variant="outline" className="gap-2">
-            <Link to="/search/">
+            <Link href="/search/">
               <Search className="h-4 w-4" />
               Find a Dentist
             </Link>
@@ -64,7 +63,7 @@ const NotFound = () => {
           <Button
             variant="ghost"
             className="gap-2"
-            onClick={() => navigate(-1)}
+            onClick={() => router.back()}
           >
             <ArrowLeft className="h-4 w-4" />
             Go Back
@@ -75,19 +74,19 @@ const NotFound = () => {
         <div className="mt-8 pt-6 border-t border-border/50">
           <p className="text-xs text-muted-foreground mb-3">Browse by Emirate:</p>
           <div className="flex flex-wrap justify-center gap-2">
-            <Link to="/dubai/" className="text-xs text-primary hover:underline">Dubai</Link>
+            <Link href="/dubai/" className="text-xs text-primary hover:underline">Dubai</Link>
             <span className="text-muted-foreground/30">•</span>
-            <Link to="/abu-dhabi/" className="text-xs text-primary hover:underline">Abu Dhabi</Link>
+            <Link href="/abu-dhabi/" className="text-xs text-primary hover:underline">Abu Dhabi</Link>
             <span className="text-muted-foreground/30">•</span>
-            <Link to="/sharjah/" className="text-xs text-primary hover:underline">Sharjah</Link>
+            <Link href="/sharjah/" className="text-xs text-primary hover:underline">Sharjah</Link>
             <span className="text-muted-foreground/30">•</span>
-            <Link to="/ajman/" className="text-xs text-primary hover:underline">Ajman</Link>
+            <Link href="/ajman/" className="text-xs text-primary hover:underline">Ajman</Link>
             <span className="text-muted-foreground/30">•</span>
-            <Link to="/ras-al-khaimah/" className="text-xs text-primary hover:underline">Ras Al Khaimah</Link>
+            <Link href="/ras-al-khaimah/" className="text-xs text-primary hover:underline">Ras Al Khaimah</Link>
             <span className="text-muted-foreground/30">•</span>
-            <Link to="/fujairah/" className="text-xs text-primary hover:underline">Fujairah</Link>
+            <Link href="/fujairah/" className="text-xs text-primary hover:underline">Fujairah</Link>
             <span className="text-muted-foreground/30">•</span>
-            <Link to="/umm-al-quwain/" className="text-xs text-primary hover:underline">Umm Al Quwain</Link>
+            <Link href="/umm-al-quwain/" className="text-xs text-primary hover:underline">Umm Al Quwain</Link>
           </div>
         </div>
       </div>

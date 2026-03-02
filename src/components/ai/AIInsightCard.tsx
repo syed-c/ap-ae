@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Sparkles, TrendingUp, DollarSign, Shield, MapPin, Stethoscope, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Insight {
@@ -211,7 +211,7 @@ export const AIInsightCard = ({
             Not sure what treatment fits your budget?
           </p>
           <Link
-            to={`/${stateSlug}/${citySlug}`}
+            href={`/${stateSlug}/${citySlug}`}
             className="text-sm font-bold text-primary hover:underline inline-flex items-center gap-1"
           >
             Try AI Search for personalized results

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { supabase } from '@/integrations/supabase/client';
 
 // Generate a unique session ID
 const generateSessionId = (): string => {
   const stored = sessionStorage.getItem('visitor_session_id');
   if (stored) return stored;
-  
+
   const newId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
   sessionStorage.setItem('visitor_session_id', newId);
   return newId;
@@ -40,7 +40,7 @@ const getPageType = (path: string): string => {
 // Extract IDs from path
 const extractPathData = (path: string) => {
   const parts = path.split('/').filter(Boolean);
-  
+
   if (path.startsWith('/clinic/') && parts[1]) {
     return { clinicSlug: parts[1] };
   }
@@ -54,7 +54,7 @@ const extractPathData = (path: string) => {
     return { stateSlug: parts[1] };
   }
   if (path.startsWith('/service/')) {
-    return { 
+    return {
       treatmentSlug: parts[1],
       citySlug: parts[2],
     };
@@ -63,7 +63,7 @@ const extractPathData = (path: string) => {
 };
 
 export function useVisitorTracking() {
-  const location = useLocation();
+  const router = useRouter();
   const sessionId = useRef<string>(generateSessionId());
   const pageStartTime = useRef<number>(Date.now());
   const scrollDepth = useRef<number>(0);
@@ -95,7 +95,7 @@ export function useVisitorTracking() {
       try {
         // Truncate referrer to max 500 chars to avoid validation errors
         const referrer = document.referrer ? document.referrer.substring(0, 500) : null;
-        
+
         await supabase.functions.invoke('track-visitor', {
           body: {
             type: 'session',
@@ -119,25 +119,25 @@ export function useVisitorTracking() {
   useEffect(() => {
     const trackPageView = async () => {
       // Don't track admin pages
-      if (location.pathname.startsWith('/admin')) return;
+      if (router.pathname.startsWith('/admin')) return;
 
       totalPageviews.current++;
       pageStartTime.current = Date.now();
       scrollDepth.current = 0;
 
-      const pageType = getPageType(location.pathname);
-      const pathData = extractPathData(location.pathname);
+      const pageType = getPageType(router.pathname);
+      const pathData = extractPathData(router.pathname);
 
       try {
         // Truncate values to avoid validation errors
         const referrer = document.referrer ? document.referrer.substring(0, 500) : null;
-        
+
         await supabase.functions.invoke('track-visitor', {
           body: {
             type: 'pageview',
             sessionId: sessionId.current,
             data: {
-              pagePath: location.pathname?.substring(0, 500),
+              pagePath: router.pathname?.substring(0, 500),
               pageTitle: document.title?.substring(0, 200),
               pageType,
               referrer,
@@ -161,16 +161,16 @@ export function useVisitorTracking() {
             type: 'pageview',
             sessionId: sessionId.current,
             data: {
-              pagePath: location.pathname,
+              pagePath: router.pathname,
               timeOnPage,
               scrollDepth: scrollDepth.current,
               exitPage: true,
             },
           },
-        }).catch(() => {});
+        }).catch(() => { });
       }
     };
-  }, [location.pathname]);
+  }, [router.pathname]);
 
   // Track events
   const trackEvent = useCallback(async (
@@ -179,7 +179,7 @@ export function useVisitorTracking() {
     metadata?: Record<string, any>
   ) => {
     totalEvents.current++;
-    
+
     try {
       await supabase.functions.invoke('track-visitor', {
         body: {
@@ -188,7 +188,7 @@ export function useVisitorTracking() {
           data: {
             eventType,
             eventCategory,
-            pagePath: location.pathname,
+            pagePath: router.pathname,
             metadata,
           },
         },
@@ -196,7 +196,7 @@ export function useVisitorTracking() {
     } catch (error) {
       console.error('Failed to track event:', error);
     }
-  }, [location.pathname]);
+  }, [router.pathname]);
 
   // Track journey step
   const trackJourneyStep = useCallback(async (
@@ -213,7 +213,7 @@ export function useVisitorTracking() {
           data: {
             stage,
             stepNumber,
-            pagePath: location.pathname,
+            pagePath: router.pathname,
             clinicId,
             dentistId,
           },
@@ -222,7 +222,7 @@ export function useVisitorTracking() {
     } catch (error) {
       console.error('Failed to track journey:', error);
     }
-  }, [location.pathname]);
+  }, [router.pathname]);
 
   // Link session to patient after booking
   const linkPatient = useCallback(async (
@@ -255,7 +255,7 @@ export function useVisitorTracking() {
           data: {
             stage: 'converted',
             stepNumber: 99,
-            pagePath: location.pathname,
+            pagePath: router.pathname,
             converted: true,
             appointmentId,
           },
@@ -264,7 +264,7 @@ export function useVisitorTracking() {
     } catch (error) {
       console.error('Failed to link patient:', error);
     }
-  }, [location.pathname]);
+  }, [router.pathname]);
 
   return {
     sessionId: sessionId.current,
