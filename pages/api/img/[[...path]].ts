@@ -14,18 +14,15 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         path: targetPath,
         method: 'GET', // Images are always GET
         headers: {
-            ...req.headers,
-            host: targetHost,
+            'host': targetHost,
+            'accept': req.headers['accept'] as string,
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
         },
         rejectUnauthorized: false,
         servername: targetHost,
     };
 
-    delete options.headers?.['x-vercel-id'];
-    delete options.headers?.['x-vercel-forwarded-for'];
-    delete options.headers?.['x-forwarded-for'];
-    delete options.headers?.['connection'];
+    if (!options.headers?.['accept']) delete options.headers['accept'];
 
     const proxy = https.request(options, (targetRes) => {
         res.status(targetRes.statusCode || 200);

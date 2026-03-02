@@ -14,14 +14,23 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         path: targetPath,
         method: req.method,
         headers: {
-            ...req.headers,
-            host: targetHost,
-            // Performance: Use a modern browser user-agent
+            // ONLY forward essential Supabase headers
+            'apikey': req.headers['apikey'] as string,
+            'authorization': req.headers['authorization'] as string,
+            'content-type': req.headers['content-type'] as string,
+            'accept': req.headers['accept'] as string,
+            'x-client-info': req.headers['x-client-info'] as string,
+            'host': targetHost,
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
         },
         rejectUnauthorized: false,
-        servername: targetHost, // CRITICAL for SNI to work with Cloudflare
+        servername: targetHost,
     };
+
+    // Remove undefined headers if they weren't in the original request
+    Object.keys(options.headers || {}).forEach(key => {
+        if (!options.headers?.[key]) delete options.headers[key];
+    });
 
     // Remove headers that can conflict or cause infinite loops
     delete options.headers?.['x-vercel-id'];
