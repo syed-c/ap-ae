@@ -54,3 +54,7 @@ coverage/
 # Emergent platform files
 .emergent/
 .gitconfig
+-e 
+# Environment files
+*.env
+*.env.*

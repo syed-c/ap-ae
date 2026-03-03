@@ -97,7 +97,13 @@ export default function RankingRulesTab() {
       
       if (data?.value) {
         const config = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
-        if (config.factors) setFactors(config.factors);
+        // Merge saved config with default icons (icons can't be serialized to JSON)
+        if (config.factors) {
+          setFactors(config.factors.map((f: any) => {
+            const defaultFactor = defaultFactors.find(df => df.key === f.key);
+            return { ...f, icon: defaultFactor?.icon || Settings };
+          }));
+        }
         if (config.boosts) setBoosts(config.boosts);
         if (config.penalties) setPenalties(config.penalties);
       }
