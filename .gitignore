@@ -1,18 +1,56 @@
-# Next.js
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Next.js build
 .next/
 out/
+build/
+dist/
 
-# Node
-node_modules/
-
-# Env
+# Env files (sensitive)
 .env
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
 
 # Logs
 npm-debug.log*
 yarn-debug.log*
+yarn-error.log*
 pnpm-debug.log*
+*.log
 
-# OS
+# OS files
 .DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# TypeScript cache
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Large data files
+*.csv
+*.csv.gz
+public/temp/
+data/
+
+# Supabase local
+.supabase/
+
+# Misc
+.vercel
+coverage/
+
+# Emergent platform files
+.emergent/
+.gitconfig
