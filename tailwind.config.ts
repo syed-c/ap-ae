@@ -19,8 +19,8 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ['"DM Sans"', '"Plus Jakarta Sans"', "system-ui", "sans-serif"],
-        display: ['"Quicksand"', '"DM Sans"', "system-ui", "sans-serif"],
+        sans: ['"Plus Jakarta Sans"', '"Nunito"', "system-ui", "sans-serif"],
+        display: ['"Nunito"', '"Plus Jakarta Sans"', "system-ui", "sans-serif"],
       },
       fontWeight: {
         normal: "400",

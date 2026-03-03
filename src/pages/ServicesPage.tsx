@@ -77,7 +77,7 @@ const ServicesPage = () => {
               Verified Specialists
             </Badge>
             
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4" style={{ fontFamily: "'Varela Round', system-ui, sans-serif" }}>
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4" style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif" }}>
               <span className="text-white">Dental</span>
               <span className="block text-primary">Services</span>
             </h1>

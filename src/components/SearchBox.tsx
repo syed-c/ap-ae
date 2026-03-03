@@ -63,7 +63,7 @@ function levenshtein(a: string, b: string): number {
   return dp[m][n];
 }
 
-const headingFont = "'Varela Round', 'Quicksand', system-ui, sans-serif";
+const headingFont = "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif";
 
 function SmartSearchInput({
   placeholder,

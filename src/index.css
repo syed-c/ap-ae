@@ -200,14 +200,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'DM Sans', 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Nunito', system-ui, sans-serif;
     font-weight: 400;
     overflow-x: hidden;
     letter-spacing: -0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Quicksand', 'DM Sans', system-ui, sans-serif;
+    font-family: 'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif;
     @apply tracking-tight font-bold;
   }
 
@@ -220,39 +220,39 @@
   /* ========================================
      TYPOGRAPHY SYSTEM
      Nunito for headings (round, friendly, professional)
-     DM Sans for body (clean, readable)
+     Plus Jakarta Sans for body (clean, readable)
      ======================================== */
   
   .text-hero {
-    font-family: 'Quicksand', system-ui, sans-serif;
+    font-family: 'Nunito', system-ui, sans-serif;
     @apply font-bold tracking-tight leading-tight;
   }
 
   .text-section {
-    font-family: 'Quicksand', system-ui, sans-serif;
+    font-family: 'Nunito', system-ui, sans-serif;
     @apply font-bold tracking-tight;
   }
 
   .text-micro {
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-size: 11px;
     @apply uppercase font-semibold tracking-wider text-muted-foreground;
   }
 
   .text-interface {
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-size: 12px;
     letter-spacing: 0.08em;
     @apply uppercase font-bold;
   }
 
   .text-data {
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     @apply font-bold tabular-nums;
   }
 
   .text-body {
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     @apply font-normal leading-relaxed;
   }
 
@@ -388,12 +388,12 @@
 
   .hero-display {
     @apply text-7xl font-bold text-primary;
-    font-family: 'Quicksand', system-ui, sans-serif;
+    font-family: 'Nunito', system-ui, sans-serif;
   }
 
   .hero-display-sm {
     @apply text-5xl font-bold text-primary;
-    font-family: 'Quicksand', system-ui, sans-serif;
+    font-family: 'Nunito', system-ui, sans-serif;
   }
 
   .glow-container {
@@ -582,7 +582,7 @@
 
 @layer utilities {
   .font-display {
-    font-family: 'Nunito', 'DM Sans', system-ui, sans-serif;
+    font-family: 'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 
   .bg-dark-section {
@@ -803,7 +803,7 @@
 
 .blog-content h1 {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 800;
   margin-top: 2rem;
   margin-bottom: 1rem;
   color: hsl(var(--foreground));
@@ -813,7 +813,7 @@
 
 .blog-content h2 {
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 800;
   margin-top: 2rem;
   margin-bottom: 0.75rem;
   color: hsl(var(--foreground));
@@ -825,7 +825,7 @@
 
 .blog-content h3 {
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
   color: hsl(var(--foreground));
@@ -1115,8 +1115,8 @@
 .will-transform { will-change: transform; }
 .will-opacity { will-change: opacity; }
 
-.font-loading-fallback { font-family: 'DM Sans Fallback', system-ui, -apple-system, sans-serif; }
-.font-loaded { font-family: 'DM Sans', system-ui, -apple-system, sans-serif; }
+.font-loading-fallback { font-family: 'Plus Jakarta Sans Fallback', system-ui, -apple-system, sans-serif; }
+.font-loaded { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

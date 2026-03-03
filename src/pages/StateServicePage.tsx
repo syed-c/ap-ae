@@ -194,7 +194,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 px-2"
-              style={{ fontFamily: "'Varela Round', system-ui, sans-serif" }}
+              style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif" }}
             >
               <span className="text-white">{treatmentName} in </span>
               <span className="text-primary">{stateName}</span>

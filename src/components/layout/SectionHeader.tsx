@@ -33,7 +33,7 @@ export const SectionHeader = ({
       <h2 className={cn(
         "font-display text-3xl md:text-4xl lg:text-5xl font-black mt-2",
         dark && "text-dark-section-foreground"
-      )} style={{ fontFamily: "'Quicksand', sans-serif" }}>
+      )} style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', sans-serif" }}>
         {title} {highlight && <span className="text-primary">{highlight}</span>}
       </h2>
       {description && (

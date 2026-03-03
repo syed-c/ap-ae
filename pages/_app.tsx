@@ -8,6 +8,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { MetaTagInjector } from '@/components/analytics/MetaTagInjector';
+import Head from 'next/head';
 
 // Lazy-load non-critical components — keeps initial JS bundle lean
 const AnalyticsProvider = dynamic(

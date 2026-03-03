@@ -325,7 +325,7 @@ const StatePage = () => {
               <span className="text-sm font-bold text-primary">Licensed Dental Professionals</span>
             </div>
 
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 px-2" style={{ fontFamily: "'Varela Round', system-ui, sans-serif" }}>
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 px-2" style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif" }}>
               {pageH1.includes(stateName) ? (
                 <>
                   <span className="text-white">{pageH1.split(stateName)[0]}</span>

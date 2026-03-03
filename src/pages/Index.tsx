@@ -54,18 +54,49 @@ const benefits = [
 ];
 
 const popularAreas = [
+  // Dubai Areas
   { name: "Jumeirah", emirate: "Dubai", slug: "dubai/jumeirah" },
-  { name: "Marina", emirate: "Dubai", slug: "dubai/marina" },
-  { name: "Downtown", emirate: "Dubai", slug: "dubai/downtown" },
+  { name: "Dubai Marina", emirate: "Dubai", slug: "dubai/marina" },
+  { name: "Downtown Dubai", emirate: "Dubai", slug: "dubai/downtown" },
   { name: "Deira", emirate: "Dubai", slug: "dubai/deira" },
   { name: "Al Barsha", emirate: "Dubai", slug: "dubai/al-barsha" },
   { name: "Business Bay", emirate: "Dubai", slug: "dubai/business-bay" },
   { name: "JLT", emirate: "Dubai", slug: "dubai/jlt" },
-  { name: "Khalidiyah", emirate: "Abu Dhabi", slug: "abu-dhabi/khalidiyah" },
-  { name: "Al Nahda", emirate: "Sharjah", slug: "sharjah/al-nahda" },
   { name: "Mirdif", emirate: "Dubai", slug: "dubai/mirdif" },
   { name: "DIFC", emirate: "Dubai", slug: "dubai/difc" },
   { name: "Karama", emirate: "Dubai", slug: "dubai/karama" },
+  { name: "Bur Dubai", emirate: "Dubai", slug: "dubai/bur-dubai" },
+  { name: "JBR", emirate: "Dubai", slug: "dubai/jbr" },
+  { name: "Palm Jumeirah", emirate: "Dubai", slug: "dubai/palm-jumeirah" },
+  { name: "Dubai Silicon Oasis", emirate: "Dubai", slug: "dubai/silicon-oasis" },
+  { name: "Al Qusais", emirate: "Dubai", slug: "dubai/al-qusais" },
+  { name: "International City", emirate: "Dubai", slug: "dubai/international-city" },
+  { name: "Jumeirah Village Circle", emirate: "Dubai", slug: "dubai/jvc" },
+  { name: "Al Nahda Dubai", emirate: "Dubai", slug: "dubai/al-nahda" },
+  { name: "Dubai Healthcare City", emirate: "Dubai", slug: "dubai/dhcc" },
+  { name: "Motor City", emirate: "Dubai", slug: "dubai/motor-city" },
+  // Abu Dhabi Areas
+  { name: "Khalidiyah", emirate: "Abu Dhabi", slug: "abu-dhabi/khalidiyah" },
+  { name: "Al Reem Island", emirate: "Abu Dhabi", slug: "abu-dhabi/reem-island" },
+  { name: "Corniche Abu Dhabi", emirate: "Abu Dhabi", slug: "abu-dhabi/corniche" },
+  { name: "Yas Island", emirate: "Abu Dhabi", slug: "abu-dhabi/yas-island" },
+  { name: "Mussafah", emirate: "Abu Dhabi", slug: "abu-dhabi/mussafah" },
+  { name: "Al Ain", emirate: "Abu Dhabi", slug: "abu-dhabi/al-ain" },
+  // Sharjah Areas
+  { name: "Al Nahda Sharjah", emirate: "Sharjah", slug: "sharjah/al-nahda" },
+  { name: "Al Majaz", emirate: "Sharjah", slug: "sharjah/al-majaz" },
+  { name: "Al Qasimia", emirate: "Sharjah", slug: "sharjah/al-qasimia" },
+  { name: "Muwaileh", emirate: "Sharjah", slug: "sharjah/muwaileh" },
+  // Ajman
+  { name: "Ajman Downtown", emirate: "Ajman", slug: "ajman/downtown" },
+  { name: "Al Nuaimiya", emirate: "Ajman", slug: "ajman/al-nuaimiya" },
+  // Ras Al Khaimah
+  { name: "RAK City", emirate: "Ras Al Khaimah", slug: "ras-al-khaimah/rak-city" },
+  { name: "Al Nakheel RAK", emirate: "Ras Al Khaimah", slug: "ras-al-khaimah/al-nakheel" },
+  // Fujairah
+  { name: "Fujairah City", emirate: "Fujairah", slug: "fujairah/fujairah-city" },
+  // Umm Al Quwain
+  { name: "UAQ City Center", emirate: "Umm Al Quwain", slug: "umm-al-quwain/city-center" },
 ];
 
 const uaeFaqs = [
@@ -104,7 +135,7 @@ const defaultEmirateImages: Record<string, string> = {
 function EmirateCard({ state, index }: { state: any; index: number }) {
   const imageUrl = defaultEmirateImages[state.slug];
   const isFirst = index < ACTIVE_STATES.length;
-  const headingFont = "'Varela Round', 'Quicksand', system-ui, sans-serif";
+  const headingFont = "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif";
 
   return (
     <Link
@@ -212,7 +243,7 @@ const Index = () => {
     type: p.type,
   })) || [];
 
-  const headingFont = "'Varela Round', 'Quicksand', system-ui, sans-serif";
+  const headingFont = "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif";
 
   return (
     <div className="min-h-screen bg-background">
@@ -422,27 +453,102 @@ const Index = () => {
               Popular <span className="text-primary">Areas</span>
             </h2>
             <p className="text-muted-foreground mt-2 max-w-lg mx-auto">
-              Browse dentists in top neighborhoods across Dubai, Abu Dhabi & Sharjah.
+              Browse dentists in top neighborhoods across all 7 Emirates.
             </p>
           </motion.div>
+          
+          {/* Dubai Areas */}
           <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="show"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex flex-wrap justify-center gap-x-2 gap-y-2 max-w-4xl mx-auto"
+            className="mb-6"
           >
-            {popularAreas.map((area, i) => (
-              <motion.span key={area.slug} variants={staggerItem} className="inline-flex items-center">
-                <Link
-                  href={`/${area.slug}/`}
-                  className="text-primary hover:text-primary/80 font-semibold hover:underline transition-colors text-sm md:text-base"
-                >
-                  {area.name}
-                </Link>
-                {i < popularAreas.length - 1 && <span className="text-muted-foreground ml-2">·</span>}
-              </motion.span>
-            ))}
+            <h3 className="text-lg font-bold text-primary mb-3 text-center" style={{ fontFamily: headingFont }}>Dubai</h3>
+            <div className="flex flex-wrap justify-center gap-x-2 gap-y-2 max-w-5xl mx-auto">
+              {popularAreas.filter(a => a.emirate === "Dubai").map((area, i, arr) => (
+                <span key={area.slug} className="inline-flex items-center">
+                  <Link
+                    href={`/${area.slug}/`}
+                    className="text-foreground hover:text-primary font-semibold hover:underline transition-colors text-sm md:text-base"
+                  >
+                    {area.name}
+                  </Link>
+                  {i < arr.length - 1 && <span className="text-muted-foreground/50 ml-2">·</span>}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Abu Dhabi Areas */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="mb-6"
+          >
+            <h3 className="text-lg font-bold text-primary mb-3 text-center" style={{ fontFamily: headingFont }}>Abu Dhabi</h3>
+            <div className="flex flex-wrap justify-center gap-x-2 gap-y-2 max-w-4xl mx-auto">
+              {popularAreas.filter(a => a.emirate === "Abu Dhabi").map((area, i, arr) => (
+                <span key={area.slug} className="inline-flex items-center">
+                  <Link
+                    href={`/${area.slug}/`}
+                    className="text-foreground hover:text-primary font-semibold hover:underline transition-colors text-sm md:text-base"
+                  >
+                    {area.name}
+                  </Link>
+                  {i < arr.length - 1 && <span className="text-muted-foreground/50 ml-2">·</span>}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Sharjah Areas */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.15 }}
+            className="mb-6"
+          >
+            <h3 className="text-lg font-bold text-primary mb-3 text-center" style={{ fontFamily: headingFont }}>Sharjah</h3>
+            <div className="flex flex-wrap justify-center gap-x-2 gap-y-2 max-w-4xl mx-auto">
+              {popularAreas.filter(a => a.emirate === "Sharjah").map((area, i, arr) => (
+                <span key={area.slug} className="inline-flex items-center">
+                  <Link
+                    href={`/${area.slug}/`}
+                    className="text-foreground hover:text-primary font-semibold hover:underline transition-colors text-sm md:text-base"
+                  >
+                    {area.name}
+                  </Link>
+                  {i < arr.length - 1 && <span className="text-muted-foreground/50 ml-2">·</span>}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Other Emirates */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <h3 className="text-lg font-bold text-primary mb-3 text-center" style={{ fontFamily: headingFont }}>Other Emirates</h3>
+            <div className="flex flex-wrap justify-center gap-x-2 gap-y-2 max-w-4xl mx-auto">
+              {popularAreas.filter(a => !["Dubai", "Abu Dhabi", "Sharjah"].includes(a.emirate)).map((area, i, arr) => (
+                <span key={area.slug} className="inline-flex items-center">
+                  <Link
+                    href={`/${area.slug}/`}
+                    className="text-foreground hover:text-primary font-semibold hover:underline transition-colors text-sm md:text-base"
+                  >
+                    {area.name}
+                  </Link>
+                  {i < arr.length - 1 && <span className="text-muted-foreground/50 ml-2">·</span>}
+                </span>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>

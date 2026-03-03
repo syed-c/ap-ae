@@ -37,11 +37,11 @@ class MyDocument extends Document {
           <link
             rel="preload"
             as="style"
-            href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Varela+Round&family=Quicksand:wght@400;500;600;700&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
           />
           <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Varela+Round&family=Quicksand:wght@400;500;600;700&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
             media="print"
             // @ts-ignore
             onLoad="this.media='all'"
@@ -49,7 +49,7 @@ class MyDocument extends Document {
           <noscript>
             <link
               rel="stylesheet"
-              href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Varela+Round&family=Quicksand:wght@400;500;600;700&display=swap"
+              href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
             />
           </noscript>
 
