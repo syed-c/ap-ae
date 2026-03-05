@@ -66,6 +66,7 @@ serve(async (req) => {
       state: string;
       cities_count: number;
       services_count: number;
+      state_page_created: boolean;
       city_pages_created: number;
       service_location_pages_created: number;
       errors: string[];
@@ -74,10 +75,38 @@ serve(async (req) => {
       state: state.name,
       cities_count: cities?.length || 0,
       services_count: treatments?.length || 0,
+      state_page_created: false,
       city_pages_created: 0,
       service_location_pages_created: 0,
       errors: [],
     };
+
+    // First, create the STATE SEO page if it doesn't exist
+    try {
+      const { error: statePageError } = await supabaseAdmin
+        .from("seo_pages")
+        .upsert({
+          slug: state.slug,
+          page_type: "state",
+          title: `Dentists in ${state.name}`,
+          meta_title: `Find Dentists in ${state.name}, UAE | AppointPanda`,
+          meta_description: `Discover top-rated dentists across ${state.name}. Browse ${cities?.length || 0}+ areas, compare reviews, and book appointments online with AppointPanda.`,
+          h1: `Dentists in ${state.name}`,
+          canonical_url: `/${state.slug}`,
+          is_indexed: true,
+          is_thin_content: true,
+          needs_optimization: true,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "slug" });
+
+      if (statePageError) {
+        results.errors.push(`State page: ${statePageError.message}`);
+      } else {
+        results.state_page_created = true;
+      }
+    } catch (e) {
+      results.errors.push(`State page: ${e instanceof Error ? e.message : "Unknown error"}`);
+    }
 
     // Create city SEO pages
     for (const city of cities || []) {
@@ -163,7 +192,7 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         results,
-        message: `Created ${results.city_pages_created} city pages and ${results.service_location_pages_created} service+location pages for ${state.name}`,
+        message: `Created ${results.state_page_created ? '1 state page, ' : ''}${results.city_pages_created} city pages and ${results.service_location_pages_created} service+location pages for ${state.name}`,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

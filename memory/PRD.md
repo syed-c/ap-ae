@@ -42,26 +42,26 @@ Comprehensive audit and enhancement of a Next.js and Supabase-based dental clini
 - [x] High-level architecture audit
 - [x] Identified root cause of admin tab errors (missing Supabase secrets)
 - [x] **UI/UX Font Changes**: Updated fonts from `DM Sans/Quicksand` to `Nunito/Plus Jakarta Sans` (round, bold, modern style)
-  - Updated: `/app/tailwind.config.ts`
-  - Updated: `/app/src/index.css`
-  - Updated: `/app/pages/_document.tsx` (Google Fonts)
-  - Updated: All page components with hardcoded font references
 - [x] **Popular Areas Section**: Expanded from 12 to 36+ areas across all 7 Emirates
-  - Dubai: 20 areas (Jumeirah, Marina, Downtown, DIFC, JBR, Palm Jumeirah, etc.)
-  - Abu Dhabi: 6 areas (Khalidiyah, Reem Island, Corniche, Yas Island, etc.)
-  - Sharjah: 4 areas (Al Nahda, Al Majaz, Al Qasimia, Muwaileh)
-  - Other Emirates: Ajman, RAK, Fujairah, UAQ
-  - Areas now grouped by emirate for better navigation
 - [x] **GitHub Push Fix**: Removed large CSV files from git history (reduced .git from 29MB to 5MB)
 - [x] **Fixed Ranking Rules Tab**: Resolved "Element type is invalid" error by fixing icon serialization when loading from database
 - [x] **FAQ Studio**: Verified working - UI loads correctly with page selection and generation settings
 - [x] **Content Studio**: Verified working - UI loads correctly with state setup and page selection engine
+- [x] **Schema Fixes for Search Console**:
+  - Fixed "reviewCount must be positive" error: AggregateRating only included when reviewCount > 0
+  - Fixed "unnamed item" error in ItemList: Each ListItem now has proper `item` property with `@type`
+  - Updated both `StructuredData.tsx` and `SyncStructuredData.tsx`
+- [x] **Content Studio Enhancements**:
+  - State Setup now also creates the state page itself (not just city/service pages)
+  - Added "Setup Static Pages" button to create SEO entries for About, Contact, FAQ, Privacy, etc.
+  - Created `setup-static-seo-pages` edge function for static page management
 
 ### 🟠 P1 - High Priority (Next)
+- [ ] Deploy updated edge functions to Supabase (setup-state-seo-pages, setup-static-seo-pages)
+- [ ] Run State Setup for all Emirates to create missing state pages
+- [ ] Run Static Pages Setup to create SEO entries
 - [ ] Implement appointment reminder system (24hr and 1hr before)
 - [ ] Test email notifications (booking confirmations, dentist alerts)
-- [ ] End-to-end test of FAQ generation with actual AI call
-- [ ] End-to-end test of Content generation with actual AI call
 
 ### 🟡 P2 - Medium Priority
 - [ ] End-to-end flow testing (Admin, Dentist, Patient perspectives)

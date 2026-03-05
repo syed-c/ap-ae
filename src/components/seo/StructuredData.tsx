@@ -152,48 +152,59 @@ const generateOrganizationSchema = (settings?: {
   return schema;
 };
 
-const generateLocalBusinessSchema = (props: LocalBusinessSchemaProps) => ({
-  '@context': 'https://schema.org',
-  '@type': ['Dentist', 'LocalBusiness'],
-  name: props.name,
-  description: props.description,
-  url: `${BASE_URL}${withTrailingSlash(props.url)}`,
-  image: props.image,
-  telephone: props.phone,
-  email: props.email,
-  priceRange: props.priceRange || '$$',
-  address: props.address
-    ? {
+const generateLocalBusinessSchema = (props: LocalBusinessSchemaProps) => {
+  const schema: Record<string, any> = {
+    '@context': 'https://schema.org',
+    '@type': ['Dentist', 'LocalBusiness'],
+    name: props.name,
+    description: props.description,
+    url: `${BASE_URL}${withTrailingSlash(props.url)}`,
+    image: props.image,
+    telephone: props.phone,
+    email: props.email,
+    priceRange: props.priceRange || '$$',
+  };
+
+  if (props.address) {
+    schema.address = {
       '@type': 'PostalAddress',
       streetAddress: props.address,
       addressLocality: props.city,
       addressCountry: props.country || 'AE',
-    }
-    : undefined,
-  geo: props.geo
-    ? {
+    };
+  }
+
+  if (props.geo) {
+    schema.geo = {
       '@type': 'GeoCoordinates',
       latitude: props.geo.lat,
       longitude: props.geo.lng,
-    }
-    : undefined,
-  aggregateRating:
-    props.rating
-      ? {
-        '@type': 'AggregateRating',
-        ratingValue: props.rating,
-        reviewCount: props.reviewCount || 0,
-        bestRating: 5,
-        worstRating: 1,
-      }
-      : undefined,
-  openingHoursSpecification: props.openingHours?.map((h) => ({
-    '@type': 'OpeningHoursSpecification',
-    dayOfWeek: h.day,
-    opens: h.open,
-    closes: h.close,
-  })),
-});
+    };
+  }
+
+  // Only include aggregateRating if both rating AND reviewCount are positive
+  // Google Search Console requires reviewCount to be positive when aggregateRating is present
+  if (props.rating && props.rating > 0 && props.reviewCount && props.reviewCount > 0) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: props.rating,
+      reviewCount: props.reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    };
+  }
+
+  if (props.openingHours && props.openingHours.length > 0) {
+    schema.openingHoursSpecification = props.openingHours.map((h) => ({
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: h.day,
+      opens: h.open,
+      closes: h.close,
+    }));
+  }
+
+  return schema;
+};
 
 const generatePersonSchema = (props: PersonSchemaProps) => ({
   '@context': 'https://schema.org',

@@ -747,6 +747,23 @@ export default function ContentGenerationStudioTab() {
     },
   });
 
+  // Static pages setup mutation
+  const setupStaticPagesMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('setup-static-seo-pages');
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || 'Static SEO pages created successfully!');
+      queryClient.invalidateQueries({ queryKey: ['content-studio-pages'] });
+      refetchPages();
+    },
+    onError: (err) => {
+      toast.error(`Setup failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    },
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -776,7 +793,7 @@ export default function ContentGenerationStudioTab() {
             Quick Actions: State Setup
           </CardTitle>
           <CardDescription>
-            Create all city + service pages for a state with one click
+            Create all city + service pages for a state with one click (also creates the state page)
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -803,9 +820,35 @@ export default function ContentGenerationStudioTab() {
             ))}
           </div>
           <p className="text-xs text-muted-foreground mt-3">
-            Each state setup creates city pages + service+city pages for all services.
+            Each state setup creates the state page + city pages + service+city pages for all services.
             After setup, select pages above and generate content.
           </p>
+          
+          {/* Static Pages Setup */}
+          <div className="mt-4 pt-4 border-t border-border/50">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  if (confirm('Create SEO entries for all static pages (About, Contact, FAQ, Privacy, etc.)? This will create ~15 pages.')) {
+                    setupStaticPagesMutation.mutate();
+                  }
+                }}
+                disabled={setupStaticPagesMutation.isPending}
+              >
+                {setupStaticPagesMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                ) : (
+                  <FileText className="h-4 w-4 mr-1" />
+                )}
+                Setup Static Pages
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                Creates SEO entries for About, Contact, FAQ, Privacy, Terms, How It Works, etc.
+              </span>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

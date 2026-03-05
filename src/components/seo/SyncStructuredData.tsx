@@ -192,7 +192,7 @@ const generateLocalBusinessSchema = (data: LocalBusinessSchemaData) => ({
       longitude: data.geo.lng,
     },
   }),
-  ...(data.rating && data.reviewCount && {
+  ...(data.rating && data.reviewCount && data.reviewCount > 0 && {
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: data.rating,
@@ -336,10 +336,13 @@ const generateItemListSchema = (data: ItemListSchemaData) => ({
   itemListElement: data.items.map((item, index) => ({
     '@type': 'ListItem',
     position: item.position || index + 1,
-    name: item.name,
-    url: item.url.startsWith('http') ? item.url : `${BASE_URL}${withTrailingSlash(item.url)}`,
-    ...(item.image && { image: item.image }),
-    ...(item.description && { description: item.description }),
+    item: {
+      '@type': 'Thing',
+      name: item.name,
+      url: item.url.startsWith('http') ? item.url : `${BASE_URL}${withTrailingSlash(item.url)}`,
+      ...(item.image && { image: item.image }),
+      ...(item.description && { description: item.description }),
+    },
   })),
 });
 
