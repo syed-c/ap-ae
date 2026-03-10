@@ -376,13 +376,12 @@ const BlogPostPage = () => {
       }
 
       if (b.type === "heading") {
-        const HTag = (b.headingLevel || "h2") as "h1" | "h2" | "h3";
+        // Never use h1 for content headings - only h2 and h3 (main title is already h1)
+        const HTag = (b.headingLevel === "h3" ? "h3" : "h2") as "h2" | "h3";
         const headingClass =
-          HTag === "h1"
-            ? "text-3xl font-bold mt-8 mb-4"
-            : HTag === "h3"
-              ? "text-xl font-bold mt-6 mb-3"
-              : "text-2xl font-bold mt-8 mb-4";
+          HTag === "h3"
+            ? "text-xl font-bold mt-6 mb-3"
+            : "text-2xl font-bold mt-8 mb-4";
 
         return (
           <div key={b.id || `heading-${i}`}>
@@ -407,10 +406,12 @@ const BlogPostPage = () => {
 
     // If content contains HTML tags (and no special markers), render as HTML directly
     if (isHtmlContent(content)) {
+      // Replace all H1 tags with H2 tags to avoid duplicate H1s (main title is already H1)
+      const contentWithoutH1 = content.replace(/<h1(\s[^>]*)?>/gi, '<h2$1>').replace(/<\/h1>/gi, '</h2>');
       return (
         <div
           className="blog-content"
-          dangerouslySetInnerHTML={{ __html: content }}
+          dangerouslySetInnerHTML={{ __html: contentWithoutH1 }}
         />
       );
     }
