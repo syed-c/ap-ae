@@ -235,7 +235,7 @@ const BlogPostPage = () => {
       .split('\n')
       .map((line, i) => {
         if (line.startsWith('# ')) {
-          return <h1 key={i} className="text-3xl font-bold mt-8 mb-4">{renderInlineContent(line.slice(2))}</h1>;
+          return <h2 key={i} className="text-3xl font-bold mt-8 mb-4">{renderInlineContent(line.slice(2))}</h2>;
         } else if (line.startsWith('## ')) {
           return <h2 key={i} className="text-2xl font-bold mt-8 mb-4">{renderInlineContent(line.slice(3))}</h2>;
         } else if (line.startsWith('### ')) {

@@ -108,7 +108,7 @@ const BlogPage = () => {
             </h1>
 
             <p className="text-lg text-dark-section-foreground/70 max-w-xl mx-auto mb-8">
-              Expert advice, dental tips, and the latest news from top dental professionals across the United States.
+              Expert advice, dental tips, and the latest news from top dental professionals across the UAE.
             </p>
 
             <div className="flex flex-wrap justify-center gap-4 text-sm">
@@ -163,9 +163,6 @@ const BlogPage = () => {
                     <h3 className={`font-display font-bold text-white group-hover:text-primary transition-colors ${i === 0 ? "text-2xl md:text-3xl" : "text-lg"}`}>
                       {post.title}
                     </h3>
-                    {i === 0 && post.excerpt && (
-                      <p className="text-white/70 mt-2 line-clamp-2">{post.excerpt}</p>
-                    )}
                     <div className="flex items-center gap-4 mt-3 text-sm text-white/60">
                       {post.author_name && (
                         <span className="flex items-center gap-1">
@@ -265,11 +262,6 @@ const BlogPage = () => {
                       <h3 className="font-display text-lg font-bold group-hover:text-primary transition-colors line-clamp-2">
                         {post.title}
                       </h3>
-                      {post.excerpt && (
-                        <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                          {post.excerpt}
-                        </p>
-                      )}
                       <div className="flex items-center gap-2 mt-4 text-sm font-bold text-primary">
                         Read More
                         <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -386,7 +378,7 @@ const BlogPage = () => {
             Ready to Find Your Dentist?
           </h2>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
-            Browse our directory of verified dental professionals across the United States.
+            Browse our directory of verified dental professionals across the UAE.
           </p>
           <Button asChild size="lg" variant="secondary" className="rounded-2xl font-bold">
             <Link href="/search">
