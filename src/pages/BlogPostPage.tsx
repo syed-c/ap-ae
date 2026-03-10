@@ -506,25 +506,11 @@ const BlogPostPage = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="p-3 bg-muted/30 border-t border-border">
-                  <p className="text-xs text-muted-foreground text-center">
-                    Featured image for: {post.title}
-                  </p>
-                </div>
               </div>
             )}
 
             {/* Content Card */}
             <div className="card-modern p-6 md:p-8">
-              {/* Excerpt/Summary */}
-              {post.excerpt && (
-                <div className="bg-primary/5 border-l-4 border-primary rounded-r-xl p-4 mb-8">
-                  <p className="text-lg text-muted-foreground italic leading-relaxed">
-                    {post.excerpt}
-                  </p>
-                </div>
-              )}
-
               {/* Main Content */}
               <div className="prose prose-lg max-w-none text-foreground blog-content">
                 {post.content ? (

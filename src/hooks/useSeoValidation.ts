@@ -250,10 +250,12 @@ export function generateLocalBusinessSchema(clinic: {
       addressCountry: 'US',
     } : undefined,
     telephone: clinic.phone,
-    aggregateRating: clinic.rating ? {
+    aggregateRating: (clinic.rating && clinic.reviewCount && clinic.reviewCount > 0) ? {
       '@type': 'AggregateRating',
       ratingValue: clinic.rating,
-      reviewCount: clinic.reviewCount || 0,
+      reviewCount: clinic.reviewCount,
+      bestRating: 5,
+      worstRating: 1,
     } : undefined,
   };
 }

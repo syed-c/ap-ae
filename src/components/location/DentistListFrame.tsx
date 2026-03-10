@@ -150,9 +150,9 @@ export const DentistListFrame = ({
               <h4 itemProp="name">{profile.name}</h4>
               {profile.location && <p itemProp="address">{profile.location}</p>}
               {profile.specialty && <p itemProp="medicalSpecialty">{profile.specialty}</p>}
-              {profile.rating && <span itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+              {profile.rating && profile.review_count && profile.review_count > 0 && <span itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
                 <meta itemProp="ratingValue" content={String(profile.rating)} />
-                <meta itemProp="reviewCount" content={String(profile.review_count || 0)} />
+                <meta itemProp="reviewCount" content={String(profile.review_count)} />
                 <meta itemProp="bestRating" content="5" />
                 <meta itemProp="worstRating" content="1" />
               </span>}
@@ -173,9 +173,9 @@ export const DentistListFrame = ({
             <span itemProp="name">{profile.name}</span>
             {profile.location && <span itemProp="address">{profile.location}</span>}
             {profile.specialty && <span itemProp="medicalSpecialty">{profile.specialty}</span>}
-            {profile.rating && <span itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+            {profile.rating && profile.review_count && profile.review_count > 0 && <span itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
               <meta itemProp="ratingValue" content={String(profile.rating)} />
-              <meta itemProp="reviewCount" content={String(profile.review_count || 0)} />
+              <meta itemProp="reviewCount" content={String(profile.review_count)} />
               <meta itemProp="bestRating" content="5" />
               <meta itemProp="worstRating" content="1" />
             </span>}
