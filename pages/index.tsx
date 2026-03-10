@@ -100,97 +100,122 @@ export const getServerSideProps: GetServerSideProps = async () => {
       }
     }),
 
-    // Prefetch Top Dentists 
+    // Prefetch Top Dentists - ONE per location across all Emirates
     queryClient.prefetchQuery({
       queryKey: ['top-dentists-per-location', 30],
       queryFn: async () => {
-        const { data: popularCities } = await supabase
-          .from('cities')
+        // Get all active states (Emirates)
+        const { data: states } = await supabase
+          .from('states')
           .select('id, name, slug')
           .eq('is_active', true)
-          .order('name')
-          .limit(10);
+          .in('slug', ACTIVE_STATE_SLUGS)
+          .order('display_order');
 
-        if (!popularCities?.length) return [];
+        if (!states?.length) return [];
+
+        // Get all active cities grouped by state
+        const { data: cities } = await supabase
+          .from('cities')
+          .select('id, name, state_id, slug')
+          .eq('is_active', true)
+          .not('state_id', 'is', null);
+
+        if (!cities?.length) return [];
+
+        // Group cities by state
+        const citiesByState = cities.reduce((acc: any, city) => {
+          if (!acc[city.state_id]) acc[city.state_id] = [];
+          acc[city.state_id].push(city);
+          return acc;
+        }, {});
 
         let allProfiles: any[] = [];
-        const cityIds = popularCities.map(c => c.id);
 
-        const { data: topClinics } = await supabase
-          .from('clinics')
-          .select(`
-            id, name, slug, description, cover_image_url, rating, review_count, address,
-            city:cities(name, state:states(name))
-          `)
-          .in('city_id', cityIds)
-          .eq('is_active', true)
-          .order('rating', { ascending: false })
-          .order('review_count', { ascending: false })
-          .limit(40); // slightly more to ensure we get good ones
+        // For each state, get the top-rated dentist/clinic WITH IMAGE
+        for (const state of states) {
+          const stateCities = citiesByState[state.id] || [];
+          const cityIds = stateCities.map((c: any) => c.id);
 
-        if (topClinics) {
-          allProfiles = topClinics.map(c => ({
-            id: c.id,
-            name: c.name,
-            slug: c.slug,
-            type: 'clinic',
-            specialty: 'Dental Clinic',
-            location: c.city ? `${c.city.name}, ${c.city.state?.name || ''}` : 'UAE',
-            rating: c.rating || 0,
-            reviewCount: c.review_count || 0,
-            image: c.cover_image_url,
-            score: (c.rating || 0) * Math.log10((c.review_count || 0) + 1),
-          }));
+          if (cityIds.length === 0) continue;
+
+          // Get top clinics from this state with images only
+          const { data: topClinic } = await supabase
+            .from('clinics')
+            .select(`
+              id, name, slug, description, cover_image_url, rating, review_count, address,
+              city:cities(name, state:states(name, slug))
+            `)
+            .in('city_id', cityIds)
+            .eq('is_active', true)
+            .not('cover_image_url', 'is', null) // MUST have image
+            .not('cover_image_url', 'eq', '')
+            .gte('rating', 4.0) // At least 4.0 rating
+            .gte('review_count', 5) // At least 5 reviews
+            .order('rating', { ascending: false })
+            .order('review_count', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (topClinic && topClinic.cover_image_url) {
+            allProfiles.push({
+              id: topClinic.id,
+              name: topClinic.name,
+              slug: topClinic.slug,
+              type: 'clinic',
+              specialty: 'Dental Clinic',
+              location: topClinic.city ? `${topClinic.city.name}, ${topClinic.city.state?.name || state.name}` : state.name,
+              rating: topClinic.rating || 0,
+              reviewCount: topClinic.review_count || 0,
+              image: topClinic.cover_image_url,
+              score: (topClinic.rating || 0) * Math.log10((topClinic.review_count || 0) + 1),
+              stateSlug: state.slug,
+            });
+          } else {
+            // If no clinic with image found, try to get a dentist from this state
+            const { data: topDentist } = await (supabase
+              .from('dentists')
+              .select(`
+                id, name, slug, title, specializations, rating, review_count, photo_url,
+                clinic:clinics(city:cities(name, state_id, state:states(name, slug)))
+              `) as any)
+              .eq('is_active', true)
+              .not('photo_url', 'is', null) // MUST have image
+              .not('photo_url', 'eq', '')
+              .gte('rating', 4.0) // At least 4.0 rating
+              .gte('review_count', 3) // At least 3 reviews
+              .order('rating', { ascending: false })
+              .order('review_count', { ascending: false })
+              .limit(50); // Get more to filter by state
+
+            // Filter dentists by state
+            const dentistsInState = (topDentist || []).filter((d: any) => 
+              d.clinic?.city?.state_id === state.id
+            );
+
+            if (dentistsInState.length > 0) {
+              const d = dentistsInState[0];
+              allProfiles.push({
+                id: d.id,
+                name: d.name,
+                slug: d.slug,
+                type: 'dentist',
+                specialty: Array.isArray(d.specializations) && d.specializations.length > 0 ? d.specializations[0] : d.title || 'Dentist',
+                location: d.clinic?.city ? `${d.clinic.city.name}, ${d.clinic.city.state?.name || state.name}` : state.name,
+                rating: d.rating || 0,
+                reviewCount: d.review_count || 0,
+                image: d.photo_url,
+                score: (d.rating || 0) * Math.log10((d.review_count || 0) + 1),
+                stateSlug: state.slug,
+              });
+            }
+          }
         }
 
-        // Add actual dentists
-        const { data: topDentists } = await (supabase
-          .from('dentists')
-          .select(`
-            id, name, slug, title, specializations, rating, review_count, photo_url,
-            clinic:clinics(city:cities(name, state:states(name)))
-          `) as any)
-          .eq('is_active', true)
-          .order('rating', { ascending: false })
-          .order('review_count', { ascending: false })
-          .limit(20);
-
-        if (topDentists) {
-          const dentistProfiles = topDentists.map((d: any) => ({
-            id: d.id,
-            name: d.name,
-            slug: d.slug,
-            type: 'dentist',
-            specialty: Array.isArray(d.specializations) && d.specializations.length > 0 ? d.specializations[0] : d.title || 'Dentist',
-            location: d.clinic?.city ? `${d.clinic.city.name}, ${d.clinic.city.state?.name || ''}` : 'UAE',
-            rating: d.rating || 0,
-            reviewCount: d.review_count || 0,
-            image: d.photo_url,
-            score: (d.rating || 0) * Math.log10((d.review_count || 0) + 1),
-          }));
-
-          allProfiles = [...allProfiles, ...dentistProfiles];
-        }
-
-        // Sort by score and take top N
+        // Sort by score (best first)
         allProfiles.sort((a, b) => b.score - a.score);
-        const selected = allProfiles.slice(0, 30);
 
-        // Shuffle the selected profiles deterministically based on date (rotates daily)
-        const dateSeed = new Date().toDateString();
-        let seed = 0;
-        for (let i = 0; i < dateSeed.length; i++) {
-          seed += dateSeed.charCodeAt(i);
-        }
-
-        const shuffled = [...selected];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-          const j = Math.floor((seed * (i + 1)) % (i + 1));
-          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-          seed = (seed * 9301 + 49297) % 233280;
-        }
-
-        return shuffled;
+        return allProfiles;
       }
     }),
 
