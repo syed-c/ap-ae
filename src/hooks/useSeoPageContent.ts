@@ -86,21 +86,6 @@ export function useSeoPageContent(slug: string | undefined) {
         ].filter(Boolean))
       );
 
-      // First try to get optimized content with actual content
-      const { data: optimizedData, error: optimizedError } = await supabase
-        .from("seo_pages")
-        .select("*")
-        .in("slug", candidates)
-        .eq("is_optimized", true)
-        .not("content", "is", null)
-        .order("updated_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (optimizedError) {
-        console.error("Error fetching SEO page content:", optimizedError);
-      }
-
       // Helper to safely parse faqs from JSON to typed array
       const parseFaqs = (rawFaqs: unknown): { question: string; answer: string }[] | null => {
         if (!rawFaqs) return null;
@@ -115,6 +100,72 @@ export function useSeoPageContent(slug: string | undefined) {
         );
         return validated.length > 0 ? validated : null;
       };
+
+      // PRIORITY 1: Check page_content table first (admin CMS editable content)
+      const { data: pageContentData, error: pageContentError } = await supabase
+        .from("page_content")
+        .select("*")
+        .in("page_slug", candidates)
+        .eq("is_published", true)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (pageContentError) {
+        console.error("Error fetching page_content:", pageContentError);
+      }
+
+      // If we found admin-edited content, transform it to SeoPageContent format
+      if (pageContentData) {
+        // Combine section content into markdown-style content
+        const sections = [];
+        if (pageContentData.section_1_title && pageContentData.section_1_content) {
+          sections.push(`## ${pageContentData.section_1_title}\n\n${pageContentData.section_1_content}`);
+        }
+        if (pageContentData.section_2_title && pageContentData.section_2_content) {
+          sections.push(`## ${pageContentData.section_2_title}\n\n${pageContentData.section_2_content}`);
+        }
+        if (pageContentData.section_3_title && pageContentData.section_3_content) {
+          sections.push(`## ${pageContentData.section_3_title}\n\n${pageContentData.section_3_content}`);
+        }
+        
+        const combinedContent = [
+          pageContentData.hero_intro || '',
+          pageContentData.body_content || '',
+          ...sections,
+        ].filter(Boolean).join('\n\n');
+
+        return {
+          id: pageContentData.id,
+          slug: pageContentData.page_slug,
+          page_type: pageContentData.page_type,
+          title: pageContentData.h1 || null,
+          meta_title: pageContentData.meta_title || null,
+          meta_description: pageContentData.meta_description || null,
+          h1: pageContentData.h1 || null,
+          content: combinedContent || null,
+          og_title: pageContentData.meta_title || null,
+          og_description: pageContentData.meta_description || null,
+          is_optimized: true,
+          faqs: parseFaqs(pageContentData.faqs),
+        } as SeoPageContent;
+      }
+
+      // PRIORITY 2: Fall back to seo_pages table (legacy/generated content)
+      // First try to get optimized content with actual content
+      const { data: optimizedData, error: optimizedError } = await supabase
+        .from("seo_pages")
+        .select("*")
+        .in("slug", candidates)
+        .eq("is_optimized", true)
+        .not("content", "is", null)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (optimizedError) {
+        console.error("Error fetching SEO page content:", optimizedError);
+      }
 
       // If we found optimized content, return it
       if (optimizedData && optimizedData.content) {
