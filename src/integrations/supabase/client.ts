@@ -4,9 +4,8 @@ import type { Database } from './types';
 const rawSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "";
 
-// Always use proxy in the browser to bypass DNS poisoning/blocking
-const isBrowser = typeof window !== 'undefined';
-const supabaseUrl = isBrowser ? `${window.location.origin}/api/sb` : rawSupabaseUrl;
+// Use direct Supabase URL for better compatibility
+const supabaseUrl = rawSupabaseUrl;
 
 if (!rawSupabaseUrl || !supabaseKey) {
   console.error('Supabase credentials missing! Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY are set in .env');
@@ -14,8 +13,6 @@ if (!rawSupabaseUrl || !supabaseKey) {
 
 console.log('Supabase config loaded:', {
   url: supabaseUrl,
-  isProxy: isBrowser,
-  isLocalhost: isBrowser && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'),
   hasKey: !!supabaseKey,
   envKey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ? 'from env' : 'missing'
 });
