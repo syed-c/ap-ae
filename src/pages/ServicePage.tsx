@@ -19,7 +19,6 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useServicePriceRanges } from "@/hooks/useServicePriceRanges";
 import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
-import { usePrerenderReady } from "@/hooks/usePrerenderReady";
 import {
   Accordion,
   AccordionContent,
@@ -85,7 +84,6 @@ const ServicePage = () => {
     : seoContent?.content ? parseFaqFromContent(seoContent.content) : [];
 
   const isDataReady = !treatmentLoading && !profilesLoading;
-  usePrerenderReady(isDataReady);
   const shouldNoIndex = !profilesLoading && (!profiles || profiles.length < MIN_PROFILE_COUNT);
 
   // Price stats

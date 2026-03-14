@@ -11,7 +11,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { getContentBody, calculateReadingTime } from "@/lib/blogContent";
-import { usePrerenderReady } from "@/hooks/usePrerenderReady";
 import { BlogDentistList } from "@/components/blog/BlogDentistList";
 import { BlogFAQList } from "@/components/blog/BlogFAQList";
 import {
@@ -98,7 +97,6 @@ const BlogPostPage = () => {
 
   // Signal prerender when data is ready
   const isDataReady = !isLoading && !!post;
-  usePrerenderReady(isDataReady);
 
   if (isLoading) {
     return (

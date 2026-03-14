@@ -22,7 +22,6 @@ import { InternalLinkBlock, generateServiceLocationInternalLinks } from "@/compo
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { useState as useStateData, useCity, useCitiesByStateSlug } from "@/hooks/useLocations";
 import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
-import { usePrerenderReady } from "@/hooks/usePrerenderReady";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
 import {
   Accordion,
@@ -112,7 +111,7 @@ const ServiceLocationPage = () => {
     !treatmentFetching &&
     !seoContentLoading &&
     !seoContentFetching;
-  usePrerenderReady(isDataReady, { delay: 600 });
+  // Prerender removed - using SSG now
 
   const locationName = city?.name || citySlug?.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()) || '';
   const stateName = state?.name || '';

@@ -17,7 +17,6 @@ import { GeographicLinkBlock } from "@/components/seo/GeographicLinkBlock";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { useCitiesByStateSlug } from "@/hooks/useLocations";
-import { usePrerenderReady } from "@/hooks/usePrerenderReady";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
 import { useServicePriceRanges } from "@/hooks/useServicePriceRanges";
 import {
@@ -92,7 +91,6 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
   });
 
   const isDataReady = !profilesLoading && !citiesLoading;
-  usePrerenderReady(isDataReady, { delay: 600 });
 
   const pageTitle = `${treatmentName} in ${stateName} - Best Clinics & Prices (AED)`;
   const pageDescription = `Find the best ${treatmentName.toLowerCase()} clinics in ${stateName}. Compare ${profiles?.length || 0}+ verified providers, prices in AED, and book appointments online.`;

@@ -22,7 +22,6 @@ import { InternalLinkBlock, generateCityInternalLinks } from "@/components/seo/I
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { useCity, useState as useStateData, useCitiesByStateSlug } from "@/hooks/useLocations";
 import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
-import { usePrerenderReady } from "@/hooks/usePrerenderReady";
 import { usePinnedProfiles, sortWithPinnedFirst } from "@/hooks/usePinnedProfiles";
 import { useAreaLocalContent, generateAreaIntro } from "@/hooks/useAreaLocalContent";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
@@ -205,7 +204,6 @@ const CityPage = () => {
   // Signal prerender when ALL SEO-critical data loads
   // Includes: location data, profiles (for listings), treatments, nearby cities (internal links), and SEO content
   const isDataReady = !stateLoading && !cityLoading && !profilesLoading && !treatmentsLoading && !nearbyCitiesLoading && !seoContentLoading && !seoContentFetching;
-  usePrerenderReady(isDataReady, { delay: 600 });
 
   if (!stateSlug || !citySlug) {
     return <NotFound />;

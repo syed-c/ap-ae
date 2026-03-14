@@ -1,11 +1,33 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps, GetStaticPaths } from 'next';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import ServicePageComponent from '@/pages/ServicePage';
 
 export default ServicePageComponent;
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+// Generate static paths for all service pages at build time
+export const getStaticPaths: GetStaticPaths = async () => {
+    const supabase = createServerSupabase();
+    
+    const { data: treatments } = await supabase
+        .from('treatments')
+        .select('slug')
+        .eq('is_active', true);
+    
+    const paths = (treatments || []).map(treatment => ({
+        params: { serviceSlug: treatment.slug }
+    }));
+    
+    console.log(`[SSG] Generated ${paths.length} service page paths`);
+    
+    return {
+        paths,
+        fallback: 'blocking'
+    };
+};
+
+// Convert to Static Site Generation
+export const getStaticProps: GetStaticProps = async (ctx) => {
     const queryClient = new QueryClient();
     const supabase = createServerSupabase();
     const serviceSlug = ctx.params?.serviceSlug as string;
@@ -187,5 +209,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         props: {
             dehydratedState: dehydrate(queryClient),
         },
+        revalidate: 3600, // Revalidate every hour (ISR)
     };
 };

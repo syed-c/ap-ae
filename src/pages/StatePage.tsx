@@ -18,7 +18,6 @@ import { StructuredData } from "@/components/seo/StructuredData";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { useState as useStateData, useCitiesByStateSlug } from "@/hooks/useLocations";
 import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
-import { usePrerenderReady } from "@/hooks/usePrerenderReady";
 import { usePinnedProfiles, sortWithPinnedFirst } from "@/hooks/usePinnedProfiles";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
 import NotFound from "./NotFound";
@@ -212,7 +211,6 @@ const StatePage = () => {
 
   // Signal prerender when ALL data is ready (including SEO content)
   const isDataReady = !stateLoading && !citiesLoading && !profilesLoading && !treatmentsLoading && !seoContentLoading && !seoContentFetching && !!state;
-  usePrerenderReady(isDataReady);
 
   // Now check for invalid slug after all hooks
   if (isInvalidSlug) {

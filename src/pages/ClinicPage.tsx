@@ -18,7 +18,6 @@ import { InterlinkingSection } from "@/components/seo/InterlinkingSection";
 import { RelatedClinicsBlock } from "@/components/seo/RelatedClinicsBlock";
 import { MultiStepBookingModal } from "@/components/MultiStepBookingModal";
 import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
-import { usePrerenderReady } from "@/hooks/usePrerenderReady";
 import { PromotionBanner } from "@/components/subscription/PromotionBanner";
 import {
   ClinicStickyBooking,
@@ -213,7 +212,6 @@ const ClinicPage = () => {
   const isDataReady = !isLoading && !!clinic &&
     !!treatments && // Services list is SEO-critical
     (!!seoContent || !seoSlug); // SEO content loaded or not expected
-  usePrerenderReady(isDataReady, { delay: 600 });
 
   if (isLoading) {
     return (

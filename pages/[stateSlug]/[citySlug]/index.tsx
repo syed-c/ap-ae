@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps, GetStaticPaths } from 'next';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import CityPageComponent from '@/pages/CityPage';
@@ -6,7 +6,34 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 export default CityPageComponent;
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+// Generate static paths for all emirate-area combinations at build time
+export const getStaticPaths: GetStaticPaths = async () => {
+    const supabase = createServerSupabase();
+    
+    // Get all active states and cities
+    const { data: cities } = await supabase
+        .from('cities')
+        .select('slug, state:states!inner(slug)')
+        .eq('is_active', true)
+        .eq('state.is_active', true);
+    
+    const paths = (cities || []).map(city => ({
+        params: { 
+            stateSlug: city.state.slug,
+            citySlug: city.slug 
+        }
+    }));
+    
+    console.log(`[SSG] Generated ${paths.length} area page paths`);
+    
+    return {
+        paths,
+        fallback: 'blocking' // Generate pages on-demand if not built initially
+    };
+};
+
+// Convert to Static Site Generation
+export const getStaticProps: GetStaticProps = async (ctx) => {
     const queryClient = new QueryClient();
     const supabase = createServerSupabase();
     const stateSlug = ctx.params?.stateSlug as string;
@@ -355,5 +382,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         props: {
             dehydratedState: dehydrate(queryClient),
         },
+        revalidate: 3600, // Revalidate every hour (ISR)
     };
 };

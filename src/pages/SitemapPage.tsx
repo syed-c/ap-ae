@@ -32,7 +32,6 @@ import { useTreatments } from "@/hooks/useTreatments";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import SEOHead from "@/components/seo/SEOHead";
-import { usePrerenderReady } from "@/hooks/usePrerenderReady";
 
 const SitemapPage = () => {
   const { data: states, isLoading: statesLoading } = useStates();
@@ -153,7 +152,6 @@ const SitemapPage = () => {
 
   // Signal prerender ready when all critical data is loaded
   const isDataReady = !statesLoading && !citiesLoading && !treatmentsLoading && !clinicsLoading && !dentistsLoading;
-  usePrerenderReady(isDataReady);
 
   return (
     <PageLayout>

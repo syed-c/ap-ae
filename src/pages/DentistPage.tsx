@@ -18,7 +18,6 @@ import { useSeoPageContent } from "@/hooks/useSeoPageContent";
 import { MultiStepBookingModal } from "@/components/MultiStepBookingModal";
 import { InlineBookingCalendar } from "@/components/booking/InlineBookingCalendar";
 import { useToast } from "@/hooks/use-toast";
-import { usePrerenderReady } from "@/hooks/usePrerenderReady";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Star,
@@ -174,7 +173,6 @@ const DentistPage = () => {
 
   // Signal prerender when data is ready
   const isDataReady = !isLoading && !!dentist;
-  usePrerenderReady(isDataReady);
 
   if (isLoading) {
     return (

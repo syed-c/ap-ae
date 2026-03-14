@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps, GetStaticPaths } from 'next';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import ServiceLocationPage from '@/pages/ServiceLocationPage';
@@ -6,7 +6,80 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 export default ServiceLocationPage;
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+// Generate static paths for emirate-area-service combinations with actual clinics
+export const getStaticPaths: GetStaticPaths = async () => {
+    const supabase = createServerSupabase();
+    
+    // Get all active treatments
+    const { data: treatments } = await supabase
+        .from('treatments')
+        .select('id, slug')
+        .eq('is_active', true);
+    
+    if (!treatments || treatments.length === 0) {
+        return { paths: [], fallback: 'blocking' };
+    }
+    
+    const treatmentIds = treatments.map(t => t.id);
+    const treatmentSlugMap = new Map(treatments.map(t => [t.id, t.slug]));
+    
+    // Get all cities with their states and clinic counts per treatment
+    const { data: cities } = await supabase
+        .from('cities')
+        .select('id, slug, state:states!inner(slug)')
+        .eq('is_active', true)
+        .eq('state.is_active', true);
+    
+    if (!cities || cities.length === 0) {
+        return { paths: [], fallback: 'blocking' };
+    }
+    
+    const paths: any[] = [];
+    
+    // For each city, check which treatments have clinics
+    for (const city of cities) {
+        const cityId = city.id;
+        const citySlug = city.slug;
+        const stateSlug = city.state.slug;
+        
+        // Get clinic-treatment combinations for this city
+        const { data: clinicTreatments } = await supabase
+            .from('clinic_treatments')
+            .select('treatment_id, clinic:clinics!inner(city_id)')
+            .eq('clinic.city_id', cityId)
+            .eq('clinic.is_active', true)
+            .in('treatment_id', treatmentIds);
+        
+        if (clinicTreatments && clinicTreatments.length > 0) {
+            // Get unique treatment IDs that have clinics in this city
+            const availableTreatmentIds = [...new Set(clinicTreatments.map(ct => ct.treatment_id))];
+            
+            // Generate paths for each treatment with clinics
+            for (const treatmentId of availableTreatmentIds) {
+                const treatmentSlug = treatmentSlugMap.get(treatmentId);
+                if (treatmentSlug) {
+                    paths.push({
+                        params: {
+                            stateSlug,
+                            citySlug,
+                            serviceSlug: treatmentSlug
+                        }
+                    });
+                }
+            }
+        }
+    }
+    
+    console.log(`[SSG] Generated ${paths.length} area-service page paths (only combinations with clinics)`);
+    
+    return {
+        paths,
+        fallback: 'blocking' // Allow new combinations on-demand
+    };
+};
+
+// Convert to Static Site Generation
+export const getStaticProps: GetStaticProps = async (ctx) => {
     const queryClient = new QueryClient();
     const supabase = createServerSupabase();
     const stateSlug = ctx.params?.stateSlug as string;
@@ -332,5 +405,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         props: {
             dehydratedState: dehydrate(queryClient),
         },
+        revalidate: 3600, // Revalidate every hour (ISR)
     };
 };
