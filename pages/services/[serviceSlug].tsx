@@ -194,7 +194,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                     location: c.area?.name || c.city?.name || 'UAE',
                     rating: Number(c.rating) || 0,
                     reviewCount: c.review_count || 0,
-                    image: c.cover_image_url || undefined,
+                    image: c.cover_image_url || null,
                     isVerified: c.claim_status === 'claimed' && c.verification_status === 'verified',
                     clinicName: c.name,
                     clinicId: c.id,
