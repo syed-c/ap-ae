@@ -6,71 +6,53 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 export default ServiceLocationPage;
 
-// Generate static paths for emirate-area-service combinations with actual clinics
+// Generate static paths for emirate-area-service combinations
 export const getStaticPaths: GetStaticPaths = async () => {
     const supabase = createServerSupabase();
+    
+    console.log('[SSG] Generating area-service paths...');
     
     // Get all active treatments
     const { data: treatments } = await supabase
         .from('treatments')
-        .select('id, slug')
+        .select('slug')
         .eq('is_active', true);
     
     if (!treatments || treatments.length === 0) {
+        console.log('[SSG] No treatments found');
         return { paths: [], fallback: 'blocking' };
     }
     
-    const treatmentIds = treatments.map(t => t.id);
-    const treatmentSlugMap = new Map(treatments.map(t => [t.id, t.slug]));
+    const treatmentSlugs = treatments.map(t => t.slug);
     
-    // Get all cities with their states and clinic counts per treatment
+    // Get all cities with their states
     const { data: cities } = await supabase
         .from('cities')
-        .select('id, slug, state:states!inner(slug)')
+        .select('slug, state:states!inner(slug)')
         .eq('is_active', true)
         .eq('state.is_active', true);
     
     if (!cities || cities.length === 0) {
+        console.log('[SSG] No cities found');
         return { paths: [], fallback: 'blocking' };
     }
     
+    // Generate ALL combinations (we'll filter at render time)
     const paths: any[] = [];
     
-    // For each city, check which treatments have clinics
     for (const city of cities) {
-        const cityId = city.id;
-        const citySlug = city.slug;
-        const stateSlug = city.state.slug;
-        
-        // Get clinic-treatment combinations for this city
-        const { data: clinicTreatments } = await supabase
-            .from('clinic_treatments')
-            .select('treatment_id, clinic:clinics!inner(city_id)')
-            .eq('clinic.city_id', cityId)
-            .eq('clinic.is_active', true)
-            .in('treatment_id', treatmentIds);
-        
-        if (clinicTreatments && clinicTreatments.length > 0) {
-            // Get unique treatment IDs that have clinics in this city
-            const availableTreatmentIds = [...new Set(clinicTreatments.map(ct => ct.treatment_id))];
-            
-            // Generate paths for each treatment with clinics
-            for (const treatmentId of availableTreatmentIds) {
-                const treatmentSlug = treatmentSlugMap.get(treatmentId);
-                if (treatmentSlug) {
-                    paths.push({
-                        params: {
-                            stateSlug,
-                            citySlug,
-                            serviceSlug: treatmentSlug
-                        }
-                    });
+        for (const treatmentSlug of treatmentSlugs) {
+            paths.push({
+                params: {
+                    stateSlug: city.state.slug,
+                    citySlug: city.slug,
+                    serviceSlug: treatmentSlug
                 }
-            }
+            });
         }
     }
     
-    console.log(`[SSG] Generated ${paths.length} area-service page paths (only combinations with clinics)`);
+    console.log(`[SSG] Generated ${paths.length} area-service paths (${cities.length} areas × ${treatmentSlugs.length} services)`);
     
     return {
         paths,
