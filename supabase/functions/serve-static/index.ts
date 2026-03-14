@@ -78,30 +78,40 @@ const CORE_STATES = [
   { name: 'Umm Al Quwain', slug: 'umm-al-quwain' },
 ];
 
-// Core services for fallback navigation (must match treatment slugs)
-const CORE_SERVICES = [
-  { name: 'Teeth Whitening', slug: 'teeth-whitening' },
-  { name: 'Dental Implants', slug: 'dental-implants' },
-  { name: 'Invisalign', slug: 'invisalign' },
-  { name: 'Root Canal', slug: 'root-canal' },
-  { name: 'Dental Crowns', slug: 'dental-crowns' },
-  { name: 'Dental Veneers', slug: 'dental-veneers' },
-  { name: 'Dental Bridges', slug: 'dental-bridges' },
-  { name: 'Dentures', slug: 'dentures' },
-  { name: 'Cosmetic Dentistry', slug: 'cosmetic-dentistry' },
-  { name: 'Emergency Dental Care', slug: 'emergency-dental-care' },
-  { name: 'Teeth Cleaning', slug: 'teeth-cleaning' },
-  { name: 'Dental Fillings', slug: 'dental-fillings' },
-  { name: 'Braces', slug: 'braces' },
-  { name: 'Wisdom Teeth Removal', slug: 'wisdom-teeth-removal' },
-  { name: 'Dental X-Ray', slug: 'dental-x-ray' },
-  { name: 'Gum Treatment', slug: 'gum-treatment' },
-  { name: 'Pediatric Dentistry', slug: 'pediatric-dentistry' },
-  { name: 'Dental Check-up', slug: 'dental-check-up' },
-  { name: 'Tooth Extraction', slug: 'tooth-extraction' },
-  { name: 'Smile Makeover', slug: 'smile-makeover' },
-  { name: 'Hollywood Smile', slug: 'hollywood-smile' },
-];
+// Core services - now fetched dynamically from database
+// Cache for edge function lifetime to avoid repeated queries
+let CORE_SERVICES_CACHE: { name: string; slug: string }[] | null = null;
+
+/**
+ * Fetch all active treatments from database
+ * Caches result for edge function lifetime
+ */
+async function fetchCoreServices(supabase: any): Promise<{ name: string; slug: string }[]> {
+  // Return cached data if available
+  if (CORE_SERVICES_CACHE) {
+    return CORE_SERVICES_CACHE;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('treatments')
+      .select('name, slug')
+      .eq('is_active', true)
+      .order('name');
+
+    if (error) {
+      console.error('Error fetching treatments:', error);
+      return [];
+    }
+
+    // Cache the result
+    CORE_SERVICES_CACHE = data || [];
+    return CORE_SERVICES_CACHE;
+  } catch (err) {
+    console.error('Exception fetching treatments:', err);
+    return [];
+  }
+}
 
 function matchRoute(routePattern: string, actualPath: string): boolean {
   const routeParts = routePattern.split('/').filter(Boolean);
@@ -122,7 +132,7 @@ function matchRoute(routePattern: string, actualPath: string): boolean {
   return true;
 }
 
-function classifyPath(pathname: string): { indexable: boolean; pageType: string | null } {
+function classifyPath(pathname: string, coreServices: { name: string; slug: string }[]): { indexable: boolean; pageType: string | null } {
   const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\/+$/, '');
 
   for (const pattern of PRIVATE_ROUTE_PATTERNS) {
@@ -139,7 +149,7 @@ function classifyPath(pathname: string): { indexable: boolean; pageType: string 
         const parts = normalizedPath.split('/').filter(Boolean);
         if (parts.length === 2) {
           const isEmirateSlug = CORE_STATES.some(s => s.slug === parts[0]);
-          const isServiceSlug = CORE_SERVICES.some(s => s.slug === parts[1]);
+          const isServiceSlug = coreServices.some(s => s.slug === parts[1]);
           if (isEmirateSlug && isServiceSlug) {
             return { indexable: true, pageType: 'state-service' };
           }
@@ -184,7 +194,7 @@ function extractPathInfo(path: string): { stateSlug?: string; citySlug?: string;
 
   if (parts.length === 2) {
     // Check if second part is a service (state-service page)
-    const isServiceSlug = CORE_SERVICES.some(s => s.slug === parts[1]);
+    const isServiceSlug = CORE_SERVICES_CACHE.some(s => s.slug === parts[1]);
     if (isServiceSlug && CORE_STATES.some(s => s.slug === parts[0])) {
       return { stateSlug: parts[0], serviceSlug: parts[1] };
     }
@@ -350,6 +360,64 @@ async function fetchCityListings(supabase: any, stateSlug: string, citySlug: str
 }
 
 /**
+ * Fetch top clinics across ALL cities in a state/emirate
+ * Used for state pages like /dubai/ to show representative listings
+ */
+async function fetchStateListings(supabase: any, stateSlug: string): Promise<{
+  clinics: { name: string; slug: string; rating: number; address: string; cityName: string }[];
+  count: number;
+}> {
+  try {
+    const { data: state } = await supabase
+      .from('states')
+      .select('id')
+      .eq('slug', stateSlug)
+      .limit(1)
+      .maybeSingle();
+
+    if (!state) return { clinics: [], count: 0 };
+
+    // Get all cities in this state
+    const { data: cities } = await supabase
+      .from('cities')
+      .select('id, name')
+      .eq('state_id', state.id)
+      .eq('is_active', true);
+
+    if (!cities || cities.length === 0) return { clinics: [], count: 0 };
+
+    const cityIds = cities.map((c: any) => c.id);
+
+    // Fetch top 15 clinics across all cities in this state
+    const { data: clinics, count } = await supabase
+      .from('clinics')
+      .select('name, slug, rating, address, city_id', { count: 'exact' })
+      .in('city_id', cityIds)
+      .eq('is_active', true)
+      .order('rating', { ascending: false })
+      .limit(15);
+
+    // Map city IDs to names
+    const cityMap = new Map(cities.map((c: any) => [c.id, c.name]));
+
+    return {
+      clinics: (clinics || []).map((c: any) => ({
+        name: c.name,
+        slug: c.slug,
+        rating: c.rating || 0,
+        address: c.address || '',
+        cityName: cityMap.get(c.city_id) || ''
+      })),
+      count: count || 0
+    };
+  } catch (err) {
+    console.error('Error fetching state listings:', err);
+    return { clinics: [], count: 0 };
+  }
+}
+
+
+/**
  * Fetch clinic profile for clinic pages
  */
 async function fetchClinicProfile(supabase: any, clinicSlug: string): Promise<{
@@ -448,17 +516,17 @@ async function generateMinimalHtmlWithContent(
     description = `Find the best ${serviceName.toLowerCase()} specialists in ${cityName}, ${stateName}, UAE. Compare dentists, read reviews, check AED pricing, and book online.`;
   } else if (pageType === 'state-service' && stateSlug && serviceSlug) {
     const stateName = CORE_STATES.find(s => s.slug === stateSlug)?.name || formatSlugToName(stateSlug);
-    const serviceName = CORE_SERVICES.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
+    const serviceName = CORE_SERVICES_CACHE.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
     title = `${serviceName} in ${stateName} - Best Clinics & Prices (AED) | AppointPanda`;
     h1 = `${serviceName} in ${stateName}`;
     description = `Find the best ${serviceName.toLowerCase()} clinics in ${stateName}, UAE. Compare verified providers, prices in AED, and book appointments online.`;
   } else if (pageType === 'cost-guide' && serviceSlug) {
-    const serviceName = CORE_SERVICES.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
+    const serviceName = CORE_SERVICES_CACHE.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
     title = `${serviceName} Cost in UAE - Prices by Emirate | AppointPanda`;
     h1 = `${serviceName} Cost in UAE`;
     description = `How much does ${serviceName.toLowerCase()} cost in the UAE? Compare AED prices across all 7 Emirates and find the best value.`;
   } else if (pageType === 'comparison' && serviceSlug) {
-    const serviceName = CORE_SERVICES.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
+    const serviceName = CORE_SERVICES_CACHE.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
     title = `${serviceName} Price Comparison | AppointPanda`;
     h1 = `${serviceName} Price Comparison`;
     description = `Compare ${serviceName.toLowerCase()} prices across UAE Emirates. See side-by-side pricing in AED and find the best value.`;
@@ -620,14 +688,14 @@ async function generateMinimalHtmlWithContent(
   if (!seoContent?.content) {
     if (pageType === 'state-service' && stateSlug && serviceSlug) {
       const stateName = CORE_STATES.find(s => s.slug === stateSlug)?.name || formatSlugToName(stateSlug);
-      const serviceName = CORE_SERVICES.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
+      const serviceName = CORE_SERVICES_CACHE.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
       contentHtml = `<section>
         <h2>${serviceName} in ${stateName}</h2>
         <p>Looking for ${serviceName.toLowerCase()} in ${stateName}? AppointPanda lists verified dental clinics across ${stateName} offering professional ${serviceName.toLowerCase()} services with transparent AED pricing.</p>
         <p>Compare clinics, read patient reviews, and book your ${serviceName.toLowerCase()} appointment online. All practitioners are licensed by the ${stateName} health authority.</p>
       </section>`;
     } else if (pageType === 'cost-guide' && serviceSlug) {
-      const serviceName = CORE_SERVICES.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
+      const serviceName = CORE_SERVICES_CACHE.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
       contentHtml = `<section>
         <h2>${serviceName} Cost in UAE</h2>
         <p>${serviceName} prices in the UAE vary by emirate, clinic, and complexity. Dubai tends to have higher prices, while Sharjah and Ajman are often more affordable.</p>
@@ -640,11 +708,36 @@ async function generateMinimalHtmlWithContent(
       </section>`;
     } else if (pageType === 'state' && stateSlug) {
       const stateName = CORE_STATES.find(s => s.slug === stateSlug)?.name || formatSlugToName(stateSlug);
+      
+      // Fetch real clinic listings for this state
+      const stateListings = await fetchStateListings(supabase, stateSlug);
+      
+      // Generate clinic list HTML
+      let clinicsHtml = '';
+      if (stateListings.clinics.length > 0) {
+        clinicsHtml = `<div class="clinic-listings">
+          <h2>Top Rated Clinics in ${stateName}</h2>
+          <ul class="clinic-list">
+            ${stateListings.clinics.map(clinic => `
+              <li class="clinic-item">
+                <a href="/clinic/${clinic.slug}">
+                  <strong>${clinic.name}</strong>
+                  ${clinic.rating ? `<span class="rating">★ ${clinic.rating.toFixed(1)}</span>` : ''}
+                </a>
+                <span class="location">${clinic.cityName}${clinic.address ? `, ${clinic.address}` : ''}</span>
+              </li>
+            `).join('')}
+          </ul>
+          <p class="total-count">Showing ${stateListings.clinics.length} of ${stateListings.count} dental clinics in ${stateName}</p>
+        </div>`;
+      }
+      
       contentHtml = `<section>
         <h2>Dental Care in ${stateName}</h2>
         <p>${stateName} is home to hundreds of dental professionals offering comprehensive oral health services. From routine cleanings to advanced cosmetic procedures, you'll find qualified, DHA-aligned dentists ready to help you achieve your best smile.</p>
         <p>AppointPanda makes it easy to compare dentists in ${stateName}, read verified patient reviews, check AED pricing, and book appointments online.</p>
-      </section>`;
+      </section>
+      ${clinicsHtml}`;
     } else if (pageType === 'city' && stateSlug && citySlug) {
       const cityName = formatSlugToName(citySlug);
       const stateName = CORE_STATES.find(s => s.slug === stateSlug)?.name || formatSlugToName(stateSlug);
@@ -691,7 +784,7 @@ async function generateMinimalHtmlWithContent(
     `<li><a href="${BASE_URL}/${s.slug}/">Dentists in ${s.name}, UAE</a></li>`
   ).join('\n            ');
 
-  const serviceLinks = CORE_SERVICES.map(s =>
+  const serviceLinks = CORE_SERVICES_CACHE.map(s =>
     `<li><a href="${BASE_URL}/services/${s.slug}/">${s.name}</a></li>`
   ).join('\n            ');
 
@@ -705,7 +798,7 @@ async function generateMinimalHtmlWithContent(
 
   // Service-location links for cities
   const serviceLocationLinks = (citySlug && stateSlug)
-    ? CORE_SERVICES.slice(0, 6).map(s =>
+    ? CORE_SERVICES_CACHE.slice(0, 6).map(s =>
       `<li><a href="${BASE_URL}/${stateSlug}/${citySlug}/${s.slug}/">${s.name} in ${formatSlugToName(citySlug)}</a></li>`
     ).join('\n            ')
     : '';
@@ -1077,6 +1170,9 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const prerenderToken = Deno.env.get("PRERENDER_TOKEN");
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Fetch dynamic service list (cached for edge function lifetime)
+    const CORE_SERVICES = await fetchCoreServices(supabase);
 
     const url = new URL(req.url);
     let requestedPath = url.searchParams.get('path') || url.pathname.replace('/serve-static', '');

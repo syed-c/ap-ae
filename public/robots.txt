@@ -6,6 +6,8 @@
 
 User-agent: Googlebot
 Allow: /
+# Block API endpoints from crawl budget
+Disallow: /api/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
@@ -60,48 +62,56 @@ Allow: /
 # AI Crawlers - explicitly allowed with llms.txt reference
 User-agent: GPTBot
 Allow: /
+Disallow: /api/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /api/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
 
 User-agent: Claude-Web
 Allow: /
+Disallow: /api/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
 
 User-agent: Anthropic-AI
 Allow: /
+Disallow: /api/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /api/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /api/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
 
 User-agent: Cohere-ai
 Allow: /
+Disallow: /api/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
 
 User-agent: *
 Allow: /
+Disallow: /api/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
