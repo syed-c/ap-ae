@@ -217,12 +217,17 @@ const ClinicPage = () => {
     !!treatments && // Services list is SEO-critical
     (!!seoContent || !seoSlug); // SEO content loaded or not expected
 
+  // Build metaDescription from available data
+  const fallbackDescription = clinic?.description 
+    ? clinic.description.slice(0, 160) 
+    : "Find the best dental clinic in UAE. Book appointments with verified dentists and clinics.";
+
   // Always render SEOHead - use real data if available, fallback only if truly loading without prefetch
   const seoTitle = clinic 
     ? (seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${clinic.city?.name || 'UAE'}`)
     : (seoContent?.meta_title || "Dental Clinic");
   const seoDescription = clinic
-    ? (seoContent?.meta_description || metaDescription)
+    ? (seoContent?.meta_description || fallbackDescription)
     : (seoContent?.meta_description || "Find the best dental clinic");
 
   // If we have clinic data from prefetch, render full page (even during hydration)

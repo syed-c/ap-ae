@@ -225,8 +225,7 @@ const CityPage = () => {
   const hasCityData = !!city;
   const hasTreatmentData = !!treatmentMatch;
 
-  // Build SEO data
-  const seoSlug = normalizedStateSlug && citySlug ? `${normalizedStateSlug}/${citySlug}` : '';
+  // Build SEO data - use existing seoSlug variable
   const locationName = city?.name || treatmentMatch?.name || citySlug || '';
   const seoTitle = state && locationName
     ? (seoContent?.meta_title || `Best Dentists in ${locationName}, ${state.abbreviation} - Dental Clinics`)
@@ -269,6 +268,11 @@ const CityPage = () => {
     if (!city && treatmentMatchLoading) {
       return (
         <PageLayout>
+          <SEOHead
+            title={seoTitle}
+            description={seoDescription}
+            canonical={`/${seoSlug}/`}
+          />
           <div className="container py-12">
             <Skeleton className="h-12 w-64 mb-4" />
             <Skeleton className="h-6 w-96" />

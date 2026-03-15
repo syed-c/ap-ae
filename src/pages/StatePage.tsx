@@ -215,16 +215,6 @@ const StatePage = () => {
   // Signal prerender when ALL data is ready (including SEO content)
   const isDataReady = !stateLoading && !citiesLoading && !profilesLoading && !treatmentsLoading && !seoContentLoading && !seoContentFetching && !!state;
 
-  // Build SEO data from available data
-  const stateName = state?.name || '';
-  const stateAbbr = state?.abbreviation || '';
-  const seoTitle = state 
-    ? (seoContent?.meta_title || `Find Dentists in ${stateName} - Top Dental Clinics in ${stateName}`)
-    : (seoContent?.meta_title || "Dental Clinics");
-  const seoDescription = state
-    ? (seoContent?.meta_description || `Find and book appointments with top-rated dental professionals in ${stateName}.`)
-    : (seoContent?.meta_description || "Find the best dentists and dental clinics");
-
   // Now check for invalid slug after all hooks
   if (isInvalidSlug) {
     return <NotFound />;
@@ -236,7 +226,17 @@ const StatePage = () => {
     return null;
   }
 
-  // If we have state data from prefetch, render full page (even during hydration)
+  // Build SEO data from available data
+  const stateName = state?.name || '';
+  const stateAbbr = state?.abbreviation || '';
+  const seoTitle = state 
+    ? (seoContent?.meta_title || `Find Dentists in ${stateName} - Top Dental Clinics in ${stateName}`)
+    : (seoContent?.meta_title || "Dental Clinics");
+  const seoDescription = state
+    ? (seoContent?.meta_description || `Find and book appointments with top-rated dental professionals in ${stateName}.`)
+    : (seoContent?.meta_description || "Find the best dentists and dental clinics");
+
+  // If we don't have state data and it's still loading, show loading state with SEO
   if (!hasStateData && stateLoading) {
     return (
       <PageLayout>
@@ -256,9 +256,6 @@ const StatePage = () => {
   if (!state) {
     return <NotFound />;
   }
-
-  const stateName = state.name;
-  const stateAbbr = state.abbreviation;
 
   const breadcrumbs = [
     { label: "Home", href: "/" },
