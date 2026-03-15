@@ -26,7 +26,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     };
 };
 
-// Convert to Static Site Generation
+// Convert to Static Site Generation - OPTIMIZED VERSION
 export const getStaticProps: GetStaticProps = async (ctx) => {
     const queryClient = new QueryClient();
     const supabase = createServerSupabase();
@@ -36,90 +36,25 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
-    // 1. Prefetch Treatment
-    await queryClient.prefetchQuery({
-        queryKey: ['treatment', serviceSlug],
-        queryFn: async () => {
-            const { data } = await supabase
-                .from('treatments')
-                .select('*')
-                .eq('slug', serviceSlug)
-                .maybeSingle();
-            return data || null;
-        }
-    });
-
-    const treatment = queryClient.getQueryData<any>(['treatment', serviceSlug]);
-    if (!treatment) {
-        return { notFound: true };
-    }
-
-    // Parallelize remaining fetch queries
-    const seoSlug = `services/${serviceSlug}`;
+    // Only fetch essential data for initial render
     await Promise.all([
-        // 2. Prefetch SEO Content
         queryClient.prefetchQuery({
-            queryKey: ['seo-page-content', seoSlug],
+            queryKey: ['treatment', serviceSlug],
             queryFn: async () => {
-                const withTrailingSlash = (s: string) => (s.endsWith("/") ? s : `${s}/`);
-                const withoutTrailingSlash = (s: string) => s.replace(/\/+$/g, "");
-
-                const candidates = Array.from(new Set([
-                    seoSlug,
-                    `/${seoSlug}`,
-                    withTrailingSlash(seoSlug),
-                    withTrailingSlash(`/${seoSlug}`),
-                    withoutTrailingSlash(seoSlug),
-                    `/${withoutTrailingSlash(seoSlug)}`,
-                ].filter(Boolean)));
-
-                // Try optimized
-                const { data: optimizedData } = await supabase
-                    .from("seo_pages")
-                    .select("*")
-                    .in("slug", candidates)
-                    .eq("is_optimized", true)
-                    .not("content", "is", null)
-                    .order("updated_at", { ascending: false })
-                    .limit(1)
+                const { data } = await supabase
+                    .from('treatments')
+                    .select('id, name, slug, description')
+                    .eq('slug', serviceSlug)
                     .maybeSingle();
-
-                if (optimizedData && optimizedData.content) return optimizedData;
-
-                // Try any
-                const { data: anyData } = await supabase
-                    .from("seo_pages")
-                    .select("*")
-                    .in("slug", candidates)
-                    .not("content", "is", null)
-                    .order("updated_at", { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
-
-                if (anyData) return anyData;
-
-                // Try meta only
-                const { data: metaOnlyData } = await supabase
-                    .from("seo_pages")
-                    .select("*")
-                    .in("slug", candidates)
-                    .or("meta_title.not.is.null,meta_description.not.is.null")
-                    .order("is_optimized", { ascending: false })
-                    .order("updated_at", { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
-
-                return metaOnlyData || null;
+                return data || null;
             }
         }),
-
-        // 3. Prefetch Related Treatments
         queryClient.prefetchQuery({
             queryKey: ["related-treatments", serviceSlug],
             queryFn: async () => {
                 const { data } = await supabase
                     .from("treatments")
-                    .select("*")
+                    .select("id, name, slug")
                     .eq("is_active", true)
                     .neq("slug", serviceSlug)
                     .order("display_order")
@@ -127,83 +62,40 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 return data || [];
             },
         }),
-
-        // 4. Prefetch States
         queryClient.prefetchQuery({
             queryKey: ["states"],
             queryFn: async () => {
                 const { data } = await supabase
                     .from("states")
-                    .select("*")
+                    .select("id, name, slug, abbreviation")
                     .eq("is_active", true)
                     .order("display_order");
                 return data || [];
             },
-        }),
-
-        // 5. Prefetch Price Ranges
-        queryClient.prefetchQuery({
-            queryKey: ['service-price-ranges', serviceSlug],
-            queryFn: async () => {
-                const { data: ranges } = await supabase
-                    .from('service_price_ranges')
-                    .select(`
-            id, price_min, price_max, state_id,
-            state:states(id, name, slug)
-          `)
-                    .eq('treatment_id', treatment.id);
-
-                if (!ranges || ranges.length === 0) return [];
-
-                const latestPerState = ranges.reduce((acc: any, current: any) => {
-                    if (!acc[current.state_id]) {
-                        acc[current.state_id] = current;
-                    }
-                    return acc;
-                }, {});
-
-                return Object.values(latestPerState);
-            }
-        }),
-
-        // 6. Prefetch Service Profiles 
-        queryClient.prefetchQuery({
-            queryKey: ['profiles', { limit: 50 }],
-            queryFn: async () => {
-                // Very basic fallback logic for now similar to default useProfiles behavior
-                const { data: clinics } = await supabase
-                    .from('clinics')
-                    .select(`
-            id, name, slug, description, cover_image_url, rating, review_count,
-            verification_status, claim_status, city_id, area_id,
-            city:cities(name, slug),
-            area:areas(name, slug)
-          `)
-                    .eq('is_active', true)
-                    .order('rating', { ascending: false })
-                    .limit(50);
-
-                if (!clinics) return [];
-
-                return clinics.map((c: any) => ({
-                    id: c.id,
-                    name: c.name,
-                    slug: c.slug,
-                    type: 'clinic',
-                    specialty: 'Dental Clinic',
-                    location: c.area?.name || c.city?.name || 'UAE',
-                    rating: Number(c.rating) || 0,
-                    reviewCount: c.review_count || 0,
-                    image: c.cover_image_url || null,
-                    isVerified: c.claim_status === 'claimed' && c.verification_status === 'verified',
-                    clinicName: c.name,
-                    clinicId: c.id,
-                    areaId: c.area_id,
-                    cityId: c.city_id,
-                }));
-            }
         })
     ]);
+
+    const treatment = queryClient.getQueryData<any>(['treatment', serviceSlug]);
+    if (!treatment) {
+        return { notFound: true };
+    }
+
+    // Fetch SEO content - simplified
+    const seoSlug = `services/${serviceSlug}`;
+    await queryClient.prefetchQuery({
+        queryKey: ['seo-page-content', seoSlug],
+        queryFn: async () => {
+            const { data } = await supabase
+                .from("seo_pages")
+                .select("id, slug, meta_title, meta_description, content, is_optimized")
+                .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
+                .order("is_optimized", { ascending: false })
+                .order("updated_at", { ascending: false })
+                .limit(1)
+                .maybeSingle();
+            return data || null;
+        }
+    });
 
     return {
         props: {
