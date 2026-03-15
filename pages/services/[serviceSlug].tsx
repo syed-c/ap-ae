@@ -26,7 +26,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     };
 };
 
-// Convert to Static Site Generation - OPTIMIZED VERSION
+// Convert to Static Site Generation - FULL DATA PREFETCH FOR SEO
 export const getStaticProps: GetStaticProps = async (ctx) => {
     const queryClient = new QueryClient();
     const supabase = createServerSupabase();
@@ -36,15 +36,37 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
-    // Only fetch essential data for initial render
+    // Fetch treatment
+    await queryClient.prefetchQuery({
+        queryKey: ['treatment', serviceSlug],
+        queryFn: async () => {
+            const { data } = await supabase
+                .from('treatments')
+                .select('*')
+                .eq('slug', serviceSlug)
+                .maybeSingle();
+            return data || null;
+        }
+    });
+
+    const treatment = queryClient.getQueryData<any>(['treatment', serviceSlug]);
+    if (!treatment) {
+        return { notFound: true };
+    }
+
+    // Fetch SEO content, related treatments, states, and profiles IN PARALLEL
+    const seoSlug = `services/${serviceSlug}`;
     await Promise.all([
         queryClient.prefetchQuery({
-            queryKey: ['treatment', serviceSlug],
+            queryKey: ['seo-page-content', seoSlug],
             queryFn: async () => {
                 const { data } = await supabase
-                    .from('treatments')
-                    .select('id, name, slug, description')
-                    .eq('slug', serviceSlug)
+                    .from("seo_pages")
+                    .select("*")
+                    .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
+                    .order("is_optimized", { ascending: false })
+                    .order("updated_at", { ascending: false })
+                    .limit(1)
                     .maybeSingle();
                 return data || null;
             }
@@ -54,7 +76,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             queryFn: async () => {
                 const { data } = await supabase
                     .from("treatments")
-                    .select("id, name, slug")
+                    .select("*")
                     .eq("is_active", true)
                     .neq("slug", serviceSlug)
                     .order("display_order")
@@ -67,40 +89,76 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             queryFn: async () => {
                 const { data } = await supabase
                     .from("states")
-                    .select("id, name, slug, abbreviation")
+                    .select("*")
                     .eq("is_active", true)
                     .order("display_order");
                 return data || [];
             },
+        }),
+        queryClient.prefetchQuery({
+            queryKey: ['service-price-ranges', serviceSlug],
+            queryFn: async () => {
+                const { data: ranges } = await supabase
+                    .from('service_price_ranges')
+                    .select(`
+            id, price_min, price_max, state_id,
+            state:states(id, name, slug)
+          `)
+                    .eq('treatment_id', treatment.id);
+
+                if (!ranges || ranges.length === 0) return [];
+
+                const latestPerState = ranges.reduce((acc: any, current: any) => {
+                    if (!acc[current.state_id]) {
+                        acc[current.state_id] = current;
+                    }
+                    return acc;
+                }, {});
+
+                return Object.values(latestPerState);
+            }
+        }),
+        queryClient.prefetchQuery({
+            queryKey: ['profiles', { limit: 50 }],
+            queryFn: async () => {
+                const { data: clinics } = await supabase
+                    .from('clinics')
+                    .select(`
+            id, name, slug, description, cover_image_url, rating, review_count,
+            verification_status, claim_status, city_id, area_id,
+            city:cities(name, slug),
+            area:areas(name, slug)
+          `)
+                    .eq('is_active', true)
+                    .order('rating', { ascending: false })
+                    .limit(50);
+
+                if (!clinics) return [];
+
+                return clinics.map((c: any) => ({
+                    id: c.id,
+                    name: c.name,
+                    slug: c.slug,
+                    type: 'clinic',
+                    specialty: 'Dental Clinic',
+                    location: c.area?.name || c.city?.name || 'UAE',
+                    rating: Number(c.rating) || 0,
+                    reviewCount: c.review_count || 0,
+                    image: c.cover_image_url || null,
+                    isVerified: c.claim_status === 'claimed' && c.verification_status === 'verified',
+                    clinicName: c.name,
+                    clinicId: c.id,
+                    areaId: c.area_id,
+                    cityId: c.city_id,
+                }));
+            }
         })
     ]);
-
-    const treatment = queryClient.getQueryData<any>(['treatment', serviceSlug]);
-    if (!treatment) {
-        return { notFound: true };
-    }
-
-    // Fetch SEO content - simplified
-    const seoSlug = `services/${serviceSlug}`;
-    await queryClient.prefetchQuery({
-        queryKey: ['seo-page-content', seoSlug],
-        queryFn: async () => {
-            const { data } = await supabase
-                .from("seo_pages")
-                .select("id, slug, meta_title, meta_description, content, is_optimized")
-                .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
-                .order("is_optimized", { ascending: false })
-                .order("updated_at", { ascending: false })
-                .limit(1)
-                .maybeSingle();
-            return data || null;
-        }
-    });
 
     return {
         props: {
             dehydratedState: dehydrate(queryClient),
         },
-        revalidate: 3600, // Revalidate every hour (ISR)
+        revalidate: 3600,
     };
 };

@@ -209,8 +209,21 @@ const StatePage = () => {
     },
   });
 
+  // Check if state data is available from server prefetch
+  const hasStateData = !!state;
+  
   // Signal prerender when ALL data is ready (including SEO content)
   const isDataReady = !stateLoading && !citiesLoading && !profilesLoading && !treatmentsLoading && !seoContentLoading && !seoContentFetching && !!state;
+
+  // Build SEO data from available data
+  const stateName = state?.name || '';
+  const stateAbbr = state?.abbreviation || '';
+  const seoTitle = state 
+    ? (seoContent?.meta_title || `Find Dentists in ${stateName} - Top Dental Clinics in ${stateName}`)
+    : (seoContent?.meta_title || "Dental Clinics");
+  const seoDescription = state
+    ? (seoContent?.meta_description || `Find and book appointments with top-rated dental professionals in ${stateName}.`)
+    : (seoContent?.meta_description || "Find the best dentists and dental clinics");
 
   // Now check for invalid slug after all hooks
   if (isInvalidSlug) {
@@ -223,12 +236,14 @@ const StatePage = () => {
     return null;
   }
 
-  if (stateLoading) {
+  // If we have state data from prefetch, render full page (even during hydration)
+  if (!hasStateData && stateLoading) {
     return (
       <PageLayout>
         <SEOHead
-          title="Loading..."
-          description="Loading dental clinics information..."
+          title={seoTitle}
+          description={seoDescription}
+          canonical={`/${normalizedStateSlug}/`}
         />
         <div className="container py-12">
           <Skeleton className="h-12 w-64 mb-4" />

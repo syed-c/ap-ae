@@ -86,8 +86,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     };
 };
 
-// Convert to Static Site Generation - OPTIMIZED VERSION
-// Only fetches essential data; rest is fetched client-side via React Query
+// Convert to Static Site Generation - FULL DATA PREFETCH FOR SEO
 export const getStaticProps: GetStaticProps = async (ctx) => {
     const queryClient = new QueryClient();
     const supabase = createServerSupabase();
@@ -100,31 +99,30 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
-    // Only fetch essential data for initial render
-    // Client-side will fetch additional data
+    // Fetch state and treatment in parallel
     await Promise.all([
-        queryClient.prefetchQuery({
-            queryKey: ["treatment", serviceSlug],
-            queryFn: async () => {
-                const { data } = await supabase
-                    .from("treatments")
-                    .select("id, name, slug, description")
-                    .eq("slug", serviceSlug)
-                    .maybeSingle();
-                return data;
-            },
-        }),
         queryClient.prefetchQuery({
             queryKey: ['state', normalizedStateSlug],
             queryFn: async () => {
                 const { data } = await supabase
                     .from('states')
-                    .select('id, name, slug, abbreviation')
+                    .select('*')
                     .eq('slug', normalizedStateSlug)
                     .eq('is_active', true)
                     .maybeSingle();
                 return data || null;
             }
+        }),
+        queryClient.prefetchQuery({
+            queryKey: ["treatment", serviceSlug],
+            queryFn: async () => {
+                const { data } = await supabase
+                    .from("treatments")
+                    .select("*")
+                    .eq("slug", serviceSlug)
+                    .maybeSingle();
+                return data;
+            },
         }),
     ]);
 
@@ -135,17 +133,17 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
-    // Fetch city separately
+    // Fetch city
     await queryClient.prefetchQuery({
         queryKey: ['city', citySlug, normalizedStateSlug],
         queryFn: async () => {
-            const { data: cities } = await supabase
+            const { data } = await supabase
                 .from('cities')
-                .select('id, name, slug, state_id')
+                .select('*, state:states(*)')
                 .eq('slug', citySlug)
                 .eq('is_active', true)
                 .maybeSingle();
-            return cities || null;
+            return data || null;
         }
     });
 
@@ -154,20 +152,209 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
-    // SEO content - simplified to single query
     const seoSlug = `${normalizedStateSlug}/${citySlug}/${serviceSlug}`;
+
+    // Fetch SEO content, related services, nearby cities IN PARALLEL
+    await Promise.all([
+        queryClient.prefetchQuery({
+            queryKey: ['seo-page-content', seoSlug],
+            queryFn: async () => {
+                const { data } = await supabase
+                    .from("seo_pages")
+                    .select("*")
+                    .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
+                    .order("is_optimized", { ascending: false })
+                    .order("updated_at", { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+                return data || null;
+            }
+        }),
+        queryClient.prefetchQuery({
+            queryKey: ["related-services", serviceSlug],
+            queryFn: async () => {
+                const { data } = await supabase
+                    .from("treatments")
+                    .select("*")
+                    .eq("is_active", true)
+                    .neq("slug", serviceSlug)
+                    .order("display_order")
+                    .limit(6);
+                return data || [];
+            },
+        }),
+        queryClient.prefetchQuery({
+            queryKey: ['cities-by-state', normalizedStateSlug],
+            queryFn: async () => {
+                const { data } = await supabase
+                    .from('cities')
+                    .select('*, state:states(*)')
+                    .eq('state_id', stateData.id)
+                    .eq('is_active', true)
+                    .order('name');
+                return data || [];
+            }
+        })
+    ]);
+
+    // Fetch profiles for this city + treatment
     await queryClient.prefetchQuery({
-        queryKey: ['seo-page-content', seoSlug],
+        queryKey: ['profiles', { cityId: cityData.id, treatmentId: treatmentData.id, limit: 50 }],
         queryFn: async () => {
-            const { data } = await supabase
-                .from("seo_pages")
-                .select("id, slug, meta_title, meta_description, content, is_optimized")
-                .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
-                .order("is_optimized", { ascending: false })
-                .order("updated_at", { ascending: false })
-                .limit(1)
-                .maybeSingle();
-            return data || null;
+            let eligibleClinicIds: Set<string> | null = null;
+
+            const { data: cityClinics } = await supabase
+                .from('clinics')
+                .select('id')
+                .eq('city_id', cityData.id)
+                .eq('is_active', true);
+
+            eligibleClinicIds = new Set((cityClinics || []).map((c: any) => c.id));
+
+            if (eligibleClinicIds.size === 0) {
+                return [];
+            }
+
+            let treatmentQuery = supabase
+                .from("clinic_treatments")
+                .select("clinic_id, clinic:clinics!inner(id, city_id, is_active)")
+                .eq("treatment_id", treatmentData.id)
+                .eq("clinic.city_id", cityData.id);
+
+            const { data: clinicTreatments } = await treatmentQuery;
+
+            const treatmentClinicIds = new Set((clinicTreatments || [])
+                .filter((ct: any) => ct.clinic?.is_active)
+                .map((ct: any) => ct.clinic_id));
+
+            if (treatmentClinicIds.size > 0) {
+                eligibleClinicIds = new Set([...eligibleClinicIds].filter(id => treatmentClinicIds.has(id)));
+
+                if (eligibleClinicIds.size === 0) {
+                    const { data: fallbackClinics } = await supabase
+                        .from('clinics')
+                        .select('id')
+                        .eq('city_id', cityData.id)
+                        .eq('is_active', true);
+                    eligibleClinicIds = new Set((fallbackClinics || []).map((c: any) => c.id));
+                }
+            }
+
+            const clinicIdArray = [...eligibleClinicIds];
+            const profiles: any[] = [];
+
+            let dentistQuery = supabase
+                .from('dentists')
+                .select(`
+                *,
+                clinic:clinics(
+                    id, name, slug, city_id, area_id, verification_status, claim_status, cover_image_url, rating, review_count,
+                    city:cities(name, slug),
+                    area:areas(name, slug)
+                )
+                `)
+                .eq('is_active', true)
+                .order('rating', { ascending: false });
+
+            if (clinicIdArray.length > 0) {
+                dentistQuery = dentistQuery.in('clinic_id', clinicIdArray);
+            } else {
+                dentistQuery = dentistQuery.eq('id', 'impossible-id-that-never-matches');
+            }
+
+            dentistQuery = dentistQuery.limit(50);
+
+            const { data: dentists } = await dentistQuery;
+
+            const clinicsWithDentists = new Set<string>();
+
+            if (dentists) {
+                for (const d of dentists as any[]) {
+                    if (d.clinic_id) {
+                        clinicsWithDentists.add(d.clinic_id);
+                    }
+
+                    if (d.clinic?.city_id !== cityData.id) continue;
+
+                    let photoUrl = d.image_url;
+                    if (!photoUrl && d.clinic?.cover_image_url) {
+                        photoUrl = d.clinic.cover_image_url;
+                    }
+
+                    const isVerified = d.clinic?.claim_status === 'claimed' && d.clinic?.verification_status === 'verified';
+
+                    profiles.push({
+                        id: d.id,
+                        name: d.name,
+                        slug: d.slug,
+                        type: 'dentist',
+                        specialty: d.title || 'General Dentist',
+                        location: d.clinic?.area?.name || d.clinic?.city?.name || 'UAE',
+                        rating: Number(d.rating) || 0,
+                        reviewCount: d.review_count || 0,
+                        image: photoUrl || null,
+                        isVerified,
+                        clinicName: d.clinic?.name,
+                        clinicId: d.clinic_id || null,
+                        languages: d.languages || [],
+                        areaId: d.clinic?.area_id,
+                        cityId: d.clinic?.city_id,
+                    });
+                }
+            }
+
+            let clinicQuery = supabase
+                .from('clinics')
+                .select(`
+                *,
+                city:cities(name, slug),
+                area:areas(name, slug)
+                `)
+                .eq('is_active', true)
+                .order('rating', { ascending: false });
+
+            if (clinicIdArray.length > 0) {
+                clinicQuery = clinicQuery.in('id', clinicIdArray);
+            } else {
+                clinicQuery = clinicQuery.eq('city_id', cityData.id);
+            }
+
+            const { data: clinics } = await clinicQuery as any;
+
+            if (clinics) {
+                for (const c of clinics) {
+                    if (clinicsWithDentists.has(c.id)) continue;
+
+                    let photoUrl = c.cover_image_url;
+
+                    const isVerified = c.claim_status === 'claimed' && c.verification_status === 'verified';
+
+                    profiles.push({
+                        id: c.id,
+                        name: c.name,
+                        slug: c.slug,
+                        type: 'clinic',
+                        specialty: 'Dental Clinic',
+                        location: c.area?.name || c.city?.name || 'UAE',
+                        rating: Number(c.rating) || 0,
+                        reviewCount: c.review_count || 0,
+                        image: photoUrl || null,
+                        isVerified,
+                        clinicName: c.name,
+                        clinicId: c.id,
+                        areaId: c.area_id,
+                        cityId: c.city_id,
+                    });
+                }
+            }
+
+            profiles.sort((a, b) => b.rating - a.rating);
+
+            if (profiles.length > 50) {
+                return profiles.slice(0, 50);
+            }
+
+            return profiles;
         }
     });
 
@@ -175,6 +362,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         props: {
             dehydratedState: dehydrate(queryClient),
         },
-        revalidate: 3600, // Revalidate every hour (ISR)
+        revalidate: 3600,
     };
+};
 };

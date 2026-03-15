@@ -207,18 +207,34 @@ const ClinicPage = () => {
     }
   }, [clinic?.id, clinic?.name, clinic?.city?.name, clinic?.city?.state?.abbreviation, trackProfileView]);
 
+  // Check if data is available from server prefetch (even during loading/hydration)
+  const hasClinicData = !!clinic;
+  const hasSeoContent = !!seoContent;
+
   // Signal prerender when ALL SEO-critical data is ready
   // This includes clinic data, treatments (for services list), and SEO content
   const isDataReady = !isLoading && !!clinic &&
     !!treatments && // Services list is SEO-critical
     (!!seoContent || !seoSlug); // SEO content loaded or not expected
 
-  if (isLoading) {
+  // Always render SEOHead - use real data if available, fallback only if truly loading without prefetch
+  const seoTitle = clinic 
+    ? (seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${clinic.city?.name || 'UAE'}`)
+    : (seoContent?.meta_title || "Dental Clinic");
+  const seoDescription = clinic
+    ? (seoContent?.meta_description || metaDescription)
+    : (seoContent?.meta_description || "Find the best dental clinic");
+
+  // If we have clinic data from prefetch, render full page (even during hydration)
+  if (hasClinicData) {
+    // Render full page with data
+  } else if (isLoading) {
     return (
       <PageLayout>
         <SEOHead
-          title="Loading..."
-          description="Loading dental clinic information..."
+          title={seoTitle}
+          description={seoDescription}
+          canonical={`/clinic/${slug}/`}
         />
         <div className="container py-8">
           <Skeleton className="h-80 rounded-3xl mb-8" />

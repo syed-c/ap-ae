@@ -220,12 +220,29 @@ const CityPage = () => {
     return <Navigate href={`/dentist/${citySlug}/`} replace />;
   }
 
-  if (stateLoading || cityLoading) {
+  // Check if we have data from prefetch
+  const hasStateData = !!state;
+  const hasCityData = !!city;
+  const hasTreatmentData = !!treatmentMatch;
+
+  // Build SEO data
+  const seoSlug = normalizedStateSlug && citySlug ? `${normalizedStateSlug}/${citySlug}` : '';
+  const locationName = city?.name || treatmentMatch?.name || citySlug || '';
+  const seoTitle = state && locationName
+    ? (seoContent?.meta_title || `Best Dentists in ${locationName}, ${state.abbreviation} - Dental Clinics`)
+    : (seoContent?.meta_title || "Dental Clinics");
+  const seoDescription = state && locationName
+    ? (seoContent?.meta_description || `Find and book appointments with top-rated dentists in ${locationName}, ${state.name}.`)
+    : (seoContent?.meta_description || "Find the best dentists and dental clinics");
+
+  // If we have state data from prefetch, render full page
+  if (!hasStateData && (stateLoading || cityLoading)) {
     return (
       <PageLayout>
         <SEOHead
-          title="Loading..."
-          description="Loading dental clinics information..."
+          title={seoTitle}
+          description={seoDescription}
+          canonical={`/${seoSlug}/`}
         />
         <div className="container py-12">
           <Skeleton className="h-12 w-64 mb-4" />
@@ -235,7 +252,7 @@ const CityPage = () => {
     );
   }
 
-  if (!state || !city) {
+  if (!state || (!city && !treatmentMatch)) {
     // If city not found but the slug matches a treatment, render state-level service page
     if (state && !city && treatmentMatch && !treatmentMatchLoading) {
       return (
