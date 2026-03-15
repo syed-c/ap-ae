@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import ServicePricePage from '@/pages/ServicePricePage';
 export default ServicePricePage;
-export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });
+export const getServerSideProps: GetStaticProps = async () => ({ props: {} });

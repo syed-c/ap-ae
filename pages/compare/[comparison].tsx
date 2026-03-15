@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import EmirateComparisonPage from '@/pages/EmirateComparisonPage';
 export default EmirateComparisonPage;
-export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });
+export const getServerSideProps: GetStaticProps = async () => ({ props: {} });

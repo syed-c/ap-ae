@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import AppointmentManagePage from '@/pages/AppointmentManagePage';
 export default AppointmentManagePage;
-export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });
+export const getServerSideProps: GetStaticProps = async () => ({ props: {} });

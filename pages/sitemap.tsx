@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import SitemapPage from '@/pages/SitemapPage';
 export default SitemapPage;
-export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });
+export const getStaticProps: GetStaticProps = async () => ({ props: {} });

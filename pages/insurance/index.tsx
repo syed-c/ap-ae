@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import InsurancePage from '@/pages/InsurancePage';
 export default InsurancePage;
-export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });
+export const getServerSideProps: GetStaticProps = async () => ({ props: {} });

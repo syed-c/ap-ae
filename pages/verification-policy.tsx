@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import VerificationPolicyPage from '@/pages/VerificationPolicyPage';
 export default VerificationPolicyPage;
-export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });
+export const getStaticProps: GetStaticProps = async () => ({ props: {} });

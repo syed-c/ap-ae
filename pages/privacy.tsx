@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import PrivacyPage from '@/pages/PrivacyPage';
 export default PrivacyPage;
-export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });
+export const getStaticProps: GetStaticProps = async () => ({ props: {} });

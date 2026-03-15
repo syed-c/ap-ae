@@ -1,11 +1,11 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 
 // Redirect /find-dentist to /search
 export default function FindDentistRedirect() {
     return null;
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
     return {
         redirect: {
             destination: '/search',

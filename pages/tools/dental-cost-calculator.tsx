@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import DentalCostCalculator from '@/pages/tools/DentalCostCalculator';
 export default DentalCostCalculator;
-export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });
+export const getStaticProps: GetStaticProps = async () => ({ props: {} });

@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 
 const AdminDashboard = dynamic(() => import('@/pages/admin/AdminDashboard'), {
@@ -12,6 +12,6 @@ const AdminDashboard = dynamic(() => import('@/pages/admin/AdminDashboard'), {
 
 export default AdminDashboard;
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetStaticProps = async () => {
     return { props: {} };
 };

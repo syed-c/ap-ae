@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import ClaimProfilePage from '@/pages/ClaimProfilePage';
 export default ClaimProfilePage;
-export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });
+export const getServerSideProps: GetStaticProps = async () => ({ props: {} });
