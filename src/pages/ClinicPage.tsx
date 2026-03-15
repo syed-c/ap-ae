@@ -230,10 +230,8 @@ const ClinicPage = () => {
     ? (seoContent?.meta_description || fallbackDescription)
     : (seoContent?.meta_description || "Find the best dental clinic");
 
-  // If we have clinic data from prefetch, render full page (even during hydration)
-  if (hasClinicData) {
-    // Render full page with data
-  } else if (isLoading) {
+  // If no clinic data and still loading, show loading state with SEO
+  if (!hasClinicData && isLoading) {
     return (
       <PageLayout>
         <SEOHead

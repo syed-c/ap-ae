@@ -26,7 +26,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     };
 };
 
-// Convert to Static Site Generation - FULL DATA PREFETCH FOR SEO
+// Static Site Generation - minimal prefetch for SEO
 export const getStaticProps: GetStaticProps = async (ctx) => {
     const queryClient = new QueryClient();
     const supabase = createServerSupabase();
@@ -36,88 +36,41 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
-    // Fetch clinic data
-    await queryClient.prefetchQuery({
-        queryKey: ['clinic', clinicSlug],
-        queryFn: async () => {
-            const { data, error } = await supabase
-                .from("clinics")
-                .select("*, city:cities(name, slug, state:states(name, slug, abbreviation)), area:areas(name, slug)")
-                .eq("slug", clinicSlug)
-                .maybeSingle();
-            if (error) throw error;
-            return data;
-        }
-    });
+    const seoSlug = `clinic/${clinicSlug}`;
+
+    // Prefetch clinic and SEO content (critical for SEO)
+    await Promise.all([
+        queryClient.prefetchQuery({
+            queryKey: ['clinic', clinicSlug],
+            queryFn: async () => {
+                const { data, error } = await supabase
+                    .from("clinics")
+                    .select("*, city:cities(name, slug, state:states(name, slug, abbreviation)), area:areas(name, slug)")
+                    .eq("slug", clinicSlug)
+                    .maybeSingle();
+                if (error) throw error;
+                return data;
+            }
+        }),
+        queryClient.prefetchQuery({
+            queryKey: ['seo-page-content', seoSlug],
+            queryFn: async () => {
+                const { data } = await supabase
+                    .from("seo_pages")
+                    .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
+                    .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
+                    .order("is_optimized", { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+                return data || null;
+            }
+        })
+    ]);
 
     const clinic = queryClient.getQueryData<any>(['clinic', clinicSlug]);
     if (!clinic) {
         return { notFound: true };
     }
-
-    // Fetch SEO content
-    const seoSlug = `clinic/${clinicSlug}`;
-    await queryClient.prefetchQuery({
-        queryKey: ['seo-page-content', seoSlug],
-        queryFn: async () => {
-            const { data } = await supabase
-                .from("seo_pages")
-                .select("*")
-                .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
-                .order("is_optimized", { ascending: false })
-                .order("updated_at", { ascending: false })
-                .limit(1)
-                .maybeSingle();
-            return data || null;
-        }
-    });
-
-    // Fetch dentists, treatments, and reviews IN PARALLEL
-    await Promise.all([
-        queryClient.prefetchQuery({
-            queryKey: ["clinic-dentists", clinic.id],
-            queryFn: async () => {
-                const { data } = await supabase
-                    .from("dentists")
-                    .select("*")
-                    .eq("clinic_id", clinic.id)
-                    .eq("is_active", true)
-                    .order("is_primary", { ascending: false })
-                    .order("name");
-                return data || [];
-            }
-        }),
-        queryClient.prefetchQuery({
-            queryKey: ["clinic-treatments", clinic.id],
-            queryFn: async () => {
-                const { data } = await supabase
-                    .from("clinic_treatments")
-                    .select("*, treatment:treatments(*)")
-                    .eq("clinic_id", clinic.id);
-                return data || [];
-            }
-        }),
-        queryClient.prefetchQuery({
-            queryKey: ["clinic-reviews", clinic.id],
-            queryFn: async () => {
-                const { data } = await supabase
-                    .from("review_funnel_events")
-                    .select("*")
-                    .eq("clinic_id", clinic.id)
-                    .eq("event_type", "rating_submitted")
-                    .order("created_at", { ascending: false })
-                    .limit(20);
-                return (data || []).map((r: any) => ({
-                    id: r.id,
-                    patient_name: r.visitor_id || 'Anonymous',
-                    rating: r.rating || 5,
-                    content: r.comment || '',
-                    created_at: r.created_at,
-                    source: 'internal' as const,
-                }));
-            }
-        })
-    ]);
 
     return {
         props: {
