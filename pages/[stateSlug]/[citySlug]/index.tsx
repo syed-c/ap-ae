@@ -1,10 +1,35 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
+import Head from 'next/head';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import CityPageComponent from '@/pages/CityPage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
-export default CityPageComponent;
+// Wrapper component to render SEO meta tags server-side
+const CityPageWithSEO = ({ citySlug, stateSlug, seoData, dehydratedState }: {
+    citySlug: string;
+    stateSlug: string;
+    seoData: { title: string; description: string; canonical: string };
+    dehydratedState: any;
+}) => {
+    return (
+        <>
+            <Head>
+                <title>{seoData.title}</title>
+                <meta name="description" content={seoData.description} />
+                <link rel="canonical" href={seoData.canonical} />
+            </Head>
+            <CityPageComponent 
+                citySlugProp={citySlug}
+                stateSlugProp={stateSlug}
+                dehydratedStateProp={dehydratedState}
+                seoDataProp={seoData}
+            />
+        </>
+    );
+};
+
+export default CityPageWithSEO;
 
 // Generate static paths for emirate-area combinations
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -118,13 +143,24 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     ]);
 
     const stateData = queryClient.getQueryData<any>(['state', normalizedStateSlug]);
-    if (!stateData) {
-        return { notFound: true };
-    }
+    const cityData = queryClient.getQueryData<any>(['city', citySlug, normalizedStateSlug]);
+    const seoContent = queryClient.getQueryData<any>(['seo-page-content', seoSlug]);
+    
+    const cityName = cityData?.name || citySlug;
+    const stateName = stateData?.name || normalizedStateSlug;
+    const metaTitle = seoContent?.meta_title || `Dental Clinics in ${cityName}, ${stateName} | Book Appointments`;
+    const metaDescription = seoContent?.meta_description || `Find and book appointments with top-rated dental clinics in ${cityName}, ${stateName}. Verified dentists, real reviews.`;
 
     return {
         props: {
             dehydratedState: dehydrate(queryClient),
+            citySlug,
+            stateSlug: normalizedStateSlug,
+            seoData: {
+                title: metaTitle,
+                description: metaDescription,
+                canonical: `/${normalizedStateSlug}/${citySlug}/`,
+            }
         },
         revalidate: 3600,
     };

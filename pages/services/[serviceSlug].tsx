@@ -1,9 +1,32 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
+import Head from 'next/head';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import ServicePageComponent from '@/pages/ServicePage';
 
-export default ServicePageComponent;
+// Wrapper component to render SEO meta tags server-side
+const ServicePageWithSEO = ({ serviceSlug, seoData, dehydratedState }: {
+    serviceSlug: string;
+    seoData: { title: string; description: string; canonical: string };
+    dehydratedState: any;
+}) => {
+    return (
+        <>
+            <Head>
+                <title>{seoData.title}</title>
+                <meta name="description" content={seoData.description} />
+                <link rel="canonical" href={seoData.canonical} />
+            </Head>
+            <ServicePageComponent 
+                serviceSlugProp={serviceSlug}
+                dehydratedStateProp={dehydratedState}
+                seoDataProp={seoData}
+            />
+        </>
+    );
+};
+
+export default ServicePageWithSEO;
 
 // Generate static paths for all service pages at build time
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -71,9 +94,20 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
+    const seoContent = queryClient.getQueryData<any>(['seo-page-content', seoSlug]);
+    
+    const metaTitle = seoContent?.meta_title || `${treatment.name} - Dental Treatment in UAE`;
+    const metaDescription = seoContent?.meta_description || `Get ${treatment.name} treatment at top dental clinics in UAE. Book appointments with verified dentists.`;
+
     return {
         props: {
             dehydratedState: dehydrate(queryClient),
+            serviceSlug,
+            seoData: {
+                title: metaTitle,
+                description: metaDescription,
+                canonical: `/services/${serviceSlug}/`,
+            }
         },
         revalidate: 3600,
     };

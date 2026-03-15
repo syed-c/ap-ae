@@ -1,10 +1,33 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
+import Head from 'next/head';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import StatePageComponent from '@/pages/StatePage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
-export default StatePageComponent;
+// Wrapper component to render SEO meta tags server-side
+const StatePageWithSEO = ({ stateSlug, seoData, dehydratedState }: {
+    stateSlug: string;
+    seoData: { title: string; description: string; canonical: string };
+    dehydratedState: any;
+}) => {
+    return (
+        <>
+            <Head>
+                <title>{seoData.title}</title>
+                <meta name="description" content={seoData.description} />
+                <link rel="canonical" href={seoData.canonical} />
+            </Head>
+            <StatePageComponent 
+                stateSlugProp={stateSlug}
+                dehydratedStateProp={dehydratedState}
+                seoDataProp={seoData}
+            />
+        </>
+    );
+};
+
+export default StatePageWithSEO;
 
 // Generate static paths for all emirates at build time
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -70,9 +93,20 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
+    const seoContent = queryClient.getQueryData<any>(['seo-page-content', normalizedStateSlug]);
+    
+    const metaTitle = seoContent?.meta_title || `Dental Clinics in ${stateData.name} | Book Appointments`;
+    const metaDescription = seoContent?.meta_description || `Find and book appointments with top-rated dental clinics in ${stateData.name}, UAE. Verified dentists, real reviews.`;
+
     return {
         props: {
             dehydratedState: dehydrate(queryClient),
+            stateSlug: normalizedStateSlug,
+            seoData: {
+                title: metaTitle,
+                description: metaDescription,
+                canonical: `/${normalizedStateSlug}/`,
+            }
         },
         revalidate: 3600,
     };
