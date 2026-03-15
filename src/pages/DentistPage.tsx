@@ -177,6 +177,10 @@ const DentistPage = () => {
   if (isLoading) {
     return (
       <PageLayout>
+        <SEOHead
+          title="Loading..."
+          description="Loading dentist information..."
+        />
         <div className="container py-8">
           <Skeleton className="h-64 rounded-3xl mb-8" />
           <div className="grid lg:grid-cols-3 gap-8">

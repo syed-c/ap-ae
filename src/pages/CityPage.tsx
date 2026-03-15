@@ -223,6 +223,10 @@ const CityPage = () => {
   if (stateLoading || cityLoading) {
     return (
       <PageLayout>
+        <SEOHead
+          title="Loading..."
+          description="Loading dental clinics information..."
+        />
         <div className="container py-12">
           <Skeleton className="h-12 w-64 mb-4" />
           <Skeleton className="h-6 w-96" />

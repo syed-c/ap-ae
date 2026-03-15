@@ -101,6 +101,10 @@ const BlogPostPage = () => {
   if (isLoading) {
     return (
       <PageLayout>
+        <SEOHead
+          title="Loading..."
+          description="Loading blog post..."
+        />
         <div className="container py-8">
           <Skeleton className="h-96 rounded-3xl mb-8" />
           <div className="max-w-3xl mx-auto space-y-4">
