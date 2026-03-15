@@ -1,4 +1,5 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
+import Head from 'next/head';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import ClinicPageComponent from '@/pages/ClinicPage';
@@ -111,12 +112,47 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
+    const seoContent = queryClient.getQueryData<any>(['seo-page-content', seoSlug]);
+    
+    const cityName = clinic.city?.name || 'UAE';
+    const stateAbbrev = clinic.city?.state?.abbreviation || 'UAE';
+    const metaTitle = seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${cityName}`;
+    const metaDescription = seoContent?.meta_description || (clinic.description ? clinic.description.slice(0, 160) : `Book an appointment at ${clinic.name}. Professional dental clinic in ${cityName} with experienced dentists.`);
+
     return {
         props: {
             dehydratedState: dehydrate(queryClient),
-            // Also pass data directly as props for immediate access
             clinicSlug,
+            seoData: {
+                title: metaTitle,
+                description: metaDescription,
+                canonical: `/clinic/${clinicSlug}/`,
+            }
         },
         revalidate: 3600,
     };
 };
+
+// Wrapper component to render SEO meta tags server-side
+const ClinicPageWithSEO = ({ clinicSlug, seoData, dehydratedState }: {
+    clinicSlug: string;
+    seoData: { title: string; description: string; canonical: string };
+    dehydratedState: any;
+}) => {
+    return (
+        <>
+            <Head>
+                <title>{seoData.title}</title>
+                <meta name="description" content={seoData.description} />
+                <link rel="canonical" href={seoData.canonical} />
+            </Head>
+            <ClinicPageComponent 
+                clinicSlugProp={clinicSlug} 
+                dehydratedStateProp={dehydratedState}
+                seoDataProp={seoData}
+            />
+        </>
+    );
+};
+
+export default ClinicPageWithSEO;

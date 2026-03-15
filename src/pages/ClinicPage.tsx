@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -54,9 +55,20 @@ import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { proxyImageUrl } from "@/lib/proxyImageUrl";
 
-const ClinicPage = () => {
+interface ClinicPageProps {
+  clinicSlugProp?: string;
+  dehydratedStateProp?: any;
+  seoDataProp?: {
+    title: string;
+    description: string;
+    canonical: string;
+  };
+}
+
+const ClinicPage = ({ clinicSlugProp, seoDataProp }: ClinicPageProps = {}) => {
   const router = useRouter();
-  const clinicSlug = typeof router.query?.clinicSlug === 'string' ? router.query.clinicSlug : '';
+  // Use props from server-side SSG if available, otherwise fall back to router.query
+  const clinicSlug = clinicSlugProp || (typeof router.query?.clinicSlug === 'string' ? router.query.clinicSlug : '');
   const slug = clinicSlug || "";
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectedDentistId, setSelectedDentistId] = useState<string | undefined>();
@@ -223,21 +235,26 @@ const ClinicPage = () => {
     : "Find the best dental clinic in UAE. Book appointments with verified dentists and clinics.";
 
   // Always render SEOHead - use real data if available, fallback only if truly loading without prefetch
-  const seoTitle = clinic 
-    ? (seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${clinic.city?.name || 'UAE'}`)
-    : (seoContent?.meta_title || "Dental Clinic");
-  const seoDescription = clinic
-    ? (seoContent?.meta_description || fallbackDescription)
-    : (seoContent?.meta_description || "Find the best dental clinic");
+  // Use server-side SEO data if provided (from getStaticProps), otherwise use client-side data
+  const seoTitle = seoDataProp?.title 
+    ? seoDataProp.title
+    : (clinic 
+        ? (seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${clinic.city?.name || 'UAE'}`)
+        : (seoContent?.meta_title || "Dental Clinic"));
+  const seoDescription = seoDataProp?.description
+    ? seoDataProp.description
+    : (clinic
+        ? (seoContent?.meta_description || fallbackDescription)
+        : (seoContent?.meta_description || "Find the best dental clinic"));
 
   // If no clinic data and still loading, show loading state with SEO
   if (!hasClinicData && isLoading) {
     return (
       <PageLayout>
         <SEOHead
-          title={seoTitle}
-          description={seoDescription}
-          canonical={`/clinic/${slug}/`}
+          title={seoDataProp?.title || seoTitle}
+          description={seoDataProp?.description || seoDescription}
+          canonical={seoDataProp?.canonical || `/clinic/${slug}/`}
         />
         <div className="container py-8">
           <Skeleton className="h-80 rounded-3xl mb-8" />
@@ -311,9 +328,9 @@ const ClinicPage = () => {
   return (
     <PageLayout>
       <SEOHead
-        title={seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${clinic.city?.name || 'UAE'}`}
-        description={metaDescription}
-        canonical={`/clinic/${clinic.slug}/`}
+        title={seoDataProp?.title || seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${clinic.city?.name || 'UAE'}`}
+        description={seoDataProp?.description || metaDescription}
+        canonical={seoDataProp?.canonical || `/clinic/${clinic.slug}/`}
         keywords={[clinic.name, `dental clinic ${clinic.city?.name}`, `dentist ${clinic.city?.state?.abbreviation || 'US'}`]}
       />
       {/* Synchronous JSON-LD structured data for SEO */}

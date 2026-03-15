@@ -1,10 +1,21 @@
 import { GetStaticProps } from 'next';
+import Head from 'next/head';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import IndexPage from '@/pages/Index';
 import { ACTIVE_STATE_SLUGS } from '@/lib/constants/activeStates';
 
-export default IndexPage;
+export default function IndexPageWithSEO({ dehydratedState, seoData }: { dehydratedState: any; seoData: { title: string; description: string } }) {
+  return (
+    <>
+      <Head>
+        <title>{seoData.title}</title>
+        <meta name="description" content={seoData.description} />
+      </Head>
+      <IndexPage dehydratedStateProp={dehydratedState} seoDataProp={seoData} />
+    </>
+  );
+}
 
 export const getStaticProps: GetStaticProps = async () => {
   const queryClient = new QueryClient();
@@ -237,9 +248,18 @@ export const getStaticProps: GetStaticProps = async () => {
     })
   ]);
 
+  const seoContent = queryClient.getQueryData<any>(['seo-page-content', '/']);
+  
+  const metaTitle = seoContent?.meta_title || 'AppointPanda - Find & Book Dental Appointments in UAE';
+  const metaDescription = seoContent?.meta_description || 'Find and book appointments with top-rated dental professionals across the UAE. Verified dentists, real reviews, easy booking.';
+
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
+      seoData: {
+        title: metaTitle,
+        description: metaDescription,
+      }
     },
   };
 };

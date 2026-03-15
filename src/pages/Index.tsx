@@ -177,7 +177,15 @@ const staggerItem = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-const Index = () => {
+interface IndexPageProps {
+  dehydratedStateProp?: any;
+  seoDataProp?: {
+    title: string;
+    description: string;
+  };
+}
+
+const Index = ({ seoDataProp }: IndexPageProps = {}) => {
   const router = useRouter();
   const legacyPostId = typeof router.query?.p === 'string' ? router.query.p : null;
 
@@ -248,8 +256,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title={seoContent?.meta_title || "Find the Best Dentists in Dubai & UAE | AppointPanda"}
-        description={seoContent?.meta_description || "Search verified DHA & DOH licensed dentists across Dubai, Abu Dhabi, Sharjah & all 7 Emirates. Compare reviews, check AED pricing & book appointments online."}
+        title={seoDataProp?.title || seoContent?.meta_title || "Find the Best Dentists in Dubai & UAE | AppointPanda"}
+        description={seoDataProp?.description || seoContent?.meta_description || "Search verified DHA & DOH licensed dentists across Dubai, Abu Dhabi, Sharjah & all 7 Emirates. Compare reviews, check AED pricing & book appointments online."}
         canonical="/"
         keywords={['dentist in dubai', 'dental clinics UAE', 'DHA licensed dentist', 'dentist abu dhabi', 'best dentist sharjah', 'dental implants dubai', 'teeth whitening UAE']}
       />
