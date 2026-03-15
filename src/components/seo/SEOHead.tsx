@@ -20,8 +20,8 @@ const BASE_URL = 'https://www.appointpanda.ae';
 const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.png`;
 
 export const SEOHead = ({
-  title,
-  description,
+  title = '',
+  description = '',
   canonical,
   noindex = false,
   ogType = 'website',
@@ -34,8 +34,13 @@ export const SEOHead = ({
   const router = useRouter();
   const currentPath = router.asPath || '/';
 
+  // Ensure we have at least some title
+  const safeTitle = title || 'Dental Clinics in UAE';
   // Avoid double branding: if title already contains the site name, use it as-is
-  const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
+  const fullTitle = safeTitle.includes(SITE_NAME) ? safeTitle : `${safeTitle} | ${SITE_NAME}`;
+  
+  // Ensure description is not empty
+  const safeDescription = description || 'Find and book appointments with top-rated dental professionals across the UAE.';
 
   // CRITICAL: Always generate canonical URL - use provided or derive from current path
   const canonicalUrl = canonical
@@ -57,7 +62,7 @@ export const SEOHead = ({
     <Head>
       {/* Primary Meta Tags - These are CRITICAL for SEO */}
       <title>{fullTitle}</title>
-      <meta name="description" content={description} />
+      <meta name="description" content={safeDescription} />
       <meta name="robots" content={effectiveNoindex ? 'noindex, nofollow' : 'index, follow'} />
 
       {/* Canonical URL - Prevents duplicate content */}
@@ -78,7 +83,7 @@ export const SEOHead = ({
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={normalizedCanonical} />
       <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
+      <meta property="og:description" content={safeDescription} />
       <meta property="og:image" content={imageUrl} />
       <meta property="og:site_name" content={SITE_NAME} />
 
@@ -86,7 +91,7 @@ export const SEOHead = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:url" content={normalizedCanonical} />
       <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
+      <meta name="twitter:description" content={safeDescription} />
       <meta name="twitter:image" content={imageUrl} />
 
       {/* Article specific (for blog posts) */}
