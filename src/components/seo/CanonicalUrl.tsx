@@ -14,7 +14,7 @@ interface CanonicalUrlProps {
   baseDomain?: string;
 }
 
-const BASE_URL = 'https://www.AppointPanda.ae';
+const BASE_URL = 'https://www.appointpanda.ae';
 
 export function CanonicalUrl({ href, baseDomain }: CanonicalUrlProps) {
   const router = useRouter();

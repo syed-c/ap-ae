@@ -259,6 +259,21 @@ const ClinicPage = () => {
   // Get state slug from city data
   const stateSlug = clinic.city?.state?.slug || '';
 
+  // Helper function to truncate description to SEO-friendly length
+  const truncateDescription = (text: string | null | undefined, maxLength: number = 155): string => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    // Truncate at word boundary
+    const truncated = text.substring(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(' ');
+    return lastSpace > 0 ? truncated.substring(0, lastSpace) + '...' : truncated + '...';
+  };
+
+  // Generate SEO-optimized meta description
+  const metaDescription = seoContent?.meta_description 
+    || truncateDescription(clinic.description) 
+    || `Book an appointment at ${clinic.name}. ${isVerified ? 'Verified' : ''} dental clinic in ${clinic.city?.name || 'UAE'} with ${dentists?.length || 0} specialists.`;
+
   const breadcrumbs = [
     { label: "Clinics", href: "/search" },
     ...(clinic.city?.state ? [{ label: clinic.city.state.name, href: `/${clinic.city.state.slug}` }] : []),
@@ -270,7 +285,7 @@ const ClinicPage = () => {
     <PageLayout>
       <SEOHead
         title={seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${clinic.city?.name || 'UAE'}`}
-        description={seoContent?.meta_description || clinic.description || `Book an appointment at ${clinic.name}. ${isVerified ? 'Verified' : ''} dental clinic in ${clinic.city?.name || 'UAE'} with ${dentists?.length || 0} specialists.`}
+        description={metaDescription}
         canonical={`/clinic/${clinic.slug}/`}
         keywords={[clinic.name, `dental clinic ${clinic.city?.name}`, `dentist ${clinic.city?.state?.abbreviation || 'US'}`]}
       />

@@ -59,13 +59,13 @@ export interface SiteSettings {
 // These should match the values stored in global_settings table
 const DEFAULT_SITE_SETTINGS: SiteSettings = {
   siteName: 'AppointPanda',
-  siteUrl: 'https://www.AppointPanda.ae/',
+  siteUrl: 'https://www.appointpanda.ae/',
   siteTagline: 'UAE Dental Directory',
   contactDetails: {
-    support_email: 'support@AppointPanda.ae',
-    booking_email: 'bookings@AppointPanda.ae',
-    sales_email: 'sales@AppointPanda.ae',
-    partnerships_email: 'partners@AppointPanda.ae',
+    support_email: 'support@appointpanda.ae',
+    booking_email: 'bookings@appointpanda.ae',
+    sales_email: 'sales@appointpanda.ae',
+    partnerships_email: 'partners@appointpanda.ae',
     support_phone: '+971 4 123 4567',
     booking_phone: '+971 4 123 4567',
     sales_phone: '+971 4 123 4567',
