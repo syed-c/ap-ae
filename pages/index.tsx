@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import IndexPage from '@/pages/Index';
@@ -6,7 +6,7 @@ import { ACTIVE_STATE_SLUGS } from '@/lib/constants/activeStates';
 
 export default IndexPage;
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const queryClient = new QueryClient();
   const supabase = createServerSupabase();
 
