@@ -29,7 +29,7 @@ const DentistPageWithSEO = ({ dentistSlug, seoData, dehydratedState }: {
 export default DentistPageWithSEO;
 
 // Limit pre-rendered pages to prevent long build times
-const TOP_DENTISTS_LIMIT = 50;
+const TOP_DENTISTS_LIMIT = 20;
 
 export const getStaticPaths: GetStaticPaths = async () => {
     const supabase = createServerSupabase();

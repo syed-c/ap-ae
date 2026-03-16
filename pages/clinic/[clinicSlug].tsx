@@ -8,7 +8,7 @@ export default ClinicPageComponent;
 
 // Limit pre-rendered pages to prevent long build times
 // Rest will be generated on-demand with ISR
-const TOP_CLINICS_LIMIT = 50;
+const TOP_CLINICS_LIMIT = 20;
 
 export const getStaticPaths: GetStaticPaths = async () => {
     const supabase = createServerSupabase();
@@ -47,7 +47,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     const seoSlug = `clinic/${clinicSlug}`;
 
-    // Prefetch clinic and SEO content (critical for SEO)
+    // Only prefetch what's needed for SEO - let client fetch the rest
     await Promise.all([
         queryClient.prefetchQuery({
             queryKey: ['clinic', clinicSlug],
@@ -73,30 +73,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                     .maybeSingle();
                 return data || null;
             }
-        }),
-        // Also prefetch dentists, treatments, reviews for complete SSR
-        queryClient.prefetchQuery({
-            queryKey: ["clinic-dentists-by-slug", clinicSlug],
-            queryFn: async () => {
-                // First get clinic ID
-                const { data: clinic } = await supabase
-                    .from("clinics")
-                    .select("id")
-                    .eq("slug", clinicSlug)
-                    .maybeSingle();
-                if (!clinic) return [];
-                
-                const { data } = await supabase
-                    .from("dentists")
-                    .select("*")
-                    .eq("clinic_id", clinic.id)
-                    .eq("is_active", true)
-                    .order("is_primary", { ascending: false })
-                    .order("name");
-                return data || [];
-            }
-        }),
-        queryClient.prefetchQuery({
+        })
+    ]);
             queryKey: ["clinic-treatments-by-slug", clinicSlug],
             queryFn: async () => {
                 const { data: clinic } = await supabase

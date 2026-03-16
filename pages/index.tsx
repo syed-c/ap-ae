@@ -1,103 +1,33 @@
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
-import { QueryClient, dehydrate } from '@tanstack/react-query';
-import { createServerSupabase } from '@/lib/supabaseServer';
 import IndexPage from '@/pages/Index';
-import { ACTIVE_STATE_SLUGS } from '@/lib/constants/activeStates';
 
-export default function IndexPageWithSEO({ dehydratedState, seoData }: { dehydratedState: any; seoData: { title: string; description: string } }) {
+export default function IndexPageWithSEO({ seoData }: { seoData: { title: string; description: string } }) {
   return (
     <>
       <Head>
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
       </Head>
-      <IndexPage dehydratedStateProp={dehydratedState} seoDataProp={seoData} />
+      <IndexPage />
     </>
   );
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const queryClient = new QueryClient();
-  const supabase = createServerSupabase();
+  // Minimal SEO data - let client fetch the rest
+  const metaTitle = 'AppointPanda - Find & Book Dental Appointments in UAE';
+  const metaDescription = 'Find and book appointments with top-rated dental professionals across the UAE. Verified dentists, real reviews, easy booking.';
 
-  await Promise.all([
-    // Prefetch SEO Content
-    queryClient.prefetchQuery({
-      queryKey: ['seo-page-content', '/'],
-      queryFn: async () => {
-        // First try to get optimized content
-        const { data: optimizedData } = await supabase
-          .from('seo_pages')
-          .select('*')
-          .in('slug', ['/', ''])
-          .eq('is_optimized', true)
-          .order('updated_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (optimizedData && optimizedData.content) {
-          return optimizedData;
-        }
-
-        // Fallback to any content
-        const { data: anyData } = await supabase
-          .from('seo_pages')
-          .select('*')
-          .in('slug', ['/', ''])
-          .order('updated_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        return anyData || null;
+  return {
+    props: {
+      seoData: {
+        title: metaTitle,
+        description: metaDescription,
       }
-    }),
-
-    // Prefetch Homepage Treatments
-    queryClient.prefetchQuery({
-      queryKey: ['homepage-treatments'],
-      queryFn: async () => {
-        const { data } = await supabase
-          .from('treatments')
-          .select('id, name, slug')
-          .eq('is_active', true)
-          .order('display_order')
-          .limit(12);
-        return data || [];
-      },
-    }),
-
-    // Prefetch States with Clinics
-    queryClient.prefetchQuery({
-      queryKey: ['states-with-clinics'],
-      queryFn: async () => {
-        // Use raw fetch logic similar to hook
-        const { data: allStates } = await supabase
-          .from('states')
-          .select('*')
-          .eq('is_active', true)
-          .in('slug', ACTIVE_STATE_SLUGS)
-          .order('display_order');
-
-        if (!allStates || allStates.length === 0) return [];
-
-        const { data: clinicsRaw } = await (supabase
-          .from('clinics')
-          .select('city_id') as any)
-          .eq('is_active', true)
-          .eq('is_duplicate', false);
-
-        const clinics = clinicsRaw as Array<{ city_id: string | null }> | null;
-        const cityIds = (clinics || []).map(c => c.city_id).filter((id): id is string => id !== null);
-
-        if (cityIds.length === 0) return [];
-
-        const { data: citiesRaw } = await supabase
-          .from('cities')
-          .select('id, state_id')
-          .eq('is_active', true);
-
-        const citiesData = citiesRaw as Array<{ id: string; state_id: string | null }> | null;
+    },
+  };
+};
 
         const cityIdSet = new Set(cityIds);
         const stateIdSet = new Set<string>();
