@@ -109,6 +109,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         props: {
             dehydratedState: dehydrate(queryClient),
             clinicSlug,
+            clinicData: clinic,
             seoData: {
                 title: metaTitle,
                 description: metaDescription,
@@ -120,8 +121,9 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 };
 
 // Wrapper component to render SEO meta tags server-side
-const ClinicPageWithSEO = ({ clinicSlug, seoData, dehydratedState }: {
+const ClinicPageWithSEO = ({ clinicSlug, clinicData, seoData, dehydratedState }: {
     clinicSlug: string;
+    clinicData: any;
     seoData: { title: string; description: string; canonical: string };
     dehydratedState: any;
 }) => {
@@ -134,6 +136,7 @@ const ClinicPageWithSEO = ({ clinicSlug, seoData, dehydratedState }: {
             </Head>
             <ClinicPageComponent 
                 clinicSlugProp={clinicSlug} 
+                clinicDataProp={clinicData}
                 dehydratedStateProp={dehydratedState}
                 seoDataProp={seoData}
             />

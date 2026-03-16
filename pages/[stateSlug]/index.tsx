@@ -6,8 +6,9 @@ import StatePageComponent from '@/pages/StatePage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 // Wrapper component to render SEO meta tags server-side
-const StatePageWithSEO = ({ stateSlug, seoData, dehydratedState }: {
+const StatePageWithSEO = ({ stateSlug, stateData, seoData, dehydratedState }: {
     stateSlug: string;
+    stateData: any;
     seoData: { title: string; description: string; canonical: string };
     dehydratedState: any;
 }) => {
@@ -20,6 +21,7 @@ const StatePageWithSEO = ({ stateSlug, seoData, dehydratedState }: {
             </Head>
             <StatePageComponent 
                 stateSlugProp={stateSlug}
+                stateDataProp={stateData}
                 dehydratedStateProp={dehydratedState}
                 seoDataProp={seoData}
             />
@@ -102,6 +104,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         props: {
             dehydratedState: dehydrate(queryClient),
             stateSlug: normalizedStateSlug,
+            stateData: stateData,
             seoData: {
                 title: metaTitle,
                 description: metaDescription,

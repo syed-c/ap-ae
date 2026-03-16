@@ -37,6 +37,7 @@ import { proxyImageUrl } from "@/lib/proxyImageUrl";
 
 interface DentistPageProps {
   dentistSlugProp?: string;
+  dentistDataProp?: any;
   dehydratedStateProp?: any;
   seoDataProp?: {
     title: string;
@@ -45,7 +46,7 @@ interface DentistPageProps {
   };
 }
 
-const DentistPage = ({ dentistSlugProp, seoDataProp }: DentistPageProps = {}) => {
+const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistPageProps = {}) => {
   const router = useRouter();
   const isServerRender = typeof window === 'undefined';
   const dentistSlug = isServerRender
@@ -75,6 +76,7 @@ const DentistPage = ({ dentistSlugProp, seoDataProp }: DentistPageProps = {}) =>
       if (error) throw error;
       return data;
     },
+    initialData: dentistDataProp,
     enabled: !!slug && !slug.includes('/'),
   });
 

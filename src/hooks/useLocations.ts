@@ -79,7 +79,7 @@ export function useStatesWithClinics() {
   });
 }
 
-export function useState(slug: string) {
+export function useState(slug: string, initialData?: State | null) {
   const normalized = normalizeStateSlug(slug);
   return useQuery({
     queryKey: ['state', normalized],
@@ -94,6 +94,7 @@ export function useState(slug: string) {
       if (error) throw error;
       return data as State | null;
     },
+    initialData: initialData ?? undefined,
     enabled: !!normalized,
     staleTime: 10 * 60 * 1000, // Cache for 10 minutes
     gcTime: 30 * 60 * 1000,
@@ -162,7 +163,7 @@ export function useCitiesByStateSlug(stateSlug: string) {
   });
 }
 
-export function useCity(slug: string, stateSlug?: string) {
+export function useCity(slug: string, stateSlug?: string, initialData?: City | null) {
   const normalizedStateSlug = stateSlug ? normalizeStateSlug(stateSlug) : null;
   return useQuery({
     queryKey: ['city', slug, normalizedStateSlug],
@@ -193,6 +194,7 @@ export function useCity(slug: string, stateSlug?: string) {
       // Otherwise return the first match (legacy behavior)
       return cities[0] as City | null;
     },
+    initialData: initialData ?? undefined,
     enabled: !!slug,
     staleTime: 10 * 60 * 1000, // Cache for 10 minutes
     gcTime: 30 * 60 * 1000,

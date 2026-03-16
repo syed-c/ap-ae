@@ -40,6 +40,7 @@ import {
 
 interface StatePageProps {
   stateSlugProp?: string;
+  stateDataProp?: any;
   dehydratedStateProp?: any;
   seoDataProp?: {
     title: string;
@@ -48,7 +49,7 @@ interface StatePageProps {
   };
 }
 
-const StatePage = ({ stateSlugProp, seoDataProp }: StatePageProps = {}) => {
+const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp }: StatePageProps = {}) => {
   const router = useRouter();
   const isServerRender = typeof window === 'undefined';
   const stateSlug = isServerRender
@@ -75,7 +76,7 @@ const StatePage = ({ stateSlugProp, seoDataProp }: StatePageProps = {}) => {
   const isInvalidSlug = !stateSlug || staticRoutes.includes(stateSlug) || stateSlug.includes('/');
 
   // All hooks must be called before any conditional returns
-  const { data: state, isLoading: stateLoading } = useStateData(normalizedStateSlug || '');
+  const { data: state, isLoading: stateLoading } = useStateData(normalizedStateSlug || '', stateDataProp);
   const { data: cities, isLoading: citiesLoading } = useCitiesByStateSlug(normalizedStateSlug || '');
 
   // Fetch SEO content from seo_pages table

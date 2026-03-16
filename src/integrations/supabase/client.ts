@@ -2,7 +2,8 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 const rawSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY 
+                 || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "";
 
 // Use direct Supabase URL for better compatibility
 const supabaseUrl = rawSupabaseUrl;

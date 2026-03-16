@@ -53,6 +53,8 @@ const MIN_DENTIST_COUNT = 2; // noindex pages with fewer than 2 dentists
 interface CityPageProps {
   citySlugProp?: string;
   stateSlugProp?: string;
+  stateDataProp?: any;
+  cityDataProp?: any;
   dehydratedStateProp?: any;
   seoDataProp?: {
     title: string;
@@ -61,7 +63,7 @@ interface CityPageProps {
   };
 }
 
-const CityPage = ({ citySlugProp, stateSlugProp, seoDataProp }: CityPageProps = {}) => {
+const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp }: CityPageProps = {}) => {
   const router = useRouter();
   const isServerRender = typeof window === 'undefined';
   const stateSlug = isServerRender
@@ -79,8 +81,8 @@ const CityPage = ({ citySlugProp, stateSlugProp, seoDataProp }: CityPageProps = 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useReactState(false);
   const { filters, setFilters } = useBudgetFilters();
 
-  const { data: state, isLoading: stateLoading } = useStateData(normalizedStateSlug || '');
-  const { data: city, isLoading: cityLoading } = useCity(citySlug || '', normalizedStateSlug || '');
+  const { data: state, isLoading: stateLoading } = useStateData(normalizedStateSlug || '', stateDataProp);
+  const { data: city, isLoading: cityLoading } = useCity(citySlug || '', normalizedStateSlug || '', cityDataProp);
 
   // Check if "citySlug" is actually a treatment slug (for state-level service pages like /dubai/teeth-whitening/)
   const { data: treatmentMatch, isLoading: treatmentMatchLoading } = useQuery({

@@ -57,6 +57,7 @@ import { proxyImageUrl } from "@/lib/proxyImageUrl";
 
 interface ClinicPageProps {
   clinicSlugProp?: string;
+  clinicDataProp?: any;
   dehydratedStateProp?: any;
   seoDataProp?: {
     title: string;
@@ -65,7 +66,7 @@ interface ClinicPageProps {
   };
 }
 
-const ClinicPage = ({ clinicSlugProp, seoDataProp }: ClinicPageProps = {}) => {
+const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageProps = {}) => {
   const router = useRouter();
   // Always trust clinicSlugProp for SSR - it's passed from getStaticProps
   // Only fall back to router.query for client-side navigations after initial SSR
@@ -100,6 +101,7 @@ const ClinicPage = ({ clinicSlugProp, seoDataProp }: ClinicPageProps = {}) => {
       if (error) throw error;
       return data;
     },
+    initialData: clinicDataProp,
     enabled: !!slug && !slug.includes('/'),
   });
 

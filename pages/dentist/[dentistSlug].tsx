@@ -5,8 +5,9 @@ import { createServerSupabase } from '@/lib/supabaseServer';
 import DentistPageComponent from '@/pages/DentistPage';
 
 // Wrapper component to render SEO meta tags server-side
-const DentistPageWithSEO = ({ dentistSlug, seoData, dehydratedState }: {
+const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData, dehydratedState }: {
     dentistSlug: string;
+    dentistData: any;
     seoData: { title: string; description: string; canonical: string };
     dehydratedState: any;
 }) => {
@@ -19,6 +20,7 @@ const DentistPageWithSEO = ({ dentistSlug, seoData, dehydratedState }: {
             </Head>
             <DentistPageComponent 
                 dentistSlugProp={dentistSlug} 
+                dentistDataProp={dentistData}
                 dehydratedStateProp={dehydratedState}
                 seoDataProp={seoData}
             />
@@ -114,6 +116,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         props: {
             dehydratedState: dehydrate(queryClient),
             dentistSlug,
+            dentistData: dentist,
             seoData: {
                 title: metaTitle,
                 description: metaDescription,
