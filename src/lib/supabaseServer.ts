@@ -10,8 +10,10 @@ export function createServerSupabase() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-    if (!url || !key) {
-        throw new Error('Missing Supabase environment variables');
+    // Skip if missing or invalid
+    if (!url || !key || !url.startsWith('http')) {
+        console.warn('Missing or invalid Supabase environment variables - skipping server-side queries');
+        return null;
     }
 
     return createClient<Database>(url, key, {

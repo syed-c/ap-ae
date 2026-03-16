@@ -8,6 +8,11 @@ export default BlogPostPageComponent;
 export const getStaticPaths: GetStaticPaths = async () => {
     const supabase = createServerSupabase();
     
+    // Skip if no Supabase credentials
+    if (!supabase) {
+        return { paths: [], fallback: 'blocking' };
+    }
+    
     console.log('[SSG] Generating blog post paths...');
     
     const { data: posts } = await supabase

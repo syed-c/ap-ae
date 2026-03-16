@@ -4,14 +4,16 @@ import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import ClinicPageComponent from '@/pages/ClinicPage';
 
-export default ClinicPageComponent;
-
 // Limit pre-rendered pages to prevent long build times
 // Rest will be generated on-demand with ISR
 const TOP_CLINICS_LIMIT = 20;
 
 export const getStaticPaths: GetStaticPaths = async () => {
     const supabase = createServerSupabase();
+    
+    if (!supabase) {
+        return { paths: [], fallback: 'blocking' };
+    }
     
     // Only pre-render top clinics by rating/review count
     const { data: clinics } = await supabase
@@ -45,6 +47,21 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
+    // If no Supabase, skip prefetch - client will fetch data
+    if (!supabase) {
+        return {
+            props: {
+                clinicSlug,
+                seoData: {
+                    title: 'Dental Clinic',
+                    description: 'Find and book dental appointments in UAE',
+                    canonical: `/clinic/${clinicSlug}/`,
+                }
+            },
+            revalidate: 3600,
+        };
+    }
+
     const seoSlug = `clinic/${clinicSlug}`;
 
     // Only prefetch what's needed for SEO - let client fetch the rest
@@ -72,23 +89,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                     .limit(1)
                     .maybeSingle();
                 return data || null;
-            }
-        })
-    ]);
-            queryKey: ["clinic-treatments-by-slug", clinicSlug],
-            queryFn: async () => {
-                const { data: clinic } = await supabase
-                    .from("clinics")
-                    .select("id")
-                    .eq("slug", clinicSlug)
-                    .maybeSingle();
-                if (!clinic) return [];
-                
-                const { data } = await supabase
-                    .from("clinic_treatments")
-                    .select("*, treatment:treatments(*)")
-                    .eq("clinic_id", clinic.id);
-                return data || [];
             }
         })
     ]);
