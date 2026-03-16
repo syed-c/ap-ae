@@ -67,8 +67,12 @@ interface ClinicPageProps {
 
 const ClinicPage = ({ clinicSlugProp, seoDataProp }: ClinicPageProps = {}) => {
   const router = useRouter();
-  // Use props from server-side SSG if available, otherwise fall back to router.query
-  const clinicSlug = clinicSlugProp || (typeof router.query?.clinicSlug === 'string' ? router.query.clinicSlug : '');
+  // Always trust clinicSlugProp for SSR - it's passed from getStaticProps
+  // Only fall back to router.query for client-side navigations after initial SSR
+  const isServerRender = typeof window === 'undefined';
+  const clinicSlug = isServerRender 
+    ? (clinicSlugProp || '')
+    : (clinicSlugProp || (typeof router.query?.clinicSlug === 'string' ? router.query.clinicSlug : ''));
   const slug = clinicSlug || "";
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectedDentistId, setSelectedDentistId] = useState<string | undefined>();
@@ -249,12 +253,33 @@ const ClinicPage = ({ clinicSlugProp, seoDataProp }: ClinicPageProps = {}) => {
 
   // If no clinic data and still loading, show loading state with SEO
   if (!hasClinicData && isLoading) {
+    // If we have server-side SEO data from getStaticProps, render meaningful SSR content
+    if (seoDataProp) {
+      return (
+        <PageLayout>
+          <SEOHead
+            title={seoDataProp.title}
+            description={seoDataProp.description}
+            canonical={seoDataProp.canonical}
+          />
+          <div className="container py-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-4">
+                <h1 className="text-2xl md:text-3xl font-display font-bold">{seoDataProp.title}</h1>
+                <p className="text-muted-foreground">{seoDataProp.description}</p>
+              </div>
+            </div>
+          </div>
+        </PageLayout>
+      );
+    }
+    // Only render visual skeleton for client-side navigations (no server data)
     return (
       <PageLayout>
         <SEOHead
-          title={seoDataProp?.title || seoTitle}
-          description={seoDataProp?.description || seoDescription}
-          canonical={seoDataProp?.canonical || `/clinic/${slug}/`}
+          title={seoTitle}
+          description={seoDescription}
+          canonical={`/clinic/${slug}/`}
         />
         <div className="container py-8">
           <Skeleton className="h-80 rounded-3xl mb-8" />

@@ -50,7 +50,10 @@ interface StatePageProps {
 
 const StatePage = ({ stateSlugProp, seoDataProp }: StatePageProps = {}) => {
   const router = useRouter();
-  const stateSlug = stateSlugProp || (typeof router.query?.stateSlug === 'string' ? router.query.stateSlug : '');
+  const isServerRender = typeof window === 'undefined';
+  const stateSlug = isServerRender
+    ? (stateSlugProp || '')
+    : (stateSlugProp || (typeof router.query?.stateSlug === 'string' ? router.query.stateSlug : ''));
 
   // Only render SEOHead on client-side when there's no server-provided seoDataProp
   // Server-side SEO is handled by the wrapper component in getStaticProps
@@ -252,6 +255,23 @@ const StatePage = ({ stateSlugProp, seoDataProp }: StatePageProps = {}) => {
 
   // If we don't have state data and it's still loading, show loading state with SEO
   if (!hasStateData && stateLoading) {
+    // If we have server-side SEO data from getStaticProps, render meaningful SSR content
+    if (seoDataProp) {
+      return (
+        <PageLayout>
+          <SEOHead
+            title={seoDataProp.title}
+            description={seoDataProp.description}
+            canonical={seoDataProp.canonical}
+          />
+          <div className="container py-12">
+            <h1 className="text-2xl md:text-3xl font-display font-bold mb-2">{seoDataProp.title}</h1>
+            <p className="text-muted-foreground">{seoDataProp.description}</p>
+          </div>
+        </PageLayout>
+      );
+    }
+    // Only render visual skeleton for client-side navigations
     return (
       <PageLayout>
         {shouldRenderSeoHead && (

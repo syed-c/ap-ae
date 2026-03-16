@@ -10,8 +10,6 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          <title>AppointPanda - Find & Book Dental Appointments in UAE</title>
-          <meta name="description" content="Find and book appointments with top-rated dental professionals across the UAE. Verified dentists, real reviews, easy booking." />
           <link rel="icon" type="image/png" href="/favicon.png?v=5" />
           <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png?v=5" />
           <link rel="manifest" href="/site.webmanifest?v=5" />

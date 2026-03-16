@@ -63,8 +63,13 @@ interface CityPageProps {
 
 const CityPage = ({ citySlugProp, stateSlugProp, seoDataProp }: CityPageProps = {}) => {
   const router = useRouter();
-  const stateSlug = stateSlugProp || (typeof router.query?.stateSlug === 'string' ? router.query.stateSlug : '');
-  const citySlug = citySlugProp || (typeof router.query?.citySlug === 'string' ? router.query.citySlug : '');
+  const isServerRender = typeof window === 'undefined';
+  const stateSlug = isServerRender
+    ? (stateSlugProp || '')
+    : (stateSlugProp || (typeof router.query?.stateSlug === 'string' ? router.query.stateSlug : ''));
+  const citySlug = isServerRender
+    ? (citySlugProp || '')
+    : (citySlugProp || (typeof router.query?.citySlug === 'string' ? router.query.citySlug : ''));
   const normalizedStateSlug = normalizeStateSlug(stateSlug);
 
   // Only render SEOHead on client-side when there's no server-provided seoDataProp
@@ -254,6 +259,23 @@ const CityPage = ({ citySlugProp, stateSlugProp, seoDataProp }: CityPageProps = 
 
   // If we have state data from prefetch, render full page
   if (!hasStateData && (stateLoading || cityLoading)) {
+    // If we have server-side SEO data from getStaticProps, render meaningful SSR content
+    if (seoDataProp) {
+      return (
+        <PageLayout>
+          <SEOHead
+            title={seoDataProp.title}
+            description={seoDataProp.description}
+            canonical={seoDataProp.canonical}
+          />
+          <div className="container py-12">
+            <h1 className="text-2xl md:text-3xl font-display font-bold mb-2">{seoDataProp.title}</h1>
+            <p className="text-muted-foreground">{seoDataProp.description}</p>
+          </div>
+        </PageLayout>
+      );
+    }
+    // Only render visual skeleton for client-side navigations
     return (
       <PageLayout>
         {shouldRenderSeoHead && (
@@ -286,6 +308,22 @@ const CityPage = ({ citySlugProp, stateSlugProp, seoDataProp }: CityPageProps = 
     }
     // Still loading treatment check
     if (!city && treatmentMatchLoading) {
+      // If we have server-side SEO data from getStaticProps, render meaningful SSR content
+      if (seoDataProp) {
+        return (
+          <PageLayout>
+            <SEOHead
+              title={seoDataProp.title}
+              description={seoDataProp.description}
+              canonical={seoDataProp.canonical}
+            />
+            <div className="container py-12">
+              <h1 className="text-2xl md:text-3xl font-display font-bold mb-2">{seoDataProp.title}</h1>
+              <p className="text-muted-foreground">{seoDataProp.description}</p>
+            </div>
+          </PageLayout>
+        );
+      }
       return (
         <PageLayout>
           <SEOHead

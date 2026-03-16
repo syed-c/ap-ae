@@ -47,7 +47,10 @@ interface DentistPageProps {
 
 const DentistPage = ({ dentistSlugProp, seoDataProp }: DentistPageProps = {}) => {
   const router = useRouter();
-  const dentistSlug = dentistSlugProp || (typeof router.query?.dentistSlug === 'string' ? router.query.dentistSlug : '');
+  const isServerRender = typeof window === 'undefined';
+  const dentistSlug = isServerRender
+    ? (dentistSlugProp || '')
+    : (dentistSlugProp || (typeof router.query?.dentistSlug === 'string' ? router.query.dentistSlug : ''));
   const slug = dentistSlug || "";
   const [bookingOpen, setBookingOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -189,13 +192,33 @@ const DentistPage = ({ dentistSlugProp, seoDataProp }: DentistPageProps = {}) =>
   const shouldRenderSeoHead = !!dentist;
 
   if (isLoading) {
+    // If we have server-side SEO data from getStaticProps, render meaningful SSR content
+    if (seoDataProp) {
+      return (
+        <PageLayout>
+          <SEOHead
+            title={seoDataProp.title}
+            description={seoDataProp.description}
+            canonical={seoDataProp.canonical}
+          />
+          <div className="container py-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-4">
+                <h1 className="text-2xl md:text-3xl font-display font-bold">{seoDataProp.title}</h1>
+                <p className="text-muted-foreground">{seoDataProp.description}</p>
+              </div>
+            </div>
+          </div>
+        </PageLayout>
+      );
+    }
+    // Only render visual skeleton for client-side navigations
     return (
       <PageLayout>
         <SEOHead
           title="Loading..."
           description="Loading dentist information..."
         />
-        )}
         <div className="container py-8">
           <Skeleton className="h-64 rounded-3xl mb-8" />
           <div className="grid lg:grid-cols-3 gap-8">
