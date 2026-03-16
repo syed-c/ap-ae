@@ -38,9 +38,19 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-const StatePage = () => {
+interface StatePageProps {
+  stateSlugProp?: string;
+  dehydratedStateProp?: any;
+  seoDataProp?: {
+    title: string;
+    description: string;
+    canonical: string;
+  };
+}
+
+const StatePage = ({ stateSlugProp, seoDataProp }: StatePageProps = {}) => {
   const router = useRouter();
-  const stateSlug = typeof router.query?.stateSlug === 'string' ? router.query.stateSlug : '';
+  const stateSlug = stateSlugProp || (typeof router.query?.stateSlug === 'string' ? router.query.stateSlug : '');
 
   const normalizedStateSlug = normalizeStateSlug(stateSlug);
 

@@ -39,9 +39,19 @@ import {
 
 const MIN_PROFILE_COUNT = 2;
 
-const ServicePage = () => {
-  const { serviceSlug: serviceSlugParam } = useRouter().query as { serviceSlug?: string };
-  const serviceSlug = serviceSlugParam || "";
+interface ServicePageProps {
+  serviceSlugProp?: string;
+  dehydratedStateProp?: any;
+  seoDataProp?: {
+    title: string;
+    description: string;
+    canonical: string;
+  };
+}
+
+const ServicePage = ({ serviceSlugProp, seoDataProp }: ServicePageProps = {}) => {
+  const router = useRouter();
+  const serviceSlug = serviceSlugProp || (typeof router.query?.serviceSlug === 'string' ? router.query.serviceSlug : '');
 
   const seoSlug = `services/${serviceSlug}`;
   const { data: seoContent, isLoading: seoContentLoading, isFetching: seoContentFetching } = useSeoPageContent(seoSlug);

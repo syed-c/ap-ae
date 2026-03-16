@@ -50,8 +50,21 @@ import {
 
 const MIN_DENTIST_COUNT = 2; // noindex pages with fewer than 2 dentists
 
-const CityPage = () => {
-  const { stateSlug, citySlug } = useRouter().query as { stateSlug?: string; citySlug?: string };
+interface CityPageProps {
+  citySlugProp?: string;
+  stateSlugProp?: string;
+  dehydratedStateProp?: any;
+  seoDataProp?: {
+    title: string;
+    description: string;
+    canonical: string;
+  };
+}
+
+const CityPage = ({ citySlugProp, stateSlugProp, seoDataProp }: CityPageProps = {}) => {
+  const router = useRouter();
+  const stateSlug = stateSlugProp || (typeof router.query?.stateSlug === 'string' ? router.query.stateSlug : '');
+  const citySlug = citySlugProp || (typeof router.query?.citySlug === 'string' ? router.query.citySlug : '');
   const normalizedStateSlug = normalizeStateSlug(stateSlug);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useReactState(false);
   const { filters, setFilters } = useBudgetFilters();

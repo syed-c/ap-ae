@@ -35,8 +35,19 @@ import {
 import { TrustSignalStrip, AEDPricingDisplay, CredentialsBadge } from "@/components/healthcare";
 import { proxyImageUrl } from "@/lib/proxyImageUrl";
 
-const DentistPage = () => {
-  const { dentistSlug } = useRouter().query as { dentistSlug?: string };
+interface DentistPageProps {
+  dentistSlugProp?: string;
+  dehydratedStateProp?: any;
+  seoDataProp?: {
+    title: string;
+    description: string;
+    canonical: string;
+  };
+}
+
+const DentistPage = ({ dentistSlugProp, seoDataProp }: DentistPageProps = {}) => {
+  const router = useRouter();
+  const dentistSlug = dentistSlugProp || (typeof router.query?.dentistSlug === 'string' ? router.query.dentistSlug : '');
   const slug = dentistSlug || "";
   const [bookingOpen, setBookingOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
