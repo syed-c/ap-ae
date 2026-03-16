@@ -6,20 +6,28 @@ import ClinicPageComponent from '@/pages/ClinicPage';
 
 export default ClinicPageComponent;
 
-// Generate static paths for all clinic pages at build time
+// Limit pre-rendered pages to prevent long build times
+// Rest will be generated on-demand with ISR
+const TOP_CLINICS_LIMIT = 50;
+
 export const getStaticPaths: GetStaticPaths = async () => {
     const supabase = createServerSupabase();
     
+    // Only pre-render top clinics by rating/review count
     const { data: clinics } = await supabase
         .from('clinics')
-        .select('slug')
-        .eq('is_active', true);
+        .select('slug, rating, review_count')
+        .eq('is_active', true)
+        .eq('is_duplicate', false)
+        .order('rating', { ascending: false })
+        .order('review_count', { ascending: false })
+        .limit(TOP_CLINICS_LIMIT);
     
     const paths = (clinics || []).map(clinic => ({
         params: { clinicSlug: clinic.slug }
     }));
     
-    console.log(`[SSG] Generated ${paths.length} clinic page paths`);
+    console.log(`[SSG] Generated ${paths.length} clinic page paths (limited to top ${TOP_CLINICS_LIMIT})`);
     
     return {
         paths,

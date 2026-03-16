@@ -28,16 +28,22 @@ const DentistPageWithSEO = ({ dentistSlug, seoData, dehydratedState }: {
 
 export default DentistPageWithSEO;
 
-// Generate static paths for all dentist pages at build time
+// Limit pre-rendered pages to prevent long build times
+const TOP_DENTISTS_LIMIT = 50;
+
 export const getStaticPaths: GetStaticPaths = async () => {
     const supabase = createServerSupabase();
     
     console.log('[SSG] Generating dentist paths...');
     
+    // Only pre-render top dentists by rating
     const { data: dentists } = await supabase
         .from('dentists')
-        .select('slug')
-        .eq('is_active', true);
+        .select('slug, rating, review_count')
+        .eq('is_active', true)
+        .order('rating', { ascending: false })
+        .order('review_count', { ascending: false })
+        .limit(TOP_DENTISTS_LIMIT);
     
     const paths = (dentists || []).map(dentist => ({
         params: { dentistSlug: dentist.slug }
