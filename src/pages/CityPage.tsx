@@ -677,6 +677,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
                 .slice(0, 3),
             ]}
             contextLabel={`city-${citySlug}`}
+            defaultOpen={true}
           />
         </div>
       </Section>

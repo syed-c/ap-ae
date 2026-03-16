@@ -263,6 +263,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
             title={seoDataProp.title}
             description={seoDataProp.description}
             canonical={seoDataProp.canonical}
+            skipCanonical
           />
           <div className="container py-8">
             <div className="grid lg:grid-cols-3 gap-8">
@@ -362,7 +363,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
         title={seoDataProp?.title || seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${clinic.city?.name || 'UAE'}`}
         description={seoDataProp?.description || metaDescription}
         canonical={seoDataProp?.canonical || `/clinic/${slug}/`}
-        keywords={[clinic.name, `dental clinic ${clinic.city?.name}`, `dentist ${clinic.city?.state?.abbreviation || 'US'}`]}
+        keywords={clinic.city?.name ? [clinic.name, `dental clinic ${clinic.city.name}`, `dentist in ${clinic.city.state?.abbreviation || 'UAE'}`] : [clinic.name, 'dental clinic UAE', 'dentist UAE']}
       />
       )}
       {/* Synchronous JSON-LD structured data for SEO */}
@@ -707,6 +708,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
                       items={allFaqs}
                       contextLabel={`clinic-${slug}`}
                       className="px-0"
+                      defaultOpen={true}
                     />
                   );
                 })()}

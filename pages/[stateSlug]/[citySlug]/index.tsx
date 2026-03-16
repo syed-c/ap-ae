@@ -6,6 +6,8 @@ import CityPageComponent from '@/pages/CityPage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 // Wrapper component to render SEO meta tags server-side
+const BASE_URL = 'https://www.appointpanda.ae';
+
 const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, dehydratedState }: {
     citySlug: string;
     stateSlug: string;
@@ -19,7 +21,7 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, de
             <Head>
                 <title>{seoData.title}</title>
                 <meta name="description" content={seoData.description} />
-                <link rel="canonical" href={seoData.canonical} />
+                <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
             </Head>
             <CityPageComponent 
                 citySlugProp={citySlug}

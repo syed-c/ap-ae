@@ -6,6 +6,7 @@ export interface SEOHeadProps {
   title: string;
   description: string;
   canonical?: string;
+  skipCanonical?: boolean;
   noindex?: boolean;
   ogType?: 'website' | 'article' | 'profile';
   ogImage?: string;
@@ -23,6 +24,7 @@ export const SEOHead = ({
   title = '',
   description = '',
   canonical,
+  skipCanonical = false,
   noindex = false,
   ogType = 'website',
   ogImage,
@@ -66,7 +68,7 @@ export const SEOHead = ({
       <meta name="robots" content={effectiveNoindex ? 'noindex, nofollow' : 'index, follow'} />
 
       {/* Canonical URL - Prevents duplicate content */}
-      <link rel="canonical" href={normalizedCanonical} />
+      {!skipCanonical && <link rel="canonical" href={normalizedCanonical} />}
 
       {/* Sitemap reference */}
       <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />

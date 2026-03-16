@@ -127,12 +127,14 @@ const ClinicPageWithSEO = ({ clinicSlug, clinicData, seoData, dehydratedState }:
     seoData: { title: string; description: string; canonical: string };
     dehydratedState: any;
 }) => {
+    const BASE_URL = 'https://www.appointpanda.ae';
+    
     return (
         <>
             <Head>
                 <title>{seoData.title}</title>
                 <meta name="description" content={seoData.description} />
-                <link rel="canonical" href={seoData.canonical} />
+                <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
             </Head>
             <ClinicPageComponent 
                 clinicSlugProp={clinicSlug} 
