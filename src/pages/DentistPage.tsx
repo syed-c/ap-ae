@@ -185,14 +185,12 @@ const DentistPage = ({ dentistSlugProp, seoDataProp }: DentistPageProps = {}) =>
   // Signal prerender when data is ready
   const isDataReady = !isLoading && !!dentist;
 
-  // Only render SEOHead on client-side when there's no server-provided seoDataProp
-  // Server-side SEO is handled by the wrapper component in getStaticProps
-  const shouldRenderSeoHead = !seoDataProp;
+  // Always render SEOHead when we have data - it will update meta tags on client-side
+  const shouldRenderSeoHead = !!dentist;
 
   if (isLoading) {
     return (
       <PageLayout>
-        {shouldRenderSeoHead && (
         <SEOHead
           title="Loading..."
           description="Loading dentist information..."

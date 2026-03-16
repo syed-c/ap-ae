@@ -251,13 +251,11 @@ const ClinicPage = ({ clinicSlugProp, seoDataProp }: ClinicPageProps = {}) => {
   if (!hasClinicData && isLoading) {
     return (
       <PageLayout>
-        {shouldRenderSeoHead && (
         <SEOHead
           title={seoDataProp?.title || seoTitle}
           description={seoDataProp?.description || seoDescription}
           canonical={seoDataProp?.canonical || `/clinic/${slug}/`}
         />
-        )}
         <div className="container py-8">
           <Skeleton className="h-80 rounded-3xl mb-8" />
           <div className="grid lg:grid-cols-3 gap-8">
@@ -279,12 +277,10 @@ const ClinicPage = ({ clinicSlugProp, seoDataProp }: ClinicPageProps = {}) => {
     return (
       <PageLayout>
         <Section>
-          {shouldRenderSeoHead && (
           <SEOHead
             title="Clinic Not Found"
             description="The dental clinic you're looking for doesn't exist or has been removed."
           />
-          )}
           <div className="text-center py-20">
             <h1 className="font-display text-3xl font-bold mb-4">Clinic Not Found</h1>
             <p className="text-muted-foreground mb-8">
@@ -329,9 +325,8 @@ const ClinicPage = ({ clinicSlugProp, seoDataProp }: ClinicPageProps = {}) => {
     { label: clinic.name },
   ];
 
-  // Only render SEOHead on client-side when there's no server-provided seoDataProp
-  // Server-side SEO is handled by the wrapper component in getStaticProps
-  const shouldRenderSeoHead = !seoDataProp;
+  // Always render SEOHead when we have clinic data - it will update meta tags on client-side
+  const shouldRenderSeoHead = !!clinic;
 
   return (
     <PageLayout>
