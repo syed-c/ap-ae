@@ -66,6 +66,11 @@ const CityPage = ({ citySlugProp, stateSlugProp, seoDataProp }: CityPageProps = 
   const stateSlug = stateSlugProp || (typeof router.query?.stateSlug === 'string' ? router.query.stateSlug : '');
   const citySlug = citySlugProp || (typeof router.query?.citySlug === 'string' ? router.query.citySlug : '');
   const normalizedStateSlug = normalizeStateSlug(stateSlug);
+
+  // Only render SEOHead on client-side when there's no server-provided seoDataProp
+  // Server-side SEO is handled by the wrapper component in getStaticProps
+  const shouldRenderSeoHead = !seoDataProp;
+
   const [mobileFiltersOpen, setMobileFiltersOpen] = useReactState(false);
   const { filters, setFilters } = useBudgetFilters();
 
@@ -251,11 +256,13 @@ const CityPage = ({ citySlugProp, stateSlugProp, seoDataProp }: CityPageProps = 
   if (!hasStateData && (stateLoading || cityLoading)) {
     return (
       <PageLayout>
+        {shouldRenderSeoHead && (
         <SEOHead
           title={seoTitle}
           description={seoDescription}
           canonical={`/${seoSlug}/`}
         />
+        )}
         <div className="container py-12">
           <Skeleton className="h-12 w-64 mb-4" />
           <Skeleton className="h-6 w-96" />
@@ -349,6 +356,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, seoDataProp }: CityPageProps = 
 
   return (
     <PageLayout>
+      {shouldRenderSeoHead && (
       <SEOHead
         title={pageTitle}
         description={pageDescription}
@@ -356,6 +364,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, seoDataProp }: CityPageProps = 
         keywords={[`dentists ${cityName}`, `dental clinics ${cityName} ${stateAbbr}`, `best dentist ${cityName}`]}
         noindex={shouldNoIndex}
       />
+      )}
       {/* Synchronous JSON-LD structured data for SEO */}
       <SyncStructuredData
         data={[

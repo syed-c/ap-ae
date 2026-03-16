@@ -185,13 +185,19 @@ const DentistPage = ({ dentistSlugProp, seoDataProp }: DentistPageProps = {}) =>
   // Signal prerender when data is ready
   const isDataReady = !isLoading && !!dentist;
 
+  // Only render SEOHead on client-side when there's no server-provided seoDataProp
+  // Server-side SEO is handled by the wrapper component in getStaticProps
+  const shouldRenderSeoHead = !seoDataProp;
+
   if (isLoading) {
     return (
       <PageLayout>
+        {shouldRenderSeoHead && (
         <SEOHead
           title="Loading..."
           description="Loading dentist information..."
         />
+        )}
         <div className="container py-8">
           <Skeleton className="h-64 rounded-3xl mb-8" />
           <div className="grid lg:grid-cols-3 gap-8">
@@ -239,6 +245,7 @@ const DentistPage = ({ dentistSlugProp, seoDataProp }: DentistPageProps = {}) =>
 
   return (
     <PageLayout>
+      {shouldRenderSeoHead && (
       <SEOHead
         title={seoContent?.meta_title || `${dentist.name}${dentist.title ? `, ${dentist.title}` : ''} - Dentist in ${locationDisplay}`}
         description={seoContent?.meta_description || dentist.bio || `Book an appointment with ${dentist.name}. ${dentist.years_experience ? `${dentist.years_experience}+ years of experience.` : ''} Verified dental professional in ${locationDisplay}.`}
@@ -246,6 +253,7 @@ const DentistPage = ({ dentistSlugProp, seoDataProp }: DentistPageProps = {}) =>
         keywords={[dentist.name, `dentist ${cityName}`, dentist.title || 'dental specialist']}
         ogType="profile"
       />
+      )}
       <StructuredData
         type="person"
         name={dentist.name}

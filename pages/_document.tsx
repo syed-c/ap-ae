@@ -10,7 +10,7 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          {/* Favicon */}
+          <title>AppointPanda - Find & Book Dental Appointments in UAE</title>
           <link rel="icon" type="image/png" href="/favicon.png?v=5" />
           <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png?v=5" />
           <link rel="manifest" href="/site.webmanifest?v=5" />

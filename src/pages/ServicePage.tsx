@@ -53,6 +53,10 @@ const ServicePage = ({ serviceSlugProp, seoDataProp }: ServicePageProps = {}) =>
   const router = useRouter();
   const serviceSlug = serviceSlugProp || (typeof router.query?.serviceSlug === 'string' ? router.query.serviceSlug : '');
 
+  // Only render SEOHead on client-side when there's no server-provided seoDataProp
+  // Server-side SEO is handled by the wrapper component in getStaticProps
+  const shouldRenderSeoHead = !seoDataProp;
+
   const seoSlug = `services/${serviceSlug}`;
   const { data: seoContent, isLoading: seoContentLoading, isFetching: seoContentFetching } = useSeoPageContent(seoSlug);
   const isSeoContentPending = !seoContent && (seoContentLoading || seoContentFetching);
@@ -132,6 +136,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp }: ServicePageProps = {}) =>
 
   return (
     <PageLayout>
+      {shouldRenderSeoHead && (
       <SEOHead
         title={seoContent?.meta_title || `${treatmentName} in UAE — Find Specialists & Compare Prices`}
         description={seoContent?.meta_description || `Find the best ${treatmentName.toLowerCase()} specialists across the UAE. Compare prices from AED ${uaeMin.toLocaleString()}–${uaeMax.toLocaleString()}, check insurance coverage, and book verified clinics.`}
@@ -139,6 +144,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp }: ServicePageProps = {}) =>
         keywords={[`${treatmentName} UAE`, `${treatmentName} cost`, `${treatmentName} Dubai`, `best ${treatmentName} clinic UAE`]}
         noindex={shouldNoIndex}
       />
+      )}
       <StructuredData
         type="service"
         name={`${treatmentName} in UAE`}

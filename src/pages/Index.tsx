@@ -189,6 +189,10 @@ const Index = ({ seoDataProp }: IndexPageProps = {}) => {
   const router = useRouter();
   const legacyPostId = typeof router.query?.p === 'string' ? router.query.p : null;
 
+  // Only render SEOHead on client-side when there's no server-provided seoDataProp
+  // Server-side SEO is handled by the wrapper component in getStaticProps
+  const shouldRenderSeoHead = !seoDataProp;
+
   // Debug: Test Supabase connection
   const { data: testData } = useQuery({
     queryKey: ['test-supabase'],
@@ -255,12 +259,14 @@ const Index = ({ seoDataProp }: IndexPageProps = {}) => {
 
   return (
     <div className="min-h-screen bg-background">
+      {shouldRenderSeoHead && (
       <SEOHead
         title={seoDataProp?.title || seoContent?.meta_title || "Find the Best Dentists in Dubai & UAE | AppointPanda"}
         description={seoDataProp?.description || seoContent?.meta_description || "Search verified DHA & DOH licensed dentists across Dubai, Abu Dhabi, Sharjah & all 7 Emirates. Compare reviews, check AED pricing & book appointments online."}
         canonical="/"
         keywords={['dentist in dubai', 'dental clinics UAE', 'DHA licensed dentist', 'dentist abu dhabi', 'best dentist sharjah', 'dental implants dubai', 'teeth whitening UAE']}
       />
+      )}
       <StructuredData type="organization" />
       <SyncStructuredData data={{ type: 'webSite', name: 'AppointPanda', url: 'https://www.AppointPanda.ae', searchUrl: 'https://www.AppointPanda.ae/search' }} />
       <Navbar />
