@@ -5,6 +5,27 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
 
+  // Add security and SEO headers
+  async headers() {
+    return [
+      {
+        // Block all API routes from indexing
+        source: '/api/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+          { key: 'Cache-Control', value: 'no-store, max-age=0' },
+        ],
+      },
+      {
+        // Block Next.js data endpoints from indexing
+        source: '/_next/data/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+        ],
+      },
+    ];
+  },
+
   typescript: {
     ignoreBuildErrors: true,
   },

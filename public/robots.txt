@@ -8,6 +8,9 @@ User-agent: Googlebot
 Allow: /
 # Block API endpoints from crawl budget
 Disallow: /api/
+# Block Next.js data endpoints (not indexable)
+Disallow: /_next/data/
+Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
@@ -33,6 +36,9 @@ Disallow: /*?gclid=*
 
 User-agent: Bingbot
 Allow: /
+# Block Next.js data endpoints (not indexable)
+Disallow: /_next/data/
+Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
@@ -63,6 +69,8 @@ Allow: /
 User-agent: GPTBot
 Allow: /
 Disallow: /api/
+Disallow: /_next/data/
+Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
@@ -70,6 +78,8 @@ Disallow: /auth
 User-agent: ChatGPT-User
 Allow: /
 Disallow: /api/
+Disallow: /_next/data/
+Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
@@ -77,6 +87,8 @@ Disallow: /auth
 User-agent: Claude-Web
 Allow: /
 Disallow: /api/
+Disallow: /_next/data/
+Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
@@ -84,6 +96,8 @@ Disallow: /auth
 User-agent: Anthropic-AI
 Allow: /
 Disallow: /api/
+Disallow: /_next/data/
+Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
@@ -91,6 +105,8 @@ Disallow: /auth
 User-agent: Google-Extended
 Allow: /
 Disallow: /api/
+Disallow: /_next/data/
+Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
@@ -98,6 +114,8 @@ Disallow: /auth
 User-agent: PerplexityBot
 Allow: /
 Disallow: /api/
+Disallow: /_next/data/
+Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
@@ -105,6 +123,8 @@ Disallow: /auth
 User-agent: Cohere-ai
 Allow: /
 Disallow: /api/
+Disallow: /_next/data/
+Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
@@ -112,6 +132,8 @@ Disallow: /auth
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /_next/data/
+Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
