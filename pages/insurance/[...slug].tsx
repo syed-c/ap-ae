@@ -177,11 +177,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         emirateData = queryClient.getQueryData<any>(["state", emirateSlug]);
         clinicCount = queryClient.getQueryData<number>(["insurance-clinics-count", insuranceSlug, emirateSlug]) || 0;
 
-        // Return notFound for emirate with no clinics
-        if (clinicCount === 0) {
-            return { notFound: true };
-        }
-
         // If city slug is provided, fetch city data
         if (citySlug) {
             await Promise.all([
@@ -224,11 +219,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
             cityData = queryClient.getQueryData<any>(["city", citySlug, emirateSlug]);
             clinicCount = queryClient.getQueryData<number>(["insurance-clinics-count-city", insuranceSlug, emirateSlug, citySlug]) || 0;
-
-            // Return notFound for city with no clinics
-            if (clinicCount === 0) {
-                return { notFound: true };
-            }
         }
     } else {
         // No emirate - get total clinic count for this insurance
