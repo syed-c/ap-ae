@@ -8,6 +8,8 @@ const BASE_URL = 'https://www.appointpanda.ae';
 
 const InsuranceDetailWrapper = ({ 
     insuranceSlug, 
+    emirateSlug,
+    citySlug,
     insuranceData, 
     emirateData, 
     cityData,
@@ -16,6 +18,8 @@ const InsuranceDetailWrapper = ({
     dehydratedState 
 }: {
     insuranceSlug: string;
+    emirateSlug: string | null;
+    citySlug: string | null;
     insuranceData: any;
     emirateData?: any;
     cityData?: any;
@@ -31,6 +35,8 @@ const InsuranceDetailWrapper = ({
             </Head>
             <InsuranceDetailPageComponent 
                 insuranceSlugProp={insuranceSlug}
+                emirateSlugProp={emirateSlug || undefined}
+                citySlugProp={citySlug || undefined}
                 insuranceDataProp={insuranceData}
                 emirateDataProp={emirateData}
                 cityDataProp={cityData}
@@ -272,6 +278,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         props: {
             dehydratedState: dehydrate(queryClient),
             insuranceSlug,
+            emirateSlug: emirateSlug || null,
+            citySlug: citySlug || null,
             insuranceData,
             emirateData,
             cityData,
