@@ -79,7 +79,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
         cityCountMap.set(c.city_id, count + 1);
     });
     
-    const citiesWithCounts = (cities || []).map(city => ({
+    const citiesWithCounts = (cities || []).map((city: any) => ({
         ...city,
         clinicCount: cityCountMap.get(city.id) || 0
     })).sort((a: any, b: any) => b.clinicCount - a.clinicCount);

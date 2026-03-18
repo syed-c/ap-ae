@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useAdminStats, usePlatformAlerts } from '@/hooks/useAdminStats';
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -59,7 +59,7 @@ export default function OverviewTab() {
   const { data: alerts } = usePlatformAlerts();
 
   const navigateTo = (tab: string) => {
-    setSearchParams({ tab });
+    router.push(`/admin/?tab=${tab}`);
   };
 
   // Master refresh function

@@ -268,7 +268,7 @@ export default function PricingPage() {
 
   const handleSelectPlan = (plan: typeof PLANS[0]) => {
     if (!user) {
-      router.push('/auth?redirect=/pricing');
+      router.push('/auth/?redirect=/pricing/');
       return;
     }
     if (userClinic?.id) {
@@ -278,7 +278,7 @@ export default function PricingPage() {
         { onSettled: () => setCheckingOutPlan(null) }
       );
     } else {
-      router.push('/list-your-practice');
+      router.push('/list-your-practice/');
     }
   };
 
@@ -348,7 +348,7 @@ export default function PricingPage() {
                   View Monthly Plans
                   <ArrowRight className="h-4 w-4" />
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => router.push('/contact')}>
+                <Button size="lg" variant="outline" onClick={() => router.push('/contact/')}>
                   Book a Demo
                 </Button>
               </div>
@@ -657,7 +657,7 @@ export default function PricingPage() {
                   size="lg"
                   variant="secondary"
                   className="gap-2"
-                  onClick={() => router.push('/list-your-practice')}
+                  onClick={() => router.push('/list-your-practice/')}
                 >
                   Get Verified Now
                   <BadgeCheck className="h-4 w-4" />
@@ -666,7 +666,7 @@ export default function PricingPage() {
                   size="lg"
                   variant="outline"
                   className="bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-                  onClick={() => router.push('/contact')}
+                  onClick={() => router.push('/contact/')}
                 >
                   Book a Demo
                 </Button>

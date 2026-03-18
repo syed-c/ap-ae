@@ -62,6 +62,16 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
+    // Handle abbreviation redirects (e.g., /dxb/ -> /dubai/)
+    if (normalizedStateSlug !== stateSlug) {
+        return {
+            redirect: {
+                destination: `/${normalizedStateSlug}/`,
+                permanent: true,
+            },
+        };
+    }
+
     // Prefetch state and SEO content (critical for SEO)
     await Promise.all([
         queryClient.prefetchQuery({

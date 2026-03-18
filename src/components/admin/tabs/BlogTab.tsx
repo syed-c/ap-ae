@@ -1185,7 +1185,7 @@ export default function BlogTab() {
                       <TableCell className="text-right">
                         {post.status === 'published' && (
                           <Button variant="ghost" size="sm" asChild>
-                            <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
+                            <a href={`/blog/${post.slug}/`} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-4 w-4" />
                             </a>
                           </Button>

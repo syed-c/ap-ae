@@ -321,7 +321,7 @@ const StateFallbackContent = ({
             {popularTreatments.slice(0, 8).map((t) => (
               <Link
                 key={t.slug}
-                href={`/services/${t.slug}`}
+                href={`/services/${t.slug}/`}
                 className="bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium hover:bg-primary/20 transition-colors"
               >
                 {t.name}
@@ -414,7 +414,7 @@ const CityFallbackContent = ({
           {popularTreatments.slice(0, 8).map((t) => (
             <Link
               key={t.slug}
-              href={`/${stateSlug}/${citySlug}/${t.slug}`}
+              href={`/${stateSlug}/${citySlug}/${t.slug}/`}
               className="bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium hover:bg-primary/20 transition-colors"
             >
               {t.name} in {cityName}
@@ -437,7 +437,7 @@ const CityFallbackContent = ({
           {nearbyLocations.map((loc) => (
             <Link
               key={loc.slug}
-              href={`/${stateSlug}/${loc.slug}`}
+              href={`/${stateSlug}/${loc.slug}/`}
               className="flex items-center gap-1 bg-muted hover:bg-muted/80 rounded-full px-4 py-2 text-sm font-medium transition-colors"
             >
               <MapPin className="h-3 w-3" />

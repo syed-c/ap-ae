@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import DentistDashboardLayoutV2 from './DentistDashboardLayoutV2';
 import DashboardOverviewV2 from './DashboardOverviewV2';
 import MyPracticePage from './MyPracticePage';
@@ -38,7 +38,7 @@ export default function DentistDashboardV2() {
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
-    setSearchParams({ tab: tabId }, { replace: true });
+    router.push(`/dashboard/?tab=${tabId}`);
   };
 
   const renderContent = () => {

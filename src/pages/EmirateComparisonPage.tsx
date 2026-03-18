@@ -129,10 +129,10 @@ const EmirateComparisonPage = () => {
                         <p className="text-sm text-muted-foreground mb-4">
                           Average: AED {Math.round((emirate.data.price_min + emirate.data.price_max) / 2).toLocaleString()}
                         </p>
-                        <Link
-                          href={`/${emirate.slug}`}
-                          className="inline-flex items-center gap-1 text-sm text-primary font-bold hover:underline"
-                        >
+                      <Link
+                        href={`/${emirate.slug}/`}
+                        className="inline-flex items-center gap-1 text-sm text-primary font-bold hover:underline"
+                      >
                           Find clinics in {emirate.name} <ArrowRight className="h-3 w-3" />
                         </Link>
                       </>
@@ -169,13 +169,13 @@ const EmirateComparisonPage = () => {
             Compare Other <span className="text-primary">Emirates</span>
           </h2>
           <div className="leading-loose">
-            {priceRanges?.filter(r => r.state?.slug !== emirate1 && r.state?.slug !== emirate2).map((range, i) => (
-              <span key={range.id}>
-                {i > 0 && <span className="text-muted-foreground mx-2">·</span>}
-                <Link
-                  href={`/compare/${slug}/${emirate1}-vs-${range.state?.slug}`}
-                  className="text-primary font-bold hover:underline"
-                >
+                {priceRanges?.filter(r => r.state?.slug !== emirate1 && r.state?.slug !== emirate2).map((range, i) => (
+                  <span key={range.id}>
+                    {i > 0 && <span className="text-muted-foreground mx-2">·</span>}
+                    <Link
+                      href={`/compare/${slug}/${emirate1}-vs-${range.state?.slug}/`}
+                      className="text-primary font-bold hover:underline"
+                    >
                   {emirate1Name} vs {range.state?.name}
                 </Link>
               </span>

@@ -133,7 +133,7 @@ export function AISmartSearch({
     if (onResultClick) {
       onResultClick(result);
     } else {
-      router.push(`/clinic/${result.slug}`);
+      router.push(`/clinic/${result.slug}/`);
     }
     setShowResults(false);
   }, [router, onResultClick]);

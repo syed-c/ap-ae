@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -104,11 +104,8 @@ export default function ProfileEditorTab() {
     if (gmbConnected === 'true') {
       setGmbJustConnected(true);
       toast.success('Google Business Profile connected successfully!');
-      // Remove the param to prevent showing toast again on refresh
-      const newParams = new URLSearchParams(searchParams);
-      newParams.delete('gmb_connected');
-      newParams.set('tab', 'my-profile');
-      setSearchParams(newParams, { replace: true });
+      // Navigate to profile tab without gmb_connected param
+      router.push('/dashboard/?tab=my-profile');
     }
   }, [searchParams, router]);
 

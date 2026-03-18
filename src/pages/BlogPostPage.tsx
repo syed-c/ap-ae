@@ -33,10 +33,11 @@ type BlogContentBlock = {
   faqs?: Array<{ question: string; answer: string }>;
 };
 
-const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp }: {
+const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp, dehydratedStateProp }: {
     postSlugProp?: string;
     postDataProp?: any;
     seoDataProp?: { title: string; description: string; canonical: string };
+    dehydratedStateProp?: any;
 }) => {
   const routerQuery = useRouter().query;
   const slug = postSlugProp || routerQuery.postSlug as string || "";
@@ -132,7 +133,7 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp }: {
               The blog post you're looking for doesn't exist.
             </p>
             <Button asChild className="rounded-xl font-bold">
-              <Link href="/blog">Back to Blog</Link>
+              <Link href="/blog/">Back to Blog</Link>
             </Button>
           </div>
         </Section>
@@ -595,7 +596,7 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp }: {
                 Ready to book an appointment? Find verified dental professionals in your city.
               </p>
               <Button asChild className="w-full rounded-xl font-bold">
-                <Link href="/search">
+                <Link href="/search/">
                   Browse Dentists
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -612,7 +613,7 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp }: {
                 {popularStates?.map((state) => (
                   <Link
                     key={state.slug}
-                    href={`/${state.slug}`}
+                    href={`/${state.slug}/`}
                     className="flex items-center justify-between p-3 rounded-xl bg-muted/50 hover:bg-primary/10 transition-colors group"
                   >
                     <span className="font-medium group-hover:text-primary">{state.name}</span>
@@ -685,7 +686,7 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp }: {
                 Our team can help you find the right dentist for your needs.
               </p>
               <Button asChild variant="outline" className="w-full rounded-xl font-bold border-coral/30 hover:bg-coral/10">
-                <Link href="/contact">Contact Us</Link>
+                <Link href="/contact/">Contact Us</Link>
               </Button>
             </div>
           </aside>
@@ -694,7 +695,7 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp }: {
         {/* Back to Blog */}
         <div className="mt-8">
           <Button asChild variant="outline" className="rounded-xl font-bold">
-            <Link href="/blog">
+            <Link href="/blog/">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Blog
             </Link>
@@ -709,11 +710,11 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp }: {
             <h2 className="font-display text-2xl font-bold mb-6">Related Articles</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {relatedPosts.map((relatedPost) => (
-                <Link
-                  key={relatedPost.id}
-                  href={`/blog/${relatedPost.slug}`}
-                  className="card-modern overflow-hidden group card-hover"
-                >
+                  <Link
+                    key={relatedPost.id}
+                    href={`/blog/${relatedPost.slug}/`}
+                    className="card-modern overflow-hidden group card-hover"
+                  >
                   <div className="h-40 relative overflow-hidden">
                     {relatedPost.featured_image_url ? (
                       <img
@@ -751,13 +752,13 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp }: {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button asChild size="lg" variant="secondary" className="rounded-2xl font-bold">
-              <Link href="/search">
+              <Link href="/search/">
                 Find a Dentist
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="rounded-2xl font-bold bg-transparent border-white/30 text-white hover:bg-white/10">
-              <Link href="/services">
+              <Link href="/services/">
                 Browse Services
               </Link>
             </Button>

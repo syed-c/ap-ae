@@ -379,7 +379,7 @@ export default function AuthCallback() {
             localStorage.setItem('gmb_relink_flow', 'true');
           }
           console.log('Redirecting to GMB selection page', { isRelinkFlow, isListingFlow, restoredOriginalUser });
-          router.push('/gmb-select', { replace: true, state: { providerToken } });
+          router.replace('/gmb-select/');
           return;
         }
 
@@ -425,7 +425,7 @@ export default function AuthCallback() {
                 // New user without clinic - redirect to GMB business selection
                 // so they can add their practice via GMB or manually
                 localStorage.setItem('gmb_listing_flow', 'true');
-                router.push('/gmb-select', { replace: true, state: { providerToken, isNewUser: true } });
+                router.replace('/gmb-select/');
               } else {
                 // User already has a clinic - go to dashboard
                 router.replace('/dashboard?tab=my-dashboard');
@@ -434,7 +434,7 @@ export default function AuthCallback() {
               console.error('Failed to bootstrap dentist:', err);
               // Still try to navigate to GMB selection for new users
               localStorage.setItem('gmb_listing_flow', 'true');
-              router.push('/gmb-select', { replace: true, state: { providerToken, isNewUser: true } });
+              router.replace('/gmb-select/');
             }
           } else {
             // Non-Google signup without role - go to onboarding
@@ -498,7 +498,7 @@ export default function AuthCallback() {
               <p className="text-foreground font-medium">{message}</p>
               {errorDetails && <p className="text-sm text-muted-foreground text-center">{errorDetails}</p>}
               <div className="flex gap-2 mt-4">
-                <Button variant="outline" onClick={() => router.push('/auth')}>
+                <Button variant="outline" onClick={() => router.push('/auth/')}>
                   Try Again
                 </Button>
                 <Button onClick={() => router.push('/')}>Go Home</Button>

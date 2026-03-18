@@ -242,7 +242,7 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistP
               The dentist profile you're looking for doesn't exist.
             </p>
             <Button asChild className="rounded-xl font-bold">
-              <Link href="/search">Find Dentists</Link>
+              <Link href="/search/">Find Dentists</Link>
             </Button>
           </div>
         </Section>
@@ -353,7 +353,7 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistP
                   )}
                   {dentist.clinic && (
                     <Link
-                      href={`/clinic/${dentist.clinic.slug}`}
+                      href={`/clinic/${dentist.clinic.slug}/`}
                       className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
                     >
                       <Briefcase className="h-4 w-4 text-primary" />
@@ -481,7 +481,7 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistP
                   Works At
                 </h3>
                 <Link
-                  href={`/clinic/${dentist.clinic.slug}`}
+                  href={`/clinic/${dentist.clinic.slug}/`}
                   className="block p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors"
                 >
                   <p className="font-bold text-lg">{dentist.clinic.name}</p>

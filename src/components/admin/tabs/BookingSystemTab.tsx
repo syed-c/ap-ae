@@ -821,7 +821,7 @@ export default function BookingSystemTab() {
                                 Settings
                               </Button>
                               <Button variant="ghost" size="sm" asChild>
-                                <Link href={`/clinic/${clinic.slug}`} target="_blank">
+                                <Link href={`/clinic/${clinic.slug}/`} target="_blank">
                                   <ExternalLink className="h-3 w-3" />
                                 </Link>
                               </Button>

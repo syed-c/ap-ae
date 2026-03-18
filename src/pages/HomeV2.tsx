@@ -119,7 +119,7 @@ const HomeV2 = () => {
         {/* Background image */}
         <div className="absolute inset-0">
           <img
-            src={heroDentalFamily}
+            src={heroDentalFamily.src}
             alt="Happy family at dental clinic"
             className="w-full h-full object-cover"
             loading="eager"
@@ -161,12 +161,12 @@ const HomeV2 = () => {
 
           {/* CTA Buttons */}
           <motion.div {...fadeUp} transition={{ delay: 0.3 }} className="flex flex-wrap justify-center gap-3">
-            <Button size="lg" className="rounded-xl font-semibold h-12 px-8 shadow-lg" onClick={() => router.push("/search")}>
+            <Button size="lg" className="rounded-xl font-semibold h-12 px-8 shadow-lg" onClick={() => router.push("/search/")}>
               <Search className="mr-2 h-4 w-4" />
               Find a Dentist
             </Button>
             <Button size="lg" variant="outline" className="rounded-xl font-semibold h-12 px-8 bg-background/10 border-background/30 text-background hover:bg-background/20 hover:text-background" asChild>
-              <Link href="/list-your-practice">
+              <Link href="/list-your-practice/">
                 <Stethoscope className="mr-2 h-4 w-4" />
                 I'm a Dentist
               </Link>
@@ -239,7 +239,7 @@ const HomeV2 = () => {
             >
               <div className="relative">
                 <div className="absolute -inset-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl -z-10" />
-                <img src={pandaMascot} alt="AppointPanda mascot" className="w-64 md:w-80 h-auto rounded-2xl" loading="lazy" />
+                <img src={pandaMascot.src} alt="AppointPanda mascot" className="w-64 md:w-80 h-auto rounded-2xl" loading="lazy" />
               </div>
             </motion.div>
 
@@ -293,7 +293,7 @@ const HomeV2 = () => {
             {ACTIVE_STATES.map((emirate) => (
               <Link
                 key={emirate.slug}
-                href={`/${emirate.slug}`}
+                href={`/${emirate.slug}/`}
                 className="bg-card border border-border rounded-xl px-5 py-3 text-sm font-medium text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all shadow-sm hover:shadow-md"
               >
                 <MapPin className="inline h-3.5 w-3.5 mr-1.5 opacity-50" />
@@ -315,7 +315,7 @@ const HomeV2 = () => {
             </motion.div>
             <div className="flex flex-wrap gap-2">
               {dubaiAreas.map((area) => (
-                <Link key={area.id} href={`/dubai/${area.slug}`} className="inline-flex items-center gap-1.5 bg-muted/60 border border-border/50 rounded-lg px-3.5 py-2 text-sm font-medium text-foreground hover:border-primary/40 hover:text-primary transition-all">
+                <Link key={area.id} href={`/dubai/${area.slug}/`} className="inline-flex items-center gap-1.5 bg-muted/60 border border-border/50 rounded-lg px-3.5 py-2 text-sm font-medium text-foreground hover:border-primary/40 hover:text-primary transition-all">
                   <MapPin className="h-3 w-3 text-primary/60" />
                   {area.name}
                 </Link>
@@ -335,7 +335,7 @@ const HomeV2 = () => {
             </motion.div>
             <div className="flex flex-wrap gap-2">
               {sharjahAreas.map((area) => (
-                <Link key={area.id} href={`/sharjah/${area.slug}`} className="inline-flex items-center gap-1.5 bg-background border border-border/50 rounded-lg px-3.5 py-2 text-sm font-medium text-foreground hover:border-primary/40 hover:text-primary transition-all">
+                <Link key={area.id} href={`/sharjah/${area.slug}/`} className="inline-flex items-center gap-1.5 bg-background border border-border/50 rounded-lg px-3.5 py-2 text-sm font-medium text-foreground hover:border-primary/40 hover:text-primary transition-all">
                   <MapPin className="h-3 w-3 text-primary/60" />
                   {area.name}
                 </Link>
@@ -354,14 +354,14 @@ const HomeV2 = () => {
                 <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-1">Dental <span className="text-primary">Services</span></h2>
                 <p className="text-sm text-muted-foreground">Find specialists for every dental need</p>
               </div>
-              <Link href="/services" className="hidden md:inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+              <Link href="/services/" className="hidden md:inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
                 All Services <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </motion.div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {popularTreatments.map((treatment, i) => (
                 <motion.div key={treatment.id} {...fadeUp} transition={{ delay: i * 0.04 }}>
-                  <Link href={`/services/${treatment.slug}`} className="group flex items-center justify-between bg-card border border-border rounded-xl p-4 hover:border-primary/30 hover:shadow-md transition-all">
+                  <Link href={`/services/${treatment.slug}/`} className="group flex items-center justify-between bg-card border border-border rounded-xl p-4 hover:border-primary/30 hover:shadow-md transition-all">
                     <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{treatment.name}</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
                   </Link>
@@ -369,7 +369,7 @@ const HomeV2 = () => {
               ))}
             </div>
             <div className="md:hidden text-center mt-6">
-              <Link href="/services" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+              <Link href="/services/" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
                 View All Services <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
@@ -422,7 +422,7 @@ const HomeV2 = () => {
             <AutoScrollCarousel doctors={carouselProfiles} autoScrollSpeed={25} />
             <div className="text-center mt-8">
               <Button variant="outline" className="rounded-xl font-medium" asChild>
-                <Link href="/search">View Full Directory <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link href="/search/">View Full Directory <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
             </div>
           </div>
@@ -435,7 +435,7 @@ const HomeV2 = () => {
           <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-center">
             <motion.div {...fadeUp}>
               <div className="rounded-2xl overflow-hidden shadow-lg">
-                <img src={dentalPracticeGrowth} alt="Grow your dental practice" className="w-full h-auto object-cover aspect-[4/3]" loading="lazy" />
+                <img src={dentalPracticeGrowth.src} alt="Grow your dental practice" className="w-full h-auto object-cover aspect-[4/3]" loading="lazy" />
               </div>
             </motion.div>
             <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
@@ -459,7 +459,7 @@ const HomeV2 = () => {
                 ))}
               </div>
               <Button className="rounded-xl font-semibold" asChild>
-                <Link href="/list-your-practice">
+                <Link href="/list-your-practice/">
                   List Your Practice Free <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -546,12 +546,12 @@ const HomeV2 = () => {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button size="lg" className="rounded-xl font-semibold h-12 px-8" asChild>
-                <Link href="/search">
+                <Link href="/search/">
                   Find a Dentist <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="rounded-xl font-semibold h-12 px-8 border-border" asChild>
-                <Link href="/list-your-practice">
+                <Link href="/list-your-practice/">
                   <Stethoscope className="mr-2 h-4 w-4" /> I'm a Dentist
                 </Link>
               </Button>

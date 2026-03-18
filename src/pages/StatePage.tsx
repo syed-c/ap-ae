@@ -386,7 +386,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp }: StatePageProps
             </p>
 
             <div className="flex flex-wrap justify-center gap-3 mb-8">
-              <Link href="/search">
+              <Link href="/search/">
                 <Button size="lg" className="h-12 px-6 font-bold rounded-2xl">
                   Find a Dentist <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

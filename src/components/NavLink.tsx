@@ -3,28 +3,28 @@ import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 import { withTrailingSlash } from "@/lib/url/withTrailingSlash";
 
-interface NavLinkCompatProps extends Omit<NavLinkProps, "className"> {
+interface NavLinkCompatProps {
   className?: string;
   activeClassName?: string;
   pendingClassName?: string;
+  to: string;
+  href?: string;
 }
 
 const NavLink = forwardRef<HTMLAnchorElement, NavLinkCompatProps>(
-  ({ className, activeClassName, pendingClassName, to, ...props }, ref) => {
-    const normalizedTo =
-      typeof to === "string"
-        ? withTrailingSlash(to)
-        : to && typeof to === "object" && "pathname" in to && typeof to.pathname === "string"
-          ? { ...to, pathname: withTrailingSlash(to.pathname) }
-          : to;
+  ({ className, activeClassName, to, href, ...props }, ref) => {
+    const normalizedTo = to || href;
+
+    const normalizedHref =
+      typeof normalizedTo === 'string'
+        ? withTrailingSlash(normalizedTo)
+        : normalizedTo;
 
     return (
-      <RouterNavLink
+      <Link
         ref={ref}
-        href={normalizedTo}
-        className={({ isActive, isPending }) =>
-          cn(className, isActive && activeClassName, isPending && pendingClassName)
-        }
+        href={normalizedHref}
+        className={cn(className)}
         {...props}
       />
     );

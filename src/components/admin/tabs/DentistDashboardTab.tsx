@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -116,20 +116,22 @@ export default function DentistDashboardTab() {
       toast.success('🎉 Subscription activated successfully! Welcome to your new plan.', {
         duration: 5000,
       });
-      // Remove the param from URL
-      searchParams.delete('subscription');
-      setSearchParams(searchParams, { replace: true });
+      // Remove the param from URL - redirect to clean URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete('subscription');
+      router.replace(url.pathname + '/');
       // Refresh subscription data
       queryClient.invalidateQueries({ queryKey: ['clinic-subscription'] });
     } else if (subscriptionStatus === 'cancelled') {
       toast.info('Checkout was cancelled. You can upgrade anytime from your dashboard.');
-      searchParams.delete('subscription');
-      setSearchParams(searchParams, { replace: true });
+      const url = new URL(window.location.href);
+      url.searchParams.delete('subscription');
+      router.replace(url.pathname + '/');
     }
   }, [searchParams, router, queryClient]);
 
   const navigateTo = (tab: string) => {
-    setSearchParams({ tab });
+    router.push(`/dashboard/?tab=${tab}`);
   };
 
   // Fetch dentist's clinic - skip for admins

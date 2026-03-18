@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 import { useQuery } from '@tanstack/react-query';
 import { cn } from "@/lib/utils";
 import { proxyImageUrl } from "@/lib/proxyImageUrl";
@@ -17,7 +18,8 @@ import { SEOHead } from '@/components/seo/SEOHead';
  * URL: /book/:clinicId
  */
 export default function BookDirectPage() {
-  const { clinicId } = useParams<{ clinicId: string }>();
+  const router = useRouter();
+  const { clinicId } = useParams() as { clinicId?: string };
 
   const { data: clinic, isLoading, error } = useQuery({
     queryKey: ['clinic-booking', clinicId],
@@ -81,7 +83,7 @@ export default function BookDirectPage() {
 
   if (error || !clinic) {
     // Redirect to home if clinic not found
-    return <Navigate to="/" replace />;
+    return router.replace('/');
   }
 
   const locationDisplay = [

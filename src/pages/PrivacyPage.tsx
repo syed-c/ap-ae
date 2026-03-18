@@ -211,7 +211,7 @@ Data Protection Inquiries: privacy@AppointPanda.ae`
             <div className="mt-12 pt-8 border-t text-center">
               <p className="text-muted-foreground mb-4">Have questions about your privacy?</p>
               <Button asChild variant="outline" className="rounded-2xl font-bold">
-                <Link href="/contact">
+                <Link href="/contact/">
                   Contact Us
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>

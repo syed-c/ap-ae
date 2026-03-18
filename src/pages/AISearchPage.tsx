@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import {
   Search, Sparkles, MapPin, DollarSign, Star, Shield, Clock,
   ArrowRight, Loader2, Building2, CheckCircle, Navigation, MessageCircle, Send
@@ -120,7 +121,7 @@ const AISearchPage = () => {
 
     // Clear input and search
     setQuery("");
-    setSearchParams({ q: fullQuery });
+    router.push(`/search/?q=${encodeURIComponent(fullQuery)}`);
     await search(fullQuery);
   };
 
@@ -466,7 +467,7 @@ const AISearchPage = () => {
 function ResultCard({ result, index }: { result: SearchResult; index: number }) {
   return (
     <Link
-      href={`/clinic/${result.slug}`}
+      href={`/clinic/${result.slug}/`}
       className={cn(
         "block bg-white/5 border border-white/10 rounded-xl md:rounded-2xl p-3 md:p-4 hover:border-primary/50 hover:bg-white/10 transition-all",
         "animate-fade-in-up"

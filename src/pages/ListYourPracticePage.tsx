@@ -280,7 +280,7 @@ const ListYourPracticePage = () => {
         description: "Our team will review your listing and contact you within 24-48 hours.",
       });
 
-      router.push("/list-your-practice/success");
+      router.push("/list-your-practice/success/");
     } catch (error) {
       toast({
         title: "Submission Failed",

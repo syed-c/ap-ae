@@ -133,10 +133,11 @@ const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, sta
   const stateAbbr = state?.abbreviation || '';
   const treatmentName = treatment?.name || service.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
   const locationDisplay = stateName ? `${locationName}, ${stateName}` : locationName;
+  const router = useRouter();
 
   // Redirect legacy slugs
   if (stateSlug && normalizedStateSlug && stateSlug !== normalizedStateSlug && citySlug && serviceSlug) {
-    return <Navigate href={`/${normalizedStateSlug}/${citySlug}/${serviceSlug}/`} replace />;
+    return router.replace(`/${normalizedStateSlug}/${citySlug}/${serviceSlug}/`);
   }
 
   const breadcrumbs = [

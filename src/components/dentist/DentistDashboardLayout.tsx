@@ -138,7 +138,7 @@ export default function DentistDashboardLayout({
 
   const handleLogout = async () => {
     await signOut();
-    router.push('/auth');
+    router.push('/auth/');
   };
 
   const renderBadge = (badge: string | null, itemId: string) => {

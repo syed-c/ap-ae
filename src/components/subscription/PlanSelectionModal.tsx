@@ -133,13 +133,13 @@ export function PlanSelectionModal({
 
   const handleSelectPlan = (planSlug: string) => {
     if (!user) {
-      router.push('/auth?redirect=/pricing');
+      router.push('/auth/?redirect=/pricing/');
       onOpenChange(false);
       return;
     }
 
     if (!clinicId) {
-      router.push('/list-your-practice');
+      router.push('/list-your-practice/');
       onOpenChange(false);
       return;
     }
@@ -313,7 +313,7 @@ export function PlanSelectionModal({
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground mb-3">
             Need help choosing?{' '}
-            <Button variant="link" className="p-0 h-auto" onClick={() => { onOpenChange(false); router.push('/pricing'); }}>
+            <Button variant="link" className="p-0 h-auto" onClick={() => { onOpenChange(false); router.push('/pricing/'); }}>
               View full comparison
             </Button>
           </p>

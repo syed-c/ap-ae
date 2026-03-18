@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -35,7 +36,7 @@ interface RequestData {
 }
 
 export default function ReviewRequestPage() {
-  const { requestCode } = useParams<{ requestCode: string }>();
+  const { requestCode } = useParams() as { requestCode?: string };
   const [step, setStep] = useState<Step>('initial');
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');

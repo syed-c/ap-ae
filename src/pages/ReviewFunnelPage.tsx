@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,8 @@ import { Star, CheckCircle, Building2, Sparkles, Heart, Shield } from 'lucide-re
 import { toast } from 'sonner';
 
 export default function ReviewFunnelPage() {
-  const { clinicId, clinicSlug } = useParams<{ clinicId?: string; clinicSlug?: string }>();
+  const router = useRouter();
+  const { clinicId, clinicSlug } = useParams() as { clinicId?: string; clinicSlug?: string };
   const [searchParams] = useState(() => new URLSearchParams(window.location.search));
   const source = searchParams.get('source') || 'link';
   

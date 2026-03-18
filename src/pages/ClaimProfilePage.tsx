@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -98,7 +98,8 @@ const ClaimProfilePage = () => {
   useEffect(() => {
     if (prefilledClinic) {
       setSearchQuery(prefilledClinic);
-      setSearchParams({}, { replace: true });
+      const url = new URL(window.location.href);
+      router.replace(url.pathname + '/');
     }
   }, [prefilledClinic, router]);
 
@@ -495,7 +496,7 @@ const ClaimProfilePage = () => {
                   <div className="text-center py-6">
                     <p className="text-muted-foreground mb-4">No profiles found matching your search.</p>
                     <Button asChild variant="outline" className="rounded-xl font-bold" size="sm">
-                      <Link href="/list-your-practice">
+                      <Link href="/list-your-practice/">
                         List Your Practice Instead
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
@@ -510,7 +511,7 @@ const ClaimProfilePage = () => {
                     If your clinic isn't listed yet, you can add it for free.
                   </p>
                   <Button asChild variant="outline" className="rounded-xl font-bold border-gold text-gold hover:bg-gold hover:text-white" size="sm">
-                    <Link href="/list-your-practice">
+                    <Link href="/list-your-practice/">
                       List Your Practice
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
@@ -984,10 +985,10 @@ const ClaimProfilePage = () => {
                 </p>
                 <div className="flex flex-col gap-3">
                   <Button asChild className="rounded-xl font-bold">
-                    <Link href="/dashboard?tab=my-dashboard">Go to Dashboard</Link>
+                    <Link href="/dashboard/?tab=my-dashboard">Go to Dashboard</Link>
                   </Button>
                   <Button asChild variant="outline" className="rounded-xl font-bold">
-                    <Link href={`/clinic/${selectedClinic?.slug}`}>View Your Profile</Link>
+                    <Link href={`/clinic/${selectedClinic?.slug}/`}>View Your Profile</Link>
                   </Button>
                 </div>
               </div>

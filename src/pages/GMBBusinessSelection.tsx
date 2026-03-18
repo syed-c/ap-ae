@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { getGmbProviderToken, setGmbProviderToken, clearGmbProviderToken } from '@/lib/gmbAuth';
@@ -50,9 +50,9 @@ interface LocationMatchResult {
 
 export default function GMBBusinessSelection() {
   const router = useRouter();
-  const location = useLocation();
+  const location = useSearchParams();
   const { user, refreshRoles } = useAuth();
-  const providerTokenFromNavState = (location.state as any)?.providerToken as string | undefined;
+  const providerTokenFromNavState = (location as unknown as { state?: { providerToken?: string } })?.state?.providerToken;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -267,9 +267,8 @@ export default function GMBBusinessSelection() {
 
       if (locationMatch?.requiresManualSelection) {
         // Navigate to onboarding with location selection needed flag
-        router.push(
-          `/onboarding?gmb_connected=true&listing_created=true&location_pending=true&detected_city=${encodeURIComponent(locationMatch.cityName || '')}&detected_city_id=${locationMatch.cityId || ''}`,
-          { replace: true }
+        router.replace(
+          `/onboarding?gmb_connected=true&listing_created=true&location_pending=true&detected_city=${encodeURIComponent(locationMatch.cityName || '')}&detected_city_id=${locationMatch.cityId || ''}`
         );
       } else {
         // Location auto-matched, go directly to onboarding

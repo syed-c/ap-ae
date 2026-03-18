@@ -312,7 +312,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
               The clinic you're looking for doesn't exist or has been removed.
             </p>
             <Button asChild className="rounded-xl font-bold">
-              <Link href="/search">Browse Clinics</Link>
+              <Link href="/search/">Browse Clinics</Link>
             </Button>
           </div>
         </Section>
@@ -586,7 +586,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
                 </div>
               </div>
               <Button asChild className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 hover:from-red-600 hover:to-orange-600">
-                <Link href="/pricing">
+                <Link href="/pricing/">
                   View Plans
                 </Link>
               </Button>

@@ -1,4 +1,7 @@
 import { useParams, useSearchParams, usePathname, useRouter } from 'next/navigation';
-import { Link } from 'next/link';
+import NextLink from "next/link";
+import type { LinkProps as NextLinkProps } from "next/link";
+
+const Link = (props: NextLinkProps) => <NextLink {...props} />;
 
 export { useParams, useSearchParams, usePathname, useRouter, Link };

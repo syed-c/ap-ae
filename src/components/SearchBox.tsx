@@ -263,20 +263,20 @@ export function SearchBox({
         params.set('city', citySlug);
         params.set('state', targetStateSlug);
         if (treatment) params.set('treatment', treatment);
-        router.push(`/insurance/${insurance}?${params.toString()}`);
+        router.push(`/insurance/${insurance}?${params.toString()}/`);
         return;
       }
       if (treatment) {
-        router.push(`/${targetStateSlug}/${citySlug}/${treatment}`);
+        router.push(`/${targetStateSlug}/${citySlug}/${treatment}/`);
       } else {
-        router.push(`/${targetStateSlug}/${citySlug}`);
+        router.push(`/${targetStateSlug}/${citySlug}/`);
       }
     } else if (insurance) {
-      router.push(`/insurance/${insurance}`);
+      router.push(`/insurance/${insurance}/`);
     } else if (stateContext) {
-      router.push(`/${stateContext}`);
+      router.push(`/${stateContext}/`);
     } else {
-      router.push('/search');
+      router.push('/search/');
     }
   };
 

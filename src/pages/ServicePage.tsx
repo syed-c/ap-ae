@@ -171,134 +171,47 @@ const ServicePage = ({ serviceSlugProp, seoDataProp }: ServicePageProps = {}) =>
           </div>
 
           <div className="max-w-3xl mx-auto text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 bg-foreground/5 backdrop-blur-sm border border-foreground/10 rounded-full px-4 py-2 mb-4"
-            >
-              <Stethoscope className="h-4 w-4 text-emerald" />
-              <span className="text-xs md:text-sm font-bold text-foreground/80">UAE Dental Service</span>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-3 px-2"
-            >
-              {treatmentName} in <span className="text-primary">UAE</span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="text-base md:text-lg text-muted-foreground mb-6 max-w-2xl mx-auto px-2"
-            >
-              {treatment?.description || `Find the best ${treatmentName.toLowerCase()} specialists across all 7 UAE emirates. Compare prices, check insurance coverage, and book verified clinics.`}
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="max-w-xl md:max-w-2xl mx-auto mb-6"
-            >
-              <SearchBox variant="hero" />
-            </motion.div>
-
-            {/* Stats */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="flex flex-wrap justify-center gap-2"
-            >
-              <div className="flex items-center gap-1.5 bg-card/80 backdrop-blur-sm border border-border rounded-xl px-3 py-2 shadow-sm">
-                <Users className="h-4 w-4 text-primary" />
-                <span className="font-bold text-sm">{profiles?.length || 0}+ Specialists</span>
+            {sortedByPrice.length > 0 && (() => {
+              const minPrice = Math.min(...sortedByPrice.map(r => r.price_min));
+              const maxPrice = Math.max(...sortedByPrice.map(r => r.price_max));
+              return (
+              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                {sortedByPrice.map((range, i) => {
+                  const barLeft = sortedByPrice.length > 1 ? ((range.price_min - minPrice) / (maxPrice - minPrice)) * 100 : 0;
+                  const barWidth = sortedByPrice.length > 1 ? ((range.price_max - range.price_min) / (maxPrice - minPrice)) * 100 : 20;
+                  return (
+                    <motion.div
+                      key={range.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      className="bg-card border border-border rounded-2xl p-4 hover:border-primary/30 transition-all"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <Link href={`/${range.state?.slug}/`} className="flex items-center gap-2 hover:text-primary transition-colors">
+                          <MapPin className="h-4 w-4 text-primary" />
+                          <span className="font-bold text-foreground">{range.state?.name}</span>
+                        </Link>
+                        <span className="font-bold text-primary">
+                          AED {range.price_min.toLocaleString()} – {range.price_max.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="absolute h-full bg-gradient-to-r from-primary/60 to-primary rounded-full"
+                          style={{ left: `${barLeft}%`, width: `${Math.max(barWidth, 5)}%` }}
+                        />
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
-              {uaeMin > 0 && (
-                <div className="flex items-center gap-1.5 bg-card/80 backdrop-blur-sm border border-border rounded-xl px-3 py-2 shadow-sm">
-                  <DollarSign className="h-4 w-4 text-primary" />
-                  <span className="font-bold text-sm">From AED {uaeMin.toLocaleString()}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-1.5 bg-card/80 backdrop-blur-sm border border-border rounded-xl px-3 py-2 shadow-sm">
-                <Star className="h-4 w-4 text-gold fill-gold" />
-                <span className="font-bold text-sm">4.8 Avg. Rating</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-card/80 backdrop-blur-sm border border-border rounded-xl px-3 py-2 shadow-sm">
-                <Shield className="h-4 w-4 text-emerald" />
-                <span className="font-bold text-sm">Verified</span>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Related Services Quick Links - Text Based */}
-      {relatedServices.length > 0 && (
-        <section className="py-4 bg-muted/30 border-y border-border">
-          <div className="container px-4">
-            <LocationQuickLinks
-              variant="services"
-              items={relatedServices}
-              title="Related Dental Treatments"
-            />
-          </div>
-        </section>
-      )}
-
-      {/* Price by Emirate Section */}
-      {sortedByPrice.length > 0 && (
-        <Section size="lg" className="bg-muted/30">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-6">
-              <span className="inline-block text-xs font-bold text-primary uppercase tracking-widest mb-2">Price Intelligence</span>
-              <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-                {treatmentName} Cost <span className="text-primary">by Emirate</span>
-              </h2>
-              <p className="text-muted-foreground mt-2">
-                UAE-wide prices range from <strong className="text-primary">AED {uaeMin.toLocaleString()}</strong> to <strong className="text-primary">AED {uaeMax.toLocaleString()}</strong>
-              </p>
-            </div>
-
-            <div className="space-y-3 mb-6">
-              {sortedByPrice.map((range, i) => {
-                const barWidth = uaeMax > 0 ? ((range.price_max - range.price_min) / uaeMax) * 100 : 50;
-                const barLeft = uaeMax > 0 ? (range.price_min / uaeMax) * 100 : 0;
-                return (
-                  <motion.div
-                    key={range.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="bg-card border border-border rounded-2xl p-4 hover:border-primary/30 transition-all"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <Link href={`/${range.state?.slug}`} className="flex items-center gap-2 hover:text-primary transition-colors">
-                        <MapPin className="h-4 w-4 text-primary" />
-                        <span className="font-bold text-foreground">{range.state?.name}</span>
-                      </Link>
-                      <span className="font-bold text-primary">
-                        AED {range.price_min.toLocaleString()} – {range.price_max.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="relative h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="absolute h-full bg-gradient-to-r from-primary/60 to-primary rounded-full"
-                        style={{ left: `${barLeft}%`, width: `${Math.max(barWidth, 5)}%` }}
-                      />
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
+              );
+            })()}
 
             <div className="text-center">
               <Link
-                href={`/cost/${serviceSlug}`}
+                href={`/cost/${serviceSlug}/`}
                 className="inline-flex items-center gap-2 text-primary font-bold hover:underline"
               >
                 <BarChart3 className="h-4 w-4" />
@@ -307,8 +220,8 @@ const ServicePage = ({ serviceSlugProp, seoDataProp }: ServicePageProps = {}) =>
               </Link>
             </div>
           </div>
-        </Section>
-      )}
+        </div>
+      </section>
 
       {/* Main Content */}
       <Section size="lg">
@@ -349,11 +262,11 @@ const ServicePage = ({ serviceSlugProp, seoDataProp }: ServicePageProps = {}) =>
             {/* Text-based paragraph with embedded links */}
             <div className="text-center text-muted-foreground leading-relaxed mb-6">
               <p>
-                Looking for {treatmentName.toLowerCase()} specialists? Browse verified clinics across all 7 emirates: {states.map((state, i) => (
+                Looking for {treatmentName.toLowerCase()} specialists? Browse verified clinics across all 7 emirates:                 {states.map((state, i) => (
                   <span key={state.id}>
                     {i > 0 && (i === states.length - 1 ? ', and ' : ', ')}
                     <Link
-                      href={`/${state.slug}`}
+                      href={`/${state.slug}/`}
                       className="text-primary font-bold hover:underline"
                     >
                       {treatmentName} in {state.name}
@@ -375,7 +288,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp }: ServicePageProps = {}) =>
                       <span key={range.id}>
                         {i > 0 && <span className="text-muted-foreground mx-2">·</span>}
                         <Link
-                          href={`/compare/${serviceSlug}/${range.state?.slug}-vs-${nextRange.state?.slug}`}
+                          href={`/compare/${serviceSlug}/${range.state?.slug}-vs-${nextRange.state?.slug}/`}
                           className="text-primary font-bold hover:underline text-sm"
                         >
                           {range.state?.name} vs {nextRange.state?.name}

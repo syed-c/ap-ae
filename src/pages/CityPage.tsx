@@ -1,6 +1,7 @@
 'use client';
 import { useState as useReactState, useMemo } from "react";
 import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -65,6 +66,7 @@ interface CityPageProps {
 
 const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp }: CityPageProps = {}) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isServerRender = typeof window === 'undefined';
   const stateSlug = isServerRender
     ? (stateSlugProp || '')
@@ -231,14 +233,14 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
   }
 
   if (stateSlug && normalizedStateSlug && stateSlug !== normalizedStateSlug) {
-    return <Navigate href={`/${normalizedStateSlug}/${citySlug}/`} replace />;
+    return router.replace(`/${normalizedStateSlug}/${citySlug}/`);
   }
 
   if (stateSlug === "clinic") {
-    return <Navigate href={`/clinic/${citySlug}/`} replace />;
+    return router.replace(`/clinic/${citySlug}/`);
   }
   if (stateSlug === "dentist") {
-    return <Navigate href={`/dentist/${citySlug}/`} replace />;
+    return router.replace(`/dentist/${citySlug}/`);
   }
 
   // Check if we have data from prefetch

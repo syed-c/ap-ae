@@ -365,7 +365,7 @@ const Search = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            <Link href="/tools/dental-cost-calculator"
+            <Link href="/tools/dental-cost-calculator/"
               className="group bg-card border border-border rounded-2xl p-6 hover:border-primary/50 hover:shadow-md transition-all text-center"
             >
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
@@ -375,7 +375,7 @@ const Search = () => {
               <p className="text-xs text-muted-foreground">Compare real prices from verified dentists</p>
             </Link>
 
-            <Link href="/tools/insurance-checker"
+            <Link href="/tools/insurance-checker/"
               className="group bg-card border border-border rounded-2xl p-6 hover:border-primary/50 hover:shadow-md transition-all text-center"
             >
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
@@ -385,7 +385,7 @@ const Search = () => {
               <p className="text-xs text-muted-foreground">Find dentists who accept your plan</p>
             </Link>
 
-            <Link href="/emergency-dentist"
+            <Link href="/emergency-dentist/"
               className="group bg-card border border-border rounded-2xl p-6 hover:border-primary/50 hover:shadow-md transition-all text-center"
             >
               <div className="h-12 w-12 rounded-xl bg-destructive/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-destructive/20 transition-colors">

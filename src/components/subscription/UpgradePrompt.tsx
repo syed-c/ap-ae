@@ -33,12 +33,12 @@ export default function UpgradePrompt({
 
   const handleUpgrade = () => {
     if (!user) {
-      router.push('/auth?redirect=/pricing');
+      router.push('/auth/?redirect=/pricing/');
       return;
     }
 
     if (!clinicId) {
-      router.push('/pricing');
+      router.push('/pricing/');
       return;
     }
 
@@ -115,7 +115,7 @@ export default function UpgradePrompt({
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => router.push('/pricing')}
+              onClick={() => router.push('/pricing/')}
             >
               Compare all plans
             </Button>

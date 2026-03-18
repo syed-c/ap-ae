@@ -211,7 +211,7 @@ export const AIInsightCard = ({
             Not sure what treatment fits your budget?
           </p>
           <Link
-            href={`/${stateSlug}/${citySlug}`}
+            href={`/${stateSlug}/${citySlug}/`}
             className="text-sm font-bold text-primary hover:underline inline-flex items-center gap-1"
           >
             Try AI Search for personalized results

@@ -321,7 +321,7 @@ const SitemapPage = () => {
               </div>
             ) : (
               <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <Link href="/services"
+                <Link href="/services/"
                   className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-gold/10 to-gold/5 border border-gold/20 hover:border-gold/40 transition-colors group"
                 >
                   <Star className="h-5 w-5 text-gold" />
@@ -331,7 +331,7 @@ const SitemapPage = () => {
                 {treatments?.map((treatment) => (
                   <Link
                     key={treatment.slug}
-                    href={`/services/${treatment.slug}`}
+                    href={`/services/${treatment.slug}/`}
                     className="flex items-center gap-3 p-4 rounded-2xl bg-muted/30 border hover:border-primary/40 hover:bg-primary/5 transition-colors group"
                   >
                     <span className="font-medium group-hover:text-primary transition-colors">{treatment.name}</span>
@@ -365,7 +365,7 @@ const SitemapPage = () => {
                   return (
                     <div key={state.slug} className="rounded-3xl bg-gradient-to-br from-background to-muted/30 border p-6 hover:shadow-lg transition-shadow">
                       <Link
-                        href={`/${state.slug}`}
+                        href={`/${state.slug}/`}
                         className="flex items-center gap-3 mb-4 group"
                       >
                         <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -381,7 +381,7 @@ const SitemapPage = () => {
                         {stateCities.slice(0, 8).map((city) => (
                           <Link
                             key={city.slug}
-                            href={`/${state.slug}/${city.slug}`}
+                            href={`/${state.slug}/${city.slug}/`}
                             className="text-sm px-3 py-1 rounded-full bg-muted hover:bg-primary/10 hover:text-primary transition-colors"
                           >
                             {city.name}
@@ -421,7 +421,7 @@ const SitemapPage = () => {
                 {clinics?.slice(0, 20).map((clinic) => (
                   <Link
                     key={clinic.slug}
-                    href={`/clinic/${clinic.slug}`}
+                    href={`/clinic/${clinic.slug}/`}
                     className="flex flex-col p-4 rounded-2xl bg-muted/30 border hover:border-primary/40 hover:bg-primary/5 transition-colors group"
                   >
                     <span className="font-medium group-hover:text-primary transition-colors line-clamp-1">{clinic.name}</span>
@@ -431,7 +431,7 @@ const SitemapPage = () => {
                   </Link>
                 ))}
                 {clinics && clinics.length > 20 && (
-                  <Link href="/search"
+                  <Link href="/search/"
                     className="flex items-center justify-center gap-2 p-4 rounded-2xl bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors text-primary font-semibold"
                   >
                     View All Clinics
@@ -463,7 +463,7 @@ const SitemapPage = () => {
                 {dentists?.slice(0, 16).map((dentist) => (
                   <Link
                     key={dentist.slug}
-                    href={`/dentist/${dentist.slug}`}
+                    href={`/dentist/${dentist.slug}/`}
                     className="flex flex-col p-4 rounded-2xl bg-muted/30 border hover:border-coral/40 hover:bg-coral/5 transition-colors group"
                   >
                     <span className="font-medium group-hover:text-coral transition-colors line-clamp-1">{dentist.name}</span>
@@ -473,7 +473,7 @@ const SitemapPage = () => {
                   </Link>
                 ))}
                 {dentists && dentists.length > 16 && (
-                  <Link href="/search"
+                  <Link href="/search/"
                     className="flex items-center justify-center gap-2 p-4 rounded-2xl bg-coral/10 border border-coral/20 hover:bg-coral/20 transition-colors text-coral font-semibold"
                   >
                     View All Dentists
@@ -502,7 +502,7 @@ const SitemapPage = () => {
               </div>
             ) : blogPosts && blogPosts.length > 0 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Link href="/blog"
+                <Link href="/blog/"
                   className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 hover:border-primary/40 transition-colors group"
                 >
                   <BookOpen className="h-5 w-5 text-primary" />
@@ -512,7 +512,7 @@ const SitemapPage = () => {
                 {blogPosts.map((post) => (
                   <Link
                     key={post.slug}
-                    href={`/blog/${post.slug}`}
+                    href={`/blog/${post.slug}/`}
                     className="flex items-center p-4 rounded-2xl bg-muted/30 border hover:border-primary/40 hover:bg-primary/5 transition-colors group"
                   >
                     <span className="font-medium group-hover:text-primary transition-colors line-clamp-1">{post.title}</span>
@@ -543,7 +543,7 @@ const SitemapPage = () => {
                   treatments?.slice(0, 2).map((treatment) => (
                     <Link
                       key={`${state.slug}-${city.slug}-${treatment.slug}`}
-                      href={`/${state.slug}/${city.slug}/${treatment.slug}`}
+                      href={`/${state.slug}/${city.slug}/${treatment.slug}/`}
                       className="text-sm px-4 py-2 rounded-full bg-muted hover:bg-primary/10 hover:text-primary transition-colors text-center"
                     >
                       {treatment.name} in {city.name}

@@ -265,7 +265,7 @@ export default function EmergencyDentistFinder() {
                   <h3 className="font-display text-lg font-bold mb-2">No clinics found</h3>
                   <p className="text-muted-foreground mb-4">Try a nearby city or broader emirate search.</p>
                   <Button variant="outline" className="rounded-xl" asChild>
-                    <Link href="/search">Browse All Dentists</Link>
+                    <Link href="/search/">Browse All Dentists</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -436,10 +436,10 @@ export default function EmergencyDentistFinder() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button size="lg" className="rounded-xl font-semibold" asChild>
-              <Link href="/search">Find a Dentist <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              <Link href="/search/">Find a Dentist <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
             <Button size="lg" variant="outline" className="rounded-xl font-semibold" asChild>
-              <Link href="/services">Browse Services</Link>
+              <Link href="/services/">Browse Services</Link>
             </Button>
           </div>
         </div>
@@ -488,7 +488,7 @@ function ClinicCard({ clinic, isOpen }: { clinic: any; isOpen: boolean }) {
             </Button>
           )}
           <Button size="sm" className="rounded-xl" asChild>
-            <Link href={`/clinic/${clinic.slug || clinic.id}`}>
+            <Link href={`/clinic/${clinic.slug || clinic.id}/`}>
               <Navigation className="h-4 w-4 mr-1" /> View Profile
             </Link>
           </Button>
