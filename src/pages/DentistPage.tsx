@@ -190,9 +190,6 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistP
   // Signal prerender when data is ready
   const isDataReady = !isLoading && !!dentist;
 
-  // Always render SEOHead when we have data - it will update meta tags on client-side
-  const shouldRenderSeoHead = !!dentist;
-
   if (isLoading) {
     // If we have server-side SEO data from getStaticProps, render meaningful SSR content
     if (seoDataProp) {
@@ -268,15 +265,13 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistP
 
   return (
     <PageLayout>
-      {shouldRenderSeoHead && (
       <SEOHead
-        title={seoContent?.meta_title || `${dentist.name}${dentist.title ? `, ${dentist.title}` : ''} - Dentist in ${locationDisplay}`}
-        description={seoContent?.meta_description || dentist.bio || `Book an appointment with ${dentist.name}. ${dentist.years_experience ? `${dentist.years_experience}+ years of experience.` : ''} Verified dental professional in ${locationDisplay}.`}
-        canonical={`/dentist/${dentist.slug}/`}
+        title={seoDataProp?.title ?? (seoContent?.meta_title || `${dentist.name}${dentist.title ? `, ${dentist.title}` : ''} - Dentist in ${locationDisplay}`)}
+        description={seoDataProp?.description ?? (seoContent?.meta_description || dentist.bio || `Book an appointment with ${dentist.name}. ${dentist.years_experience ? `${dentist.years_experience}+ years of experience.` : ''} Verified dental professional in ${locationDisplay}.`)}
+        canonical={seoDataProp?.canonical ?? `/dentist/${dentist.slug}/`}
         keywords={[dentist.name, `dentist ${cityName}`, dentist.title || 'dental specialist']}
         ogType="profile"
       />
-      )}
       <StructuredData
         type="person"
         name={dentist.name}

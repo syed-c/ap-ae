@@ -56,10 +56,6 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp }: StatePageProps
     ? (stateSlugProp || '')
     : (stateSlugProp || (typeof router.query?.stateSlug === 'string' ? router.query.stateSlug : ''));
 
-  // Only render SEOHead on client-side when there's no server-provided seoDataProp
-  // Server-side SEO is handled by the wrapper component in getStaticProps
-  const shouldRenderSeoHead = !seoDataProp;
-
   const normalizedStateSlug = normalizeStateSlug(stateSlug);
 
   // Check if this is actually a static page route or reserved path
@@ -275,13 +271,11 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp }: StatePageProps
     // Only render visual skeleton for client-side navigations
     return (
       <PageLayout>
-        {shouldRenderSeoHead && (
         <SEOHead
           title={seoTitle}
           description={seoDescription}
-          canonical={`/${normalizedStateSlug}/`}
+          canonical={seoDataProp?.canonical ?? `/${normalizedStateSlug}/`}
         />
-        )}
         <div className="container py-12">
           <Skeleton className="h-12 w-64 mb-4" />
           <Skeleton className="h-6 w-96" />
@@ -336,14 +330,12 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp }: StatePageProps
 
   return (
     <PageLayout>
-      {shouldRenderSeoHead && (
       <SEOHead
-        title={pageTitle}
-        description={pageDescription}
-        canonical={`/${normalizedStateSlug}/`}
+        title={seoDataProp?.title ?? pageTitle}
+        description={seoDataProp?.description ?? pageDescription}
+        canonical={seoDataProp?.canonical ?? `/${normalizedStateSlug}/`}
         keywords={[`dentists ${stateName}`, `dental clinics ${stateName}`, `find dentist ${stateName}`, 'book dental appointment']}
       />
-      )}
       <StructuredData
         type="breadcrumb"
         items={[
