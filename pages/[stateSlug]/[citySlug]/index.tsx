@@ -21,7 +21,6 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, de
             <Head>
                 <title>{seoData.title}</title>
                 <meta name="description" content={seoData.description} />
-                <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
             </Head>
             <CityPageComponent 
                 citySlugProp={citySlug}

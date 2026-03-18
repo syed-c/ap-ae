@@ -19,7 +19,6 @@ const StatePageWithSEO = ({ stateSlug, stateData, seoData, dehydratedState }: {
             <Head>
                 <title>{seoData.title}</title>
                 <meta name="description" content={seoData.description} />
-                <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
             </Head>
             <StatePageComponent 
                 stateSlugProp={stateSlug}

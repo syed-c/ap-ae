@@ -18,7 +18,6 @@ const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData, dehydratedState
             <Head>
                 <title>{seoData.title}</title>
                 <meta name="description" content={seoData.description} />
-                <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
             </Head>
             <DentistPageComponent 
                 dentistSlugProp={dentistSlug} 

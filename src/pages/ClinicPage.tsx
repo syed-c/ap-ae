@@ -262,8 +262,6 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
           <SEOHead
             title={seoDataProp.title}
             description={seoDataProp.description}
-            canonical={seoDataProp.canonical}
-            skipCanonical
           />
           <div className="container py-8">
             <div className="grid lg:grid-cols-3 gap-8">
@@ -282,7 +280,6 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
         <SEOHead
           title={seoTitle}
           description={seoDescription}
-          canonical={`/clinic/${slug}/`}
         />
         <div className="container py-8">
           <Skeleton className="h-80 rounded-3xl mb-8" />
@@ -353,19 +350,14 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
     { label: clinic.name },
   ];
 
-  // Always render SEOHead when we have clinic data - it will update meta tags on client-side
-  const shouldRenderSeoHead = !!clinic;
-
   return (
     <PageLayout>
-      {shouldRenderSeoHead && (
       <SEOHead
-        title={seoDataProp?.title || seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${clinic.city?.name || 'UAE'}`}
-        description={seoDataProp?.description || metaDescription}
-        canonical={seoDataProp?.canonical || `/clinic/${slug}/`}
-        keywords={clinic.city?.name ? [clinic.name, `dental clinic ${clinic.city.name}`, `dentist in ${clinic.city.state?.abbreviation || 'UAE'}`] : [clinic.name, 'dental clinic UAE', 'dentist UAE']}
+        title={seoDataProp?.title ?? (clinic ? (seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${clinic.city?.name ?? 'UAE'}`) : (seoContent?.meta_title || "Dental Clinic"))}
+        description={seoDataProp?.description ?? (clinic ? (seoContent?.meta_description || metaDescription) : (seoContent?.meta_description || "Find the best dental clinic"))}
+        canonical={seoDataProp?.canonical ?? `/clinic/${slug}/`}
+        keywords={clinic?.city?.name ? [clinic.name, `dental clinic ${clinic.city.name}`, `dentist in ${clinic.city.state?.abbreviation || 'UAE'}`] : [clinic.name, 'dental clinic UAE', 'dentist UAE']}
       />
-      )}
       {/* Synchronous JSON-LD structured data for SEO */}
       <SyncStructuredData
         data={[
