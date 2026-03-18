@@ -39,13 +39,27 @@ import {
 
 const MIN_PROFILE_COUNT = 2; // noindex pages with fewer than 2 providers
 
-const ServiceLocationPage = () => {
-  const { stateSlug, citySlug, serviceSlug } = useRouter().query as { stateSlug?: string; citySlug?: string; serviceSlug?: string };
+interface ServiceLocationPageProps {
+  stateSlugProp?: string;
+  citySlugProp?: string;
+  serviceSlugProp?: string;
+  stateDataProp?: any;
+  cityDataProp?: any;
+  treatmentDataProp?: any;
+  seoDataProp?: { title: string; description: string; canonical: string };
+  dehydratedStateProp?: any;
+}
+
+const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, stateDataProp, cityDataProp, treatmentDataProp, seoDataProp }: ServiceLocationPageProps) => {
+  const routerQuery = useRouter().query;
+  const stateSlug = stateSlugProp || routerQuery.stateSlug as string || '';
+  const citySlug = citySlugProp || routerQuery.citySlug as string || '';
+  const serviceSlug = serviceSlugProp || routerQuery.serviceSlug as string || '';
   const normalizedStateSlug = normalizeStateSlug(stateSlug);
   const service = serviceSlug || "";
 
-  const { data: state } = useStateData(normalizedStateSlug || '');
-  const { data: city } = useCity(citySlug || '', normalizedStateSlug || '');
+  const { data: state } = useStateData(normalizedStateSlug || '', stateDataProp);
+  const { data: city } = useCity(citySlug || '', normalizedStateSlug || '', cityDataProp);
 
   // Fetch SEO content
   const seoSlug = `${normalizedStateSlug || ""}/${citySlug || ""}/${serviceSlug || ""}`;
@@ -72,6 +86,7 @@ const ServiceLocationPage = () => {
       return data;
     },
     enabled: !!service,
+    initialData: treatmentDataProp || undefined,
   });
 
   // Fetch profiles
@@ -173,9 +188,9 @@ const ServiceLocationPage = () => {
   return (
     <PageLayout>
       <SEOHead
-        title={pageTitle}
-        description={pageDescription}
-        canonical={`/${normalizedStateSlug}/${citySlug}/${service}/`}
+        title={seoDataProp?.title || pageTitle}
+        description={seoDataProp?.description || pageDescription}
+        canonical={seoDataProp?.canonical || `/${normalizedStateSlug}/${citySlug}/${service}/`}
         keywords={[`${treatmentName} ${locationName}`, `${treatmentName} specialist`, `best ${treatmentName} clinic`]}
         noindex={shouldNoIndex}
       />

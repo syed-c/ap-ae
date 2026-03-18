@@ -1,10 +1,43 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
+import Head from 'next/head';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
-import ServiceLocationPage from '@/pages/ServiceLocationPage';
+import ServiceLocationPageComponent from '@/pages/ServiceLocationPage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
-export default ServiceLocationPage;
+const BASE_URL = 'https://www.appointpanda.ae';
+
+const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, dehydratedState }: {
+    stateSlug: string;
+    citySlug: string;
+    serviceSlug: string;
+    stateData: any;
+    cityData: any;
+    treatmentData: any;
+    seoData: { title: string; description: string; canonical: string };
+    dehydratedState: any;
+}) => {
+    return (
+        <>
+            <Head>
+                <title>{seoData.title}</title>
+                <meta name="description" content={seoData.description} />
+            </Head>
+            <ServiceLocationPageComponent 
+                stateSlugProp={stateSlug}
+                citySlugProp={citySlug}
+                serviceSlugProp={serviceSlug}
+                stateDataProp={stateData}
+                cityDataProp={cityData}
+                treatmentDataProp={treatmentData}
+                seoDataProp={seoData}
+                dehydratedStateProp={dehydratedState}
+            />
+        </>
+    );
+};
+
+export default ServiceLocationPageWithSEO;
 
 // Generate static paths for emirate-area-service combinations
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -143,13 +176,34 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     ]);
 
     const stateData = queryClient.getQueryData<any>(['state', normalizedStateSlug]);
+    const cityData = queryClient.getQueryData<any>(['city', citySlug, normalizedStateSlug]);
+    const treatmentData = queryClient.getQueryData<any>(['treatment', serviceSlug]);
+    const seoContent = queryClient.getQueryData<any>(['seo-page-content', seoSlug]);
+
     if (!stateData) {
         return { notFound: true };
     }
 
+    const stateName = stateData.name;
+    const cityName = cityData?.name || citySlug;
+    const treatmentName = treatmentData?.name || serviceSlug;
+    const metaTitle = seoContent?.meta_title || `${treatmentName} in ${cityName}, ${stateName} | Book Appointments`;
+    const metaDescription = seoContent?.meta_description || `Find and book ${treatmentName} appointments with top-rated dental clinics in ${cityName}, ${stateName}. Verified dentists, real reviews.`;
+
     return {
         props: {
             dehydratedState: dehydrate(queryClient),
+            stateSlug: normalizedStateSlug,
+            citySlug,
+            serviceSlug,
+            stateData,
+            cityData,
+            treatmentData,
+            seoData: {
+                title: metaTitle,
+                description: metaDescription,
+                canonical: `/${normalizedStateSlug}/${citySlug}/${serviceSlug}/`,
+            }
         },
         revalidate: 3600,
     };

@@ -33,9 +33,13 @@ type BlogContentBlock = {
   faqs?: Array<{ question: string; answer: string }>;
 };
 
-const BlogPostPage = () => {
-  const { postSlug } = useRouter().query as { postSlug?: string };
-  const slug = postSlug || "";
+const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp }: {
+    postSlugProp?: string;
+    postDataProp?: any;
+    seoDataProp?: { title: string; description: string; canonical: string };
+}) => {
+  const routerQuery = useRouter().query;
+  const slug = postSlugProp || routerQuery.postSlug as string || "";
 
   const { data: post, isLoading } = useQuery({
     queryKey: ["blog-post", slug],
@@ -48,6 +52,7 @@ const BlogPostPage = () => {
         .maybeSingle();
       return data;
     },
+    initialData: postDataProp || undefined,
   });
 
   const { data: relatedPosts } = useQuery({
@@ -425,9 +430,9 @@ const BlogPostPage = () => {
   return (
     <PageLayout>
       <SEOHead
-        title={post.seo_title || post.title}
-        description={post.seo_description || post.excerpt || `Read "${post.title}" on AppointPanda's dental health blog.`}
-        canonical={`/blog/${post.slug}/`}
+        title={seoDataProp?.title || post.seo_title || post.title}
+        description={seoDataProp?.description || post.seo_description || post.excerpt || `Read "${post.title}" on AppointPanda's dental health blog.`}
+        canonical={seoDataProp?.canonical || `/blog/${post.slug}/`}
         ogType="article"
         ogImage={post.featured_image_url || undefined}
         author={post.author_name || 'AppointPanda Team'}
