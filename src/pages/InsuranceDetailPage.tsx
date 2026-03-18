@@ -26,13 +26,34 @@ import {
 
 const PAGE_SIZE = 20;
 
-const InsuranceDetailPage = () => {
+interface InsuranceDetailPageProps {
+  insuranceSlugProp?: string;
+  emirateSlugProp?: string;
+  citySlugProp?: string;
+  insuranceDataProp?: any;
+  emirateDataProp?: any;
+  cityDataProp?: any;
+  clinicCountProp?: number;
+  seoDataProp?: { title: string; description: string; canonical: string };
+  dehydratedStateProp?: any;
+}
+
+const InsuranceDetailPage = ({ 
+  insuranceSlugProp, 
+  emirateSlugProp, 
+  citySlugProp,
+  insuranceDataProp,
+  emirateDataProp,
+  cityDataProp,
+  clinicCountProp,
+  seoDataProp 
+}: InsuranceDetailPageProps) => {
   const router = useRouter();
   const routerSlug = router.query.slug;
   const slugSegments = Array.isArray(routerSlug) ? routerSlug : [];
-  const insuranceSlug = slugSegments[0] || "";
-  const emirateSlug = slugSegments[1] || "";
-  const urlCitySlug = slugSegments[2] || "";
+  const insuranceSlug = insuranceSlugProp || slugSegments[0] || "";
+  const emirateSlug = emirateSlugProp || slugSegments[1] || "";
+  const urlCitySlug = citySlugProp || slugSegments[2] || "";
   const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const slug = insuranceSlug || "";
 
@@ -60,6 +81,7 @@ const InsuranceDetailPage = () => {
         .maybeSingle();
       return data;
     },
+    initialData: insuranceDataProp || undefined,
   });
 
   // Fetch emirate data if URL segment present
@@ -74,6 +96,7 @@ const InsuranceDetailPage = () => {
         .maybeSingle();
       return data;
     },
+    initialData: emirateDataProp || undefined,
     enabled: !!emirateSlug,
   });
 
@@ -159,7 +182,8 @@ const InsuranceDetailPage = () => {
   const handleClearFilters = useCallback(() => {
     setMinRating(undefined);
     setSortBy("rating");
-    setSearchParams({});
+    const path = router.asPath.split('?')[0];
+    router.replace(path);
   }, [router]);
 
   // Build breadcrumbs
@@ -220,13 +244,13 @@ const InsuranceDetailPage = () => {
     );
   }
 
-  const canonicalUrl = buildInsuranceUrl(insurance.slug, emirateSlug, urlCitySlug);
+  const canonicalUrl = seoDataProp?.canonical || buildInsuranceUrl(insurance.slug, emirateSlug, urlCitySlug);
 
   return (
     <PageLayout>
       <SEOHead
-        title={`${insurance.name} Dentists${locationSuffix} - Find Providers | UAE`}
-        description={`Find ${totalCount}+ dental clinics accepting ${insurance.name}${locationSuffix}. Direct billing, pre-approval assistance. Book today.`}
+        title={seoDataProp?.title || `${insurance.name} Dentists${locationSuffix} - Find Providers | UAE`}
+        description={seoDataProp?.description || `Find ${totalCount}+ dental clinics accepting ${insurance.name}${locationSuffix}. Direct billing, pre-approval assistance. Book today.`}
         canonical={canonicalUrl}
         keywords={[`${insurance.name} dental`, `${insurance.name} dentist UAE`, `dental insurance ${locationSuffix}`]}
       />

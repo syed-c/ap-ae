@@ -19,7 +19,14 @@ import {
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-const InsurancePage = () => {
+interface InsurancePageProps {
+  insuranceListProp?: any[];
+  clinicCountsProp?: Record<string, number>;
+  seoDataProp?: { title: string; description: string };
+  dehydratedStateProp?: any;
+}
+
+const InsurancePage = ({ insuranceListProp, clinicCountsProp, seoDataProp }: InsurancePageProps) => {
   const { data: seoContent } = useSeoPageContent("insurance");
   const [activeGroup, setActiveGroup] = useState<"all" | "local" | "international">("all");
   const [activeLetter, setActiveLetter] = useState<string | null>(null);
@@ -34,6 +41,7 @@ const InsurancePage = () => {
         .order("name");
       return data || [];
     },
+    initialData: insuranceListProp || undefined,
   });
 
   const { data: clinicCounts } = useQuery({
@@ -48,6 +56,7 @@ const InsurancePage = () => {
       });
       return counts;
     },
+    initialData: clinicCountsProp || undefined,
   });
 
   const filtered = useMemo(() => {
