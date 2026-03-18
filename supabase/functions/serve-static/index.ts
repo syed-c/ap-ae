@@ -642,7 +642,7 @@ async function generateMinimalHtmlWithContent(
           <meta itemprop="position" content="${idx + 1}" />
           <article itemscope itemprop="item" itemtype="https://schema.org/Dentist">
             <h3 itemprop="name"><a href="${BASE_URL}/clinic/${clinic.slug}/" itemprop="url">${clinic.name}</a></h3>
-            ${clinic.rating > 0 ? `<div class="rating"><span itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating"><span itemprop="ratingValue">${clinic.rating.toFixed(1)}</span>/5 stars</span></div>` : ''}
+            ${clinic.rating > 0 && clinic.reviewCount > 0 ? `<div class="rating"><span itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating"><span itemprop="ratingValue">${clinic.rating.toFixed(1)}</span>/5 (<span itemprop="reviewCount">${clinic.reviewCount}</span> reviews)</span></div>` : ''}
             ${clinic.address ? `<p itemprop="address">${clinic.address}</p>` : ''}
           </article>
         </li>
@@ -666,9 +666,9 @@ async function generateMinimalHtmlWithContent(
       <meta itemprop="name" content="${profile.name}" />
       ${profile.address ? `<p itemprop="address">${profile.address}</p>` : ''}
       ${profile.phone ? `<p>Phone: <a href="tel:${profile.phone}" itemprop="telephone">${profile.phone}</a></p>` : ''}
-      ${profile.rating > 0 ? `<div class="rating" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+      ${profile.rating > 0 && profile.reviewCount > 0 ? `<div class="rating" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
         <span itemprop="ratingValue">${profile.rating.toFixed(1)}</span>/5 stars
-        ${profile.reviewCount > 0 ? `(<span itemprop="reviewCount">${profile.reviewCount}</span> reviews)` : ''}
+        (<span itemprop="reviewCount">${profile.reviewCount}</span> reviews)
       </div>` : ''}
       ${profile.description ? `<p itemprop="description">${profile.description}</p>` : ''}
       ${profile.services.length > 0 ? `

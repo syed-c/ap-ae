@@ -582,7 +582,7 @@ serve(async (req) => {
               "url": `${BASE_URL}${path}`,
               ...(item.address && { "address": { "@type": "PostalAddress", "streetAddress": item.address } }),
               ...(item.phone && { "telephone": item.phone }),
-              ...(item.rating && { "aggregateRating": { "@type": "AggregateRating", "ratingValue": item.rating, "reviewCount": item.review_count || 0 } })
+              ...(item.rating && item.review_count && item.review_count > 0 && { "aggregateRating": { "@type": "AggregateRating", "ratingValue": item.rating, "reviewCount": item.review_count } })
             }
           };
         }
