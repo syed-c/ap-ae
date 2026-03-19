@@ -274,10 +274,6 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
     if (seoDataProp) {
       return (
         <PageLayout>
-          <SEOHead
-            title={seoDataProp.title}
-            description={seoDataProp.description}
-          />
           <div className="container py-8">
             <div className="grid lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-4">
@@ -292,10 +288,6 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
     // Only render visual skeleton for client-side navigations (no server data)
     return (
       <PageLayout>
-        <SEOHead
-          title={seoTitle}
-          description={seoDescription}
-        />
         <div className="container py-8">
           <Skeleton className="h-80 rounded-3xl mb-8" />
           <div className="grid lg:grid-cols-3 gap-8">
@@ -320,6 +312,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
           <SEOHead
             title="Clinic Not Found"
             description="The dental clinic you're looking for doesn't exist or has been removed."
+            canonical={`/clinic/${slug}/`}
           />
           <div className="text-center py-20">
             <h1 className="font-display text-3xl font-bold mb-4">Clinic Not Found</h1>

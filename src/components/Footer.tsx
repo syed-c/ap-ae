@@ -4,8 +4,6 @@ import {
   Facebook, Instagram, Twitter, Linkedin, Youtube,
   Mail, Phone, MapPin, Heart, ChevronRight, Shield, CheckCircle, Lock,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { ACTIVE_STATES } from "@/lib/constants/activeStates";
 
@@ -44,38 +42,20 @@ const legal = [
   { name: "Verification", path: "/verification-policy/" },
 ];
 
-interface CityData {
-  name: string;
-  slug: string;
-  dentist_count: number;
-}
+const POPULAR_DUBAI_AREAS = [
+  { name: "Jumeirah", slug: "jumeirah" },
+  { name: "Marina", slug: "marina" },
+  { name: "Downtown", slug: "downtown" },
+  { name: "Deira", slug: "dera" },
+  { name: "Al Barsha", slug: "al-barsha" },
+  { name: "Business Bay", slug: "business-bay" },
+  { name: "JLT", slug: "jlt" },
+  { name: "Mirdif", slug: "mirdif" },
+];
 
 export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
   (props, ref) => {
     const { data: siteSettings } = useSiteSettings();
-
-    const { data: areasByEmirate } = useQuery({
-      queryKey: ["footer-areas"],
-      queryFn: async () => {
-        const result: Record<string, CityData[]> = {};
-        for (const emirate of ACTIVE_STATES.filter(s => ['dubai', 'sharjah'].includes(s.slug))) {
-          const { data } = await supabase
-            .from("cities")
-            .select("name, slug, dentist_count, states!inner(slug)")
-            .eq("is_active", true)
-            .eq("states.slug", emirate.slug)
-            .order("name", { ascending: true })
-            .limit(12);
-          result[emirate.slug] = (data || []).map(c => ({
-            name: c.name,
-            slug: c.slug,
-            dentist_count: c.dentist_count || 0,
-          }));
-        }
-        return result;
-      },
-      staleTime: 1000 * 60 * 30,
-    });
 
     const contactEmail = siteSettings?.contactDetails?.support_email || '';
     const contactPhone = siteSettings?.contactDetails?.support_phone || siteSettings?.contactDetails?.booking_phone || '';
@@ -210,7 +190,7 @@ export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
                 <div>
                   <p className="text-[10px] font-semibold text-background/30 uppercase tracking-wider mb-2">Popular Areas</p>
                   <ul className="space-y-1.5">
-                    {(areasByEmirate?.['dubai'] || []).slice(0, 8).map((area) => (
+                    {POPULAR_DUBAI_AREAS.map((area) => (
                       <li key={area.slug}>
                         <Link href={`/dubai/${area.slug}/`} className="text-sm text-background/50 hover:text-primary transition-colors">
                           {area.name}

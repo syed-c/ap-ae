@@ -557,7 +557,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp, faqsProp }: Stat
             </h2>
           </div>
 
-          <Accordion type="single" collapsible className="space-y-4">
+          <Accordion type="single" collapsible defaultValue="faq-0" className="space-y-4">
             {faqs.map((faq, i) => (
               <AccordionItem
                 key={i}

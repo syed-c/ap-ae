@@ -200,7 +200,7 @@ export function Navbar() {
             <div className="lg:hidden py-4 border-t border-border animate-fade-in bg-card">
               {/* Mobile Search */}
               <button
-                onClick={() => { setMobileMenuOpen(false); router.push("/search"); }}
+                onClick={() => { setMobileMenuOpen(false); router.push("/search/"); }}
                 className="flex items-center gap-2 w-full bg-muted/60 border border-border/60 rounded-lg px-4 py-3 text-sm text-muted-foreground mb-3"
               >
                 <Search className="h-4 w-4" />
@@ -235,7 +235,7 @@ export function Navbar() {
                 <Button variant="outline" className="w-full rounded-lg font-semibold border-border text-foreground" asChild>
                   <Link href="/auth/" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
                 </Button>
-                <Button className="w-full rounded-lg bg-primary text-primary-foreground font-semibold" onClick={() => { setMobileMenuOpen(false); router.push("/search"); }}>
+                <Button className="w-full rounded-lg bg-primary text-primary-foreground font-semibold" onClick={() => { setMobileMenuOpen(false); router.push("/search/"); }}>
                   Find Dentist
                 </Button>
               </div>

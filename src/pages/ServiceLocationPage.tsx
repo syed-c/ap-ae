@@ -400,7 +400,7 @@ const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, sta
             </h2>
           </div>
           
-          <Accordion type="single" collapsible className="space-y-3">
+          <Accordion type="single" collapsible defaultValue="faq-0" className="space-y-3">
             {faqs.map((faq, i) => (
               <AccordionItem
                 key={i}

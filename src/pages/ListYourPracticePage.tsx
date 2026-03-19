@@ -412,7 +412,7 @@ const ListYourPracticePage = () => {
                     </Card>
 
                     <p className="text-xs text-center text-muted-foreground">
-                      By continuing, you agree to our <Link href="/terms" className="text-primary hover:underline">Terms</Link> and <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                      By continuing, you agree to our <Link href="/terms/" className="text-primary hover:underline">Terms</Link> and <Link href="/privacy/" className="text-primary hover:underline">Privacy Policy</Link>
                     </p>
                   </div>
                 )}
@@ -650,7 +650,7 @@ const ListYourPracticePage = () => {
                                 onCheckedChange={(checked) => setFormData(prev => ({ ...prev, agreeTerms: checked === true }))}
                               />
                               <Label htmlFor="agreeTerms" className="text-sm leading-relaxed cursor-pointer">
-                                I agree to the <Link href="/terms" className="text-primary hover:underline">Terms & Conditions</Link> and <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>. I confirm that I am authorized to list this practice.
+                                I agree to the <Link href="/terms/" className="text-primary hover:underline">Terms & Conditions</Link> and <Link href="/privacy/" className="text-primary hover:underline">Privacy Policy</Link>. I confirm that I am authorized to list this practice.
                               </Label>
                             </div>
                           </div>
@@ -694,7 +694,7 @@ const ListYourPracticePage = () => {
                   If your clinic is already listed, claim and verify it instead.
                 </p>
                 <Button asChild variant="outline" size="sm" className="rounded-xl font-bold w-full">
-                  <Link href="/claim-profile">
+                  <Link href="/claim-profile/">
                     Claim Existing Profile
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

@@ -13,6 +13,7 @@ Disallow: /_next/data/
 Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
+Disallow: /dashboard-v2
 Disallow: /auth
 Disallow: /auth/callback
 Disallow: /onboarding
@@ -20,6 +21,7 @@ Disallow: /gmb-select
 Disallow: /claim-profile
 Disallow: /list-your-practice
 Disallow: /list-your-practice/success
+Disallow: /home-v2
 Disallow: /book/
 Disallow: /appointment/
 Disallow: /review/
@@ -41,6 +43,7 @@ Disallow: /_next/data/
 Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
+Disallow: /dashboard-v2
 Disallow: /auth
 Disallow: /auth/callback
 Disallow: /onboarding
@@ -48,6 +51,7 @@ Disallow: /gmb-select
 Disallow: /claim-profile
 Disallow: /list-your-practice
 Disallow: /list-your-practice/success
+Disallow: /home-v2
 Disallow: /book/
 Disallow: /appointment/
 Disallow: /review/
@@ -73,6 +77,8 @@ Disallow: /_next/data/
 Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
+Disallow: /dashboard-v2
+Disallow: /home-v2
 Disallow: /auth
 
 User-agent: ChatGPT-User
@@ -82,6 +88,8 @@ Disallow: /_next/data/
 Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
+Disallow: /dashboard-v2
+Disallow: /home-v2
 Disallow: /auth
 
 User-agent: Claude-Web
@@ -91,6 +99,8 @@ Disallow: /_next/data/
 Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
+Disallow: /dashboard-v2
+Disallow: /home-v2
 Disallow: /auth
 
 User-agent: Anthropic-AI
@@ -100,6 +110,8 @@ Disallow: /_next/data/
 Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
+Disallow: /dashboard-v2
+Disallow: /home-v2
 Disallow: /auth
 
 User-agent: Google-Extended
@@ -109,6 +121,8 @@ Disallow: /_next/data/
 Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
+Disallow: /dashboard-v2
+Disallow: /home-v2
 Disallow: /auth
 
 User-agent: PerplexityBot
@@ -118,6 +132,8 @@ Disallow: /_next/data/
 Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
+Disallow: /dashboard-v2
+Disallow: /home-v2
 Disallow: /auth
 
 User-agent: Cohere-ai
@@ -136,6 +152,7 @@ Disallow: /_next/data/
 Disallow: /_next/static/
 Disallow: /admin
 Disallow: /dashboard
+Disallow: /dashboard-v2
 Disallow: /auth
 Disallow: /auth/callback
 Disallow: /onboarding
@@ -143,6 +160,7 @@ Disallow: /gmb-select
 Disallow: /claim-profile
 Disallow: /list-your-practice
 Disallow: /list-your-practice/success
+Disallow: /home-v2
 Disallow: /book/
 Disallow: /appointment/
 Disallow: /review/
@@ -158,11 +176,11 @@ Disallow: /*?fbclid=*
 Disallow: /*?gclid=*
 
 # Sitemap
-Sitemap: https://www.AppointPanda.ae/sitemap.xml
+Sitemap: https://www.appointpanda.ae/sitemap.xml
 
 # Crawl-delay for non-Google bots (reduce server load)
 # Note: Googlebot ignores Crawl-delay
 
 # LLMs.txt for AI assistants
-# See: https://www.AppointPanda.ae/llms.txt
-# Full version: https://www.AppointPanda.ae/llms-full.txt
+# See: https://www.appointpanda.ae/llms.txt
+# Full version: https://www.appointpanda.ae/llms-full.txt

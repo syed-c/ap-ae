@@ -143,7 +143,7 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp, dehydratedState
 
   const breadcrumbs = [
     { label: "Home", href: "/" },
-    { label: "Blog", href: "/blog" },
+    { label: "Blog", href: "/blog/" },
     { label: post.title },
   ];
 
@@ -633,7 +633,7 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp, dehydratedState
                 {popularTreatments?.map((treatment) => (
                   <Link
                     key={treatment.slug}
-                    href={`/services/${treatment.slug}`}
+                    href={`/services/${treatment.slug}/`}
                     className="px-3 py-1.5 text-sm rounded-full bg-muted hover:bg-primary/10 hover:text-primary transition-colors"
                   >
                     {treatment.name}
