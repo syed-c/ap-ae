@@ -4,9 +4,9 @@ import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import dynamic from 'next/dynamic';
 import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { ConversationalQABlock, AIDiscoveryMeta } from "@/components/ai-seo";
 import { generateCityQA } from "@/lib/ai-seo/generateQAContent";
 import { Section } from "@/components/layout/Section";
 import { SearchBox } from "@/components/SearchBox";
@@ -48,6 +48,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+
+const ConversationalQABlock = dynamic(
+  () => import('@/components/ai-seo/ConversationalQABlock').then(m => ({ default: m.ConversationalQABlock })),
+  { ssr: false, loading: () => <div className="animate-pulse bg-muted rounded-xl h-48" /> }
+);
+const AIDiscoveryMeta = dynamic(
+  () => import('@/components/ai-seo/AIDiscoveryMeta').then(m => ({ default: m.AIDiscoveryMeta })),
+  { ssr: false }
+);
 
 const MIN_DENTIST_COUNT = 2; // noindex pages with fewer than 2 dentists
 

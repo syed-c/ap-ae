@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import dynamic from 'next/dynamic';
 import { useQuery } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,9 +18,7 @@ import { SEOHead } from "@/components/seo/SEOHead";
 import { SyncStructuredData } from "@/components/seo/SyncStructuredData";
 import { InterlinkingSection } from "@/components/seo/InterlinkingSection";
 import { RelatedClinicsBlock } from "@/components/seo/RelatedClinicsBlock";
-import { MultiStepBookingModal } from "@/components/MultiStepBookingModal";
 import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
-import { PromotionBanner } from "@/components/subscription/PromotionBanner";
 import {
   ClinicStickyBooking,
   ClinicTeamSection,
@@ -49,11 +48,27 @@ import {
 } from "lucide-react";
 import { AIMatchBadge } from "@/components/ai";
 import { TrustSignalStrip, AEDPricingDisplay } from "@/components/healthcare";
-import { ConversationalQABlock, AIDiscoveryMeta } from "@/components/ai-seo";
 import { generateClinicQA } from "@/lib/ai-seo/generateQAContent";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { proxyImageUrl } from "@/lib/proxyImageUrl";
+
+const ConversationalQABlock = dynamic(
+  () => import('@/components/ai-seo/ConversationalQABlock').then(m => ({ default: m.ConversationalQABlock })),
+  { ssr: false, loading: () => <div className="animate-pulse bg-muted rounded-xl h-48" /> }
+);
+const AIDiscoveryMeta = dynamic(
+  () => import('@/components/ai-seo/AIDiscoveryMeta').then(m => ({ default: m.AIDiscoveryMeta })),
+  { ssr: false }
+);
+const MultiStepBookingModal = dynamic(
+  () => import('@/components/MultiStepBookingModal').then(m => ({ default: m.MultiStepBookingModal })),
+  { ssr: false }
+);
+const PromotionBanner = dynamic(
+  () => import('@/components/subscription/PromotionBanner').then(m => ({ default: m.PromotionBanner })),
+  { ssr: false }
+);
 
 interface ClinicPageProps {
   clinicSlugProp?: string;

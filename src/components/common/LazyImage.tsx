@@ -57,8 +57,7 @@ export function LazyImage({
   return (
     <img
       ref={imgRef}
-      src={isInView ? finalSrc : undefined}
-      data-src={finalSrc}
+      src={finalSrc}
       alt={alt}
       width={width}
       height={height}

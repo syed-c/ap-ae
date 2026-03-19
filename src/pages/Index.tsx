@@ -1,10 +1,10 @@
 'use client';
 import { ArrowRight, Shield, Clock, Star, MapPin, Heart, Search, Building2, Stethoscope, Calendar, CheckCheck, Sparkles, Globe, ChevronRight, Users, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import dynamic from 'next/dynamic';
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SearchBox } from "@/components/SearchBox";
-import { AIExplainerSection, ForDentistsAISection } from "@/components/ai";
 import { AutoScrollCarousel } from "@/components/AutoScrollCarousel";
 import { TypewriterText } from "@/components/TypewriterText";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,15 @@ import { useStatesWithClinics } from "@/hooks/useLocations";
 import { ACTIVE_STATES } from "@/lib/constants/activeStates";
 import { useRealCounts } from "@/hooks/useRealCounts";
 import { useSeoPageContent } from "@/hooks/useSeoPageContent";
+
+const AIExplainerSection = dynamic(
+  () => import('@/components/ai/AIExplainerSection').then(m => ({ default: m.AIExplainerSection })),
+  { ssr: false, loading: () => <div className="animate-pulse bg-muted rounded-xl h-64" /> }
+);
+const ForDentistsAISection = dynamic(
+  () => import('@/components/ai/ForDentistsAISection').then(m => ({ default: m.ForDentistsAISection })),
+  { ssr: false, loading: () => <div className="animate-pulse bg-muted rounded-xl h-48" /> }
+);
 
 const heroTexts = [
   "Teeth Whitening",

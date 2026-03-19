@@ -24,6 +24,7 @@ interface DoctorCardProps {
   type?: 'dentist' | 'clinic';
   nextAvailable?: string;
   reviewCount?: number;
+  priority?: boolean;
 }
 
 export const DoctorCard = forwardRef<HTMLDivElement, DoctorCardProps>(({
@@ -43,6 +44,7 @@ export const DoctorCard = forwardRef<HTMLDivElement, DoctorCardProps>(({
   type = 'dentist',
   nextAvailable = "Today",
   reviewCount = 0,
+  priority = false,
 }, ref) => {
   const [bookingOpen, setBookingOpen] = useState(false);
   
@@ -63,7 +65,7 @@ export const DoctorCard = forwardRef<HTMLDivElement, DoctorCardProps>(({
       <div className="relative bg-card rounded-2xl overflow-hidden min-w-[200px] max-w-[200px] card-hover group border border-border/50 shadow-sm">
         <Link href={profileLink} className="block">
           <div className="relative aspect-[4/5] overflow-hidden bg-muted">
-            <LazyImage src={image} alt={name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" width={200} height={250} />
+            <LazyImage src={image} alt={name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" width={200} height={250} priority={priority} />
             <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
               <div className="badge-amber text-xs px-2 py-0.5">
                 <Star className="h-3 w-3 fill-current" />

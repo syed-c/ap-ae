@@ -1,13 +1,16 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { X, Send, Loader2, User, Minimize2, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useRouter } from "next/router";
-import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/integrations/supabase/client';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ReactMarkdown = dynamic(() => import('react-markdown')) as any;
 
 interface Message {
   role: 'user' | 'assistant';

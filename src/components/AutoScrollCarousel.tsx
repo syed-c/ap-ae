@@ -94,7 +94,7 @@ export function AutoScrollCarousel({ doctors, autoScrollSpeed = 30 }: AutoScroll
             className="animate-fade-in shrink-0"
             style={{ animationDelay: `${(index % doctors.length) * 0.08}s` }}
           >
-            <DoctorCard {...doctor} variant="homepage" />
+            <DoctorCard {...doctor} variant="homepage" priority={index < doctors.length} />
           </div>
         ))}
 
