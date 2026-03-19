@@ -18,6 +18,7 @@ import { StructuredData } from "@/components/seo/StructuredData";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useServicePriceRanges } from "@/hooks/useServicePriceRanges";
+import { useStates } from "@/hooks/useLocations";
 import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
 import {
   Accordion,
@@ -76,13 +77,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
 
   const { data: profiles, isLoading: profilesLoading } = useProfiles({ limit: 50 });
 
-  const { data: states } = useQuery({
-    queryKey: ["states"],
-    queryFn: async () => {
-      const { data } = await supabase.from("states").select("*").eq("is_active", true).order("display_order");
-      return data || [];
-    },
-  });
+  const { data: states } = useStates();
 
   // Price intelligence data
   const { data: priceRanges } = useServicePriceRanges(serviceSlug);
@@ -111,7 +106,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
     { label: treatmentName },
   ];
 
-  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
+  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs : [
     {
       q: `How much does ${treatmentName} cost in the UAE?`,
       a: uaeMin > 0

@@ -284,16 +284,16 @@ export function parseMarkdownContent(content: string | null): {
 export function parseFaqFromContent(
   content: string | null,
   faqJson?: { question: string; answer: string }[] | null
-): { question: string; answer: string }[] {
-  // If we have FAQ JSON, use it directly
+): { q: string; a: string }[] {
+  // If we have FAQ JSON, use it directly (normalize to q/a)
   if (faqJson && Array.isArray(faqJson) && faqJson.length > 0) {
-    return faqJson;
+    return faqJson.map(f => ({ q: f.question, a: f.answer }));
   }
 
   // Otherwise, try to extract from content
   if (!content) return [];
 
-  const faqs: { question: string; answer: string }[] = [];
+  const faqs: { q: string; a: string }[] = [];
   const lines = content.split("\n");
   let inFaqSection = false;
   let currentQuestion = "";
@@ -310,7 +310,7 @@ export function parseFaqFromContent(
     if (inFaqSection && line.match(/^## (?!Frequently)/)) {
       inFaqSection = false;
       if (currentQuestion && currentAnswer) {
-        faqs.push({ question: currentQuestion, answer: currentAnswer.trim() });
+        faqs.push({ q: currentQuestion, a: currentAnswer.trim() });
       }
       continue;
     }
@@ -320,7 +320,7 @@ export function parseFaqFromContent(
       if (h3Match) {
         // Save previous FAQ
         if (currentQuestion && currentAnswer) {
-          faqs.push({ question: currentQuestion, answer: currentAnswer.trim() });
+          faqs.push({ q: currentQuestion, a: currentAnswer.trim() });
         }
         currentQuestion = h3Match[1];
         currentAnswer = "";
@@ -332,7 +332,7 @@ export function parseFaqFromContent(
 
   // Push last FAQ
   if (currentQuestion && currentAnswer) {
-    faqs.push({ question: currentQuestion, answer: currentAnswer.trim() });
+    faqs.push({ q: currentQuestion, a: currentAnswer.trim() });
   }
 
   return faqs;

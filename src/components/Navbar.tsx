@@ -25,7 +25,7 @@ export function Navbar() {
   const { data: siteSettings } = useSiteSettings();
 
   const { data: treatments } = useQuery({
-    queryKey: ['navbar-treatments'],
+    queryKey: ['treatments'],
     queryFn: async () => {
       const { data } = await supabase
         .from('treatments')
@@ -36,6 +36,7 @@ export function Navbar() {
       return data || [];
     },
     staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 
   // Always use the uploaded logo from public folder, not from database settings

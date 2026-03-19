@@ -228,6 +228,8 @@ export function useProfiles(filters: ProfileFilters = {}) {
 
       return profiles;
     },
+    staleTime: 5 * 60 * 1000, // 5 min cache - profiles don't change frequently
+    gcTime: 30 * 60 * 1000,
   });
 }
 

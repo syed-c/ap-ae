@@ -70,7 +70,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     
     // Pre-render more city-treatment combinations for better SEO coverage
     // Higher limit = fewer cold starts for Googlebot on service-location pages
-    const TOP_CITIES_LIMIT = 30;
+    const TOP_CITIES_LIMIT = 50;
     
     const { data: cityClinics } = await supabase
         .from('clinics')
@@ -169,7 +169,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 const { data } = await supabase
                     .from("seo_pages")
                     .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
-                    .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
+                    .eq("slug", seoSlug)
                     .order("is_optimized", { ascending: false })
                     .limit(1)
                     .maybeSingle();

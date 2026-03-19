@@ -22,6 +22,7 @@ import { SyncStructuredData } from "@/components/seo/SyncStructuredData";
 import { InternalLinkBlock, generateCityInternalLinks } from "@/components/seo/InternalLinkBlock";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { useCity, useState as useStateData, useCitiesByStateSlug } from "@/hooks/useLocations";
+import { useTreatments } from "@/hooks/useTreatments";
 import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
 import { usePinnedProfiles, sortWithPinnedFirst } from "@/hooks/usePinnedProfiles";
 import { useAreaLocalContent, generateAreaIntro } from "@/hooks/useAreaLocalContent";
@@ -217,19 +218,8 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
 
   const profiles = filteredProfiles;
 
-  // Fetch treatments
-  const { data: treatments, isLoading: treatmentsLoading } = useQuery({
-    queryKey: ["treatments"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("treatments")
-        .select("*")
-        .eq("is_active", true)
-        .order("display_order")
-        .limit(8);
-      return data || [];
-    },
-  });
+  // Fetch treatments (cached via useTreatments hook)
+  const { data: treatments, isLoading: treatmentsLoading } = useTreatments();
 
   // Fetch nearby cities for internal linking
   const { data: nearbyCities, isLoading: nearbyCitiesLoading } = useCitiesByStateSlug(normalizedStateSlug || '');
@@ -362,10 +352,12 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
 
   // Parse SEO content
   const parsedContent = seoContent?.content ? parseMarkdownContent(seoContent.content) : null;
-  // Use dedicated faqs column first, fallback to parsing from content for legacy pages
-  const seoFaqs = seoContent?.faqs && Array.isArray(seoContent.faqs) && seoContent.faqs.length > 0
+  // Use dedicated faqs column first (has question/answer format), fallback to parsing from content (now returns q/a format)
+  const rawSeoFaqs = seoContent?.faqs && Array.isArray(seoContent.faqs) && seoContent.faqs.length > 0
     ? seoContent.faqs
     : seoContent?.content ? parseFaqFromContent(seoContent.content) : [];
+  // Normalize to { q, a } format for consistent rendering
+  const seoFaqs = rawSeoFaqs.map(f => ('q' in f ? f : { q: (f as any).question, a: (f as any).answer }));
 
   // SSR FAQ data takes priority, then use client-fetched SEO content, then defaults
   const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
@@ -374,7 +366,8 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
   const pageDescription = seoContent?.meta_description || `Find and book appointments with top-rated dental professionals in ${cityName}, ${stateName}. Compare ${profiles?.length || 0}+ verified clinics.`;
   const pageH1 = seoContent?.h1 || `Best Dentists in ${locationDisplay}`;
 
-  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
+  // Note: parseFaqFromContent now returns { q, a }[] format (same as seoContent.faqs after parseFaqs validation)
+  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs : [
     {
       q: `How do I find a good dentist in ${cityName}?`,
       a: `Browse our verified list of dentists in ${cityName}. Look for verified badges, patient reviews, and specializations that match your needs.`,

@@ -28,6 +28,8 @@ export function useTreatments() {
       if (error) throw error;
       return (data || []) as Treatment[];
     },
+    staleTime: 10 * 60 * 1000, // 10 min cache (treatments rarely change)
+    gcTime: 30 * 60 * 1000,
   });
 }
 

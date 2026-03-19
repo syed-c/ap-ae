@@ -17,6 +17,7 @@ import { SEOHead } from "@/components/seo/SEOHead";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { useState as useStateData, useCitiesByStateSlug } from "@/hooks/useLocations";
+import { useTreatments } from "@/hooks/useTreatments";
 import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
 import { usePinnedProfiles, sortWithPinnedFirst } from "@/hooks/usePinnedProfiles";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
@@ -211,18 +212,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp, faqsProp }: Stat
   }, [profiles, stateFilters]);
 
   const hasActiveStateFilters = stateFilters.maxBudget !== null || stateFilters.minRating > 0 || stateFilters.verifiedOnly;
-  const { data: treatments, isLoading: treatmentsLoading } = useQuery({
-    queryKey: ["treatments"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("treatments")
-        .select("*")
-        .eq("is_active", true)
-        .order("display_order")
-        .limit(8);
-      return data || [];
-    },
-  });
+  const { data: treatments, isLoading: treatmentsLoading } = useTreatments();
 
   // Check if state data is available from server prefetch
   const hasStateData = !!state;
@@ -296,10 +286,12 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp, faqsProp }: Stat
 
   // Parse SEO content if available
   const parsedContent = seoContent?.content ? parseMarkdownContent(seoContent.content) : null;
-  // Use dedicated faqs column first, fallback to parsing from content for legacy pages
-  const seoFaqs = seoContent?.faqs && Array.isArray(seoContent.faqs) && seoContent.faqs.length > 0
+  // Use dedicated faqs column first (has question/answer format), fallback to parsing from content (now returns q/a format)
+  const rawSeoFaqs = seoContent?.faqs && Array.isArray(seoContent.faqs) && seoContent.faqs.length > 0
     ? seoContent.faqs
     : seoContent?.content ? parseFaqFromContent(seoContent.content) : [];
+  // Normalize to { q, a } format for consistent rendering
+  const seoFaqs = rawSeoFaqs.map(f => ('q' in f ? f : { q: (f as any).question, a: (f as any).answer }));
 
   // SSR FAQ data takes priority, then use client-fetched SEO content, then defaults
   const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
@@ -310,7 +302,8 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp, faqsProp }: Stat
   const pageH1 = seoContent?.h1 || `Find Dentists in ${stateName}`;
 
   // Use SEO FAQs if available, otherwise use defaults
-  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
+  // Note: parseFaqFromContent now returns { q, a }[] format
+  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs : [
     {
       q: `How do I find a dentist in ${stateName}?`,
       a: `Browse our verified list of dentists across ${stateName}. Select your city, then filter by specialty, rating, and insurance to find the perfect match.`,
@@ -330,7 +323,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp, faqsProp }: Stat
   ];
 
   const totalClinicCount = Object.values(cityClinicCounts || {}).reduce((a, b) => a + b, 0) || profiles?.length || 0;
-  const popularTreatments = (treatments || []).map(t => ({ name: t.name, slug: t.slug }));
+  const popularTreatments = (treatments || []).slice(0, 8).map(t => ({ name: t.name, slug: t.slug }));
 
   return (
     <PageLayout>
