@@ -18,53 +18,46 @@ export function useStates() {
       if (error) throw error;
       return data as State[];
     },
-    staleTime: 10 * 60 * 1000, // Cache states for 10 minutes (rarely change)
+    staleTime: 10 * 60 * 1000, // 10 min cache (rarely change)
     gcTime: 30 * 60 * 1000,
   });
 }
 
 // Only return states that have at least one approved clinic (and are active)
-export function useStatesWithClinics() {
+export function useStatesWithClinics(initialData?: any[]) {
   return useQuery({
     queryKey: ['states-with-clinics'],
     queryFn: async (): Promise<State[]> => {
-      // Get all active states (only from the active states list)
-      const { data: allStates, error: statesError } = await supabase
-        .from('states')
-        .select('*')
-        .eq('is_active', true)
-        .in('slug', ACTIVE_STATE_SLUGS)
-        .order('display_order');
-      
-      if (statesError) throw statesError;
+      // Fetch states, clinics, and cities IN PARALLEL
+      const [statesRes, clinicsRes, citiesRes] = await Promise.all([
+        supabase
+          .from('states')
+          .select('*')
+          .eq('is_active', true)
+          .in('slug', ACTIVE_STATE_SLUGS)
+          .order('display_order'),
+        (supabase.from('clinics').select('city_id') as any)
+          .eq('is_active', true)
+          .eq('is_duplicate', false),
+        supabase
+          .from('cities')
+          .select('id, state_id')
+          .eq('is_active', true),
+      ]);
+
+      if (statesRes.error) throw statesRes.error;
+      if (clinicsRes.error) throw clinicsRes.error;
+      if (citiesRes.error) throw citiesRes.error;
+
+      const allStates = statesRes.data as State[];
       if (!allStates || allStates.length === 0) return [];
 
-      // Get active clinics - cast to any to avoid TS deep instantiation issue with Supabase types
-      const { data: clinicsRaw, error: clinicError } = await (supabase
-        .from('clinics')
-        .select('city_id') as any)
-        .eq('is_active', true)
-        .eq('is_duplicate', false);
-      
-      if (clinicError) throw clinicError;
-      
-      const clinics = clinicsRaw as Array<{ city_id: string | null }> | null;
-      
-      // Get city IDs
+      const clinics = clinicsRes.data as Array<{ city_id: string | null }> | null;
+      const citiesData = citiesRes.data as Array<{ id: string; state_id: string | null }> | null;
+
       const cityIds = (clinics || []).map(c => c.city_id).filter((id): id is string => id !== null);
       if (cityIds.length === 0) return [];
 
-      // Get cities with their state IDs (only active cities)
-      const { data: citiesRaw, error: citiesError } = await supabase
-        .from('cities')
-        .select('id, state_id')
-        .eq('is_active', true);
-      
-      if (citiesError) throw citiesError;
-      
-      const citiesData = citiesRaw as Array<{ id: string; state_id: string | null }> | null;
-
-      // Filter to cities that have clinics and extract state IDs
       const cityIdSet = new Set(cityIds);
       const stateIdSet = new Set<string>();
       (citiesData || []).forEach(city => {
@@ -73,9 +66,11 @@ export function useStatesWithClinics() {
         }
       });
 
-      // Filter states that have clinics
       return allStates.filter(state => stateIdSet.has(state.id)) as State[];
     },
+    initialData: initialData ?? undefined,
+    staleTime: 5 * 60 * 1000, // 5 min cache
+    gcTime: 30 * 60 * 1000,
   });
 }
 
@@ -118,13 +113,13 @@ export function useCities(stateId?: string) {
       if (stateId) {
         query = query.eq('state_id', stateId);
       }
-      
+
       const { data, error } = await query;
-      
+
       if (error) throw error;
       return data as City[];
     },
-    staleTime: 10 * 60 * 1000, // Cache for 10 minutes
+    staleTime: 10 * 60 * 1000, // 10 min cache
     gcTime: 30 * 60 * 1000,
   });
 }
@@ -134,31 +129,21 @@ export function useCitiesByStateSlug(stateSlug: string) {
   return useQuery({
     queryKey: ['cities-by-state', normalized],
     queryFn: async () => {
-      // First get the state
-      const { data: stateData, error: stateError } = await supabase
-        .from('states')
-        .select('id')
-        .eq('slug', normalized)
-        .maybeSingle();
-      
-      if (stateError) throw stateError;
-      if (!stateData) return [];
-
       const { data, error } = await supabase
         .from('cities')
         .select(`
           *,
           state:states(*)
         `)
-        .eq('state_id', stateData.id)
+        .eq('state.slug', normalized)
         .eq('is_active', true)
         .order('name');
-      
+
       if (error) throw error;
       return data as City[];
     },
     enabled: !!normalized,
-    staleTime: 10 * 60 * 1000, // Cache for 10 minutes
+    staleTime: 10 * 60 * 1000, // 10 min cache
     gcTime: 30 * 60 * 1000,
   });
 }
@@ -217,12 +202,14 @@ export function useAreas(cityId?: string) {
       if (cityId) {
         query = query.eq('city_id', cityId);
       }
-      
+
       const { data, error } = await query;
-      
+
       if (error) throw error;
       return data as Area[];
     },
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 }
 

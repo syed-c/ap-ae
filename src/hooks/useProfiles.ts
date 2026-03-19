@@ -237,30 +237,25 @@ export function useFeaturedProfiles(limit: number = 6) {
 
 // Get one dentist per location for homepage "Top 1%" section
 // ONLY show clinics from ACTIVE cities within ACTIVE states and with proper images
-export function useTopDentistsPerLocation(limit: number = 8) {
+export function useTopDentistsPerLocation(limit: number = 8, initialData?: Profile[]) {
   return useQuery({
     queryKey: ['top-dentists-per-location', limit],
     queryFn: async () => {
-      // First get active state IDs
-      const { data: activeStates } = await supabase
-        .from('states')
-        .select('id')
-        .eq('is_active', true);
-      
-      const activeStateIds = (activeStates || []).map(s => s.id);
+      // Fetch all data IN PARALLEL
+      const [statesRes, citiesRes] = await Promise.all([
+        supabase.from('states').select('id').eq('is_active', true),
+        supabase.from('cities').select('id, state_id').eq('is_active', true),
+      ]);
+
+      const activeStateIds = (statesRes.data || []).map(s => s.id);
       if (activeStateIds.length === 0) return [];
-      
-      // Get active cities in active states
-      const { data: activeCities } = await supabase
-        .from('cities')
-        .select('id')
-        .eq('is_active', true)
-        .in('state_id', activeStateIds);
-      
-      const activeCityIds = (activeCities || []).map(c => c.id);
+
+      const activeCityIds = (citiesRes.data || [])
+        .filter(c => c.state_id && activeStateIds.includes(c.state_id))
+        .map(c => c.id);
       if (activeCityIds.length === 0) return [];
-      
-      // Fetch clinics only from active cities in active states
+
+      // Fetch clinics in parallel with other data
       const { data: clinics } = await supabase
         .from('clinics')
         .select(`
@@ -272,29 +267,22 @@ export function useTopDentistsPerLocation(limit: number = 8) {
         .eq('is_active', true)
         .in('city_id', activeCityIds)
         .order('rating', { ascending: false });
-      
+
       if (!clinics) return [];
-      
+
       const seenLocations = new Set<string>();
       const profiles: Profile[] = [];
-      
+
       for (const c of clinics) {
-        // Check if clinic has a valid image (cover_image_url)
         const photoUrl = c.cover_image_url;
-        
-        // SKIP clinics without images - they don't rank on homepage/location pages
         if (!photoUrl) continue;
-        
-        // Use city_id as the location key to get one per city
+
         const locationKey = c.city?.id || c.id;
-        
-        // Skip if we already have a profile from this location
         if (seenLocations.has(locationKey)) continue;
         seenLocations.add(locationKey);
-        
-        // Only show verified if both claimed AND verification_status is verified
+
         const isVerified = c.claim_status === 'claimed' && c.verification_status === 'verified';
-        
+
         profiles.push({
           id: c.id,
           name: c.name,
@@ -311,12 +299,15 @@ export function useTopDentistsPerLocation(limit: number = 8) {
           areaId: c.area?.id,
           cityId: c.city?.id,
         });
-        
+
         if (profiles.length >= limit) break;
       }
-      
+
       return profiles;
     },
+    initialData: initialData ?? undefined,
+    staleTime: 5 * 60 * 1000, // 5 min cache — instant on repeat visits
+    gcTime: 30 * 60 * 1000,
   });
 }
 

@@ -9,62 +9,42 @@ export interface RealCounts {
   treatments: number;
 }
 
-export function useRealCounts() {
+export function useRealCounts(initialData?: RealCounts | null) {
   return useQuery({
     queryKey: ['real-counts'],
     queryFn: async (): Promise<RealCounts> => {
-      // First get active state IDs
-      const { data: activeStates } = await supabase
-        .from('states')
-        .select('id')
-        .eq('is_active', true);
-
-      const activeStateIds = (activeStates || []).map(s => s.id);
-
-      // Count cities only in active states
-      let citiesCount = 0;
-      if (activeStateIds.length > 0) {
-        const { count } = await supabase
-          .from('cities')
-          .select('*', { count: 'exact', head: true })
-          .eq('is_active', true)
-          .in('state_id', activeStateIds);
-        citiesCount = count || 0;
-      }
-
-      // Count all active clinics in the database
-      let clinicCount = 0;
-      let dentistCount = 0;
-      if (activeStateIds.length > 0) {
-        const { count: cCount } = await supabase
-          .from('clinics')
-          .select('*', { count: 'exact', head: true })
-          .eq('is_active', true);
-        clinicCount = cCount || 0;
-
-        // Count dentists in active clinics
-        const { count: dCount } = await supabase
-          .from('dentists')
-          .select('*', { count: 'exact', head: true })
-          .eq('is_active', true);
-        dentistCount = dCount || 0;
-      }
-
+      // Fetch all counts IN PARALLEL
       const [
-        { count: treatmentsCount },
+        statesRes,
+        citiesRes,
+        clinicsRes,
+        dentistsRes,
+        treatmentsRes,
       ] = await Promise.all([
-        supabase.from('treatments').select('*', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('states').select('id', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('cities').select('id', { count: 'exact', head: true }).eq('is_active', true).not('state_id', 'is', null),
+        supabase.from('clinics').select('id', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('dentists').select('id', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('treatments').select('id', { count: 'exact', head: true }).eq('is_active', true),
       ]);
+
+      const activeStateIds = (statesRes.data || []).map(s => s.id);
+      const citiesCount = citiesRes.count || 0;
+      const clinicCount = clinicsRes.count || 0;
+      const dentistCount = dentistsRes.count || 0;
+      const treatmentsCount = treatmentsRes.count || 0;
 
       return {
         clinics: clinicCount,
         states: activeStateIds.length,
         cities: citiesCount,
         dentists: dentistCount,
-        treatments: treatmentsCount || 0,
+        treatments: treatmentsCount,
       };
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    initialData: initialData ?? undefined,
+    staleTime: 5 * 60 * 1000, // 5 min cache
+    gcTime: 30 * 60 * 1000,
   });
 }
 
@@ -75,26 +55,17 @@ export function useStateClinicCount(stateId?: string) {
     queryFn: async () => {
       if (!stateId) return 0;
 
-      // Get cities in state, then clinics in those cities
-      const { data: cities } = await supabase
-        .from('cities')
-        .select('id')
-        .eq('state_id', stateId)
-        .eq('is_active', true);
-
-      if (!cities || cities.length === 0) return 0;
-
-      const cityIds = cities.map(c => c.id);
       const { count } = await supabase
         .from('clinics')
-        .select('*', { count: 'exact', head: true })
-        .in('city_id', cityIds)
+        .select('id', { count: 'exact', head: true })
+        .eq('city.state_id', stateId)
         .eq('is_active', true);
 
       return count || 0;
     },
     enabled: !!stateId,
     staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 }
 

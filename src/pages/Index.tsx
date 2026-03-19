@@ -192,9 +192,31 @@ interface IndexPageProps {
     title: string;
     description: string;
   };
+  realCountsProp?: { clinics: number; states: number; cities: number; dentists: number; treatments: number };
+  topProfilesProp?: Profile[];
+  statesWithClinicsProp?: State[];
 }
 
-const Index = ({ seoDataProp }: IndexPageProps = {}) => {
+interface State { id: string; name: string; slug: string; abbreviation: string }
+
+interface Profile {
+  id: string;
+  name: string;
+  slug: string;
+  type: 'dentist' | 'clinic';
+  specialty?: string;
+  location?: string;
+  rating: number;
+  reviewCount: number;
+  image?: string;
+  isVerified: boolean;
+  clinicName?: string;
+  clinicId?: string;
+  areaId?: string;
+  cityId?: string;
+}
+
+const Index = ({ seoDataProp, realCountsProp, topProfilesProp, statesWithClinicsProp }: IndexPageProps = {}) => {
   const router = useRouter();
   const legacyPostId = typeof router.query?.p === 'string' ? router.query.p : null;
 
@@ -202,23 +224,12 @@ const Index = ({ seoDataProp }: IndexPageProps = {}) => {
   // Server-side SEO is handled by the wrapper component in getStaticProps
   const shouldRenderSeoHead = !seoDataProp;
 
-  // Debug: Test Supabase connection
-  const { data: testData } = useQuery({
-    queryKey: ['test-supabase'],
-    queryFn: async () => {
-      console.log('Testing Supabase connection...');
-      const { data, error } = await supabase.from('states').select('*').limit(1);
-      console.log('Supabase test result:', data, error);
-      return data;
-    },
-    enabled: true,
-  });
-
-  const { data: profiles } = useTopDentistsPerLocation(30);
-  const { data: statesWithClinics } = useStatesWithClinics();
-  // Use all 7 Emirates from ACTIVE_STATES, enriched with clinic data when available
+  // Use server-prefetched data as initialData — instant render, no refetch
+  const { data: profiles } = useTopDentistsPerLocation(30, topProfilesProp);
+  const { data: statesWithClinics } = useStatesWithClinics(statesWithClinicsProp);
+  const { data: realCounts } = useRealCounts(realCountsProp);
   const states = ACTIVE_STATES.map(as => {
-    const dbState = statesWithClinics?.find(s => s.slug === as.slug);
+    const dbState = statesWithClinics?.find((s: any) => s.slug === as.slug);
     return {
       id: dbState?.id || as.slug,
       name: as.name,
@@ -226,7 +237,6 @@ const Index = ({ seoDataProp }: IndexPageProps = {}) => {
       abbreviation: as.abbr,
     };
   });
-  const { data: realCounts } = useRealCounts();
   const { data: seoContent } = useSeoPageContent("/");
 
   const { data: treatments } = useQuery({
@@ -240,6 +250,7 @@ const Index = ({ seoDataProp }: IndexPageProps = {}) => {
         .limit(12);
       return data || [];
     },
+    staleTime: 10 * 60 * 1000,
   });
 
   if (legacyPostId) {
