@@ -25,5 +25,8 @@ export const getStaticProps: GetStaticProps = async () => {
         description: metaDescription,
       }
     },
+    // ISR: Revalidate homepage every 5 minutes to keep content fresh
+    // This prevents cold starts while keeping content updated
+    revalidate: 300,
   };
 };

@@ -31,8 +31,9 @@ const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData, dehydratedState
 
 export default DentistPageWithSEO;
 
-// Limit pre-rendered pages to prevent long build times
-const TOP_DENTISTS_LIMIT = 20;
+// Pre-render top dentists by rating for better SEO coverage
+// Higher limit = more pre-built pages = fewer cold starts for Googlebot
+const TOP_DENTISTS_LIMIT = 100;
 
 export const getStaticPaths: GetStaticPaths = async () => {
     const supabase = createServerSupabase();

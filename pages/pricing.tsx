@@ -1,4 +1,6 @@
 import { GetStaticProps } from 'next';
 import PricingPage from '@/pages/PricingPage';
 export default PricingPage;
-export const getServerSideProps: GetStaticProps = async () => ({ props: {} });
+
+// ISR: Revalidate pricing page every hour for fresh plan info
+export const getStaticProps: GetStaticProps = async () => ({ props: {}, revalidate: 3600 });

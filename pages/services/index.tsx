@@ -4,5 +4,6 @@ import ServicesPageComponent from '@/pages/ServicesPage';
 export default ServicesPageComponent;
 
 export const getStaticProps: GetStaticProps = async () => {
-    return { props: {} };
+    // ISR: Revalidate services page every hour since services list changes rarely
+    return { props: {}, revalidate: 3600 };
 };

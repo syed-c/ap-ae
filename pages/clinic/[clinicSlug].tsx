@@ -4,9 +4,9 @@ import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import ClinicPageComponent from '@/pages/ClinicPage';
 
-// Limit pre-rendered pages to prevent long build times
-// Rest will be generated on-demand with ISR
-const TOP_CLINICS_LIMIT = 20;
+// Pre-render top clinics by rating/review count for better SEO coverage
+// Higher limit = more pre-built pages = fewer cold starts for Googlebot
+const TOP_CLINICS_LIMIT = 100;
 
 export const getStaticPaths: GetStaticPaths = async () => {
     const supabase = createServerSupabase();

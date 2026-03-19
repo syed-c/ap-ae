@@ -66,8 +66,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
         return { paths: [], fallback: 'blocking' };
     }
     
-    // Only top 10 cities for build time optimization
-    const TOP_CITIES_LIMIT = 10;
+    // Pre-render more city-treatment combinations for better SEO coverage
+    // Higher limit = fewer cold starts for Googlebot on service-location pages
+    const TOP_CITIES_LIMIT = 30;
     
     const { data: cityClinics } = await supabase
         .from('clinics')

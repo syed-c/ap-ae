@@ -46,7 +46,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
         .eq('is_active', true)
         .eq('state.is_active', true);
     
-    const TOP_CITIES_LIMIT = 20;
+    // Pre-render more cities for better SEO coverage
+    // Higher limit = fewer cold starts for Googlebot on city pages
+    const TOP_CITIES_LIMIT = 50;
     
     const { data: cityClinics } = await supabase
         .from('clinics')

@@ -1,4 +1,6 @@
 import { GetStaticProps } from 'next';
 import EmergencyDentistPage from '@/pages/EmergencyDentist';
 export default EmergencyDentistPage;
-export const getServerSideProps: GetStaticProps = async () => ({ props: {} });
+
+// ISR: Revalidate every 5 minutes to keep emergency dentist listings fresh
+export const getStaticProps: GetStaticProps = async () => ({ props: {}, revalidate: 300 });

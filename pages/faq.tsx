@@ -1,4 +1,6 @@
 import { GetStaticProps } from 'next';
 import FAQPage from '@/pages/FAQPage';
 export default FAQPage;
-export const getServerSideProps: GetStaticProps = async () => ({ props: {} });
+
+// ISR: Revalidate every hour since FAQ content changes rarely
+export const getStaticProps: GetStaticProps = async () => ({ props: {}, revalidate: 3600 });

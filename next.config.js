@@ -5,6 +5,13 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
 
+  // ISR Configuration - Optimize cold start latency
+  // staleTimes: Static pages stay fresh for 60s, dynamic ISR pages for 5 minutes
+  staleTimes: {
+    static: 60,
+    dynamic: 300,
+  },
+
   // Add security and SEO headers
   async headers() {
     return [
@@ -21,6 +28,17 @@ const nextConfig = {
         source: '/_next/data/:path*',
         headers: [
           { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+        ],
+      },
+      {
+        // Stale-while-revalidate for all static pages - serve stale while revalidating
+        // This prevents cold starts for repeat visitors
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=60, stale-while-revalidate=300',
+          },
         ],
       },
     ];
@@ -86,6 +104,8 @@ const nextConfig = {
       // Icons — huge package, tree-shaking critical
       'lucide-react',
     ],
+    // Increase ISR cache memory to 256MB to reduce cache evictions
+    isrMemoryLimitBytes: 256 * 1024 * 1024,
   },
 
   webpack: (config) => {
