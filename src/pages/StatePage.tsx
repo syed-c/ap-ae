@@ -47,9 +47,10 @@ interface StatePageProps {
     description: string;
     canonical: string;
   };
+  faqsProp?: { question: string; answer: string }[];
 }
 
-const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp }: StatePageProps = {}) => {
+const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp, faqsProp }: StatePageProps = {}) => {
   const router = useRouter();
   const isServerRender = typeof window === 'undefined';
   const stateSlug = isServerRender
@@ -300,13 +301,16 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp }: StatePageProps
     ? seoContent.faqs
     : seoContent?.content ? parseFaqFromContent(seoContent.content) : [];
 
+  // SSR FAQ data takes priority, then use client-fetched SEO content, then defaults
+  const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
+
   // Use SEO content if optimized, otherwise use defaults
   const pageTitle = seoContent?.meta_title || `Find Dentists in ${stateName} - Top Dental Clinics in ${stateName}`;
   const pageDescription = seoContent?.meta_description || `Find and book appointments with top-rated dental professionals in ${stateName}. Compare verified clinics across ${cities?.length || 0}+ areas.`;
   const pageH1 = seoContent?.h1 || `Find Dentists in ${stateName}`;
 
   // Use SEO FAQs if available, otherwise use defaults
-  const faqs = seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
+  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
     {
       q: `How do I find a dentist in ${stateName}?`,
       a: `Browse our verified list of dentists across ${stateName}. Select your city, then filter by specialty, rating, and insurance to find the perfect match.`,

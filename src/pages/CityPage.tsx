@@ -62,9 +62,10 @@ interface CityPageProps {
     description: string;
     canonical: string;
   };
+  faqsProp?: { question: string; answer: string }[];
 }
 
-const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp }: CityPageProps = {}) => {
+const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp, faqsProp }: CityPageProps = {}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isServerRender = typeof window === 'undefined';
@@ -357,11 +358,14 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     ? seoContent.faqs
     : seoContent?.content ? parseFaqFromContent(seoContent.content) : [];
 
+  // SSR FAQ data takes priority, then use client-fetched SEO content, then defaults
+  const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
+
   const pageTitle = seoContent?.meta_title || `Best Dentists in ${cityName}, ${stateAbbr} - Find Dental Clinics`;
   const pageDescription = seoContent?.meta_description || `Find and book appointments with top-rated dental professionals in ${cityName}, ${stateName}. Compare ${profiles?.length || 0}+ verified clinics.`;
   const pageH1 = seoContent?.h1 || `Best Dentists in ${locationDisplay}`;
 
-  const faqs = seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
+  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
     {
       q: `How do I find a good dentist in ${cityName}?`,
       a: `Browse our verified list of dentists in ${cityName}. Look for verified badges, patient reviews, and specializations that match your needs.`,

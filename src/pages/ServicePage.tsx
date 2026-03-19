@@ -47,9 +47,10 @@ interface ServicePageProps {
     description: string;
     canonical: string;
   };
+  faqsProp?: { question: string; answer: string }[];
 }
 
-const ServicePage = ({ serviceSlugProp, seoDataProp }: ServicePageProps = {}) => {
+const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProps = {}) => {
   const router = useRouter();
   const serviceSlug = serviceSlugProp || (typeof router.query?.serviceSlug === 'string' ? router.query.serviceSlug : '');
 
@@ -93,6 +94,9 @@ const ServicePage = ({ serviceSlugProp, seoDataProp }: ServicePageProps = {}) =>
     ? seoContent.faqs
     : seoContent?.content ? parseFaqFromContent(seoContent.content) : [];
 
+  // SSR FAQ data takes priority, then use client-fetched SEO content, then defaults
+  const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
+
   const isDataReady = !treatmentLoading && !profilesLoading;
   const shouldNoIndex = !profilesLoading && (!profiles || profiles.length < MIN_PROFILE_COUNT);
 
@@ -107,7 +111,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp }: ServicePageProps = {}) =>
     { label: treatmentName },
   ];
 
-  const faqs = seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
+  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
     {
       q: `How much does ${treatmentName} cost in the UAE?`,
       a: uaeMin > 0

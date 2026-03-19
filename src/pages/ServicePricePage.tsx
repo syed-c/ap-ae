@@ -19,10 +19,19 @@ import {
 } from "@/components/ui/accordion";
 import { DollarSign, TrendingUp, MapPin, Shield, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSeoPageContent } from "@/hooks/useSeoPageContent";
 
-const ServicePricePage = () => {
+interface ServicePricePageProps {
+  faqsProp?: { q: string; a: string }[];
+  seoDataProp?: { title?: string; description?: string; canonical?: string };
+}
+
+const ServicePricePage = ({ faqsProp }: ServicePricePageProps) => {
   const { serviceSlug } = useRouter().query as { serviceSlug?: string };
   const slug = serviceSlug || "";
+
+  const seoSlug = `cost/${slug}`;
+  const { data: seoContent } = useSeoPageContent(seoSlug);
 
   const { data: treatment } = useQuery({
     queryKey: ["treatment-price", slug],
@@ -78,6 +87,12 @@ const ServicePricePage = () => {
     { q: `What factors affect the cost of ${treatmentName}?`, a: `Key factors include: clinic location (emirate and area), dentist experience and specialization, technology used (digital scanners, laser equipment), materials quality, and whether additional procedures are needed. Premium areas like DIFC or Palm Jumeirah typically charge 20-40% more.` },
   ];
 
+  const cmsFaqs = seoContent?.faqs
+    ? seoContent.faqs.map((f) => ({ q: f.question, a: f.answer }))
+    : [];
+  const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : cmsFaqs;
+  const finalFaqs = serverFaqs.length > 0 ? serverFaqs : faqs;
+
   return (
     <PageLayout>
       <SEOHead
@@ -86,7 +101,7 @@ const ServicePricePage = () => {
         canonical={`/cost/${slug}/`}
         keywords={[`${treatmentName} cost UAE`, `${treatmentName} price Dubai`, `${treatmentName} cost Sharjah`, `cheap ${treatmentName} UAE`]}
       />
-      <StructuredData type="faq" questions={faqs.map((f) => ({ question: f.q, answer: f.a }))} />
+      <StructuredData type="faq" questions={finalFaqs.map((f) => ({ question: f.q, answer: f.a }))} />
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-8 pb-14">
@@ -151,7 +166,13 @@ const ServicePricePage = () => {
               {sortedByPrice.map((range, i) => {
                 const barWidth = uaeMax > 0 ? ((range.price_max - range.price_min) / uaeMax) * 100 : 50;
                 const barLeft = uaeMax > 0 ? (range.price_min / uaeMax) * 100 : 0;
-                return (
+  const cmsFaqs = seoContent?.faqs
+    ? seoContent.faqs.map((f) => ({ q: f.question, a: f.answer }))
+    : [];
+  const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : cmsFaqs;
+  const finalFaqs = serverFaqs.length > 0 ? serverFaqs : faqs;
+
+  return (
                   <motion.div
                     key={range.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -310,7 +331,7 @@ const ServicePricePage = () => {
             Frequently Asked <span className="text-primary">Questions</span>
           </h2>
           <Accordion type="single" collapsible className="space-y-3">
-            {faqs.map((faq, i) => (
+            {finalFaqs.map((faq, i) => (
               <AccordionItem key={i} value={`faq-${i}`} className="bg-card border border-border rounded-2xl px-5 data-[state=open]:border-primary/30">
                 <AccordionTrigger className="text-left font-bold hover:no-underline py-4 text-sm md:text-base">
                   {faq.q}

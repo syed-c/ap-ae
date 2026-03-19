@@ -4,11 +4,12 @@ import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import ServicePageComponent from '@/pages/ServicePage';
 
-// Wrapper component to render SEO meta tags server-side
-const ServicePageWithSEO = ({ serviceSlug, seoData, dehydratedState }: {
+// Wrapper component to render SEO meta tags server-side with FAQ data for SSR
+const ServicePageWithSEO = ({ serviceSlug, seoData, dehydratedState, faqs }: {
     serviceSlug: string;
     seoData: { title: string; description: string; canonical: string };
     dehydratedState: any;
+    faqs: { question: string; answer: string }[];
 }) => {
     return (
         <>
@@ -20,6 +21,7 @@ const ServicePageWithSEO = ({ serviceSlug, seoData, dehydratedState }: {
                 serviceSlugProp={serviceSlug}
                 dehydratedStateProp={dehydratedState}
                 seoDataProp={seoData}
+                faqsProp={faqs}
             />
         </>
     );
@@ -48,7 +50,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     };
 };
 
-// Static Site Generation - minimal prefetch for SEO
+// Static Site Generation with SSR FAQ data for Googlebot
 export const getStaticProps: GetStaticProps = async (ctx) => {
     const queryClient = new QueryClient();
     const supabase = createServerSupabase();
@@ -98,6 +100,16 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const metaTitle = seoContent?.meta_title || `${treatment.name} - Dental Treatment in UAE`;
     const metaDescription = seoContent?.meta_description || `Get ${treatment.name} treatment at top dental clinics in UAE. Book appointments with verified dentists.`;
 
+    // Extract FAQs from SEO content for SSR
+    let ssrFaqs: { question: string; answer: string }[] = [];
+    
+    if (seoContent?.faqs && Array.isArray(seoContent.faqs) && seoContent.faqs.length > 0) {
+        ssrFaqs = seoContent.faqs.map((f: any) => ({
+            question: f.question || f.q,
+            answer: f.answer || f.a
+        }));
+    }
+
     return {
         props: {
             dehydratedState: dehydrate(queryClient),
@@ -106,7 +118,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 title: metaTitle,
                 description: metaDescription,
                 canonical: `/services/${serviceSlug}/`,
-            }
+            },
+            faqs: ssrFaqs,
         },
         revalidate: 3600,
     };

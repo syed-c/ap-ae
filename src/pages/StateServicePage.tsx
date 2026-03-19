@@ -17,6 +17,7 @@ import { GeographicLinkBlock } from "@/components/seo/GeographicLinkBlock";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { useCitiesByStateSlug } from "@/hooks/useLocations";
+import { useSeoPageContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
 import { useServicePriceRanges } from "@/hooks/useServicePriceRanges";
 import {
@@ -33,11 +34,16 @@ interface StateServicePageProps {
   stateName: string;
   stateId: string;
   treatment: { id: string; name: string; slug: string; description?: string | null };
+  faqsProp?: { q: string; a: string }[];
 }
 
-const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatment }: StateServicePageProps) => {
+const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatment, faqsProp }: StateServicePageProps) => {
   const normalizedStateSlug = normalizeStateSlug(stateSlug);
   const treatmentName = treatment.name;
+
+  // Fetch SEO content for FAQs
+  const seoSlug = `${normalizedStateSlug}/${serviceSlug}`;
+  const { data: seoContent } = useSeoPageContent(seoSlug);
 
   // Fetch cities for this state
   const { data: cities, isLoading: citiesLoading } = useCitiesByStateSlug(normalizedStateSlug || '');
@@ -128,6 +134,10 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
     },
   ];
 
+  const parsedFaqs = seoContent?.content ? parseFaqFromContent(seoContent.content) : [];
+  const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : parsedFaqs;
+  const finalFaqs = serverFaqs.length > 0 ? serverFaqs : faqs;
+
   const cityLinks = (cities || []).slice(0, 15).map(c => ({
     name: c.name,
     slug: c.slug,
@@ -153,7 +163,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
           },
           {
             type: 'faq',
-            questions: faqs.map(f => ({ question: f.q, answer: f.a })),
+            questions: finalFaqs.map(f => ({ question: f.q, answer: f.a })),
           },
           {
             type: 'service',
@@ -329,7 +339,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
             </h2>
           </div>
           <Accordion type="single" collapsible className="space-y-3">
-            {faqs.map((faq, i) => (
+            {finalFaqs.map((faq, i) => (
               <AccordionItem
                 key={i}
                 value={`faq-${i}`}

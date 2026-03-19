@@ -5,16 +5,17 @@ import { createServerSupabase } from '@/lib/supabaseServer';
 import CityPageComponent from '@/pages/CityPage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
-// Wrapper component to render SEO meta tags server-side
+// Wrapper component to render SEO meta tags server-side with FAQ data for SSR
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, dehydratedState }: {
+const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, dehydratedState, faqs }: {
     citySlug: string;
     stateSlug: string;
     stateData: any;
     cityData: any;
     seoData: { title: string; description: string; canonical: string };
     dehydratedState: any;
+    faqs: { question: string; answer: string }[];
 }) => {
     return (
         <>
@@ -29,6 +30,7 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, de
                 cityDataProp={cityData}
                 dehydratedStateProp={dehydratedState}
                 seoDataProp={seoData}
+                faqsProp={faqs}
             />
         </>
     );
@@ -82,7 +84,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     };
 };
 
-// Static Site Generation - minimal prefetch for SEO
+// Static Site Generation with SSR FAQ data for Googlebot
 export const getStaticProps: GetStaticProps = async (ctx) => {
     const queryClient = new QueryClient();
     const supabase = createServerSupabase();
@@ -158,6 +160,16 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const metaTitle = seoContent?.meta_title || `Dental Clinics in ${cityName}, ${stateName} | Book Appointments`;
     const metaDescription = seoContent?.meta_description || `Find and book appointments with top-rated dental clinics in ${cityName}, ${stateName}. Verified dentists, real reviews.`;
 
+    // Extract FAQs from SEO content for SSR
+    let ssrFaqs: { question: string; answer: string }[] = [];
+    
+    if (seoContent?.faqs && Array.isArray(seoContent.faqs) && seoContent.faqs.length > 0) {
+        ssrFaqs = seoContent.faqs.map((f: any) => ({
+            question: f.question || f.q,
+            answer: f.answer || f.a
+        }));
+    }
+
     return {
         props: {
             dehydratedState: dehydrate(queryClient),
@@ -169,7 +181,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 title: metaTitle,
                 description: metaDescription,
                 canonical: `/${normalizedStateSlug}/${citySlug}/`,
-            }
+            },
+            faqs: ssrFaqs,
         },
         revalidate: 3600,
     };

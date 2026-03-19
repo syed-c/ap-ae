@@ -48,9 +48,10 @@ interface ServiceLocationPageProps {
   treatmentDataProp?: any;
   seoDataProp?: { title: string; description: string; canonical: string };
   dehydratedStateProp?: any;
+  faqsProp?: { question: string; answer: string }[];
 }
 
-const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, stateDataProp, cityDataProp, treatmentDataProp, seoDataProp }: ServiceLocationPageProps) => {
+const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, stateDataProp, cityDataProp, treatmentDataProp, seoDataProp, faqsProp }: ServiceLocationPageProps) => {
   const routerQuery = useRouter().query;
   const stateSlug = stateSlugProp || routerQuery.stateSlug as string || '';
   const citySlug = citySlugProp || routerQuery.citySlug as string || '';
@@ -154,11 +155,14 @@ const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, sta
     ? seoContent.faqs
     : seoContent?.content ? parseFaqFromContent(seoContent.content) : [];
 
+  // SSR FAQ data takes priority, then use client-fetched SEO content, then defaults
+  const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
+
   const pageTitle = seoContent?.meta_title || `${treatmentName} in ${locationDisplay} - Find Best Specialists`;
   const pageDescription = seoContent?.meta_description || `Find the best ${treatmentName.toLowerCase()} specialists in ${locationDisplay}. Compare ${profiles?.length || 0}+ verified clinics.`;
   const pageH1 = seoContent?.h1 || `${treatmentName} in ${locationDisplay}`;
 
-  const faqs = seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
+  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
     {
       q: `Where can I find ${treatmentName} specialists in ${locationName}?`,
       a: `We have ${profiles?.length || 0}+ verified ${treatmentName.toLowerCase()} specialists in ${locationName}. Browse our directory above to compare ratings and book appointments.`,

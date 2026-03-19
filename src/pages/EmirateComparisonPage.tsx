@@ -18,10 +18,19 @@ import {
 } from "@/components/ui/accordion";
 import { BarChart3, MapPin, ArrowRight, TrendingDown, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSeoPageContent } from "@/hooks/useSeoPageContent";
 
-const EmirateComparisonPage = () => {
+interface EmirateComparisonPageProps {
+  faqsProp?: { q: string; a: string }[];
+  seoDataProp?: { title?: string; description?: string; canonical?: string };
+}
+
+const EmirateComparisonPage = ({ faqsProp }: EmirateComparisonPageProps) => {
   const query = useRouter().query; const serviceSlug = query.comparison as string || ""; const parts = serviceSlug.split("-vs-"); const emirate1 = parts[0] || ""; const emirate2 = parts[1] || "";
   const slug = serviceSlug || "";
+
+  const seoSlug = `compare/${serviceSlug}`;
+  const { data: seoContent } = useSeoPageContent(seoSlug);
 
   const { data: treatment } = useQuery({
     queryKey: ["treatment-compare", slug],
@@ -62,6 +71,12 @@ const EmirateComparisonPage = () => {
     { q: `Are dental standards the same across all emirates?`, a: `Yes. All dental clinics in the UAE must be licensed by their respective health authority (DHA for Dubai, DOH for Abu Dhabi, MOHAP for others). Standards of care and safety regulations are consistent nationwide.` },
   ];
 
+  const cmsFaqs = seoContent?.faqs
+    ? seoContent.faqs.map((f) => ({ q: f.question, a: f.answer }))
+    : [];
+  const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : cmsFaqs;
+  const finalFaqs = serverFaqs.length > 0 ? serverFaqs : faqs;
+
   return (
     <PageLayout>
       <SEOHead
@@ -70,7 +85,7 @@ const EmirateComparisonPage = () => {
         canonical={`/compare/${slug}/${emirate1}-vs-${emirate2}/`}
         keywords={[`${treatmentName} ${emirate1Name}`, `${treatmentName} ${emirate2Name}`, `dental prices comparison UAE`]}
       />
-      <StructuredData type="faq" questions={faqs.map((f) => ({ question: f.q, answer: f.a }))} />
+      <StructuredData type="faq" questions={finalFaqs.map((f) => ({ question: f.q, answer: f.a }))} />
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-8 pb-14">
@@ -196,7 +211,7 @@ const EmirateComparisonPage = () => {
             Frequently Asked <span className="text-primary">Questions</span>
           </h2>
           <Accordion type="single" collapsible className="space-y-3">
-            {faqs.map((faq, i) => (
+            {finalFaqs.map((faq, i) => (
               <AccordionItem key={i} value={`faq-${i}`} className="bg-card border border-border rounded-2xl px-5 data-[state=open]:border-primary/30">
                 <AccordionTrigger className="text-left font-bold hover:no-underline py-4 text-sm md:text-base">{faq.q}</AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pb-4 text-sm">{faq.a}</AccordionContent>
