@@ -122,6 +122,7 @@ const SeoCommandCenterTab = lazyRetry(() => import('@/components/admin/tabs/SeoC
 const RankingControlCenterTab = lazyRetry(() => import('@/components/admin/tabs/RankingControlCenterTab'));
 const SeoOperationsCenterTab = lazyRetry(() => import('@/components/admin/tabs/SeoOperationsCenterTab'));
 const ContentGenerationStudioTab = lazyRetry(() => import('@/components/admin/tabs/ContentGenerationStudioTab'));
+const PageContentGeneratorTab = lazyRetry(() => import('@/components/admin/tabs/PageContentGeneratorTab'));
 const FAQGenerationStudioTab = lazyRetry(() => import('@/components/admin/tabs/FAQGenerationStudioTab'));
 const ContentAuditBotTab = lazyRetry(() => import('@/components/admin/tabs/ContentAuditBotTab'));
 const Phase2SprintHubTab = lazyRetry(() => import('@/components/admin/tabs/Phase2SprintHubTab'));
@@ -290,6 +291,7 @@ const adminTabGroups = [
       { id: 'content-command-center', label: 'Content Hub', icon: Bot, highlight: true },
       { id: 'quality-identity', label: 'Quality & Identity', icon: Activity, highlight: true },
       { id: 'content-studio', label: 'Content Studio', icon: Sparkles, highlight: true },
+      { id: 'page-content-generator', label: 'Page Content', icon: FileText, highlight: true },
       { id: 'faq-studio', label: 'FAQ Studio', icon: Search, highlight: true },
       { id: 'clinic-enrichment', label: 'Clinic Enrichment', icon: Sparkles, highlight: true },
       { id: 'blog', label: 'Blog Engine', icon: BookOpen },
@@ -612,6 +614,7 @@ export default function AdminDashboard() {
       case 'phase3-sprint-hub': return <Phase3SprintHubTab />;
       case 'phase4-sprint-hub': return <Phase4SprintHubTab />;
       case 'content-studio': return <ContentGenerationStudioTab />;
+      case 'page-content-generator': return <PageContentGeneratorTab />;
       case 'tools-management': return <ToolsManagementTab />;
       case 'faq-studio': return <FAQGenerationStudioTab />;
       case 'content-audit': return <ContentAuditBotTab />;

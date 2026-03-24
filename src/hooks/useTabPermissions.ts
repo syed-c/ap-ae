@@ -20,6 +20,7 @@ export const AVAILABLE_TABS = [
   { key: 'seo-bot', label: 'SEO Bot', category: 'Content & SEO' },
   { key: 'seo-copilot', label: 'SEO Copilot', category: 'Content & SEO' },
   { key: 'seo-content-optimizer', label: 'Content Optimizer', category: 'Content & SEO' },
+  { key: 'page-content-generator', label: 'Page Content', category: 'Content & SEO' },
   { key: 'ranking-rules', label: 'Ranking Rules', category: 'Content & SEO' },
   { key: 'pinned-profiles', label: 'Pinned Profiles', category: 'Content & SEO' },
   { key: 'top-dentists', label: 'Top Dentists', category: 'Content & SEO' },

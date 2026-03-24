@@ -79,6 +79,7 @@ const ADMIN_TABS = [
   { id: 'seo-bot', label: 'SEO Bot', icon: 'Bot', group: 'Content & SEO' },
   { id: 'seo-copilot', label: 'SEO Copilot', icon: 'Target', group: 'Content & SEO' },
   { id: 'seo-content-optimizer', label: 'Content Optimizer', icon: 'Zap', group: 'Content & SEO' },
+  { id: 'page-content-generator', label: 'Page Content', icon: 'FileText', group: 'Content & SEO' },
   { id: 'ranking-rules', label: 'Ranking Rules', icon: 'TrendingUp', group: 'Content & SEO' },
   { id: 'pinned-profiles', label: 'Pinned Profiles', icon: 'Star', group: 'Content & SEO' },
   { id: 'top-dentists', label: 'Top Dentists', icon: 'Star', group: 'Content & SEO' },

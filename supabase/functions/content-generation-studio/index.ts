@@ -265,10 +265,9 @@ End with calm, helpful CTA encouraging users to:
 - Do NOT claim specific certifications unless provided
 - Do NOT mention AppointPanda or any booking platform`;
 
-    // Generate unique anti-duplication seed based on slug and random factors
+    // Generate unique anti-duplication seed based on slug hash (deterministic per-page)
     function generateUniquenessSeed(slug: string, pageType: string): string {
-      const timestamp = Date.now();
-      const randomId = Math.random().toString(36).substring(2, 8);
+      const slugHash = Array.from(slug).reduce((acc, c) => acc + c.charCodeAt(0), 0);
 
       // Opening style variations
       const openingStyles = [
@@ -294,16 +293,16 @@ End with calm, helpful CTA encouraging users to:
         "Organize chronologically from initial visit to ongoing care."
       ];
 
-      const selectedOpening = openingStyles[timestamp % openingStyles.length];
-      const selectedStructure = structureStyles[(timestamp + 3) % structureStyles.length];
+      const selectedOpening = openingStyles[slugHash % openingStyles.length];
+      const selectedStructure = structureStyles[(slugHash + 3) % structureStyles.length];
 
       return `
-=== UNIQUENESS DIRECTIVE (ID: ${randomId}) ===
+=== UNIQUENESS DIRECTIVE (SLUG HASH: ${slugHash}) ===
 This content MUST be completely different from all other pages. Use these specific instructions:
 
 OPENING STYLE: ${selectedOpening}
 STRUCTURE APPROACH: ${selectedStructure}
-UNIQUE IDENTIFIER: ${slug.toUpperCase()}-${randomId}
+UNIQUE IDENTIFIER: ${slug.toUpperCase()}-H${slugHash}
 
 MANDATORY DIFFERENTIATION:
 - Do NOT use generic dental industry phrases
