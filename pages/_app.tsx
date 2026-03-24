@@ -3,12 +3,27 @@ import type { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider, HydrationBoundary } from '@tanstack/react-query';
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import { Nunito } from 'next/font/google';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import { AuthProvider } from '@/hooks/useAuth';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { MetaTagInjector } from '@/components/analytics/MetaTagInjector';
-import Head from 'next/head';
+
+const nunito = Nunito({
+  subsets: ['latin'],
+  variable: '--font-nunito',
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800', '900'],
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
+});
 
 // Lazy-load non-critical components — keeps initial JS bundle lean
 const AnalyticsProvider = dynamic(
@@ -33,6 +48,7 @@ const VisitorTracker = dynamic(
 );
 
 export default function App({ Component, pageProps }: AppProps) {
+  const fontClass = `${nunito.variable} ${plusJakartaSans.variable}`;
   const [queryClient] = useState(
     () =>
       new QueryClient({

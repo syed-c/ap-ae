@@ -19,8 +19,8 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', '"Nunito"', "system-ui", "sans-serif"],
-        display: ['"Nunito"', '"Plus Jakarta Sans"', "system-ui", "sans-serif"],
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-nunito)', 'var(--font-sans)', 'system-ui', 'sans-serif'],
       },
       fontWeight: {
         normal: "400",

@@ -4,8 +4,10 @@ import IndexPage from '@/pages/Index';
 import { supabase } from '@/integrations/supabase/client';
 import { ACTIVE_STATE_SLUGS } from '@/lib/constants/activeStates';
 
+const BASE_URL = 'https://www.appointpanda.ae';
+
 interface HomePageProps {
-  seoData: { title: string; description: string };
+  seoData: { title: string; description: string; canonical: string };
   realCounts: { clinics: number; states: number; cities: number; dentists: number; treatments: number } | null;
   topProfiles: {
     id: string;
@@ -32,11 +34,44 @@ export default function IndexPageWithSEO({
   topProfiles,
   statesWithClinics,
 }: HomePageProps) {
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "AppointPanda",
+    "url": BASE_URL,
+    "description": "Find and book appointments with top-rated dental professionals across the UAE.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${BASE_URL}/search?q={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
+    },
+    "sameAs": [],
+  };
+
   return (
     <>
       <Head>
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
+        <link rel="canonical" href={seoData.canonical} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />
+        <meta property="og:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
+        <meta property="og:description" content={seoData.description} />
+        <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
+        <meta property="og:site_name" content="AppointPanda" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={`${BASE_URL}${seoData.canonical}`} />
+        <meta name="twitter:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
+        <meta name="twitter:description" content={seoData.description} />
+        <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
       </Head>
       <IndexPage
         seoDataProp={seoData}
@@ -137,6 +172,7 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
       seoData: {
         title: 'AppointPanda - Find & Book Dental Appointments in UAE',
         description: 'Find and book appointments with top-rated dental professionals across the UAE. Verified dentists, real reviews, easy booking.',
+        canonical: '/',
       },
       realCounts: realCountsData,
       topProfiles: profiles,

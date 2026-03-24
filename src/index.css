@@ -200,14 +200,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Plus Jakarta Sans', 'Nunito', system-ui, sans-serif;
+    font-family: var(--font-sans), var(--font-nunito), system-ui, sans-serif;
     font-weight: 400;
     overflow-x: hidden;
     letter-spacing: -0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: var(--font-nunito), var(--font-sans), system-ui, sans-serif;
     @apply tracking-tight font-bold;
   }
 
@@ -224,12 +224,12 @@
      ======================================== */
   
   .text-hero {
-    font-family: 'Nunito', system-ui, sans-serif;
+    font-family: var(--font-nunito), system-ui, sans-serif;
     @apply font-bold tracking-tight leading-tight;
   }
 
   .text-section {
-    font-family: 'Nunito', system-ui, sans-serif;
+    font-family: var(--font-nunito), system-ui, sans-serif;
     @apply font-bold tracking-tight;
   }
 
@@ -388,12 +388,12 @@
 
   .hero-display {
     @apply text-7xl font-bold text-primary;
-    font-family: 'Nunito', system-ui, sans-serif;
+    font-family: var(--font-nunito), system-ui, sans-serif;
   }
 
   .hero-display-sm {
     @apply text-5xl font-bold text-primary;
-    font-family: 'Nunito', system-ui, sans-serif;
+    font-family: var(--font-nunito), system-ui, sans-serif;
   }
 
   .glow-container {
@@ -582,7 +582,7 @@
 
 @layer utilities {
   .font-display {
-    font-family: 'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: var(--font-nunito), var(--font-sans), system-ui, sans-serif;
   }
 
   .bg-dark-section {
@@ -808,7 +808,7 @@
   margin-bottom: 1rem;
   color: hsl(var(--foreground));
   line-height: 1.3;
-  font-family: 'Nunito', system-ui, sans-serif;
+  font-family: var(--font-nunito), system-ui, sans-serif;
 }
 
 .blog-content h2 {
@@ -820,7 +820,7 @@
   line-height: 1.4;
   border-bottom: 1px solid hsl(var(--border));
   padding-bottom: 0.5rem;
-  font-family: 'Nunito', system-ui, sans-serif;
+  font-family: var(--font-nunito), system-ui, sans-serif;
 }
 
 .blog-content h3 {
@@ -829,7 +829,7 @@
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
   color: hsl(var(--foreground));
-  font-family: 'Nunito', system-ui, sans-serif;
+  font-family: var(--font-nunito), system-ui, sans-serif;
 }
 
 .blog-content h4 {

@@ -46,7 +46,7 @@
     },
     {
       "source": "/sitemap.xml",
-      "destination": "https://eneuthbghipsdvsqilmb.supabase.co/functions/v1/sitemap"
+      "destination": "/api/sitemap"
     },
     {
       "source": "/sitemap-static.xml",

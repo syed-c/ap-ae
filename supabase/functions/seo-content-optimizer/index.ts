@@ -95,6 +95,19 @@ serve(async (req) => {
     const { action, page_id, page_slug, page_type, batch_size = 10, run_id, issue_type, custom_prompt, page_ids } = body;
     const now = new Date().toISOString();
 
+    // DISABLED: This entire system has been disabled in favor of the three-studio architecture
+    // The studios (Meta Studio, H1 Studio, Content Studio) provide better quality control through separate AI calls
+    // This optimizer wrote ALL fields in a single AI call, bypassing the studio separation
+    return new Response(JSON.stringify({ 
+      success: false, 
+      error: "seo-content-optimizer has been disabled. Use the three-studio architecture (Meta Studio, H1 Studio, Content Studio) instead." 
+    }), {
+      status: 410,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
+    // DISABLED CODE BELOW - Keeping for reference during transition period
+    /*
     // Helper to call AI with retries for transient errors (502, 503, 504) and connection errors
     async function callAIWithRetry(body: object, maxRetries = 4): Promise<Response> {
       let lastError: Error | null = null;
@@ -1559,3 +1572,4 @@ CONTENT REQUIREMENTS:
     );
   }
 });
+*/

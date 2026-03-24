@@ -14,6 +14,7 @@ export interface SEOHeadProps {
   author?: string;
   publishedAt?: string;
   modifiedAt?: string;
+  currentPath?: string;
 }
 
 const SITE_NAME = 'AppointPanda';
@@ -32,9 +33,10 @@ export const SEOHead = ({
   author,
   publishedAt,
   modifiedAt,
+  currentPath: currentPathProp,
 }: SEOHeadProps) => {
   const router = useRouter();
-  const currentPath = router.asPath || '/';
+  const currentPath = currentPathProp ?? router.asPath ?? '/';
 
   // Ensure we have at least some title
   const safeTitle = title || 'Dental Clinics in UAE';

@@ -1,6 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
 import ServicePricePage from '@/pages/ServicePricePage';
-import { supabase } from '@/integrations/supabase/client';
+import { createServerSupabase } from '@/lib/supabaseServer';
 
 interface Props {
   faqsProp?: { q: string; a: string }[];
@@ -12,6 +12,7 @@ export default function CostPage(props: Props) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  const supabase = createServerSupabase();
   const { data: treatments } = await supabase
     .from('treatments')
     .select('slug')
@@ -26,6 +27,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
+  const supabase = createServerSupabase();
   const serviceSlug = params?.serviceSlug as string;
   const seoSlug = `cost/${serviceSlug}`;
 

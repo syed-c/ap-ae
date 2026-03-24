@@ -27,30 +27,8 @@ class MyDocument extends Document {
           <meta name="google-site-verification" content="rRYuAOlERaQwgPvDUKyirGO1QMVjD43uY-eXEPn--OM" />
 
           {/* Critical preconnects for LCP */}
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
           <link rel="dns-prefetch" href="https://eneuthbghipsdvsqilmb.supabase.co" />
-
-          {/* Google Fonts — non-blocking load */}
-          <link
-            rel="preload"
-            as="style"
-            href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-          />
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-            media="print"
-            // @ts-ignore
-            onLoad="this.media='all'"
-          />
-          <noscript>
-            <link
-              rel="stylesheet"
-              href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-            />
-          </noscript>
 
           {/* Base Organization Schema */}
           <script
@@ -70,12 +48,16 @@ class MyDocument extends Document {
                 "image": "https://www.appointpanda.ae/logo.png",
                 "description": "Find and book appointments with top-rated dental professionals across the UAE.",
                 "address": { "@type": "PostalAddress", "addressCountry": "AE" },
-                "sameAs": [],
+                "sameAs": [
+                  "https://www.facebook.com/appointpanda/",
+                  "https://www.instagram.com/appointpanda/",
+                  "https://www.linkedin.com/company/appointpanda/",
+                ],
               }),
             }}
           />
         </Head>
-        <body className="min-h-screen bg-background font-sans antialiased">
+        <body className="min-h-screen bg-background font-sans antialiased nunito plus-jakarta-sans">
           <Main />
           <NextScript />
         </body>

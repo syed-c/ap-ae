@@ -10,14 +10,63 @@ const BASE_URL = 'https://www.appointpanda.ae';
 const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData, dehydratedState }: {
     dentistSlug: string;
     dentistData: any;
-    seoData: { title: string; description: string; canonical: string };
+    seoData: { title: string; description: string; canonical: string; ogImage?: string };
     dehydratedState: any;
 }) => {
+    const physicianSchema = {
+        "@context": "https://schema.org",
+        "@type": "Dentist",
+        "name": dentistData?.name || '',
+        "description": seoData.description,
+        "url": `${BASE_URL}/dentist/${dentistSlug}/`,
+        "image": dentistData?.image_url || `${BASE_URL}/og-image.png`,
+        "jobTitle": dentistData?.title || 'Dentist',
+        "worksFor": dentistData?.clinic?.name ? {
+            "@type": "Dentist",
+            "name": dentistData.clinic.name,
+            "url": `${BASE_URL}/clinic/${dentistData.clinic.slug}/`,
+        } : undefined,
+        "address": dentistData?.clinic?.city ? {
+            "@type": "PostalAddress",
+            "addressLocality": dentistData.clinic.city.name,
+            "addressRegion": dentistData.clinic.city.state?.name || '',
+            "addressCountry": "AE",
+        } : undefined,
+        ...((dentistData?.rating && dentistData?.rating > 0) ? {
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": String(dentistData.rating),
+                "reviewCount": String(dentistData.review_count || 0),
+            }
+        } : {}),
+        "memberOf": [{
+            "@type": "Organization",
+            "name": "AppointPanda",
+            "url": BASE_URL,
+        }],
+    };
+
     return (
         <>
             <Head>
                 <title>{seoData.title}</title>
                 <meta name="description" content={seoData.description} />
+                <link rel="canonical" href={seoData.canonical} />
+                <meta property="og:type" content="profile" />
+                <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />
+                <meta property="og:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
+                <meta property="og:description" content={seoData.description} />
+                <meta property="og:image" content={seoData.ogImage || `${BASE_URL}/og-image.png`} />
+                <meta property="og:site_name" content="AppointPanda" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:url" content={`${BASE_URL}${seoData.canonical}`} />
+                <meta name="twitter:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
+                <meta name="twitter:description" content={seoData.description} />
+                <meta name="twitter:image" content={seoData.ogImage || `${BASE_URL}/og-image.png`} />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(physicianSchema) }}
+                />
             </Head>
             <DentistPageComponent 
                 dentistSlugProp={dentistSlug} 
@@ -31,23 +80,15 @@ const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData, dehydratedState
 
 export default DentistPageWithSEO;
 
-// Pre-render top dentists by rating for better SEO coverage
-// Higher limit = more pre-built pages = fewer cold starts for Googlebot
-const TOP_DENTISTS_LIMIT = 100;
-
 export const getStaticPaths: GetStaticPaths = async () => {
     const supabase = createServerSupabase();
     
     console.log('[SSG] Generating dentist paths...');
     
-    // Only pre-render top dentists by rating
     const { data: dentists } = await supabase
         .from('dentists')
-        .select('slug, rating, review_count')
-        .eq('is_active', true)
-        .order('rating', { ascending: false })
-        .order('review_count', { ascending: false })
-        .limit(TOP_DENTISTS_LIMIT);
+        .select('slug')
+        .eq('is_active', true);
     
     const paths = (dentists || []).map(dentist => ({
         params: { dentistSlug: dentist.slug }
@@ -123,6 +164,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 title: metaTitle,
                 description: metaDescription,
                 canonical: `/dentist/${dentistSlug}/`,
+                ogImage: dentist.image_url || null,
             }
         },
         revalidate: 3600
