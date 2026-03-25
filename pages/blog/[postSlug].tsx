@@ -1,16 +1,14 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
-import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import BlogPostPageComponent from '@/pages/BlogPostPage';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const BlogPostPageWithSEO = ({ postSlug, postData, seoData, dehydratedState }: {
+const BlogPostPageWithSEO = ({ postSlug, postData, seoData }: {
     postSlug: string;
     postData: any;
     seoData: { title: string; description: string; canonical: string; ogImage?: string; author?: string; publishedAt?: string | null; modifiedAt?: string | null };
-    dehydratedState: any;
 }) => {
     const fullTitle = seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`;
     const imageUrl = seoData.ogImage || `${BASE_URL}/og-image.png`;
@@ -77,7 +75,6 @@ const BlogPostPageWithSEO = ({ postSlug, postData, seoData, dehydratedState }: {
                 postSlugProp={postSlug}
                 postDataProp={postData}
                 seoDataProp={seoData}
-                dehydratedStateProp={dehydratedState}
             />
         </>
     );
@@ -85,37 +82,16 @@ const BlogPostPageWithSEO = ({ postSlug, postData, seoData, dehydratedState }: {
 
 export default BlogPostPageWithSEO;
 
-// Generate static paths for all blog posts at build time
+// Generate static paths - use fallback blocking to avoid build timeouts
 export const getStaticPaths: GetStaticPaths = async () => {
-    const supabase = createServerSupabase();
-    
-    // Skip if no Supabase credentials
-    if (!supabase) {
-        return { paths: [], fallback: 'blocking' };
-    }
-    
-    console.log('[SSG] Generating blog post paths...');
-    
-    const { data: posts } = await supabase
-        .from('blog_posts')
-        .select('slug')
-        .eq('status', 'published');
-    
-    const paths = (posts || []).map(post => ({
-        params: { postSlug: post.slug }
-    }));
-    
-    console.log(`[SSG] Generated ${paths.length} blog post paths`);
-    
     return {
-        paths,
+        paths: [],
         fallback: 'blocking'
     };
 };
 
 // Convert to Static Site Generation
 export const getStaticProps: GetStaticProps = async (ctx) => {
-    const queryClient = new QueryClient();
     const supabase = createServerSupabase();
     const postSlug = ctx.params?.postSlug as string;
 
@@ -123,21 +99,14 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
-    // Prefetch post data
-    await queryClient.prefetchQuery({
-        queryKey: ["blog-post", postSlug],
-        queryFn: async () => {
-            const { data } = await supabase
-                .from("blog_posts")
-                .select("*")
-                .eq("slug", postSlug)
-                .eq("status", "published")
-                .maybeSingle();
-            return data;
-        },
-    });
-
-    const postData = queryClient.getQueryData<any>(["blog-post", postSlug]);
+    // Direct query instead of React Query for faster build
+    const postData = await supabase
+        .from("blog_posts")
+        .select("*")
+        .eq("slug", postSlug)
+        .eq("status", "published")
+        .maybeSingle()
+        .then(r => r.data);
     
     if (!postData) {
         return { notFound: true };
@@ -150,7 +119,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     return { 
         props: {
-            dehydratedState: dehydrate(queryClient),
             postSlug,
             postData,
             seoData: {
@@ -163,6 +131,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 modifiedAt: postData.updated_at || null,
             }
         },
-        revalidate: 3600 // Revalidate every hour (ISR)
+        revalidate: 3600
     };
 };

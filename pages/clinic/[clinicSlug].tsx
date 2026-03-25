@@ -1,37 +1,17 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
-import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import ClinicPageComponent from '@/pages/ClinicPage';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    const supabase = createServerSupabase();
-    
-    if (!supabase) {
-        return { paths: [], fallback: 'blocking' };
-    }
-    
-    const { data: clinics } = await supabase
-        .from('clinics')
-        .select('slug')
-        .eq('is_active', true)
-        .eq('is_duplicate', false);
-    
-    const paths = (clinics || []).map(clinic => ({
-        params: { clinicSlug: clinic.slug }
-    }));
-    
-    console.log(`[SSG] Generated ${paths.length} clinic page paths`);
-    
     return {
-        paths,
+        paths: [],
         fallback: 'blocking'
     };
 };
 
 // Static Site Generation - prefetch ALL critical data for SEO
 export const getStaticProps: GetStaticProps = async (ctx) => {
-    const queryClient = new QueryClient();
     const supabase = createServerSupabase();
     const clinicSlug = ctx.params?.clinicSlug as string;
 
@@ -39,7 +19,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
-    // If no Supabase, skip prefetch - client will fetch data
     if (!supabase) {
         return {
             props: {
@@ -56,41 +35,27 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     const seoSlug = `clinic/${clinicSlug}`;
 
-    // Only prefetch what's needed for SEO - let client fetch the rest
-    await Promise.all([
-        queryClient.prefetchQuery({
-            queryKey: ['clinic', clinicSlug],
-            queryFn: async () => {
-                const { data, error } = await supabase
-                    .from("clinics")
-                    .select("*, city:cities(name, slug, state:states(name, slug, abbreviation)), area:areas(name, slug)")
-                    .eq("slug", clinicSlug)
-                    .maybeSingle();
-                if (error) throw error;
-                return data;
-            }
-        }),
-        queryClient.prefetchQuery({
-            queryKey: ['seo-page-content', seoSlug],
-            queryFn: async () => {
-                const { data } = await supabase
-                    .from("seo_pages")
-                    .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
-                    .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
-                    .order("is_optimized", { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
-                return data || null;
-            }
-        })
+    // Direct queries instead of React Query for faster build
+    const [clinic, seoContent] = await Promise.all([
+        supabase
+            .from("clinics")
+            .select("*, city:cities(name, slug, state:states(name, slug, abbreviation)), area:areas(name, slug)")
+            .eq("slug", clinicSlug)
+            .maybeSingle()
+            .then(r => r.data),
+        supabase
+            .from("seo_pages")
+            .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
+            .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
+            .order("is_optimized", { ascending: false })
+            .limit(1)
+            .maybeSingle()
+            .then(r => r.data)
     ]);
 
-    const clinic = queryClient.getQueryData<any>(['clinic', clinicSlug]);
     if (!clinic) {
         return { notFound: true };
     }
-
-    const seoContent = queryClient.getQueryData<any>(['seo-page-content', seoSlug]);
     
     const cityName = clinic.city?.name || 'UAE';
     const stateAbbrev = clinic.city?.state?.abbreviation || 'UAE';
@@ -99,7 +64,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     return {
         props: {
-            dehydratedState: dehydrate(queryClient),
             clinicSlug,
             clinicData: clinic,
             seoData: {
@@ -114,11 +78,10 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 };
 
 // Wrapper component to render SEO meta tags server-side
-const ClinicPageWithSEO = ({ clinicSlug, clinicData, seoData, dehydratedState }: {
+const ClinicPageWithSEO = ({ clinicSlug, clinicData, seoData }: {
     clinicSlug: string;
     clinicData: any;
     seoData: { title: string; description: string; canonical: string; ogImage?: string };
-    dehydratedState: any;
 }) => {
     const BASE_URL = 'https://www.appointpanda.ae';
 
@@ -210,7 +173,6 @@ const ClinicPageWithSEO = ({ clinicSlug, clinicData, seoData, dehydratedState }:
             <ClinicPageComponent 
                 clinicSlugProp={clinicSlug} 
                 clinicDataProp={clinicData}
-                dehydratedStateProp={dehydratedState}
                 seoDataProp={seoData}
             />
         </>

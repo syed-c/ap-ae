@@ -1,13 +1,12 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
-import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { createServerSupabase } from '@/lib/supabaseServer';
 import ServiceLocationPageComponent from '@/pages/ServiceLocationPage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, dehydratedState, faqs }: {
+const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs }: {
     stateSlug: string;
     citySlug: string;
     serviceSlug: string;
@@ -15,7 +14,6 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
     cityData: any;
     treatmentData: any;
     seoData: { title: string; description: string; canonical: string };
-    dehydratedState: any;
     faqs: { question: string; answer: string }[];
 }) => {
     return (
@@ -44,7 +42,6 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
                 cityDataProp={cityData}
                 treatmentDataProp={treatmentData}
                 seoDataProp={seoData}
-                dehydratedStateProp={dehydratedState}
                 faqsProp={faqs}
             />
         </>
@@ -53,79 +50,16 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
 
 export default ServiceLocationPageWithSEO;
 
-// Generate static paths for emirate-area-service combinations
+// Generate static paths - use fallback blocking to avoid build timeouts
 export const getStaticPaths: GetStaticPaths = async () => {
-    const supabase = createServerSupabase();
-    
-    console.log('[SSG] Generating area-service paths...');
-    
-    const { data: treatments } = await supabase
-        .from('treatments')
-        .select('slug')
-        .eq('is_active', true);
-    
-    if (!treatments || treatments.length === 0) {
-        return { paths: [], fallback: 'blocking' };
-    }
-    
-    const treatmentSlugs = treatments.map(t => t.slug);
-    
-    const { data: cities } = await supabase
-        .from('cities')
-        .select('slug, state:states!inner(slug)')
-        .eq('is_active', true)
-        .eq('state.is_active', true);
-    
-    if (!cities || cities.length === 0) {
-        return { paths: [], fallback: 'blocking' };
-    }
-    
-    // Pre-render more city-treatment combinations for better SEO coverage
-    // Higher limit = fewer cold starts for Googlebot on service-location pages
-    const TOP_CITIES_LIMIT = 50;
-    
-    const { data: cityClinics } = await supabase
-        .from('clinics')
-        .select('city_id');
-    
-    const cityCountMap = new Map<string, number>();
-    (cityClinics || []).forEach((c: any) => {
-        const count = cityCountMap.get(c.city_id) || 0;
-        cityCountMap.set(c.city_id, count + 1);
-    });
-    
-    const citiesWithCounts = (cities || []).map((city: any) => ({
-        ...city,
-        clinicCount: cityCountMap.get(city.id) || 0
-    })).sort((a: any, b: any) => b.clinicCount - a.clinicCount);
-    
-    const topCities = citiesWithCounts.slice(0, TOP_CITIES_LIMIT);
-    
-    const paths: any[] = [];
-    
-    for (const city of topCities) {
-        for (const treatmentSlug of treatmentSlugs) {
-            paths.push({
-                params: {
-                    stateSlug: city.state.slug,
-                    citySlug: city.slug,
-                    serviceSlug: treatmentSlug
-                }
-            });
-        }
-    }
-    
-    console.log(`[SSG] Generated ${paths.length} area-service paths (top ${TOP_CITIES_LIMIT} cities)`);
-    
     return {
-        paths,
+        paths: [],
         fallback: 'blocking'
     };
 };
 
 // Static Site Generation with SSR FAQ data for Googlebot
 export const getStaticProps: GetStaticProps = async (ctx) => {
-    const queryClient = new QueryClient();
     const supabase = createServerSupabase();
     const stateSlug = ctx.params?.stateSlug as string;
     const citySlug = ctx.params?.citySlug as string;
@@ -138,62 +72,37 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     const seoSlug = `${normalizedStateSlug}/${citySlug}/${serviceSlug}`;
 
-    // Prefetch state, city, treatment, and SEO content (critical for SEO)
-    await Promise.all([
-        queryClient.prefetchQuery({
-            queryKey: ['state', normalizedStateSlug],
-            queryFn: async () => {
-                const { data } = await supabase
-                    .from('states')
-                    .select('*')
-                    .eq('slug', normalizedStateSlug)
-                    .eq('is_active', true)
-                    .maybeSingle();
-                return data || null;
-            }
-        }),
-        queryClient.prefetchQuery({
-            queryKey: ['city', citySlug, normalizedStateSlug],
-            queryFn: async () => {
-                const { data } = await supabase
-                    .from('cities')
-                    .select('*, state:states(*)')
-                    .eq('slug', citySlug)
-                    .eq('is_active', true)
-                    .maybeSingle();
-                return data || null;
-            }
-        }),
-        queryClient.prefetchQuery({
-            queryKey: ["treatment", serviceSlug],
-            queryFn: async () => {
-                const { data } = await supabase
-                    .from("treatments")
-                    .select("*")
-                    .eq("slug", serviceSlug)
-                    .maybeSingle();
-                return data;
-            },
-        }),
-        queryClient.prefetchQuery({
-            queryKey: ['seo-page-content', seoSlug],
-            queryFn: async () => {
-                const { data } = await supabase
-                    .from("seo_pages")
-                    .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
-                    .eq("slug", seoSlug)
-                    .order("is_optimized", { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
-                return data || null;
-            }
-        })
+    // Direct queries instead of React Query for faster build
+    const [stateData, cityData, treatmentData, seoContent] = await Promise.all([
+        supabase
+            .from('states')
+            .select('*')
+            .eq('slug', normalizedStateSlug)
+            .eq('is_active', true)
+            .maybeSingle()
+            .then(r => r.data),
+        supabase
+            .from('cities')
+            .select('*, state:states(*)')
+            .eq('slug', citySlug)
+            .eq('is_active', true)
+            .maybeSingle()
+            .then(r => r.data),
+        supabase
+            .from('treatments')
+            .select('*')
+            .eq('slug', serviceSlug)
+            .maybeSingle()
+            .then(r => r.data),
+        supabase
+            .from('seo_pages')
+            .select('id, slug, meta_title, meta_description, content, is_optimized, h1, faqs')
+            .eq('slug', seoSlug)
+            .order('is_optimized', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+            .then(r => r.data)
     ]);
-
-    const stateData = queryClient.getQueryData<any>(['state', normalizedStateSlug]);
-    const cityData = queryClient.getQueryData<any>(['city', citySlug, normalizedStateSlug]);
-    const treatmentData = queryClient.getQueryData<any>(['treatment', serviceSlug]);
-    const seoContent = queryClient.getQueryData<any>(['seo-page-content', seoSlug]);
 
     if (!stateData) {
         return { notFound: true };
@@ -205,7 +114,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const metaTitle = seoContent?.meta_title || `${treatmentName} in ${cityName}, ${stateName} | Book Appointments`;
     const metaDescription = seoContent?.meta_description || `Find and book ${treatmentName} appointments with top-rated dental clinics in ${cityName}, ${stateName}. Verified dentists, real reviews.`;
 
-    // Extract FAQs from SEO content for SSR
     let ssrFaqs: { question: string; answer: string }[] = [];
     
     if (seoContent?.faqs && Array.isArray(seoContent.faqs) && seoContent.faqs.length > 0) {
@@ -217,7 +125,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     return {
         props: {
-            dehydratedState: dehydrate(queryClient),
             stateSlug: normalizedStateSlug,
             citySlug,
             serviceSlug,

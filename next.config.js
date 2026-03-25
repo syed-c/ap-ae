@@ -5,12 +5,8 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
 
-  // ISR Configuration - Optimize cold start latency
-  // staleTimes: Static pages stay fresh for 60s, dynamic ISR pages for 5 minutes
-  staleTimes: {
-    static: 60,
-    dynamic: 300,
-  },
+  // Increase static page generation timeout to handle heavy pages
+  staticPageGenerationTimeout: 180,
 
   // Add security and SEO headers
   async headers() {
@@ -104,8 +100,6 @@ const nextConfig = {
       // Icons — huge package, tree-shaking critical
       'lucide-react',
     ],
-    // Increase ISR cache memory to 256MB to reduce cache evictions
-    isrMemoryLimitBytes: 256 * 1024 * 1024,
   },
 
   webpack: (config) => {
