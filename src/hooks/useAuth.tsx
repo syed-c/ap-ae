@@ -152,28 +152,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
-      // Only process if we haven't already set session from onAuthStateChange
-      if (!initialCheckDone.current) {
-        setSession(existingSession);
-        setUser(existingSession?.user ?? null);
+    const initAuth = async () => {
+      try {
+        const { data: { session: existingSession } } = await supabase.auth.getSession();
+        
+        if (!initialCheckDone.current) {
+          setSession(existingSession);
+          setUser(existingSession?.user ?? null);
 
-        // Capture provider token if available (e.g., immediately after Google OAuth redirect)
-        if (existingSession?.provider_token) {
-          setGmbProviderToken(existingSession.provider_token);
-        }
+          if (existingSession?.provider_token) {
+            setGmbProviderToken(existingSession.provider_token);
+          }
 
-        if (existingSession?.user) {
-          void fetchUserData(existingSession.user.id).finally(() => {
-            setIsLoading(false);
-            initialCheckDone.current = true;
-          });
-        } else {
-          setIsLoading(false);
-          initialCheckDone.current = true;
+          if (existingSession?.user) {
+            await fetchUserData(existingSession.user.id);
+          }
         }
+      } catch (err) {
+        console.error('Auth init failed:', err);
+        setSession(null);
+        setUser(null);
+        setProfile(null);
+        setRoles([]);
+      } finally {
+        setIsLoading(false);
+        initialCheckDone.current = true;
       }
-    });
+    };
+    
+    void initAuth();
 
     return () => subscription.unsubscribe();
   }, []);

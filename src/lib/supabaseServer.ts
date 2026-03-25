@@ -11,10 +11,12 @@ export function createServerSupabase() {
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY 
              || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-    // Skip if missing or invalid
-    if (!url || !key || !url.startsWith('http')) {
-        console.warn('Missing or invalid Supabase environment variables - skipping server-side queries');
-        return null;
+    if (!url || !key) {
+        throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
+    }
+
+    if (!url.startsWith('http')) {
+        throw new Error('NEXT_PUBLIC_SUPABASE_URL must be a valid URL');
     }
 
     return createClient<Database>(url, key, {
