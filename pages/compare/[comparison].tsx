@@ -12,34 +12,7 @@ export default function ComparePage(props: Props) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const supabase = createServerSupabase();
-  const { data: treatments } = await supabase
-    .from('treatments')
-    .select('slug')
-    .eq('is_active', true)
-    .not('slug', 'is', null);
-
-  const { data: states } = await supabase
-    .from('states')
-    .select('slug')
-    .eq('is_active', true)
-    .not('slug', 'is', null);
-
-  const paths: { params: { comparison: string } }[] = [];
-
-  for (const treatment of treatments || []) {
-    for (let i = 0; i < (states?.length || 0); i++) {
-      for (let j = i + 1; j < (states?.length || 0); j++) {
-        paths.push({
-          params: {
-            comparison: `${treatment.slug}/${states![i].slug}-vs-${states![j].slug}`,
-          },
-        });
-      }
-    }
-  }
-
-  return { paths, fallback: 'blocking' };
+  return { paths: [], fallback: 'blocking' };
 };
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
