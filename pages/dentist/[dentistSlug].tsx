@@ -85,13 +85,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
             return { paths: [], fallback: 'blocking' };
         }
         
-        // Only pre-build top 100 dentists by rating - rest will be ISR
+        // Pre-build top 200 dentists by rating - rest will be ISR
         const { data: dentists } = await supabase
             .from('dentists')
             .select('slug')
             .eq('is_active', true)
             .order('rating', { ascending: false })
-            .limit(100);
+            .limit(200);
         
         const paths = (dentists || []).map((dentist) => ({
             params: { dentistSlug: dentist.slug }

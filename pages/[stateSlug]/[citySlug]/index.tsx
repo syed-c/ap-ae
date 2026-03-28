@@ -56,13 +56,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
             return { paths: [], fallback: 'blocking' };
         }
         
-        // Pre-build top 100 cities by clinic count - rest will be ISR
+        // Pre-build top 250 cities - rest will be ISR
         const { data: cities } = await supabase
             .from('cities')
             .select('slug, state:states(slug)')
             .eq('is_active', true)
-            .order('clinic_count', { ascending: false })
-            .limit(100);
+            .limit(250);
         
         const paths = (cities || [])
             .filter((city) => city.state?.slug)
