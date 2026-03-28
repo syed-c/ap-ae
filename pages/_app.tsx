@@ -7,9 +7,10 @@ import { Nunito } from 'next/font/google';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { AuthProvider } from '@/hooks/useAuth';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { Toaster } from '@/components/ui/toaster';
-import { Toaster as Sonner } from '@/components/ui/sonner';
-import { MetaTagInjector } from '@/components/analytics/MetaTagInjector';
+
+const Toaster = dynamic(() => import('@/components/ui/toaster').then(m => m.Toaster));
+const Sonner = dynamic(() => import('@/components/ui/sonner').then(m => m.Toaster));
+const MetaTagInjector = dynamic(() => import('@/components/analytics/MetaTagInjector').then(m => m.MetaTagInjector));
 
 const nunito = Nunito({
   subsets: ['latin'],
