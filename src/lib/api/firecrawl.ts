@@ -46,10 +46,10 @@ export const firecrawlApi = {
   // Extract emails from scraped content
   extractEmails(content: string): string[] {
     const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-    const matches = content.match(emailRegex) || [];
+    const matches: string[] = content.match(emailRegex) || [];
     
     // Filter out common non-business emails
-    const filtered = matches.filter(email => {
+    const filtered = matches.filter((email: string) => {
       const lower = email.toLowerCase();
       // Skip image files, example emails, etc
       if (lower.includes('.png') || lower.includes('.jpg') || lower.includes('.gif')) return false;

@@ -37,7 +37,8 @@ import {
   Stethoscope
 } from "lucide-react";
 
-const MIN_PROFILE_COUNT = 2; // noindex pages with fewer than 2 providers
+// Service-location pages are always indexable - SEO registry handles noindex for private pages
+const MIN_PROFILE_COUNT = 0; // Disabled - all service-location pages should be indexed
 
 interface ServiceLocationPageProps {
   stateSlugProp?: string;
@@ -181,7 +182,8 @@ const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, sta
     },
   ];
 
-  const shouldNoIndex = !profilesLoading && (!profiles || profiles.length < MIN_PROFILE_COUNT);
+  // Always false - service-location pages are always indexable per SEO registry
+const shouldNoIndex = false;
 
   const nearbyLocations = (nearbyCities || [])
     .filter(c => c.slug !== citySlug)

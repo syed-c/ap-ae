@@ -38,7 +38,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const MIN_PROFILE_COUNT = 2;
+// Service pages are always indexable - SEO registry handles noindex for private pages
+const MIN_PROFILE_COUNT = 0; // Disabled - all service pages should be indexed
 
 interface ServicePageProps {
   serviceSlugProp?: string;
@@ -93,7 +94,8 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
   const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
 
   const isDataReady = !treatmentLoading && !profilesLoading;
-  const shouldNoIndex = !profilesLoading && (!profiles || profiles.length < MIN_PROFILE_COUNT);
+  // Always false - service pages are always indexable per SEO registry
+const shouldNoIndex = false;
 
   // Price stats
   const uaeMin = priceRanges?.length ? Math.min(...priceRanges.map(r => r.price_min)) : 0;

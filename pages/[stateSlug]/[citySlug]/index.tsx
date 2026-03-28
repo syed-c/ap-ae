@@ -47,7 +47,7 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
 
 export default CityPageWithSEO;
 
-// Generate static paths - use fallback blocking to avoid build timeouts
+// Generate static paths - limit to top 100 cities for build speed
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
         const supabase = createServerSupabase();
@@ -56,10 +56,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
             return { paths: [], fallback: 'blocking' };
         }
         
+        // Pre-build top 100 cities by clinic count - rest will be ISR
         const { data: cities } = await supabase
             .from('cities')
             .select('slug, state:states(slug)')
-            .eq('is_active', true);
+            .eq('is_active', true)
+            .order('clinic_count', { ascending: false })
+            .limit(100);
         
         const paths = (cities || [])
             .filter((city) => city.state?.slug)

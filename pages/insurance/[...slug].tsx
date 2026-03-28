@@ -58,7 +58,8 @@ const InsuranceDetailWrapper = ({
 
 export default InsuranceDetailWrapper;
 
-// Generate static paths - use fallback blocking to avoid build timeouts
+// Generate static paths - limit to insurance-only routes for build speed
+// State/city combinations will be ISR (fallback: 'blocking')
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
         const supabase = createServerSupabase();
@@ -67,6 +68,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
             return { paths: [], fallback: 'blocking' };
         }
         
+        // Only pre-build insurance index pages - state/city combos will be ISR
         const { data: insurances } = await supabase
             .from('insurances')
             .select('slug');
@@ -75,25 +77,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
         
         for (const insurance of insurances || []) {
             paths.push({ params: { slug: [insurance.slug] } });
-            
-            const { data: states } = await supabase
-                .from('states')
-                .select('slug')
-                .eq('is_active', true);
-            
-            for (const state of states || []) {
-                paths.push({ params: { slug: [insurance.slug, state.slug] } });
-                
-                const { data: cities } = await supabase
-                    .from('cities')
-                    .select('slug')
-                    .eq('is_active', true)
-                    .limit(10);
-                
-                for (const city of cities || []) {
-                    paths.push({ params: { slug: [insurance.slug, state.slug, city.slug] } });
-                }
-            }
         }
         
         return { paths, fallback: 'blocking' };

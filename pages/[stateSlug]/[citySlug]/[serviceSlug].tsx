@@ -50,7 +50,8 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
 
 export default ServiceLocationPageWithSEO;
 
-// Generate static paths - use fallback blocking to avoid build timeouts
+// Generate static paths - LIMITED to top cities only for build speed
+// Service-location pages for other cities will be ISR
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
         const supabase = createServerSupabase();
@@ -59,20 +60,20 @@ export const getStaticPaths: GetStaticPaths = async () => {
             return { paths: [], fallback: 'blocking' };
         }
         
-        const { data: states } = await supabase
-            .from('states')
-            .select('slug')
-            .eq('is_active', true);
-        
+        // Get only top 20 cities with most clinics
         const { data: cities } = await supabase
             .from('cities')
             .select('slug, state:states(slug)')
             .eq('is_active', true)
-            .limit(200);
+            .order('clinic_count', { ascending: false })
+            .limit(20);
         
+        // Get only top 10 popular treatments
         const { data: treatments } = await supabase
             .from('treatments')
-            .select('slug');
+            .select('slug')
+            .order('name') // Alphabetical for consistency
+            .limit(10);
         
         const paths: { params: { stateSlug: string; citySlug: string; serviceSlug: string } }[] = [];
         

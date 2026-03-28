@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 import { useRouter } from "next/router";
 import { supabase } from '@/integrations/supabase/client';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ReactMarkdown = dynamic(() => import('react-markdown')) as any;
 
 interface Message {

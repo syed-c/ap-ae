@@ -6,26 +6,11 @@ const nextConfig = {
   compress: true,
 
   // Increase static page generation timeout to handle heavy pages
-  staticPageGenerationTimeout: 180,
+  staticPageGenerationTimeout: 300,
 
-  // Add security and SEO headers
+  // Add caching headers - robots directives moved to vercel.json for cleaner control
   async headers() {
     return [
-      {
-        // Block all API routes from indexing
-        source: '/api/:path*',
-        headers: [
-          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
-          { key: 'Cache-Control', value: 'no-store, max-age=0' },
-        ],
-      },
-      {
-        // Block Next.js data endpoints from indexing
-        source: '/_next/data/:path*',
-        headers: [
-          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
-        ],
-      },
       {
         // Stale-while-revalidate for all static pages - serve stale while revalidating
         // This prevents cold starts for repeat visitors
@@ -40,11 +25,13 @@ const nextConfig = {
     ];
   },
 
+  // TypeScript and ESLint errors are now enabled for production builds
+  // This ensures code quality and catches issues before deployment
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 
   // Strip console.log in production for smaller bundles & no info leakage

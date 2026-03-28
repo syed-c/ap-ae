@@ -59,7 +59,8 @@ const AIDiscoveryMeta = dynamic(
   { ssr: false }
 );
 
-const MIN_DENTIST_COUNT = 2; // noindex pages with fewer than 2 dentists
+// City pages are always indexable - SEO registry handles noindex for private pages
+const MIN_DENTIST_COUNT = 0; // Disabled - all city pages should be indexed
 
 interface CityPageProps {
   citySlugProp?: string;
@@ -386,7 +387,8 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     },
   ];
 
-  const shouldNoIndex = !profilesLoading && (!profiles || profiles.length < MIN_DENTIST_COUNT);
+  // Always false - city pages are always indexable per SEO registry
+const shouldNoIndex = false;
 
   const popularTreatments = (treatments || []).map(t => ({ name: t.name, slug: t.slug }));
   const nearbyLocations = (nearbyCities || [])
