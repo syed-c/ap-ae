@@ -342,7 +342,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp, faqsProp }: Stat
       />
       <StructuredData
         type="faq"
-        questions={faqs.map(f => ({ question: f.q, answer: f.a }))}
+        questions={faqs.map(f => ({ question: f.q || f.question, answer: f.a || f.answer }))}
       />
 
       {/* SECTION 1: Hero — Dark theme matching homepage */}

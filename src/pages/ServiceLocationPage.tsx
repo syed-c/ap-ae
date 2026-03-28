@@ -215,7 +215,7 @@ const shouldNoIndex = false;
           },
           {
             type: 'faq',
-            questions: faqs.map(f => ({ question: f.q, answer: f.a })),
+            questions: faqs.map(f => ({ question: f.q || f.question, answer: f.a || f.answer })).filter(f => f.question && f.answer),
           },
           {
             type: 'medicalProcedure',

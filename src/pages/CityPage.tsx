@@ -420,7 +420,7 @@ const shouldNoIndex = false;
           },
           {
             type: 'faq',
-            questions: faqs.map(f => ({ question: f.q, answer: f.a })),
+            questions: faqs.map(f => ({ question: f.q || f.question, answer: f.a || f.answer })).filter(f => f.question && f.answer),
           },
           {
             type: 'itemList',
@@ -673,9 +673,9 @@ const shouldNoIndex = false;
             title={`Dental Care in ${cityName}`}
             subtitle={`Common questions about finding a dentist in ${cityName}, ${stateAbbr}`}
             items={[
-              ...faqs.map(f => ({ question: f.q, answer: f.a })),
+              ...faqs.map(f => ({ question: f.q || f.question, answer: f.a || f.answer })).filter(f => f.question && f.answer),
               ...generateCityQA({ name: cityName, stateName, clinicCount: profiles?.length })
-                .filter(cq => !faqs.some(f => f.q.toLowerCase().includes(cq.question.split(' ').slice(0, 4).join(' ').toLowerCase())))
+                .filter(cq => !faqs.some(f => ((f.q || f.question) || '').toLowerCase().includes(cq.question.split(' ').slice(0, 4).join(' ').toLowerCase())))
                 .slice(0, 3),
             ]}
             contextLabel={`city-${citySlug}`}
@@ -691,7 +691,7 @@ const shouldNoIndex = false;
         entityType="location"
         location={{ city: cityName, country: "UAE" }}
         url={`/${normalizedStateSlug}/${citySlug}/`}
-        faqs={faqs.map(f => ({ question: f.q, answer: f.a }))}
+        faqs={faqs.map(f => ({ question: f.q || f.question, answer: f.a || f.answer })).filter(f => f.question && f.answer)}
         keyFacts={[
           `${profiles?.length || 0}+ dental clinics listed in ${cityName}`,
           "All clinics verified with DHA/MOHAP licensing",

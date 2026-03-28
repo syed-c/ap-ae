@@ -148,7 +148,7 @@ const shouldNoIndex = false;
         provider="AppointPanda Partner Clinics"
         areaServed="United Arab Emirates"
       />
-      <StructuredData type="faq" questions={faqs.map(f => ({ question: f.q, answer: f.a }))} />
+      <StructuredData type="faq" questions={faqs.map(f => ({ question: f.q || f.question, answer: f.a || f.answer })).filter(f => f.question && f.answer)} />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-background via-emerald-light/30 to-background pt-6 pb-10">
