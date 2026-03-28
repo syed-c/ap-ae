@@ -49,10 +49,35 @@ export default CityPageWithSEO;
 
 // Generate static paths - use fallback blocking to avoid build timeouts
 export const getStaticPaths: GetStaticPaths = async () => {
-    return {
-        paths: [],
-        fallback: 'blocking'
-    };
+    try {
+        const supabase = createServerSupabase();
+        
+        if (!supabase) {
+            return { paths: [], fallback: 'blocking' };
+        }
+        
+        const { data: cities } = await supabase
+            .from('cities')
+            .select('slug, state:states(slug)')
+            .eq('is_active', true);
+        
+        const paths = (cities || [])
+            .filter((city) => city.state?.slug)
+            .map((city) => ({
+                params: { 
+                    stateSlug: city.state.slug, 
+                    citySlug: city.slug 
+                }
+            }));
+        
+        return {
+            paths,
+            fallback: 'blocking'
+        };
+    } catch (error) {
+        console.error('Error generating city paths:', error);
+        return { paths: [], fallback: 'blocking' };
+    }
 };
 
 // Static Site Generation with SSR FAQ data for Googlebot

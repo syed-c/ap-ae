@@ -78,10 +78,28 @@ const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData }: {
 export default DentistPageWithSEO;
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    return {
-        paths: [],
-        fallback: 'blocking'
-    };
+    try {
+        const supabase = createServerSupabase();
+        
+        if (!supabase) {
+            return { paths: [], fallback: 'blocking' };
+        }
+        
+        const { data: dentists } = await supabase
+            .from('dentists')
+            .select('slug')
+            .eq('is_active', true)
+            .limit(500);
+        
+        const paths = (dentists || []).map((dentist) => ({
+            params: { dentistSlug: dentist.slug }
+        }));
+        
+        return { paths, fallback: 'blocking' };
+    } catch (error) {
+        console.error('Error generating dentist paths:', error);
+        return { paths: [], fallback: 'blocking' };
+    }
 };
 
 // Convert to Static Site Generation with SEO data

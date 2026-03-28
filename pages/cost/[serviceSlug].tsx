@@ -12,7 +12,26 @@ export default function CostPage(props: Props) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  return { paths: [], fallback: 'blocking' };
+  try {
+    const supabase = createServerSupabase();
+    
+    if (!supabase) {
+      return { paths: [], fallback: 'blocking' };
+    }
+    
+    const { data: treatments } = await supabase
+      .from('treatments')
+      .select('slug');
+    
+    const paths = (treatments || []).map((treatment) => ({
+      params: { serviceSlug: treatment.slug }
+    }));
+    
+    return { paths, fallback: 'blocking' };
+  } catch (error) {
+    console.error('Error generating cost paths:', error);
+    return { paths: [], fallback: 'blocking' };
+  }
 };
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {

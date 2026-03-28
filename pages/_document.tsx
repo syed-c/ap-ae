@@ -10,6 +10,9 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
+          <style dangerouslySetInnerHTML={{ __html: `
+            html { visibility: hidden; }
+          ` }} />
           <link rel="icon" type="image/png" href="/favicon.png?v=5" />
           <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png?v=5" />
           <link rel="manifest" href="/site.webmanifest?v=5" />
@@ -60,6 +63,16 @@ class MyDocument extends Document {
         <body className="min-h-screen bg-background font-sans antialiased nunito plus-jakarta-sans">
           <Main />
           <NextScript />
+          <script dangerouslySetInnerHTML={{ __html: `
+            window.addEventListener('load', function() {
+              requestAnimationFrame(function() {
+                document.documentElement.style.visibility = 'visible';
+              });
+            });
+            setTimeout(function() {
+              document.documentElement.style.visibility = 'visible';
+            }, 3000);
+          ` }} />
         </body>
       </Html>
     );

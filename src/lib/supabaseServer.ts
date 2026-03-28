@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
 /**
- * Server-side Supabase client for use in getServerSideProps.
+ * Server-side Supabase client for use in getServerSideProps and getStaticProps.
  * Uses the anon key (same as client) — RLS policies still apply.
  * For admin operations, use the service role key instead.
  */
@@ -12,11 +12,13 @@ export function createServerSupabase() {
              || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
     if (!url || !key) {
-        throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
+        console.warn('Missing Supabase env vars - returning null client');
+        return null;
     }
 
     if (!url.startsWith('http')) {
-        throw new Error('NEXT_PUBLIC_SUPABASE_URL must be a valid URL');
+        console.warn('Invalid Supabase URL - returning null client');
+        return null;
     }
 
     return createClient<Database>(url, key, {

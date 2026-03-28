@@ -42,10 +42,29 @@ export default ServicePageWithSEO;
 
 // Generate static paths - use fallback blocking to avoid build timeouts
 export const getStaticPaths: GetStaticPaths = async () => {
-    return {
-        paths: [],
-        fallback: 'blocking'
-    };
+    try {
+        const supabase = createServerSupabase();
+        
+        if (!supabase) {
+            return { paths: [], fallback: 'blocking' };
+        }
+        
+        const { data: treatments } = await supabase
+            .from('treatments')
+            .select('slug');
+        
+        const paths = (treatments || []).map((treatment) => ({
+            params: { serviceSlug: treatment.slug }
+        }));
+        
+        return {
+            paths,
+            fallback: 'blocking'
+        };
+    } catch (error) {
+        console.error('Error generating service paths:', error);
+        return { paths: [], fallback: 'blocking' };
+    }
 };
 
 // Static Site Generation with SSR FAQ data for Googlebot

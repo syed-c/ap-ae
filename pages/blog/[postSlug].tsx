@@ -84,10 +84,26 @@ export default BlogPostPageWithSEO;
 
 // Generate static paths - use fallback blocking to avoid build timeouts
 export const getStaticPaths: GetStaticPaths = async () => {
-    return {
-        paths: [],
-        fallback: 'blocking'
-    };
+    try {
+        const supabase = createServerSupabase();
+        
+        if (!supabase) {
+            return { paths: [], fallback: 'blocking' };
+        }
+        
+        const { data: posts } = await supabase
+            .from('blog_posts')
+            .select('slug');
+        
+        const paths = (posts || []).map((post) => ({
+            params: { postSlug: post.slug }
+        }));
+        
+        return { paths, fallback: 'blocking' };
+    } catch (error) {
+        console.error('Error generating blog paths:', error);
+        return { paths: [], fallback: 'blocking' };
+    }
 };
 
 // Convert to Static Site Generation

@@ -12,7 +12,29 @@ export default function ComparePage(props: Props) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  return { paths: [], fallback: 'blocking' };
+  try {
+    const supabase = createServerSupabase();
+    
+    if (!supabase) {
+      return { paths: [], fallback: 'blocking' };
+    }
+    
+    const { data: states } = await supabase
+      .from('states')
+      .select('slug')
+      .eq('is_active', true);
+    
+    const paths: { params: { comparison: string } }[] = [];
+    
+    for (const state of states || []) {
+      paths.push({ params: { comparison: state.slug } });
+    }
+    
+    return { paths, fallback: 'blocking' };
+  } catch (error) {
+    console.error('Error generating compare paths:', error);
+    return { paths: [], fallback: 'blocking' };
+  }
 };
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {

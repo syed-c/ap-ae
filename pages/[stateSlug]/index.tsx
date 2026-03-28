@@ -45,10 +45,30 @@ export default StatePageWithSEO;
 
 // Generate static paths for all emirates at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-    return {
-        paths: [],
-        fallback: 'blocking'
-    };
+    try {
+        const supabase = createServerSupabase();
+        
+        if (!supabase) {
+            return { paths: [], fallback: 'blocking' };
+        }
+        
+        const { data: states } = await supabase
+            .from('states')
+            .select('slug')
+            .eq('is_active', true);
+        
+        const paths = (states || []).map((state) => ({
+            params: { stateSlug: state.slug }
+        }));
+        
+        return {
+            paths,
+            fallback: 'blocking'
+        };
+    } catch (error) {
+        console.error('Error generating state paths:', error);
+        return { paths: [], fallback: 'blocking' };
+    }
 };
 
 // Static Site Generation with SSR FAQ data for Googlebot

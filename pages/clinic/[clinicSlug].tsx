@@ -4,10 +4,28 @@ import { createServerSupabase } from '@/lib/supabaseServer';
 import ClinicPageComponent from '@/pages/ClinicPage';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    return {
-        paths: [],
-        fallback: 'blocking'
-    };
+    try {
+        const supabase = createServerSupabase();
+        
+        if (!supabase) {
+            return { paths: [], fallback: 'blocking' };
+        }
+        
+        const { data: clinics } = await supabase
+            .from('clinics')
+            .select('slug')
+            .eq('is_active', true)
+            .limit(500);
+        
+        const paths = (clinics || []).map((clinic) => ({
+            params: { clinicSlug: clinic.slug }
+        }));
+        
+        return { paths, fallback: 'blocking' };
+    } catch (error) {
+        console.error('Error generating clinic paths:', error);
+        return { paths: [], fallback: 'blocking' };
+    }
 };
 
 // Static Site Generation - prefetch ALL critical data for SEO

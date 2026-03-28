@@ -60,7 +60,47 @@ export default InsuranceDetailWrapper;
 
 // Generate static paths - use fallback blocking to avoid build timeouts
 export const getStaticPaths: GetStaticPaths = async () => {
-    return { paths: [], fallback: 'blocking' };
+    try {
+        const supabase = createServerSupabase();
+        
+        if (!supabase) {
+            return { paths: [], fallback: 'blocking' };
+        }
+        
+        const { data: insurances } = await supabase
+            .from('insurances')
+            .select('slug');
+        
+        const paths: { params: { slug: string[] } }[] = [];
+        
+        for (const insurance of insurances || []) {
+            paths.push({ params: { slug: [insurance.slug] } });
+            
+            const { data: states } = await supabase
+                .from('states')
+                .select('slug')
+                .eq('is_active', true);
+            
+            for (const state of states || []) {
+                paths.push({ params: { slug: [insurance.slug, state.slug] } });
+                
+                const { data: cities } = await supabase
+                    .from('cities')
+                    .select('slug')
+                    .eq('is_active', true)
+                    .limit(10);
+                
+                for (const city of cities || []) {
+                    paths.push({ params: { slug: [insurance.slug, state.slug, city.slug] } });
+                }
+            }
+        }
+        
+        return { paths, fallback: 'blocking' };
+    } catch (error) {
+        console.error('Error generating insurance paths:', error);
+        return { paths: [], fallback: 'blocking' };
+    }
 };
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
