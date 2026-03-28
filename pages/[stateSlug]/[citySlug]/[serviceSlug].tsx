@@ -60,19 +60,18 @@ export const getStaticPaths: GetStaticPaths = async () => {
             return { paths: [], fallback: 'blocking' };
         }
         
-        // Get top 50 cities
+        // Get top 100 cities with most clinics
         const { data: cities } = await supabase
             .from('cities')
             .select('slug, state:states(slug)')
             .eq('is_active', true)
-            .limit(50);
+            .limit(100);
         
-        // Get top 15 popular treatments
+        // Get all treatments for top cities
         const { data: treatments } = await supabase
             .from('treatments')
             .select('slug')
-            .order('name')
-            .limit(15);
+            .eq('is_active', true);
         
         const paths: { params: { stateSlug: string; citySlug: string; serviceSlug: string } }[] = [];
         

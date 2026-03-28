@@ -56,12 +56,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
             return { paths: [], fallback: 'blocking' };
         }
         
-        // Pre-build top 250 cities - rest will be ISR
+        // Pre-build all active cities - eliminates slow SSR on first visit
         const { data: cities } = await supabase
             .from('cities')
             .select('slug, state:states(slug)')
-            .eq('is_active', true)
-            .limit(250);
+            .eq('is_active', true);
         
         const paths = (cities || [])
             .filter((city) => city.state?.slug)

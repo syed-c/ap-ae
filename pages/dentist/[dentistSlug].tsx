@@ -85,13 +85,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
             return { paths: [], fallback: 'blocking' };
         }
         
-        // Pre-build top 200 dentists by rating - rest will be ISR
+        // Pre-build all active dentists - eliminates slow SSR on first visit
         const { data: dentists } = await supabase
             .from('dentists')
             .select('slug')
-            .eq('is_active', true)
-            .order('rating', { ascending: false })
-            .limit(200);
+            .eq('is_active', true);
         
         const paths = (dentists || []).map((dentist) => ({
             params: { dentistSlug: dentist.slug }
