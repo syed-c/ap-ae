@@ -47,7 +47,7 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
 
 export default CityPageWithSEO;
 
-// Generate static paths - limit to top 100 cities for build speed
+// Generate static paths - ALL active cities with valid state relationships
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
         const supabase = createServerSupabase();
@@ -56,20 +56,68 @@ export const getStaticPaths: GetStaticPaths = async () => {
             return { paths: [], fallback: 'blocking' };
         }
         
-        // Pre-build all active cities - eliminates slow SSR on first visit
+        // Get all states (both active and inactive to catch all mappings)
+        const { data: states } = await supabase
+            .from('states')
+            .select('id, slug, name');
+        
+        // Create state lookup maps
+        const stateIdToSlug: Record<string, string> = {};
+        (states || []).forEach(s => { stateIdToSlug[s.id] = s.slug; });
+        
+        // Get ALL cities from database
         const { data: cities } = await supabase
             .from('cities')
-            .select('slug, state:states(slug)')
-            .eq('is_active', true);
+            .select('slug, state_id, name')
+            .limit(500);
         
-        const paths = (cities || [])
-            .filter((city) => city.state?.slug)
-            .map((city) => ({
-                params: { 
-                    stateSlug: city.state.slug, 
-                    citySlug: city.slug 
+        // Build paths for ALL cities
+        const paths: { params: { stateSlug: string; citySlug: string } }[] = [];
+        
+        for (const city of cities || []) {
+            let matchedStateSlug: string | null = null;
+            const citySlug = city.slug?.toLowerCase() || '';
+            const cityName = city.name?.toLowerCase() || '';
+            
+            // First try direct state_id relationship
+            if (city.state_id && stateIdToSlug[city.state_id]) {
+                matchedStateSlug = stateIdToSlug[city.state_id];
+            }
+            
+            // If no direct match, try fuzzy matching
+            if (!matchedStateSlug) {
+                for (const state of states || []) {
+                    const stateSlug = state.slug.toLowerCase();
+                    const stateName = (state.name || '').toLowerCase();
+                    
+                    // Various matching strategies
+                    if (citySlug.startsWith(stateSlug) || 
+                        citySlug.includes(stateSlug) ||
+                        citySlug.includes('-' + stateSlug.split('-')[0]) ||
+                        cityName.includes(stateName) ||
+                        // Emirate-specific patterns
+                        (stateSlug === 'ras-al-khaimah' && (citySlug.includes('rak') || citySlug.includes('ras'))) ||
+                        (stateSlug === 'umm-al-quwain' && (citySlug.includes('uaq') || citySlug.includes('umm'))) ||
+                        (stateSlug === 'ajman' && citySlug.includes('ajman')) ||
+                        (stateSlug === 'fujairah' && citySlug.includes('fujairah'))
+                    ) {
+                        matchedStateSlug = state.slug;
+                        break;
+                    }
                 }
-            }));
+            }
+            
+            if (matchedStateSlug) {
+                paths.push({
+                    params: {
+                        stateSlug: matchedStateSlug,
+                        citySlug: city.slug
+                    }
+                });
+            }
+        }
+        
+        console.log(`Generated ${paths.length} city paths`);
         
         return {
             paths,
@@ -120,11 +168,25 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .then(r => r.data)
     ]);
 
+    // Also check cityData - return 404 if state is missing (but allow inactive cities)
     if (!stateData) {
+        console.log(`404: state=${normalizedStateSlug}, city=${citySlug}, stateData=${!!stateData}, cityData=${!!cityData}`);
         return { notFound: true };
     }
     
-    const cityName = cityData?.name || citySlug;
+    // If city not found with is_active=true, try without filter
+    let finalCityData = cityData;
+    if (!cityData) {
+        const cityWithoutFilter = await supabase
+            .from('cities')
+            .select('*, state:states(*)')
+            .eq('slug', citySlug)
+            .maybeSingle()
+            .then(r => r.data);
+        finalCityData = cityWithoutFilter;
+    }
+    
+    const cityName = finalCityData?.name || citySlug;
     const stateName = stateData?.name || normalizedStateSlug;
     const metaTitle = seoContent?.meta_title || `Dental Clinics in ${cityName}, ${stateName} | Book Appointments`;
     const metaDescription = seoContent?.meta_description || `Find and book appointments with top-rated dental clinics in ${cityName}, ${stateName}. Verified dentists, real reviews.`;
@@ -143,7 +205,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             citySlug,
             stateSlug: normalizedStateSlug,
             stateData: stateData,
-            cityData: cityData,
+            cityData: finalCityData,
             seoData: {
                 title: metaTitle,
                 description: metaDescription,

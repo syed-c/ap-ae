@@ -98,3 +98,4 @@ coverage/
 # Environment files
 *.env
 *.env.*
+.env*.local
