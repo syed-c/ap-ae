@@ -124,7 +124,7 @@ export function useCities(stateId?: string) {
   });
 }
 
-export function useCitiesByStateSlug(stateSlug: string) {
+export function useCitiesByStateSlug(stateSlug: string, initialData?: any[]) {
   const normalized = normalizeStateSlug(stateSlug);
   return useQuery({
     queryKey: ['cities-by-state', normalized],
@@ -145,6 +145,7 @@ export function useCitiesByStateSlug(stateSlug: string) {
     enabled: !!normalized,
     staleTime: 10 * 60 * 1000, // 10 min cache
     gcTime: 30 * 60 * 1000,
+    initialData: initialData,
   });
 }
 

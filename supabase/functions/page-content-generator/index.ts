@@ -123,7 +123,8 @@ cta_button_url:
   - For city pages: /[emirate-slug]/[city-slug]/
 
 faqs:
-  - Exactly 10 FAQ items for state pages, 8 for city pages
+  - CRITICAL: You MUST generate EXACTLY 10 FAQ items for BOTH state pages AND city pages
+  - Count your FAQs before outputting. Must be exactly 10. No exceptions.
   - MANDATORY: Each FAQ must be answerable using only information available publicly about UAE dental care — no invented facts
   - Mix of question types:
       * Cost questions (AED ranges — use realistic ranges, acknowledge variance)
@@ -193,7 +194,7 @@ Validate before outputting:
   ✓ hero_intro does NOT repeat verbatim in body_content
   ✓ section_1, section_2, section_3 target THREE distinct demographics
   ✓ body_content contains ≥ 5 H2 sections
-  ✓ faqs array has correct count (10 for state, 8 for city)
+  ✓ faqs array has EXACTLY 10 items (for both state and city pages)
   ✓ No prohibited phrases present anywhere in output
   ✓ JSON is valid and parseable`;
 
@@ -572,9 +573,9 @@ function validatePageContent(content: any, pageType: string, expectedSlug: strin
   }
 
   const faqCount = content.faqs?.length || 0;
-  const requiredFaqs = pageType === "state" ? 10 : 8;
-  if (faqCount < requiredFaqs) {
-    errors.push(`faqs count ${faqCount} < required ${requiredFaqs}`);
+  const requiredFaqs = 10; // Always require exactly 10 FAQs for both state and city pages
+  if (faqCount !== requiredFaqs) {
+    errors.push(`faqs count is ${faqCount} but MUST be exactly ${requiredFaqs}.`);
   }
 
   return errors;
@@ -634,17 +635,55 @@ async function generateSinglePage(
     .replace("{{section_3_demographic}}", s3);
 
   const aiResponse = await callAIWithRetry({
-    model: "MiniMax/MiniMax-M2.5",
+    model: "claude-sonnet-4-20250514",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: userPrompt },
     ],
     temperature: 0.4,
-    response_format: { type: "json_object" },
+    max_tokens: 8000,
   });
 
   const result = await aiResponse.json();
-  const pageContent = JSON.parse(result.choices[0].message.content);
+  
+  // Handle AI response errors
+  if (!result) {
+    console.error("AI response error: no result");
+    return { success: false, skipped: false, error: "AI generation failed: No response" };
+  }
+  
+  // Handle error responses
+  if (result.error) {
+    console.error("AI API error:", result.error);
+    return { success: false, skipped: false, error: "AI generation failed: " + (result.error.message || result.error) };
+  }
+  
+  // Extract content - handle both OpenAI and Claude response formats
+  let content = "";
+  if (result.choices && result.choices[0]) {
+    content = result.choices[0].message?.content || result.choices[0]?.content || "";
+  } else if (result.content) {
+    content = result.content;
+  }
+  
+  if (!content) {
+    console.error("AI response error: no content in response", result);
+    return { success: false, skipped: false, error: "AI generation failed: No content in response" };
+  }
+  
+  let pageContent;
+  try {
+    pageContent = JSON.parse(content);
+  } catch (parseError) {
+    console.error("JSON parse error:", parseError, "Content:", content.substring(0, 500));
+    return { success: false, skipped: false, error: "Failed to parse AI response as JSON" };
+  }
+  
+  // Validate parsed content
+  if (!pageContent || typeof pageContent !== 'object') {
+    console.error("Invalid page content object:", pageContent);
+    return { success: false, skipped: false, error: "AI returned invalid content structure" };
+  }
 
   const validationErrors = validatePageContent(pageContent, pageType, pageSlug);
   if (validationErrors.length > 0) {
@@ -691,14 +730,29 @@ async function generateSinglePage(
 }
 
 serve(async (req) => {
+  // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { 
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Credentials": "true",
+      },
+    });
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Missing environment variables");
+      return new Response(JSON.stringify({ success: false, error: "Server configuration error" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -709,20 +763,22 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace("Bearer ", "");
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-    });
+    
+    // Create admin client directly without user verification for now
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    // Verify token is valid by getting user
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (userError || !user) {
+      console.error("Auth error:", userError);
       return new Response(JSON.stringify({ success: false, error: "Invalid authentication" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const userId = claimsData.claims.sub as string;
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    const userId = user.id;
 
     const { data: roles } = await supabaseAdmin
       .from("user_roles")
@@ -856,8 +912,15 @@ serve(async (req) => {
   } catch (error) {
     console.error("page-content-generator error:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ success: false, error: error.message || "Internal server error" }),
+      { 
+        status: 500, 
+        headers: { 
+          ...corsHeaders, 
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        } 
+      }
     );
   }
 });

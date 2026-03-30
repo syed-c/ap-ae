@@ -291,3 +291,9 @@ verify_jwt = false  # Service role: page identity scanning & publish gate
 # --------------------------------------------------------------------------
 [functions.reputation-ai]
 verify_jwt = false  # Service role: AI sentiment, risk, and reputation analysis
+
+# --------------------------------------------------------------------------
+# Page Content Generator (Service role - AI-powered content generation)
+# --------------------------------------------------------------------------
+[functions.page-content-generator]
+verify_jwt = false  # Service role: AI content generation for SEO pages

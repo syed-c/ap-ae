@@ -42,6 +42,7 @@ import {
 interface StatePageProps {
   stateSlugProp?: string;
   stateDataProp?: any;
+  citiesDataProp?: any[];
   dehydratedStateProp?: any;
   seoDataProp?: {
     title: string;
@@ -51,7 +52,7 @@ interface StatePageProps {
   faqsProp?: { question: string; answer: string }[];
 }
 
-const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp, faqsProp }: StatePageProps = {}) => {
+const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, faqsProp }: StatePageProps = {}) => {
   const router = useRouter();
   const isServerRender = typeof window === 'undefined';
   const stateSlug = isServerRender
@@ -75,7 +76,8 @@ const StatePage = ({ stateSlugProp, stateDataProp, seoDataProp, faqsProp }: Stat
 
   // All hooks must be called before any conditional returns
   const { data: state, isLoading: stateLoading } = useStateData(normalizedStateSlug || '', stateDataProp);
-  const { data: cities, isLoading: citiesLoading } = useCitiesByStateSlug(normalizedStateSlug || '');
+  // Use SSR data if available, otherwise fetch client-side
+  const { data: cities, isLoading: citiesLoading } = useCitiesByStateSlug(normalizedStateSlug || '', citiesDataProp);
 
   // Fetch SEO content from seo_pages table
   const { data: seoContent, isLoading: seoContentLoading, isFetching: seoContentFetching } = useSeoPageContent(normalizedStateSlug || '');

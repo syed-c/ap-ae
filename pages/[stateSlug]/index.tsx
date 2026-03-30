@@ -7,9 +7,10 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 // Wrapper component to render SEO meta tags server-side with FAQ data for SSR
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const StatePageWithSEO = ({ stateSlug, stateData, seoData, faqs }: {
+const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs }: {
     stateSlug: string;
     stateData: any;
+    citiesData: any[];
     seoData: { title: string; description: string; canonical: string };
     faqs: { question: string; answer: string }[];
 }) => {
@@ -34,6 +35,7 @@ const StatePageWithSEO = ({ stateSlug, stateData, seoData, faqs }: {
             <StatePageComponent 
                 stateSlugProp={stateSlug}
                 stateDataProp={stateData}
+                citiesDataProp={citiesData}
                 seoDataProp={seoData}
                 faqsProp={faqs}
             />
@@ -90,15 +92,21 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         };
     }
 
+    // Get state first to get its ID
+    const stateData = await supabase
+        .from('states')
+        .select('*')
+        .eq('slug', normalizedStateSlug)
+        .eq('is_active', true)
+        .maybeSingle()
+        .then(r => r.data);
+
+    if (!stateData) {
+        return { notFound: true };
+    }
+    
     // Direct queries instead of React Query for faster build
-    const [stateData, seoContent] = await Promise.all([
-        supabase
-            .from('states')
-            .select('*')
-            .eq('slug', normalizedStateSlug)
-            .eq('is_active', true)
-            .maybeSingle()
-            .then(r => r.data),
+    const [seoContent, citiesData] = await Promise.all([
         supabase
             .from("seo_pages")
             .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
@@ -106,13 +114,17 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .order("is_optimized", { ascending: false })
             .limit(1)
             .maybeSingle()
+            .then(r => r.data),
+        supabase
+            .from('cities')
+            .select('id, name, slug')
+            .eq('state_id', stateData.id)
+            .eq('is_active', true)
+            .order('name')
+            .limit(100)
             .then(r => r.data)
     ]);
 
-    if (!stateData) {
-        return { notFound: true };
-    }
-    
     const metaTitle = seoContent?.meta_title || `Dental Clinics in ${stateData.name} | Book Appointments`;
     const metaDescription = seoContent?.meta_description || `Find and book appointments with top-rated dental clinics in ${stateData.name}, UAE. Verified dentists, real reviews.`;
 
@@ -141,6 +153,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         props: {
             stateSlug: normalizedStateSlug,
             stateData: stateData,
+            citiesData: citiesData || [],
             seoData: {
                 title: metaTitle,
                 description: metaDescription,
