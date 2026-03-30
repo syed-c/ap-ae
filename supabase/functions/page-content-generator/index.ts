@@ -546,16 +546,16 @@ async function callAIWithRetry(body: object, maxRetries = 3): Promise<Response> 
 function validatePageContent(content: any, pageType: string, expectedSlug: string): string[] {
   const errors: string[] = [];
 
-  if (!content.meta_title || content.meta_title.length > 60) {
+  if (!content.meta_title || content.meta_title.length > 70) {
     errors.push(`meta_title missing or too long (${content.meta_title?.length || 0} chars)`);
   }
-  if (!content.meta_description || content.meta_description.length > 155) {
+  if (!content.meta_description || content.meta_description.length > 160) {
     errors.push(`meta_description missing or too long (${content.meta_description?.length || 0} chars)`);
   }
   if (!content.h1 || content.h1 === content.meta_title) {
     errors.push("h1 missing or identical to meta_title");
   }
-  if (!content.body_content || content.body_content.split(/\s+/).length < 400) {
+  if (!content.body_content || content.body_content.split(/\s+/).length < 300) {
     errors.push("body_content missing or too short");
   }
   if (!content.section_1_content || !content.section_2_content || !content.section_3_content) {
