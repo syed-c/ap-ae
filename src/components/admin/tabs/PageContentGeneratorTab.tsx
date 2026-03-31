@@ -99,26 +99,52 @@ export default function PageContentGeneratorTab() {
     try {
       setBatchLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Starting batch generation...`]);
 
-      const result = await generateBatch({
-        page_type_filter: batchForm.page_type_filter,
-        emirate_filter: batchForm.emirate_filter || undefined,
-        batch_size: batchForm.batch_size,
-        force_regenerate: batchForm.force_regenerate,
-      });
+      let totalProcessed = 0;
+      let totalSkipped = 0;
+      let totalFailed = 0;
+      let allErrors: string[] = [];
+      let loopCount = 0;
+      const MAX_LOOPS = 20; // Safety limit
 
-      if (stopRef.current) {
-        setBatchLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Batch stopped by user`]);
-      } else {
+      while (!stopRef.current && loopCount < MAX_LOOPS) {
+        loopCount++;
+        
+        const result = await generateBatch({
+          page_type_filter: batchForm.page_type_filter,
+          emirate_filter: batchForm.emirate_filter || undefined,
+          batch_size: batchForm.batch_size,
+          force_regenerate: batchForm.force_regenerate,
+        });
+
+        totalProcessed += result.processed;
+        totalSkipped += result.skipped;
+        totalFailed += result.failed;
+        allErrors = [...allErrors, ...result.errors];
+
         setBatchLogs((prev) => [
           ...prev,
-          `[${new Date().toLocaleTimeString()}] Batch complete: ${result.processed} processed, ${result.skipped} skipped, ${result.failed} failed`,
+          `[${new Date().toLocaleTimeString()}] Batch ${loopCount}: ${result.processed} processed, ${result.skipped} skipped, ${result.failed} failed`
         ]);
+
         if (result.errors.length > 0) {
           result.errors.forEach((err) => {
             setBatchLogs((prev) => [...prev, `[ERROR] ${err}`]);
           });
         }
+
+        const remaining = result.remaining || 0;
+        if (remaining === 0 || result.processed === 0) {
+          break;
+        }
+
+        setBatchLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${remaining} pages remaining, continuing...`]);
       }
+
+      setBatchLogs((prev) => [
+        ...prev,
+        `[${new Date().toLocaleTimeString()}] Total: ${totalProcessed} processed, ${totalSkipped} skipped, ${totalFailed} failed`
+      ]);
+
     } catch (err) {
       setBatchLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Error: ${err instanceof Error ? err.message : "Unknown error"}`]);
     } finally {

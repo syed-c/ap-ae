@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "skill": {
+      "*": "allow"
+    }
+  },
+  "agent": {
+    "coder": {
+      "permission": {
+        "skill": {
+          "elite-coder": "allow",
+          "nextjs-expert": "allow",
+          "seo-expert": "allow",
+          "supabase-expert": "allow",
+          "problem-detective": "allow"
+        }
+      }
+    }
+  }
+}

@@ -27,6 +27,8 @@ interface GenerateBatchResult {
   skipped: number;
   failed: number;
   errors: string[];
+  remaining?: number;
+  total_count?: number;
 }
 
 export async function generateSingle(
