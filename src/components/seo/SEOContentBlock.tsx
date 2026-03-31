@@ -122,35 +122,9 @@ export const SEOContentBlock = ({
     );
   }
 
-  // Even without optimized content, render minimal semantic structure for SEO
-  return (
-    <article 
-      className="space-y-6"
-      itemScope 
-      itemType="https://schema.org/Article"
-    >
-      <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
-        <div className="p-6 md:p-8">
-          <h2 className="text-xl font-bold text-foreground mb-3" itemProp="headline">
-            {variant === 'service-location' ? `About ${treatmentName} in ${locationName}` : 
-             variant === 'city' ? `Dental Care in ${locationName}` :
-             variant === 'service' ? `About ${treatmentName}` :
-             `Dental Services in ${locationName}`}
-          </h2>
-          <p className="text-muted-foreground leading-relaxed" itemProp="articleBody">
-            {variant === 'service-location' 
-              ? `Find qualified ${treatmentName?.toLowerCase()} specialists in ${locationName}. Our directory includes verified dental professionals with expertise in ${treatmentName?.toLowerCase()} procedures.`
-              : variant === 'city'
-              ? `Discover top-rated dental professionals in ${locationName}. Browse verified clinics, compare services, and book appointments online.`
-              : variant === 'service'
-              ? `Learn about ${treatmentName} and find qualified specialists across the UAE. Compare providers and book consultations.`
-              : `Find trusted dental care providers in ${locationName}. Our directory features verified clinics with patient reviews and online booking.`
-            }
-          </p>
-        </div>
-      </div>
-    </article>
-  );
+  // No optimized content from database - show nothing (no fallback)
+  // This forces content generation via admin panel before pages go live
+  return null;
 };
 
 // Optimized content from database - clean, professional layout

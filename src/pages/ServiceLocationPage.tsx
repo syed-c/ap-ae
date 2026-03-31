@@ -331,8 +331,8 @@ const shouldNoIndex = false;
 
       {/* Page Intro Section - CMS Content */}
       <PageIntroSection
-        title={parsedContent?.sections?.[0]?.heading || `${treatmentName} Services in ${locationName}`}
-        content={(seoContent as any)?.page_intro || parsedContent?.intro || parsedContent?.sections?.[0]?.content || `Find the best ${treatmentName.toLowerCase()} specialists in ${locationDisplay}. Our directory features verified dental professionals with proven expertise in ${treatmentName.toLowerCase()} procedures.`}
+        title={parsedContent?.sections?.[0]?.heading || null}
+        content={(seoContent as any)?.page_intro || parsedContent?.intro || parsedContent?.sections?.[0]?.content || null}
         isLoading={isSeoContentPending}
       />
 

@@ -544,8 +544,8 @@ const shouldNoIndex = false;
 
       {/* Page Intro Section - CMS Content */}
       <PageIntroSection
-        title={parsedContent?.sections?.[0]?.heading || `About Dental Care in ${cityName}`}
-        content={(seoContent as any)?.page_intro || parsedContent?.intro || parsedContent?.sections?.[0]?.content || generateAreaIntro(cityName, stateName, totalClinicCount || profiles?.length || 0, areaLocalContent)}
+        title={parsedContent?.sections?.[0]?.heading || null}
+        content={(seoContent as any)?.page_intro || parsedContent?.intro || parsedContent?.sections?.[0]?.content || null}
         isLoading={isSeoContentPending}
       />
 
