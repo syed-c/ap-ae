@@ -134,8 +134,8 @@ export default function PageContentGeneratorTab() {
           });
         }
 
-        // Check if there are more pages to process
-        if (!result.has_more || result.processed === 0) {
+        // Only stop when no more pages to process
+        if (!result.has_more) {
           setBatchLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] All pages completed!`]);
           break;
         }
@@ -143,6 +143,13 @@ export default function PageContentGeneratorTab() {
         // Update cursor for next batch
         cursor = result.cursor;
         const remaining = result.remaining || 0;
+        
+        // If no pages were processed in this batch but there are more, there was an error
+        if (result.processed === 0 && remaining > 0) {
+          setBatchLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Warning: No pages processed but ${remaining} remaining. Stopping to prevent infinite loop.`]);
+          break;
+        }
+        
         setBatchLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${remaining} pages remaining, fetching next batch...`]);
       }
 

@@ -267,13 +267,19 @@ async function generateContentForPage(
       aimlapiKey
     );
 
+    console.log(`page-content-generator: Raw AI response (first 500 chars): ${aiResponse.substring(0, 500)}`);
+
     const parsedContent = extractJson(aiResponse);
     if (!parsedContent) {
+      console.error(`page-content-generator: Failed to parse JSON from AI response`);
       throw new Error("Failed to parse AI response as JSON");
     }
 
+    console.log(`page-content-generator: Successfully parsed content for ${locationName}`);
+
     return { success: true, data: parsedContent };
   } catch (err) {
+    console.error(`page-content-generator: Generation error for ${locationName}: ${err instanceof Error ? err.message : String(err)}`);
     return { success: false, error: err instanceof Error ? err.message : "Generation failed" };
   }
 }
@@ -292,28 +298,43 @@ async function fetchAllRows(supabase: any, table: string, select: string, filter
 
 async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
   console.log(`page-content-generator: Saving page with slug: ${pageData.page_slug}`);
-  console.log(`page-content-generator: page_type = ${pageData.page_type}, h1 = ${pageData.h1?.substring(0, 50)}`);
+  console.log(`page-content-generator: page_type = ${pageData.page_type}`);
+  console.log(`page-content-generator: h1 = ${pageData.h1?.substring(0, 50)}`);
+  console.log(`page-content-generator: meta_title = ${pageData.meta_title?.substring(0, 50)}`);
+  console.log(`page-content-generator: page_intro = ${pageData.hero_intro?.substring(0, 50)}`);
+  console.log(`page-content-generator: faqs count = ${pageData.faqs?.length || 0}`);
   
-  const { error } = await supabase.from("seo_pages").upsert({
+  const saveData: any = {
     slug: pageData.page_slug,
     page_type: pageData.page_type,
     title: pageData.h1,
     meta_title: pageData.meta_title,
     meta_description: pageData.meta_description,
-    keywords: JSON.stringify(pageData.keywords || []),
     h1: pageData.h1,
-    h2_sections: JSON.stringify([
-      { title: pageData.section_1_title, content: pageData.section_1_content },
-      { title: pageData.section_2_title, content: pageData.section_2_content },
-      { title: pageData.section_3_title, content: pageData.section_3_content },
-    ]),
-    page_intro: pageData.hero_intro,
-    faqs: pageData.faqs || [],
-    is_published: pageData.is_published ?? true,
+    page_intro: pageData.hero_intro || pageData.intro_text,
+    is_published: true,
     is_optimized: true,
     optimized_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-  }, { onConflict: "slug" });
+  };
+
+  // Only add h2_sections if there's actual content
+  if (pageData.section_1_title || pageData.section_2_title || pageData.section_3_title) {
+    saveData.h2_sections = JSON.stringify([
+      { title: pageData.section_1_title || "", content: pageData.section_1_content || "" },
+      { title: pageData.section_2_title || "", content: pageData.section_2_content || "" },
+      { title: pageData.section_3_title || "", content: pageData.section_3_content || "" },
+    ]);
+  }
+
+  // Only add faqs if there are actual FAQs
+  if (pageData.faqs && pageData.faqs.length > 0) {
+    saveData.faqs = pageData.faqs;
+  }
+
+  console.log(`page-content-generator: Save data keys: ${Object.keys(saveData).join(", ")}`);
+  
+  const { error } = await supabase.from("seo_pages").upsert(saveData, { onConflict: "slug" });
 
   if (error) {
     console.error(`page-content-generator: Save error details:`, JSON.stringify(error));
