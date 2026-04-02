@@ -104,7 +104,8 @@ export default function PageContentGeneratorTab() {
       let totalFailed = 0;
       let allErrors: string[] = [];
       let loopCount = 0;
-      const MAX_LOOPS = 20; // Safety limit
+      const MAX_LOOPS = 50; // Safety limit - can handle up to 50*3=150 pages
+      let cursor: string | null = null;
 
       while (!stopRef.current && loopCount < MAX_LOOPS) {
         loopCount++;
@@ -114,6 +115,7 @@ export default function PageContentGeneratorTab() {
           emirate_filter: batchForm.emirate_filter || undefined,
           batch_size: batchForm.batch_size,
           force_regenerate: batchForm.force_regenerate,
+          cursor: cursor,
         });
 
         totalProcessed += result.processed;
@@ -132,12 +134,16 @@ export default function PageContentGeneratorTab() {
           });
         }
 
-        const remaining = result.remaining || 0;
-        if (remaining === 0 || result.processed === 0) {
+        // Check if there are more pages to process
+        if (!result.has_more || result.processed === 0) {
+          setBatchLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] All pages completed!`]);
           break;
         }
 
-        setBatchLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${remaining} pages remaining, continuing...`]);
+        // Update cursor for next batch
+        cursor = result.cursor;
+        const remaining = result.remaining || 0;
+        setBatchLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${remaining} pages remaining, fetching next batch...`]);
       }
 
       setBatchLogs((prev) => [

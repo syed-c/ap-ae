@@ -14,6 +14,7 @@ interface GenerateBatchParams {
   emirate_filter?: string;
   force_regenerate?: boolean;
   batch_size?: number;
+  cursor?: string | null;
 }
 
 interface GenerateSingleResult {
@@ -29,6 +30,9 @@ interface GenerateBatchResult {
   errors: string[];
   remaining?: number;
   total_count?: number;
+  cursor?: string | null;
+  has_more?: boolean;
+  processed_count?: number;
 }
 
 export async function generateSingle(
@@ -59,6 +63,7 @@ export async function generateBatch(
     {
       body: {
         action: "generate_batch",
+        batch_limit: 3, // Always process 3 pages per call
         ...params,
       },
     }

@@ -307,9 +307,11 @@ async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
       { title: pageData.section_2_title, content: pageData.section_2_content },
       { title: pageData.section_3_title, content: pageData.section_3_content },
     ]),
-    intro_text: pageData.hero_intro,
-    faq_items: JSON.stringify(pageData.faqs || []),
+    page_intro: pageData.hero_intro,
+    faqs: pageData.faqs || [],
     is_published: pageData.is_published ?? true,
+    is_optimized: true,
+    optimized_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   }, { onConflict: "slug" });
 
@@ -370,12 +372,14 @@ serve(async (req) => {
     }
 
     if (action === "generate_batch") {
-      let pagesToGenerate: any[] = [];
+      const cursor = body.cursor || null; // Last processed slug to resume from
+      const batchLimit = body.batch_limit || 3; // How many pages to process in this call
 
       const states = await fetchAllRows(supabase, "states", "id, slug, name", { is_active: true });
       const cities = await fetchAllRows(supabase, "cities", "id, slug, name, state_id, states(slug, name)", { is_active: true });
 
-      const stateMap = new Map(states.map(s => [s.id, s]));
+      // Build complete list of pages
+      let allPages: any[] = [];
 
       if (page_type_filter === "all" || page_type_filter === "state") {
         let filteredStates = states;
@@ -384,7 +388,7 @@ serve(async (req) => {
         }
         
         for (const state of filteredStates) {
-          pagesToGenerate.push({
+          allPages.push({
             slug: `/${state.slug}/`,
             type: "state",
             state_slug: state.slug,
@@ -406,7 +410,7 @@ serve(async (req) => {
           const stateData = Array.isArray(city.states) ? city.states[0] : city.states;
           if (!stateData?.slug) continue;
           
-          pagesToGenerate.push({
+          allPages.push({
             slug: `/${stateData.slug}/${city.slug}/`,
             type: "city",
             state_slug: stateData.slug,
@@ -422,76 +426,79 @@ serve(async (req) => {
       const existingSlugs = new Set(existingPages.map(p => p.slug));
       
       // Filter out already generated pages (unless force_regenerate)
+      let pagesToGenerate = allPages;
       if (!force_regenerate) {
-        const beforeCount = pagesToGenerate.length;
-        pagesToGenerate = pagesToGenerate.filter(p => !existingSlugs.has(p.slug));
+        const beforeCount = allPages.length;
+        pagesToGenerate = allPages.filter(p => !existingSlugs.has(p.slug));
         console.log(`page-content-generator: Skipping ${beforeCount - pagesToGenerate.length} already generated pages`);
       }
 
-      console.log(`page-content-generator: Found ${pagesToGenerate.length} pages to generate (total: ${states.length + cities.length})`);
+      console.log(`page-content-generator: Total pages to generate: ${pagesToGenerate.length}`);
+
+      // Find start index based on cursor
+      let startIndex = 0;
+      if (cursor) {
+        startIndex = pagesToGenerate.findIndex(p => p.slug === cursor);
+        if (startIndex === -1) startIndex = 0;
+        else startIndex += 1; // Start after the cursor
+      }
+
+      // Get the batch of pages to process (3 at a time)
+      const pagesToProcess = pagesToGenerate.slice(startIndex, startIndex + batchLimit);
+      
+      console.log(`page-content-generator: Processing ${pagesToProcess.length} pages (startIndex: ${startIndex})`);
 
       let processed = 0;
       let skipped = 0;
       let failed = 0;
       const errors: string[] = [];
+      let lastProcessedSlug = null;
 
-      const AI_BATCH_SIZE = 3;
-      const DELAY_BETWEEN_BATCHES_MS = 2000;
-      const startTime = Date.now();
-      const TIMEOUT_MS = 55000;
+      for (const page of pagesToProcess) {
+        const locationName = page.type === "state" ? page.state_name : page.city_name;
+        console.log(`page-content-generator: Generating for ${locationName} (${page.slug})...`);
 
-      for (let batchStart = 0; batchStart < pagesToGenerate.length; batchStart += AI_BATCH_SIZE) {
-        if (Date.now() - startTime > TIMEOUT_MS) {
-          console.log(`page-content-generator: Timeout approaching, returning partial results`);
-          break;
-        }
+        try {
+          const result = await generateContentForPage(page, aimlapiKey, force_regenerate);
 
-        const batchPages = pagesToGenerate.slice(batchStart, batchStart + AI_BATCH_SIZE);
-        console.log(`page-content-generator: Processing batch ${Math.floor(batchStart / AI_BATCH_SIZE) + 1}: ${batchPages.length} pages`);
-
-        for (const page of batchPages) {
-          const locationName = page.type === "state" ? page.state_name : page.city_name;
-          console.log(`page-content-generator: Generating for ${locationName}...`);
-
-          try {
-            const result = await generateContentForPage(page, aimlapiKey, force_regenerate);
-
-            if (result.success) {
-              try {
-                await saveSeoPage(supabase, result.data);
-                processed++;
-              } catch (saveErr) {
-                failed++;
-                errors.push(`Save error for ${locationName}: ${saveErr instanceof Error ? saveErr.message : String(saveErr)}`);
-              }
-            } else if (result.skipped) {
-              skipped++;
-            } else {
+          if (result.success) {
+            try {
+              await saveSeoPage(supabase, result.data);
+              processed++;
+              lastProcessedSlug = page.slug;
+            } catch (saveErr) {
               failed++;
-              errors.push(`Generation error for ${locationName}: ${result.error}`);
+              errors.push(`Save error for ${locationName}: ${saveErr instanceof Error ? saveErr.message : String(saveErr)}`);
             }
-          } catch (pageErr) {
+          } else if (result.skipped) {
+            skipped++;
+          } else {
             failed++;
-            errors.push(`Error for ${locationName}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
+            errors.push(`Generation error for ${locationName}: ${result.error}`);
           }
-
-          await delay(500);
+        } catch (pageErr) {
+          failed++;
+          errors.push(`Error for ${locationName}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
         }
 
-        if (batchStart + AI_BATCH_SIZE < pagesToGenerate.length) {
-          await delay(DELAY_BETWEEN_BATCHES_MS);
-        }
+        await delay(500);
       }
 
-      console.log(`page-content-generator: Batch complete: ${processed} processed, ${skipped} skipped, ${failed} failed`);
+      const remaining = pagesToGenerate.length - (startIndex + pagesToProcess.length);
+      const hasMore = remaining > 0;
+
+      console.log(`page-content-generator: Batch complete: ${processed} processed, ${skipped} skipped, ${failed} failed, ${remaining} remaining`);
 
       return new Response(JSON.stringify({ 
         processed, 
         skipped, 
         failed, 
         errors,
-        total_count: states.length + cities.length,
-        remaining: pagesToGenerate.length - (processed + skipped + failed)
+        cursor: lastProcessedSlug, // Return last processed slug for next batch
+        has_more: hasMore,
+        remaining: remaining,
+        total_count: pagesToGenerate.length,
+        processed_count: startIndex + processed
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
