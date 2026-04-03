@@ -77,9 +77,106 @@ SEO (SUBTLE, NOT STUFFED)
 - Secondary: dentist near me, dental appointment, dental checkup [area]
 - Keep meta title/description professional but authentic
 
-═══════════════════════════════════════
+CRITICAL CONTENT RULE:
+Each page MUST include at least 2 REAL-WORLD INSIGHTS such as:
+- When people in this area book appointments
+- What problems they face (time, cost, language)
+- What type of clinics dominate this area
+
+If these are missing, the content is INVALID.
+
+INSIGHT DEPTH RULE:
+Each insight MUST be SPECIFIC and OBSERVABLE.
+
+BAD:
+- "people prefer convenience"
+
+GOOD:
+- "many clinics here stay open until 10pm because residents work late shifts"
+
+BAD:
+- "families care about kids"
+
+GOOD:
+- "parents here often look for clinics with play areas because children get anxious"
+
+If insights are vague → content is INVALID.
+
+COMPARISON RULE:
+Mention at least one contrast:
+- How this area differs from another nearby area
+- OR how dental needs differ here vs other parts of the emirate
+
+Example:
+"Unlike Downtown, where clinics focus on tourists, residents here prefer long-term family dentists"
+
+UNIQUE SECTION RULE:
+Each page MUST include one section that is completely unique to this location.
+
+Examples:
+- "Where locals actually go for dental care in {area}"
+- "What surprises residents about dentists in {area}"
+- "The reality of dental pricing in {area}"
+
+STRUCTURE RULE:
+Randomly use one of these formats:
+1. Lifestyle → Problem → Clinics → CTA
+2. Problem → Insight → Recommendation → CTA
+3. Area breakdown → Advice → CTA
+4. Story → Insight → CTA
+
+DO NOT reuse the same structure repeatedly.
+
+ANTI-GENERIC CHECK:
+At least ONE insight must include:
+- a number (e.g. "until 10pm")
+- OR a specific behavior pattern (e.g. "last-minute bookings after 7pm")
+
+If all insights are broad/general → INVALID.
+
+LANDMARK USAGE RULE:
+Do not just mention landmarks.
+
+Connect them to behavior:
+
+BAD:
+- "near Dubai Mall"
+
+GOOD:
+- "clinics near Dubai Mall tend to get last-minute bookings from shoppers and office workers"
+
+If landmarks are not used meaningfully → INVALID.
+
+LOCAL OPINION RULE:
+Include at least one opinion or recommendation:
+
+Examples:
+- "most residents here avoid premium clinics unless necessary"
+- "families here tend to stick with one dentist for years"
+
+If content sounds neutral/informational only → INVALID.
+
+WRITING STYLE VARIATION:
+Randomly adopt one tone:
+- conversational
+- advisory
+- slightly opinionated
+- problem-solution focused
+
+Do NOT use the same tone for all pages.
+
+GRAMMAR RULE:
+- NEVER use em-dashes (—) or long dashes
+- Use proper punctuation: commas, periods, semicolons
+- Write in complete, grammatically correct sentences
+- Avoid hyphenation abuse
+- Use proper contractions where natural
+
+If content contains em-dashes → REWRITE.
+
+═══
 FAQ UNIQUENESS
-═══════════════════════════════════════
+═══
 Generate 10 FAQs that are ACTUALLY different per location:
 - Reference local specifics in questions ("Is there a dentist open late in Deira?")
 - Include real neighborhood names in answers
@@ -120,20 +217,139 @@ VALIDATION CHECKLIST:
 - [ ] Is this meaningfully different from content for other emirates?
 - [ ] Are you telling a STORY, not filling a template?`;
 
-const USER_PROMPT_TEMPLATE = `Generate unique content for {location_name}, {emirate_name}.
+const USER_PROMPT_TEMPLATE = `Generate a city page for {location_name}, {emirate_name}.
 
-CRITICAL: This content must sound like a LOCAL expert wrote it — NOT a template with location swapped. Use the LOCAL CONTEXT provided to make this content UNIQUE.
+This is NOT a generic SEO page. This should feel like insider advice from someone who understands how people in this area actually live.
 
 LOCAL CONTEXT:
-- Character: {area_character}
-- Demographics: {demographics}
-- Landmarks: {landmarks}
-- Story: {narrative}
-- Clinic count: {clinic_count}
+* Character: {area_character}
+* Demographics: {demographics}
+* Landmarks: {landmarks}
+* Narrative: {narrative}
 
-CONTENT ANGLE TO USE: {content_angle}
+MANDATORY RULES:
 
-Your job is to make this content COMPLETELY UNIQUE to {location_name}. Don't just swap city names — tell a different story that resonates with the specific people who live in {location_name}.`;
+1. PICK ONE REAL-LIFE ANGLE:
+   * Busy professionals with no time
+   * Families with kids
+   * Expats needing language-friendly clinics
+   * Budget-conscious residents
+   * Premium/luxury lifestyle
+
+2. ADD REAL HUMAN INSIGHTS:
+   You MUST include:
+   * When people usually visit dentists here (evenings, weekends, emergencies)
+   * What they care about (price, speed, comfort, language)
+   * What kind of clinics are common in this area
+
+3. DO NOT EXPLAIN THE PLATFORM:
+   Do NOT talk about features like "directory", "booking platform", etc.
+   Assume the user already knows.
+
+4. NO GENERIC LINES:
+   Avoid anything that sounds like marketing:
+   * "comprehensive services"
+   * "world-class care"
+   * "best dental experience"
+
+5. MAKE IT SPECIFIC:
+   If this content can work for another city → it is WRONG.
+
+6. VARY YOUR STRUCTURE:
+   Randomly use one of these formats:
+   - Lifestyle → Problem → Clinics → CTA
+   - Problem → Insight → Recommendation → CTA
+   - Area breakdown → Advice → CTA
+   - Story → Insight → CTA
+
+7. INSIGHT DEPTH RULE:
+   Each insight MUST be SPECIFIC and OBSERVABLE.
+
+   BAD: "people prefer convenience"
+   GOOD: "many clinics here stay open until 10pm because residents work late shifts"
+
+   BAD: "families care about kids"
+   GOOD: "parents here often look for clinics with play areas because children get anxious"
+
+8. COMPARISON RULE:
+   Mention at least one contrast showing how this area differs from nearby areas.
+
+   Example: "Unlike Downtown, where clinics focus on tourists, residents here prefer long-term family dentists"
+
+9. UNIQUE SECTION RULE:
+   Each page MUST include one section completely unique to this location.
+
+   Examples:
+   - "Where locals actually go for dental care in {location_name}"
+   - "What surprises residents about dentists in {location_name}"
+   - "The reality of dental pricing in {location_name}"
+
+10. ANTI-GENERIC CHECK:
+    At least ONE insight must include a number or specific behavior.
+
+    BAD: "clinics have convenient hours"
+    GOOD: "clinics stay open until 10pm to serve working professionals"
+
+11. LANDMARK USAGE RULE:
+    Connect landmarks to behavior, not just mention them.
+
+    BAD: "near Dubai Mall"
+    GOOD: "clinics near Dubai Mall get last-minute bookings from shoppers"
+
+12. LOCAL OPINION RULE:
+    Include at least one opinion about dental care in this area.
+
+    Examples:
+    - "most residents here avoid premium clinics unless necessary"
+    - "families here stick with one dentist for years"
+
+13. WRITING STYLE:
+    Randomly choose a tone: conversational, advisory, slightly opinionated, or problem-solution.
+
+14. GRAMMAR RULE:
+    - NEVER use em-dashes (—) or long dashes
+    - Use proper punctuation: commas, periods, semicolons
+    - Write in complete, grammatically correct sentences
+    - Avoid hyphenation abuse
+    - Use proper contractions where natural
+
+FAIL CONDITIONS:
+* Generic tone → rewrite
+* No real-life insight → rewrite
+* Sounds like template → rewrite
+* Vague insights (not specific/observable) → rewrite
+* No comparison to other areas → rewrite
+* No unique section → rewrite
+* Insights without numbers or specific behaviors → rewrite
+* Landmarks mentioned but not connected to behavior → rewrite
+* Content sounds neutral/informational only (no opinions) → rewrite
+* Contains em-dashes (—) → rewrite
+* Grammatically incorrect sentences → rewrite
+
+OUTPUT:
+Return ONLY JSON with:
+{
+  "page_type": "city",
+  "page_slug": "/{emirate_slug}/{city_slug}",
+  "meta_title": "",
+  "meta_description": "",
+  "keywords": [],
+  "h1": "",
+  "hero_subtitle": "",
+  "hero_intro": "",
+  "section_1_title": "",
+  "section_1_content": "",
+  "section_2_title": "",
+  "section_2_content": "",
+  "section_3_title": "",
+  "section_3_content": "",
+  "body_content": "",
+  "cta_text": "",
+  "cta_button_text": "",
+  "cta_button_url": "",
+  "faqs": [],
+  "is_published": true
+}`;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -141,25 +357,120 @@ const corsHeaders = {
 };
 
 const CONTENT_ANGLES = [
-  "time-sensitive: Focus on convenience for busy professionals with limited time",
-  "family: Focus on pediatric dental care and family-friendly clinics",
-  "cultural: Focus on multilingual clinics and expat-friendly services",
-  "convenience: Focus on location convenience, parking, weekend hours",
-  "premium: Focus on premium facilities and luxury dental services",
-  "emergency: Focus on emergency dental care availability",
-  "affordable: Focus on cost-effective options and payment plans",
-  "special needs: Focus on clinics catering to special needs patients"
+  "Busy professionals with no time - focus on evening/weekend appointments, quick turnaround",
+  "Families with kids - focus on pediatric specialists, family-friendly atmosphere, play areas",
+  "Expats needing language-friendly clinics - focus on multilingual staff, international standards",
+  "Budget-conscious residents - focus on affordable options, payment plans, insurance coverage",
+  "Premium/luxury lifestyle - focus on spa-like clinics, advanced technology, concierge service"
 ];
 
-const AREA_CHARACTERS = {
+const AREA_CHARACTERS: Record<string, Record<string, { character: string; demographics: string; landmarks: string; narrative: string }>> = {
   "dubai": {
-    "deira": { character: "bustling commercial heart with traditional neighborhoods", demographics: "diverse multicultural community, shift workers, business professionals", landmarks: "Dubai Creek, Gold Souk, City Centre Deira", narrative: "convenience-driven due to extended clinic hours" },
-    "jumeirah": { character: "beachfront lifestyle area", demographics: "families, professionals who value premium care", landmarks: "Jumeirah Beach, Burj Al Arab nearby", narrative: "quality and convenience emphasis" },
-    "business-bay": { character: "corporate hub", demographics: "business professionals, executives", landmarks: "Dubai Canal, Business Bay towers", narrative: "time-strapped professionals needing efficient care" },
-    "marina": { character: "waterfront living", demographics: "young professionals, expats", landmarks: "Marina Walk, JLT towers", narrative: "modern lifestyle convenience" },
-    "downtown": { character: "city center", demographics: "mixed professionals, tourists", landmarks: "Burj Khalifa, Dubai Mall", narrative: "premium accessible care" }
+    "deira": { character: "bustling commercial heart with traditional markets and old Dubai charm", demographics: "mixed income families, shift workers, small business owners, expats from South Asia", landmarks: "Dubai Creek, Gold Souk, City Centre Deira, Al Marjan Building", narrative: "people here value convenience and extended hours - many clinics open until 10pm to serve shift workers" },
+    "jumeirah": { character: "beachfront upscale residential with families and professionals", demographics: "high-income families, expats, business owners", landmarks: "Jumeirah Beach, Burj Al Arab, Jumeirah Mosque, Beach Road", narrative: "residents here prioritize quality over cost - expect premium clinics with latest technology" },
+    "bur-dubai": { character: "historic area with traditional buildings and mix of old/new", demographics: "local families, older residents, small businesses", landmarks: "Dubai Museum, Al Fahidi Fort, Meena Bazaar", narrative: "traditional community feel - locals prefer trusted family dentists they've known for years" },
+    "karama": { character: "dense residential area with mix of villas and apartments", demographics: "mid-income families, salaried professionals, expats", landmarks: "Karama Market, Dubai Police Station", narrative: "practical, value-conscious residents who want good care without premium prices" },
+    "mirdif": { character: "sprawling residential suburb with villas and family compounds", demographics: "large families, Emirati families, mid-high income", landmarks: "Mirdif City Centre, Uptown Mirdif", narrative: "family-oriented area - parents look for pediatric specialists and child-friendly environments" },
+    "rashidiya": { character: "established residential area near airport", demographics: "families, airport workers, mid-income", landmarks: "Rashidiya Park, Metro Station", narrative: "practical community - appreciate clinics that accept insurance and offer payment plans" },
+    "al-quoz": { character: "industrial-artistic hub with galleries and workshops", demographics: "artists, creative professionals, small business owners", landmarks: "Al Quoz Industrial Areas, Galleries", narrative: "creative community - appreciate holistic dental approaches and natural options" },
+    "al-barsha": { character: "residential and commercial mix near Mall of Emirates", demographics: "families, professionals, shoppers", landmarks: "Mall of Emirates, Barsha Heights, Tecom", narrative: "busy area - people want efficient appointments without long waits" },
+    "jlt": { character: "high-rise residential towers near marina", demographics: "young professionals, expats, singles", landmarks: "JLT Towers, Cluster P", narrative: "time-poor professionals who book last-minute and prefer online scheduling" },
+    "marina": { character: "waterfront lifestyle with skyscrapers and restaurants", demographics: "young professionals, expats, tourists", landmarks: "Marina Walk, Dubai Marina Mall, Pier 7", narrative: "cosmopolitan crowd that expects premium service and modern facilities" },
+    "business-bay": { character: "corporate district with offices and residential towers", demographics: "executives, business professionals, entrepreneurs", landmarks: "Business Bay towers, Dubai Canal", narrative: "time-strapped executives who need quick, efficient dental visits during work hours" },
+    "downtown": { character: "city center with iconic landmarks and tourism", demographics: "tourists, business visitors, high-income residents", landmarks: "Burj Khalifa, Dubai Mall, DIFC", narrative: "visitors and short-term residents - need urgent care and English-speaking dentists" },
+    "sheikh-zayed-road": { character: "major highway corridor with skyscrapers", demographics: "professionals, commuters, business owners", landmarks: "Trade Centre, World Trade Centre", narrative: "convenience-focused - appreciate clinics with parking and late hours" },
+    "al-awir": { character: "desert outskirts with farms and villas", demographics: "Emirati families, farmers, rural residents", landmarks: "Al Awir Farms, Desert", narrative: "traditional community - prefer familiar dentists and word-of-mouth recommendations" },
+    "international-city": { character: "large residential area with diverse expat community", demographics: "expats from many countries, budget-conscious workers", landmarks: "Dragon Mart, International City phases", narrative: "multicultural community - need multilingual clinics and affordable options" },
+    "silicon-oasis": { character: "tech hub with residential compounds", demographics: "tech professionals, engineers, families", landmarks: "Silicon Oasis headquarters, Cedre Shopping Centre", narrative: "tech-savvy residents who book online and appreciate modern equipment" },
+    "academic-city": { character: "education district with universities", demographics: "students, professors, academic staff", landmarks: "Dubai International Academic City, universities", narrative: "budget-conscious students who need affordable basic care and flexible payment" },
+    "motor-city": { character: "sports and automotive themed community", demographics: "motorsport enthusiasts, families, car enthusiasts", landmarks: "Motor City racetrack, Ibn Battuta Mall", narrative: "active community - need flexible appointments around work and sports schedules" },
+    "sports-city": { character: "sports complex with residential areas", demographics: "athletes, fitness enthusiasts, families", landmarks: "Dubai Sports City, Cricket Stadium", narrative: "health-conscious residents who need sports dentistry and emergency dental care" },
+    "discovery-gardens": { character: "large residential compound with gardens", demographics: "families, expats, mid-income", landmarks: "Discovery Gardens, Ibn Battuta", narrative: "quiet residential area - families appreciate child-friendly clinics" },
+    "al-hebar": { character: "outlying industrial and residential area", demographics: "workers, families, industrial workers", landmarks: "Industrial areas", narrative: "underserved area - residents need affordable basic dental care" },
+    "al-khawan": { character: "traditional residential area near Sharjah border", demographics: "families, mixed income", landmarks: "Local markets", narrative: "price-sensitive residents who appreciate value and quality" },
+    "emirates-hills": { character: "exclusive gated villa community", demographics: "ultra-high-net-worth individuals, business owners", landmarks: "Emirates Hills, Montgomerie Golf", narrative: "expect luxury concierge dental service with premium materials" },
+    "green-community": { character: "planned community with green spaces", demographics: "families, nature-lovers", landmarks: "Green Community, Jebel Ali", narrative: "family-focused residents who value preventive care and education" },
+    "jebel-ali": { character: "industrial port area with residential pockets", demographics: "industrial workers, logistics professionals, families", landmarks: "Jebel Ali Port, Industrial areas", narrative: "hard-working community - need clinics that understand fatigue and physical labor effects on teeth" },
+    "umm-suqeim": { character: "beach area with villas and hotels", demographics: "families, hotel workers, beachgoers", landmarks: "Umm Suqeim Beach, Wild Wadi", narrative: "mix of luxury and local - residents appreciate honesty and don't want overtreatment" }
+  },
+  "abu-dhabi": {
+    "khalifa-city": { character: "planned city with government offices and residential", demographics: "government employees, professionals, families", landmarks: "Khalifa City A, B, Masdar City", narrative: "well-planned community - appreciate organized clinics with modern equipment" },
+    "corniche": { character: "waterfront promenade with towers and beaches", demographics: "professionals, families, tourists", landmarks: "Corniche Beach, Abu Dhabi Mall", narrative: "cosmopolitan residents who expect high standards and professional service" },
+    "al-reem-island": { character: "reclaimed island with high-rise towers", demographics: "expats, young professionals, families", landmarks: "Reem Island towers, Sorbonne University", narrative: "modern community - tech-savvy and book appointments online" },
+    "saadiyat-island": { character: "cultural island with museums and beaches", demographics: "cultural workers, artists, high-income expats", landmarks: "Louvre Abu Dhabi, Saadiyat Beach", narrative: "educated community that values artistic, aesthetic dental work" },
+    "yas-island": { character: "entertainment hub with theme parks and hotels", demographics: "tourists, entertainment workers, event staff", narrative: "fast-paced area - need clinics that handle urgent cases and tourists without appointments" },
+    "al-ain": { character: "garden city with traditional and modern areas", demographics: "local families, students, professionals", landmarks: "Al Ain Zoo, Camel Market, Forts", narrative: "traditional community - families have long-term relationships with their dentists" },
+    "al-musaffah": { character: "industrial and residential area", demographics: "industrial workers, laborers, families", landmarks: "Industrial area", narrative: "working-class community needs affordable basic dental care" },
+    "al-nahda": { character: "established residential area near stadium", demographics: "families, sports enthusiasts", landmarks: "Hazza Bin Zayed Stadium", narrative: "sports-oriented community - need dental care for active lifestyles" },
+    "mohamed-bin-zayed-city": { character: "residential suburb with villas", demographics: "Emirati families, mid-high income", landmarks: "MBZ City, Schools", narrative: "family-oriented area - parents prioritize children's dental health" }
+  },
+  "sharjah": {
+    "al-corniche": { character: "waterfront area with parks and residential", demographics: "families, local residents", landmarks: "Al Corniche, Sharjah Museum", narrative: "traditional families who appreciate conservative treatment approaches" },
+    "al-qasba": { name: "canal area with tourism and residential", demographics: "families, tourists", landmarks: "Al Qasba Canal, Eye Wheel", narrative: "family-friendly area with children - need pediatric specialists" },
+    "al-majaz": { character: "cultural district with parks and museums", demographics: "families, students, culture enthusiasts", landmarks: "Sharjah Art Museum, Al Majaz Waterfront", narrative: "educated community that values knowledge about dental health" },
+    "al-nahda": { character: "commercial and residential mix", demographics: "business owners, families, shop owners", narrative: "practical community - appreciate transparent pricing and no-nonsense approach" }
+  },
+  "ajman": {
+    "al-alia": { character: "residential area near Ajman City Centre", demographics: "families, workers", landmarks: "Ajman City Centre", narrative: "newer area with young families - appreciate modern clinics" },
+    "al-hamidiya": { character: "established residential area", demographics: "local families, long-term residents", narrative: "traditional community with strong family ties - trust familiar dentists" },
+    "emirates-city": { character: "new development with towers", demographics: "expats, professionals", narrative: "growing community - appreciate efficient service" }
+  },
+  "ras-al-khaimah": {
+    "al-nakheel": { character: "coastal area with hotels and residential", demographics: "tourism workers, families", narrative: "tourism-focused area - need flexible appointments for hospitality workers" },
+    "al-hammadiya": { character: "traditional residential area", demographics: "local families", narrative: "traditional community values long-term dentist relationships" },
+    "al-jeer": { character: "coastal fishing village area", demographics: "fishermen, local families", narrative: "traditional area - need basic affordable dental care" }
+  },
+  "fujairah": {
+    "al-fujairah-city": { character: "mountain-fringed coastal city", demographics: "families, mountain residents", landmarks: "Fujairah Fort, Beach", narrative: "tight-knit community - word-of-mouth recommendations matter" },
+    "al-siji": { character: "industrial and residential area", demographics: "workers, families", narrative: "working community needs affordable basic dental services" }
+  },
+  "umm-al-quwain": {
+    "al-rashidya": { character: "old residential area near the lagoon", demographics: "local families, fishermen", landmarks: "UAQ Lagoon, Old Town", narrative: "traditional community with deep roots - prefer familiar dentists" },
+    "al-mudah": { character: "developing residential area", demographics: "new families, workers", narrative: "growing community needs modern dental options" }
   }
 };
+
+const CITY_KEYS = [
+  "deira", "jumeirah", "bur-dubai", "karama", "mirdif", "rashidiya", "al-quoz", "al-barsha", "jlt", "marina", "business-bay", "downtown", 
+  "sheikh-zayed-road", "al-awir", "international-city", "silicon-oasis", "academic-city", "motor-city", "sports-city", 
+  "discovery-gardens", "al-hebar", "al-khawan", "emirates-hills", "green-community", "jebel-ali", "umm-suqeim",
+  "khalifa-city", "corniche", "al-reem-island", "saadiyat-island", "yas-island", "al-ain", "al-musaffah", "al-nahda", "mohamed-bin-zayed-city",
+  "al-corniche", "al-qasba", "al-majaz", "al-nahda", "al-alia", "al-hammadiya", "emirates-city", "al-nakheel", "al-hammadiya", "al-jeer",
+  "al-fujairah-city", "al-siji", "al-rashidya", "al-mudah"
+];
+
+function getAreaData(stateSlug: string, citySlug: string) {
+  const stateKey = stateSlug.toLowerCase();
+  const cityKey = citySlug.toLowerCase();
+  
+  let areaData = AREA_CHARACTERS[stateKey]?.[cityKey];
+  
+  if (!areaData) {
+    for (const state of Object.keys(AREA_CHARACTERS)) {
+      if (stateKey.includes(state) || state.includes(stateKey)) {
+        const cities = AREA_CHARACTERS[state];
+        for (const cityKeyMatch of Object.keys(cities)) {
+          if (cityKey.includes(cityKeyMatch) || cityKeyMatch.includes(cityKey)) {
+            areaData = cities[cityKeyMatch];
+            break;
+          }
+        }
+      }
+      if (areaData) break;
+    }
+  }
+  
+  if (!areaData) {
+    areaData = {
+      character: "mixed residential area with working professionals and families",
+      demographics: "mid-income residents, families, salaried workers",
+      landmarks: "local markets, community centers, residential compounds",
+      narrative: "residents here prefer affordable clinics and often visit after work hours or weekends"
+    };
+  }
+  
+  return areaData;
+}
 
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -216,15 +527,60 @@ async function callAIWithRetry(messages: { role: string; content: string }[], ai
 }
 
 function extractJson(text: string): any {
-  const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || text.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
-    try {
-      return JSON.parse(jsonMatch[1] || jsonMatch[0]);
-    } catch {
-      return null;
+  try {
+    // Remove thinking/reasoning blocks that MiniMax outputs
+    let cleanedText = text.replace(/<think>[\s\S]*?/g, '').trim();
+    
+    // Try to find JSON in code blocks first
+    let jsonMatch = cleanedText.match(/```json\n([\s\S]*?)\n```/);
+    if (jsonMatch) {
+      try {
+        return JSON.parse(jsonMatch[1]);
+      } catch {
+        // Continue
+      }
     }
+    
+    // Try to find JSON object directly - look for opening { and try to parse
+    const jsonStart = cleanedText.indexOf('{');
+    if (jsonStart !== -1) {
+      // Try to find the closing brace by counting brackets
+      let depth = 0;
+      let endPos = -1;
+      for (let i = jsonStart; i < cleanedText.length; i++) {
+        if (cleanedText[i] === '{') depth++;
+        else if (cleanedText[i] === '}') depth--;
+        if (depth === 0) {
+          endPos = i + 1;
+          break;
+        }
+      }
+      
+      if (endPos !== -1) {
+        const jsonStr = cleanedText.substring(jsonStart, endPos);
+        try {
+          return JSON.parse(jsonStr);
+        } catch {
+          // Continue
+        }
+      }
+    }
+    
+    // Last resort: try matching any {...} pattern
+    const anyMatch = cleanedText.match(/\{[\s\S]*\}/);
+    if (anyMatch) {
+      try {
+        return JSON.parse(anyMatch[0]);
+      } catch {
+        return null;
+      }
+    }
+    
+    return null;
+  } catch (e) {
+    console.error('extractJson error:', e);
+    return null;
   }
-  return null;
 }
 
 async function generateContentForPage(
@@ -237,25 +593,18 @@ async function generateContentForPage(
   const emirateSlug = page.state_slug;
   const citySlug = page.city_slug || "";
   
-  const areaCharKey = emirateSlug.toLowerCase();
-  const cityCharKey = citySlug.toLowerCase();
-  const areaData = AREA_CHARACTERS[areaCharKey]?.[cityCharKey] || {
-    character: "residential area with diverse community",
-    demographics: "families and professionals",
-    landmarks: "local amenities and landmarks",
-    narrative: "community-focused dental care"
-  };
-
+  const areaData = getAreaData(emirateSlug, citySlug);
   const contentAngle = getRandomItem(CONTENT_ANGLES);
 
   const userPrompt = USER_PROMPT_TEMPLATE
     .replace(/{location_name}/g, locationName)
     .replace(/{emirate_name}/g, emirateName)
+    .replace(/{emirate_slug}/g, emirateSlug)
+    .replace(/{city_slug}/g, citySlug)
     .replace(/{area_character}/g, areaData.character)
     .replace(/{demographics}/g, areaData.demographics)
     .replace(/{landmarks}/g, areaData.landmarks)
     .replace(/{narrative}/g, areaData.narrative)
-    .replace(/{clinic_count}/g, String(Math.floor(Math.random() * 50) + 10))
     .replace(/{content_angle}/g, contentAngle);
 
   try {
@@ -317,6 +666,28 @@ async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
     optimized_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
+
+  // Build combined content field for SEO content parsing
+  const contentParts = [];
+  if (pageData.hero_intro || pageData.hero_subtitle) {
+    contentParts.push(pageData.hero_intro || pageData.hero_subtitle || "");
+  }
+  if (pageData.section_1_title && pageData.section_1_content) {
+    contentParts.push(`## ${pageData.section_1_title}\n\n${pageData.section_1_content}`);
+  }
+  if (pageData.section_2_title && pageData.section_2_content) {
+    contentParts.push(`## ${pageData.section_2_title}\n\n${pageData.section_2_content}`);
+  }
+  if (pageData.section_3_title && pageData.section_3_content) {
+    contentParts.push(`## ${pageData.section_3_title}\n\n${pageData.section_3_content}`);
+  }
+  if (pageData.body_content) {
+    contentParts.push(pageData.body_content);
+  }
+  
+  if (contentParts.length > 0) {
+    saveData.content = contentParts.filter(Boolean).join("\n\n");
+  }
 
   // Only add h2_sections if there's actual content
   if (pageData.section_1_title || pageData.section_2_title || pageData.section_3_title) {
