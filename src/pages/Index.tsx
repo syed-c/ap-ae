@@ -295,16 +295,74 @@ const Index = ({ seoDataProp, realCountsProp, topProfilesProp, statesWithClinics
           HERO — Full-viewport, dark background
           ══════════════════════════════════════════ */}
       <section className="relative overflow-hidden min-h-[100svh] flex items-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        {/* Ambient glow */}
+        {/* Ambient glow - moving light */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px]" />
-          <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-teal/15 rounded-full blur-[100px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px]" />
+          <motion.div 
+            animate={{ x: [0, 100, 0], y: [0, 50, 0], scale: [1, 1.2, 1] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -top-40 -right-40 w-[700px] h-[700px] bg-primary/15 rounded-full blur-[140px]" 
+          />
+          <motion.div 
+            animate={{ x: [0, -80, 0], y: [0, 60, 0] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-teal/10 rounded-full blur-[120px]" 
+          />
+          <motion.div 
+            animate={{ x: [0, 50, 0], y: [0, -30, 0] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 5 }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-primary/5 rounded-full blur-[180px]" 
+          />
           {/* Grid overlay */}
           <div className="absolute inset-0 opacity-[0.03]" style={{
             backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
             backgroundSize: '60px 60px',
           }} />
+        </div>
+
+        {/* Floating product showcase - 2.5D card */}
+        <div className="absolute inset-0 hidden lg:block" style={{ perspective: '1200px' }}>
+          <motion.div
+            initial={{ rotateX: 8, rotateY: -15, y: 40 }}
+            animate={{ rotateX: 6, rotateY: -12, y: 20 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="absolute right-[5%] top-[50%] -translate-y-[45%] w-[420px] h-[520px] rounded-[2.5rem]"
+            style={{ 
+              transformStyle: 'preserve-3d',
+              boxShadow: `
+                0 80px 160px rgba(0,0,0,0.5),
+                0 30px 60px rgba(0,0,0,0.3),
+                0 0 100px rgba(59, 130, 246, 0.15),
+                inset 0 1px 0 rgba(255,255,255,0.1)
+              `
+            }}
+          >
+            {/* Card content */}
+            <div className="w-full h-full bg-gradient-to-br from-slate-800/95 via-slate-900/95 to-slate-950/95 backdrop-blur-xl rounded-[2.5rem] border border-white/10 overflow-hidden">
+              {/* Glow behind card */}
+              <div className="absolute inset-0 bg-radial-gradient(circle at center, rgba(34,197,94,0.2), transparent 60%)" />
+              
+              {/* Fake dentist card preview */}
+              <div className="p-6 pt-8">
+                <div className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Featured Dentist</div>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/30 to-teal/30 border border-primary/20" />
+                  <div>
+                    <div className="w-32 h-5 bg-white/20 rounded-lg mb-2" />
+                    <div className="w-24 h-4 bg-white/10 rounded-lg" />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="w-full h-4 bg-white/10 rounded-lg" />
+                  <div className="w-4/5 h-4 bg-white/10 rounded-lg" />
+                  <div className="w-3/5 h-4 bg-white/10 rounded-lg" />
+                </div>
+                <div className="mt-8 flex gap-3">
+                  <div className="flex-1 h-12 bg-primary/20 rounded-xl" />
+                  <div className="w-12 h-12 bg-white/10 rounded-xl" />
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         <div className="container relative z-10 py-20 md:py-24 lg:py-28 px-5 md:px-8">

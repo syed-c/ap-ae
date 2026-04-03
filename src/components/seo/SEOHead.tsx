@@ -47,12 +47,14 @@ export const SEOHead = ({
   const safeDescription = description || 'Find and book appointments with top-rated dental professionals across the UAE.';
 
   // CRITICAL: Always generate canonical URL - use provided or derive from current path
+  // Don't add trailing slash - Next.js trailingSlash: true handles redirects
+  // This prevents 301 redirect loops and duplicate content issues
   const canonicalUrl = canonical
     ? `${BASE_URL}${canonical.startsWith('/') ? canonical : `/${canonical}`}`
     : `${BASE_URL}${currentPath}`;
 
-  // Normalize canonical: remove trailing slash duplicates, ensure consistency
-  const normalizedCanonical = canonicalUrl.replace(/\/+$/, '') + '/';
+  // Normalize canonical: just remove duplicate slashes, don't add trailing slash
+  const normalizedCanonical = canonicalUrl.replace(/\/+/g, '/');
 
   const imageUrl = ogImage || DEFAULT_OG_IMAGE;
 

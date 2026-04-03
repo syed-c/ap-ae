@@ -364,6 +364,60 @@ const CONTENT_ANGLES = [
   "Premium/luxury lifestyle - focus on spa-like clinics, advanced technology, concierge service"
 ];
 
+// Service-specific prompts for generating unique service pages
+const SERVICE_PROMPTS: Record<string, { angle: string; pain_points: string; why_unique: string }> = {
+  "invisalign": {
+    angle: "invisible orthodontic solution for professionals",
+    pain_points: "Adults don't want metal braces in business meetings, concerns about treatment duration, unsure about effectiveness vs traditional braces",
+    why_unique: "Unlike braces, aligners are removable for meetings and eating - most clinics offer free consultations"
+  },
+  "dental-implants": {
+    angle: "permanent tooth replacement solution",
+    pain_points: "Fear of surgery, cost concerns, unsure about implant brands, recovery time worries",
+    why_unique: "Implants feel like natural teeth - different brands have different warranties, some offer same-day implants"
+  },
+  "veneers": {
+    angle: "instant smile transformation",
+    pain_points: "Cost per tooth, fear of tooth reduction, unsure about longevity, different material options (porcelain vs composite)",
+    why_unique: "Veneers can transform your smile in 2 visits - but quality varies significantly by clinic and material"
+  },
+  "teeth-whitening": {
+    angle: "quick cosmetic improvement",
+    pain_points: "Sensitivity concerns, results not lasting, in-office vs at-home options, unsafe whitening products",
+    why_unique: "Professional whitening is safer and faster than DIY kits - results can last 1-3 years with proper care"
+  },
+  "root-canal": {
+    angle: "saving damaged teeth",
+    pain_points: "Fear of pain, multiple visits needed, crown needed after, cost vs extraction",
+    why_unique: "Root canals save your natural tooth - modern techniques make it virtually painless"
+  },
+  "dental-crowns": {
+    angle: "protecting damaged teeth",
+    pain_points: "Cost differences between materials, same-day vs multiple visits, durability concerns",
+    why_unique: "Crowns protect weak teeth - same-day crowns now available at many clinics using CAD/CAM technology"
+  },
+  "braces": {
+    angle: "traditional orthodontic treatment",
+    pain_points: "Appearance concerns, food restrictions, cleaning difficulties, treatment duration",
+    why_unique: "Modern braces are smaller and less visible - lingual braces hide completely behind teeth"
+  },
+  "tooth-extraction": {
+    angle: "removing problem teeth",
+    pain_points: "Pain concerns, swelling management, wisdom teeth complications, cost differences",
+    why_unique: "Wisdom teeth removal is common - costs vary significantly based on complexity and anesthesia type"
+  },
+  "dental-check-up": {
+    angle: "preventive dental care",
+    pain_points: "Finding time, cost of x-rays, what to expect, how often to visit",
+    why_unique: "Regular checkups prevent major problems - most clinics offer free first consultations"
+  },
+  "pediatric-dentistry": {
+    angle: "children's dental care",
+    pain_points: "Child afraid of dentist, finding pediatric specialist, behavior management techniques",
+    why_unique: "Pediatric dentists specialize in children - first visit should be by age 1"
+  }
+};
+
 const AREA_CHARACTERS: Record<string, Record<string, { character: string; demographics: string; landmarks: string; narrative: string }>> = {
   "dubai": {
     "deira": { character: "bustling commercial heart with traditional markets and old Dubai charm", demographics: "mixed income families, shift workers, small business owners, expats from South Asia", landmarks: "Dubai Creek, Gold Souk, City Centre Deira, Al Marjan Building", narrative: "people here value convenience and extended hours - many clinics open until 10pm to serve shift workers" },
@@ -470,6 +524,190 @@ function getAreaData(stateSlug: string, citySlug: string) {
   }
   
   return areaData;
+}
+
+function getServicePrompt(serviceSlug: string) {
+  return SERVICE_PROMPTS[serviceSlug] || {
+    angle: "dental procedure",
+    pain_points: "cost concerns, finding qualified providers, treatment options",
+    why_unique: "quality and experience vary significantly between providers"
+  };
+}
+
+async function generateServiceContent(pageData: any, aimlapiKey: string, forceRegenerate: boolean): Promise<any> {
+  const serviceSlug = pageData.slug.replace("services/", "");
+  const serviceData = getServicePrompt(serviceSlug);
+  
+  const prompt = `Generate a service page for ${serviceSlug.replace(/-/g, " ")} in UAE.
+
+SERVICE CONTEXT:
+* Treatment type: ${serviceSlug}
+* Focus angle: ${serviceData.angle}
+* Patient pain points: ${serviceData.pain_points}
+* What makes UAE unique: ${serviceData.why_unique}
+
+MANDATORY RULES:
+
+1. WRITE LIKE A DENTAL EXPERT ADVISING A PATIENT:
+   - Don't sell - inform and educate
+   - Include real costs ranges for UAE
+   - Mention realistic timelines
+   - Include what to ask during consultations
+
+2. UAE-SPECIFIC CONTENT:
+   - Include cost ranges in AED
+   - Mention DHA/DOH licensing requirements
+   - Reference insurance coverage where relevant
+   - Consider expat vs local patient perspectives
+
+3. FAQ UNIQUENESS:
+   - 10 FAQs about this specific procedure
+   - Include UAE-specific questions (insurance, licensing, location)
+   - Answer questions patients actually ask
+
+4. NO GENERIC MARKETING:
+   - Don't say "world-class care"
+   - Don't say "book your appointment today"
+   - Don't use template language
+
+5. GRAMMAR RULE:
+   - NEVER use em-dashes (—)
+   - Use proper punctuation
+
+OUTPUT:
+Return ONLY JSON with:
+{
+  "page_type": "service",
+  "page_slug": "/services/${serviceSlug}",
+  "meta_title": "",
+  "meta_description": "",
+  "keywords": [],
+  "h1": "",
+  "hero_subtitle": "",
+  "hero_intro": "",
+  "body_content": "",
+  "cta_text": "",
+  "cta_button_text": "",
+  "cta_button_url": "",
+  "faqs": [],
+  "is_published": true
+}`;
+
+  try {
+    const response = await callAIWithRetry([
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: prompt }
+    ], aimlapiKey);
+
+    if (!response?.choices?.[0]?.message?.content) {
+      return { success: false, error: "No response from AI" };
+    }
+
+    const content = response.choices[0].message.content;
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    
+    if (!jsonMatch) {
+      return { success: false, error: "Invalid JSON in response" };
+    }
+
+    const pageDataResult = JSON.parse(jsonMatch[0]);
+    return { success: true, data: pageDataResult };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Generation failed" };
+  }
+}
+
+async function generateServiceLocationContent(pageData: any, aimlapiKey: string, forceRegenerate: boolean): Promise<any> {
+  const parts = pageData.slug.split("/").filter(Boolean);
+  const stateSlug = parts[0];
+  const citySlug = parts[1];
+  const serviceSlug = parts[2];
+  
+  const serviceData = getServicePrompt(serviceSlug);
+  const areaData = getAreaData(stateSlug, citySlug);
+  
+  const prompt = `Generate a service-location page for ${serviceSlug.replace(/-/g, " ")} in ${pageData.city_name}, ${pageData.state_name}.
+
+LOCATION CONTEXT:
+* City character: ${areaData.character}
+* Demographics: ${areaData.demographics}
+* What locals say: ${areaData.narrative}
+
+SERVICE CONTEXT:
+* Treatment: ${serviceSlug}
+* Patient concerns: ${serviceData.pain_points}
+* UAE perspective: ${serviceData.why_unique}
+
+MANDATORY RULES:
+
+1. COMBINE LOCATION + SERVICE:
+   - How does this area's character affect dental needs for this service?
+   - What do residents here specifically need for this treatment?
+   - Reference local clinics or patterns
+
+2. LOCATION-SPECIFIC INSIGHTS:
+   - What type of patients seek this service in this area?
+   - Are there more premium or budget options here?
+   - What are the local considerations?
+
+3. UAE-SPECIFIC:
+   - Cost ranges in AED
+   - DHA/DOH requirements
+   - Insurance patterns
+   - Expat considerations
+
+4. FAQ UNIQUENESS:
+   - 10 FAQs specific to this location + service combination
+   - Include local area references
+
+5. NO GENERIC CONTENT:
+   - Don't swap location names into templates
+   - Must be specific insights
+
+6. GRAMMAR:
+   - No em-dashes (—)
+
+OUTPUT:
+Return ONLY JSON with:
+{
+  "page_type": "service-location",
+  "page_slug": "/${stateSlug}/${citySlug}/${serviceSlug}",
+  "meta_title": "",
+  "meta_description": "",
+  "keywords": [],
+  "h1": "",
+  "hero_subtitle": "",
+  "hero_intro": "",
+  "body_content": "",
+  "cta_text": "",
+  "cta_button_text": "",
+  "cta_button_url": "",
+  "faqs": [],
+  "is_published": true
+}`;
+
+  try {
+    const response = await callAIWithRetry([
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: prompt }
+    ], aimlapiKey);
+
+    if (!response?.choices?.[0]?.message?.content) {
+      return { success: false, error: "No response from AI" };
+    }
+
+    const content = response.choices[0].message.content;
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    
+    if (!jsonMatch) {
+      return { success: false, error: "Invalid JSON in response" };
+    }
+
+    const pageDataResult = JSON.parse(jsonMatch[0]);
+    return { success: true, data: pageDataResult };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Generation failed" };
+  }
 }
 
 function delay(ms: number): Promise<void> {
@@ -891,6 +1129,175 @@ serve(async (req) => {
         remaining: remaining,
         total_count: pagesToGenerate.length,
         processed_count: startIndex + processed
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // NEW: Generate service pages only
+    if (action === "generate_services") {
+      const cursor = body.cursor || null;
+      const batchLimit = body.batch_limit || 3;
+
+      const treatments = await fetchAllRows(supabase, "treatments", "id, slug, name", { is_active: true });
+      
+      // Build service pages
+      const servicePages = treatments.map(t => ({
+        slug: `services/${t.slug}`,
+        type: "service",
+        service_slug: t.slug,
+        service_name: t.name,
+      }));
+
+      // Get existing pages
+      const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
+      const existingSlugs = new Set(existingPages.map(p => p.slug));
+
+      let pagesToGenerate = servicePages;
+      if (!force_regenerate) {
+        pagesToGenerate = servicePages.filter(p => !existingSlugs.has(p.slug));
+      }
+
+      let startIndex = cursor ? pagesToGenerate.findIndex(p => p.slug === cursor) : 0;
+      if (startIndex === -1) startIndex = 0;
+      else startIndex += 1;
+
+      const pagesToProcess = pagesToGenerate.slice(startIndex, startIndex + batchLimit);
+
+      let processed = 0;
+      let skipped = 0;
+      let failed = 0;
+      const errors: string[] = [];
+      let lastProcessedSlug = null;
+
+      for (const page of pagesToProcess) {
+        console.log(`page-content-generator: Generating service for ${page.service_name}...`);
+
+        try {
+          const result = await generateServiceContent(page, aimlapiKey, force_regenerate);
+
+          if (result.success) {
+            await saveSeoPage(supabase, result.data);
+            processed++;
+            lastProcessedSlug = page.slug;
+          } else if (result.skipped) {
+            skipped++;
+          } else {
+            failed++;
+            errors.push(`Service ${page.service_name}: ${result.error}`);
+          }
+        } catch (pageErr) {
+          failed++;
+          errors.push(`Error for ${page.service_name}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
+        }
+
+        await delay(500);
+      }
+
+      const remaining = pagesToGenerate.length - (startIndex + pagesToProcess.length);
+
+      return new Response(JSON.stringify({
+        processed,
+        skipped,
+        failed,
+        errors,
+        cursor: lastProcessedSlug,
+        has_more: remaining > 0,
+        remaining,
+        total_count: pagesToGenerate.length,
+        page_type: "service"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // NEW: Generate service-location pages (e.g., /dubai/mirdif/invisalign)
+    if (action === "generate_service_locations") {
+      const cursor = body.cursor || null;
+      const batchLimit = body.batch_limit || 3;
+
+      const states = await fetchAllRows(supabase, "states", "id, slug, name", { is_active: true });
+      const cities = await fetchAllRows(supabase, "cities", "id, slug, name, state_id, states(slug, name)", { is_active: true });
+      const treatments = await fetchAllRows(supabase, "treatments", "id, slug, name", { is_active: true });
+
+      // Build service-location pages
+      let slPages: any[] = [];
+      
+      for (const city of cities) {
+        const stateData = Array.isArray(city.states) ? city.states[0] : city.states;
+        if (!stateData?.slug) continue;
+
+        for (const treatment of treatments) {
+          slPages.push({
+            slug: `/${stateData.slug}/${city.slug}/${treatment.slug}`,
+            type: "service-location",
+            state_slug: stateData.slug,
+            state_name: stateData.name,
+            city_slug: city.slug,
+            city_name: city.name,
+            service_slug: treatment.slug,
+            service_name: treatment.name,
+          });
+        }
+      }
+
+      // Get existing pages
+      const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
+      const existingSlugs = new Set(existingPages.map(p => p.slug));
+
+      let pagesToGenerate = slPages;
+      if (!force_regenerate) {
+        pagesToGenerate = slPages.filter(p => !existingSlugs.has(p.slug));
+      }
+
+      let startIndex = cursor ? pagesToGenerate.findIndex(p => p.slug === cursor) : 0;
+      if (startIndex === -1) startIndex = 0;
+      else startIndex += 1;
+
+      const pagesToProcess = pagesToGenerate.slice(startIndex, startIndex + batchLimit);
+
+      let processed = 0;
+      let skipped = 0;
+      let failed = 0;
+      const errors: string[] = [];
+      let lastProcessedSlug = null;
+
+      for (const page of pagesToProcess) {
+        console.log(`page-content-generator: Generating ${page.slug}...`);
+
+        try {
+          const result = await generateServiceLocationContent(page, aimlapiKey, force_regenerate);
+
+          if (result.success) {
+            await saveSeoPage(supabase, result.data);
+            processed++;
+            lastProcessedSlug = page.slug;
+          } else if (result.skipped) {
+            skipped++;
+          } else {
+            failed++;
+            errors.push(`SL ${page.slug}: ${result.error}`);
+          }
+        } catch (pageErr) {
+          failed++;
+          errors.push(`Error for ${page.slug}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
+        }
+
+        await delay(500);
+      }
+
+      const remaining = pagesToGenerate.length - (startIndex + pagesToProcess.length);
+
+      return new Response(JSON.stringify({
+        processed,
+        skipped,
+        failed,
+        errors,
+        cursor: lastProcessedSlug,
+        has_more: remaining > 0,
+        remaining,
+        total_count: pagesToGenerate.length,
+        page_type: "service-location"
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

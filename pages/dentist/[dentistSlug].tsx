@@ -49,7 +49,7 @@ const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData }: {
             <Head>
                 <title>{seoData.title}</title>
                 <meta name="description" content={seoData.description} />
-                <link rel="canonical" href={seoData.canonical} />
+                <link rel="canonical" href={`${BASE_URL}${seoData.canonical.replace(/\/+$/, '')}`} />
                 <meta property="og:type" content="profile" />
                 <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />
                 <meta property="og:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />

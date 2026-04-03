@@ -94,8 +94,8 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
   const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
 
   const isDataReady = !treatmentLoading && !profilesLoading;
-  // Always false - service pages are always indexable per SEO registry
-const shouldNoIndex = false;
+  // Service pages are always indexable per SEO registry
+  const shouldNoIndex = false;
 
   // Price stats
   const uaeMin = priceRanges?.length ? Math.min(...priceRanges.map(r => r.price_min)) : 0;
