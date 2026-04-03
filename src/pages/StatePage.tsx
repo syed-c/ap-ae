@@ -45,14 +45,15 @@ interface StatePageProps {
   citiesDataProp?: any[];
   dehydratedStateProp?: any;
   seoDataProp?: {
-    title: string;
-    description: string;
+    title: string | null;
+    description: string | null;
     canonical: string;
   };
   faqsProp?: { question: string; answer: string }[];
+  seoH1Prop?: string | null;
 }
 
-const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, faqsProp }: StatePageProps = {}) => {
+const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, faqsProp, seoH1Prop }: StatePageProps = {}) => {
   const router = useRouter();
   const isServerRender = typeof window === 'undefined';
   const stateSlug = isServerRender
@@ -236,12 +237,8 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
   // Build SEO data from available data
   const stateName = state?.name || '';
   const stateAbbr = state?.abbreviation || '';
-  const seoTitle = state 
-    ? (seoContent?.meta_title || `Find Dentists in ${stateName} - Top Dental Clinics in ${stateName}`)
-    : (seoContent?.meta_title || "Dental Clinics");
-  const seoDescription = state
-    ? (seoContent?.meta_description || `Find and book appointments with top-rated dental professionals in ${stateName}.`)
-    : (seoContent?.meta_description || "Find the best dentists and dental clinics");
+  const seoTitle = seoContent?.meta_title || null;
+  const seoDescription = seoContent?.meta_description || null;
 
   // If we don't have state data and it's still loading, show loading state with SEO
   if (!hasStateData && stateLoading) {
@@ -299,9 +296,9 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
   const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
 
   // Use SEO content if optimized, otherwise use defaults
-  const pageTitle = seoContent?.meta_title || `Find Dentists in ${stateName} - Top Dental Clinics in ${stateName}`;
-  const pageDescription = seoContent?.meta_description || `Find and book appointments with top-rated dental professionals in ${stateName}. Compare verified clinics across ${cities?.length || 0}+ areas.`;
-  const pageH1 = seoContent?.h1 || `Find Dentists in ${stateName}`;
+  const pageTitle = seoContent?.meta_title || seoDataProp?.title || null;
+  const pageDescription = seoContent?.meta_description || seoDataProp?.description || null;
+  const pageH1 = seoContent?.h1 || null;
 
   // Use SEO FAQs if available, otherwise use defaults
   // Note: parseFaqFromContent now returns { q, a }[] format
@@ -370,7 +367,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
             </div>
 
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 px-2" style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif" }}>
-              {pageH1.includes(stateName) ? (
+              {pageH1 && pageH1.includes(stateName) ? (
                 <>
                   <span className="text-white">{pageH1.split(stateName)[0]}</span>
                   <span className="text-primary">{stateName}</span>

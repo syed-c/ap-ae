@@ -69,14 +69,15 @@ interface CityPageProps {
   cityDataProp?: any;
   dehydratedStateProp?: any;
   seoDataProp?: {
-    title: string;
-    description: string;
+    title: string | null;
+    description: string | null;
     canonical: string;
   };
   faqsProp?: { question: string; answer: string }[];
+  seoH1Prop?: string | null;
 }
 
-const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp, faqsProp }: CityPageProps = {}) => {
+const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp, faqsProp, seoH1Prop }: CityPageProps = {}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isServerRender = typeof window === 'undefined';
@@ -251,12 +252,8 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
 
   // Build SEO data - use existing seoSlug variable
   const locationName = city?.name || treatmentMatch?.name || citySlug || '';
-  const seoTitle = state && locationName
-    ? (seoContent?.meta_title || `Best Dentists in ${locationName}, ${state.abbreviation} - Dental Clinics`)
-    : (seoContent?.meta_title || "Dental Clinics");
-  const seoDescription = state && locationName
-    ? (seoContent?.meta_description || `Find and book appointments with top-rated dentists in ${locationName}, ${state.name}.`)
-    : (seoContent?.meta_description || "Find the best dentists and dental clinics");
+  const seoTitle = seoContent?.meta_title || null;
+  const seoDescription = seoContent?.meta_description || null;
 
   // If we have state data from prefetch, render full page
   if (!hasStateData && (stateLoading || cityLoading)) {
@@ -363,29 +360,12 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
   // SSR FAQ data takes priority, then use client-fetched SEO content, then defaults
   const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
 
-  const pageTitle = seoContent?.meta_title || `Best Dentists in ${cityName}, ${stateAbbr} - Find Dental Clinics`;
-  const pageDescription = seoContent?.meta_description || `Find and book appointments with top-rated dental professionals in ${cityName}, ${stateName}. Compare ${profiles?.length || 0}+ verified clinics.`;
-  const pageH1 = seoContent?.h1 || `Best Dentists in ${locationDisplay}`;
+  const pageTitle = seoContent?.meta_title || seoDataProp?.title || null;
+  const pageDescription = seoContent?.meta_description || seoDataProp?.description || null;
+  const pageH1 = seoContent?.h1 || seoH1Prop || null;
 
   // Note: parseFaqFromContent now returns { q, a }[] format (same as seoContent.faqs after parseFaqs validation)
-  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs : [
-    {
-      q: `How do I find a good dentist in ${cityName}?`,
-      a: `Browse our verified list of dentists in ${cityName}. Look for verified badges, patient reviews, and specializations that match your needs.`,
-    },
-    {
-      q: `Are the dentists in ${cityName} verified?`,
-      a: `All dentists on our platform are licensed professionals. Profiles with the "Verified" badge have claimed and completed our verification process.`,
-    },
-    {
-      q: `How much does dental treatment cost in ${cityName}?`,
-      a: `Dental costs vary by treatment. A basic checkup typically ranges from 150-400 AED, while specialized treatments can range from 2,500-6,000 AED.`,
-    },
-    {
-      q: `Can I book emergency dental appointments in ${cityName}?`,
-      a: `Yes, many clinics in ${cityName} offer same-day emergency appointments. Use our search to find clinics with emergency availability.`,
-    },
-  ];
+  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs : [];
 
   // Always false - city pages are always indexable per SEO registry
 const shouldNoIndex = false;
@@ -471,20 +451,18 @@ const shouldNoIndex = false;
             </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 px-2"
-              style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif" }}
+              className="text-3xl md:text-4xl lg:text-5xl font-black text-center mb-4"
             >
-              {pageH1.includes(cityName) ? (
+              {pageH1 && pageH1.includes(cityName) ? (
                 <>
                   <span className="text-white">{pageH1.split(cityName)[0]}</span>
                   <span className="text-primary">{cityName}</span>
                   <span className="text-white">{pageH1.split(cityName)[1] || ''}</span>
                 </>
               ) : (
-                <span className="text-white">{pageH1}</span>
+                <span className="text-white">{pageH1 || 'Loading...'}</span>
               )}
             </motion.h1>
 
@@ -494,10 +472,7 @@ const shouldNoIndex = false;
               transition={{ delay: 0.2 }}
               className="text-sm md:text-base lg:text-lg text-white/40 mb-6 max-w-2xl mx-auto px-2"
             >
-              {areaLocalContent.hasLocalContext
-                ? `Discover dental clinics serving ${areaLocalContent.demographics} in this ${areaLocalContent.character} community.`
-                : `Find and book appointments with top-rated dental professionals in ${cityName}. Compare verified clinics and read patient reviews.`
-              }
+              {pageDescription}
             </motion.p>
 
             <motion.div

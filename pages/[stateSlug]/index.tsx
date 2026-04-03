@@ -1,34 +1,35 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
-import { createServerSupabase } from '@/lib/supabaseServer';
+import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import StatePageComponent from '@/pages/StatePage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 // Wrapper component to render SEO meta tags server-side with FAQ data for SSR
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs }: {
+const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1 }: {
     stateSlug: string;
     stateData: any;
     citiesData: any[];
-    seoData: { title: string; description: string; canonical: string };
+    seoData: { title: string | null; description: string | null; canonical: string };
     faqs: { question: string; answer: string }[];
+    seoH1: string | null;
 }) => {
     return (
         <>
             <Head>
-                <title>{seoData.title}</title>
-                <meta name="description" content={seoData.description} />
+                <title>{seoData.title || 'Loading...'}</title>
+                <meta name="description" content={seoData.description || 'Loading...'} />
                 <link rel="canonical" href={seoData.canonical} />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />
-                <meta property="og:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
+                <meta property="og:title" content={seoData.title ? (seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`) : 'Loading...'} />
                 <meta property="og:description" content={seoData.description} />
                 <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
                 <meta property="og:site_name" content="AppointPanda" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:url" content={`${BASE_URL}${seoData.canonical}`} />
-                <meta name="twitter:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
+                <meta name="twitter:title" content={seoData.title ? (seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`) : 'Loading...'} />
                 <meta name="twitter:description" content={seoData.description} />
                 <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
             </Head>
@@ -38,6 +39,7 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs }: {
                 citiesDataProp={citiesData}
                 seoDataProp={seoData}
                 faqsProp={faqs}
+                seoH1Prop={seoH1}
             />
         </>
     );
@@ -48,7 +50,7 @@ export default StatePageWithSEO;
 // Generate static paths for all emirates at build time
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
-        const supabase = createServerSupabase();
+        const supabase = createServerSupabaseAdmin();
         
         if (!supabase) {
             return { paths: [], fallback: 'blocking' };
@@ -75,7 +77,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 // Static Site Generation with SSR FAQ data for Googlebot
 export const getStaticProps: GetStaticProps = async (ctx) => {
-    const supabase = createServerSupabase();
+    const supabase = createServerSupabaseAdmin();
     const stateSlug = ctx.params?.stateSlug as string;
     const normalizedStateSlug = normalizeStateSlug(stateSlug);
 
@@ -125,8 +127,9 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .then(r => r.data)
     ]);
 
-    const metaTitle = seoContent?.meta_title || `Dental Clinics in ${stateData.name} | Book Appointments`;
-    const metaDescription = seoContent?.meta_description || `Find and book appointments with top-rated dental clinics in ${stateData.name}, UAE. Verified dentists, real reviews.`;
+    const metaTitle = seoContent?.meta_title || null;
+    const metaDescription = seoContent?.meta_description || null;
+    const seoH1 = seoContent?.h1 || null;
 
     let ssrFaqs: { question: string; answer: string }[] = [];
     
@@ -160,6 +163,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 canonical: `/${normalizedStateSlug}/`,
             },
             faqs: ssrFaqs,
+            seoH1: seoH1,
         },
         revalidate: 3600,
     };

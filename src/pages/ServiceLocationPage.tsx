@@ -47,12 +47,13 @@ interface ServiceLocationPageProps {
   stateDataProp?: any;
   cityDataProp?: any;
   treatmentDataProp?: any;
-  seoDataProp?: { title: string; description: string; canonical: string };
+  seoDataProp?: { title: string | null; description: string | null; canonical: string };
   dehydratedStateProp?: any;
   faqsProp?: { question: string; answer: string }[];
+  seoH1Prop?: string | null;
 }
 
-const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, stateDataProp, cityDataProp, treatmentDataProp, seoDataProp, faqsProp }: ServiceLocationPageProps) => {
+const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, stateDataProp, cityDataProp, treatmentDataProp, seoDataProp, faqsProp, seoH1Prop }: ServiceLocationPageProps) => {
   const routerQuery = useRouter().query;
   const stateSlug = stateSlugProp || routerQuery.stateSlug as string || '';
   const citySlug = citySlugProp || routerQuery.citySlug as string || '';
@@ -159,9 +160,9 @@ const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, sta
   // SSR FAQ data takes priority, then use client-fetched SEO content, then defaults
   const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
 
-  const pageTitle = seoContent?.meta_title || `${treatmentName} in ${locationDisplay} - Find Best Specialists`;
-  const pageDescription = seoContent?.meta_description || `Find the best ${treatmentName.toLowerCase()} specialists in ${locationDisplay}. Compare ${profiles?.length || 0}+ verified clinics.`;
-  const pageH1 = seoContent?.h1 || `${treatmentName} in ${locationDisplay}`;
+  const pageTitle = seoContent?.meta_title || seoDataProp?.title || null;
+  const pageDescription = seoContent?.meta_description || seoDataProp?.description || null;
+  const pageH1 = seoContent?.h1 || seoH1Prop || null;
 
   const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
     {
@@ -271,7 +272,7 @@ const shouldNoIndex = false;
               className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 px-2" 
               style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif" }}
             >
-              {pageH1.includes(locationName) ? (
+              {pageH1 && pageH1.includes(locationName) ? (
                 <>
                   <span className="text-white">{pageH1.split(locationName)[0]}</span>
                   <span className="block text-primary mt-1">{locationName}{pageH1.split(locationName)[1] || ''}</span>

@@ -28,3 +28,26 @@ export function createServerSupabase() {
         },
     });
 }
+
+/**
+ * Admin server-side Supabase client for build-time data fetching.
+ * Uses service role key to bypass RLS - faster for SSG builds.
+ */
+export function createServerSupabaseAdmin() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    // Check for properly named server-only key first, fallback to legacy public-prefixed key
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY 
+             || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!url || !key) {
+        console.warn('Missing Supabase service role key - falling back to anon');
+        return createServerSupabase();
+    }
+
+    return createClient<Database>(url, key, {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+        },
+    });
+}

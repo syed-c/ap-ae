@@ -1,37 +1,38 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
-import { createServerSupabase } from '@/lib/supabaseServer';
+import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import ServiceLocationPageComponent from '@/pages/ServiceLocationPage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs }: {
+const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs, seoH1 }: {
     stateSlug: string;
     citySlug: string;
     serviceSlug: string;
     stateData: any;
     cityData: any;
     treatmentData: any;
-    seoData: { title: string; description: string; canonical: string };
+    seoData: { title: string | null; description: string | null; canonical: string };
     faqs: { question: string; answer: string }[];
+    seoH1: string | null;
 }) => {
     return (
         <>
             <Head>
-                <title>{seoData.title}</title>
-                <meta name="description" content={seoData.description} />
+                <title>{seoData.title || 'Loading...'}</title>
+                <meta name="description" content={seoData.description || 'Loading...'} />
                 <link rel="canonical" href={seoData.canonical} />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />
-                <meta property="og:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
-                <meta property="og:description" content={seoData.description} />
+                <meta property="og:title" content={seoData.title ? (seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`) : 'Loading...'} />
+                <meta property="og:description" content={seoData.description || 'Loading...'} />
                 <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
                 <meta property="og:site_name" content="AppointPanda" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:url" content={`${BASE_URL}${seoData.canonical}`} />
-                <meta name="twitter:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
-                <meta name="twitter:description" content={seoData.description} />
+                <meta name="twitter:title" content={seoData.title ? (seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`) : 'Loading...'} />
+                <meta name="twitter:description" content={seoData.description || 'Loading...'} />
                 <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
             </Head>
             <ServiceLocationPageComponent 
@@ -43,6 +44,7 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
                 treatmentDataProp={treatmentData}
                 seoDataProp={seoData}
                 faqsProp={faqs}
+                seoH1Prop={seoH1}
             />
         </>
     );
@@ -54,7 +56,7 @@ export default ServiceLocationPageWithSEO;
 // Service-location pages for other cities will be ISR
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
-        const supabase = createServerSupabase();
+        const supabase = createServerSupabaseAdmin();
         
         if (!supabase) {
             return { paths: [], fallback: 'blocking' };
@@ -97,7 +99,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 // Static Site Generation with SSR FAQ data for Googlebot
 export const getStaticProps: GetStaticProps = async (ctx) => {
-    const supabase = createServerSupabase();
+    const supabase = createServerSupabaseAdmin();
     const stateSlug = ctx.params?.stateSlug as string;
     const citySlug = ctx.params?.citySlug as string;
     const serviceSlug = ctx.params?.serviceSlug as string;
@@ -148,8 +150,9 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const stateName = stateData.name;
     const cityName = cityData?.name || citySlug;
     const treatmentName = treatmentData?.name || serviceSlug;
-    const metaTitle = seoContent?.meta_title || `${treatmentName} in ${cityName}, ${stateName} | Book Appointments`;
-    const metaDescription = seoContent?.meta_description || `Find and book ${treatmentName} appointments with top-rated dental clinics in ${cityName}, ${stateName}. Verified dentists, real reviews.`;
+    const metaTitle = seoContent?.meta_title || null;
+    const metaDescription = seoContent?.meta_description || null;
+    const seoH1 = seoContent?.h1 || null;
 
     let ssrFaqs: { question: string; answer: string }[] = [];
     
@@ -174,6 +177,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 canonical: `/${normalizedStateSlug}/${citySlug}/${serviceSlug}/`,
             },
             faqs: ssrFaqs,
+            seoH1: seoH1,
         },
         revalidate: 3600,
     };
