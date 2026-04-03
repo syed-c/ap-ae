@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { generateSingle, generateBatch } from "@/hooks/usePageContentGenerator";
-import { FileText, Play, Square, Loader2, Check, X, AlertCircle } from "lucide-react";
+import { generateSingle, generateBatch, generateServices, generateServiceLocations } from "@/hooks/usePageContentGenerator";
+import { FileText, Play, Square, Loader2, Check, X, AlertCircle, Layers } from "lucide-react";
 import { toast } from "sonner";
 
 interface State {
@@ -36,6 +36,22 @@ export default function PageContentGeneratorTab() {
   const [isBatchRunning, setIsBatchRunning] = useState(false);
   const stopRef = useRef(false);
   const [batchLogs, setBatchLogs] = useState<string[]>([]);
+
+  // Service generation state
+  const [serviceForm, setServiceForm] = useState({
+    batch_size: 5,
+    force_regenerate: false,
+  });
+  const [isServiceRunning, setIsServiceRunning] = useState(false);
+  const [serviceLogs, setServiceLogs] = useState<string[]>([]);
+
+  // Service-location generation state
+  const [slForm, setSlForm] = useState({
+    batch_size: 3,
+    force_regenerate: false,
+  });
+  const [isSlRunning, setIsSlRunning] = useState(false);
+  const [slLogs, setSlLogs] = useState<string[]>([]);
 
   // Auto-scroll logs
   useEffect(() => {
@@ -392,6 +408,218 @@ export default function PageContentGeneratorTab() {
                       : "text-slate-300"
                   }
                 >
+                  {log}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Section 3: Service Pages Generator */}
+      <div className="bg-white rounded-lg border p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Layers className="w-5 h-5 text-primary" />
+          <h2 className="text-lg font-semibold">Generate Service Pages</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Generate SEO content for service pages (e.g., /services/invisalign, /services/veneers)
+        </p>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Batch Size</label>
+            <input
+              type="number"
+              min={1}
+              max={20}
+              className="w-full border rounded-md px-3 py-2"
+              value={serviceForm.batch_size}
+              onChange={(e) => setServiceForm({ ...serviceForm, batch_size: Math.min(20, Math.max(1, parseInt(e.target.value) || 5)) })}
+            />
+          </div>
+          <div className="flex items-center">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={serviceForm.force_regenerate}
+                onChange={(e) => setServiceForm({ ...serviceForm, force_regenerate: e.target.checked })}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium">Force Regenerate</span>
+            </label>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {!isServiceRunning ? (
+            <button
+              onClick={async () => {
+                setIsServiceRunning(true);
+                setServiceLogs([]);
+                let totalProcessed = 0;
+                let totalFailed = 0;
+                let cursor: string | null = null;
+
+                try {
+                  setServiceLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Starting service pages generation...`]);
+
+                  while (true) {
+                    const result = await generateServices({
+                      batch_size: serviceForm.batch_size,
+                      force_regenerate: serviceForm.force_regenerate,
+                      cursor,
+                    });
+
+                    totalProcessed += result.processed;
+                    totalFailed += result.failed;
+
+                    setServiceLogs((prev) => [
+                      ...prev,
+                      `[${new Date().toLocaleTimeString()}] Batch: ${result.processed} processed, ${result.failed} failed, ${result.remaining} remaining`
+                    ]);
+
+                    if (!result.has_more) {
+                      setServiceLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Done! Total: ${totalProcessed} processed, ${totalFailed} failed`]);
+                      break;
+                    }
+
+                    cursor = result.cursor;
+                    if (result.processed === 0) break;
+                  }
+                } catch (err) {
+                  setServiceLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Error: ${err}`]);
+                } finally {
+                  setIsServiceRunning(false);
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+            >
+              <Play className="w-4 h-4" />
+              Generate Service Pages
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Running...
+            </div>
+          )}
+        </div>
+
+        <div className="border rounded-md bg-slate-950 text-slate-100 p-4">
+          <div className="text-sm font-medium mb-2">Service Pages Log</div>
+          <div className="h-32 overflow-y-auto font-mono text-xs space-y-1">
+            {serviceLogs.length === 0 ? (
+              <div className="text-slate-500 italic">No logs yet...</div>
+            ) : (
+              serviceLogs.map((log, idx) => (
+                <div key={idx} className={log.includes("Error") ? "text-red-400" : log.includes("Done") ? "text-green-400" : "text-slate-300"}>
+                  {log}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Section 4: Service-Location Pages Generator */}
+      <div className="bg-white rounded-lg border p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Layers className="w-5 h-5 text-primary" />
+          <h2 className="text-lg font-semibold">Generate Service-Location Pages</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Generate SEO content for city + service pages (e.g., /dubai/mirdif/invisalign, /abu-dhabi/al-ain/veneers)
+        </p>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Batch Size</label>
+            <input
+              type="number"
+              min={1}
+              max={10}
+              className="w-full border rounded-md px-3 py-2"
+              value={slForm.batch_size}
+              onChange={(e) => setSlForm({ ...slForm, batch_size: Math.min(10, Math.max(1, parseInt(e.target.value) || 3)) })}
+            />
+          </div>
+          <div className="flex items-center">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={slForm.force_regenerate}
+                onChange={(e) => setSlForm({ ...slForm, force_regenerate: e.target.checked })}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium">Force Regenerate</span>
+            </label>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {!isSlRunning ? (
+            <button
+              onClick={async () => {
+                setIsSlRunning(true);
+                setSlLogs([]);
+                let totalProcessed = 0;
+                let totalFailed = 0;
+                let cursor: string | null = null;
+
+                try {
+                  setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Starting service-location pages generation...`]);
+
+                  while (true) {
+                    const result = await generateServiceLocations({
+                      batch_size: slForm.batch_size,
+                      force_regenerate: slForm.force_regenerate,
+                      cursor,
+                    });
+
+                    totalProcessed += result.processed;
+                    totalFailed += result.failed;
+
+                    setSlLogs((prev) => [
+                      ...prev,
+                      `[${new Date().toLocaleTimeString()}] Batch: ${result.processed} processed, ${result.failed} failed, ${result.remaining} remaining`
+                    ]);
+
+                    if (!result.has_more) {
+                      setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Done! Total: ${totalProcessed} processed, ${totalFailed} failed`]);
+                      break;
+                    }
+
+                    cursor = result.cursor;
+                    if (result.processed === 0) break;
+                  }
+                } catch (err) {
+                  setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Error: ${err}`]);
+                } finally {
+                  setIsSlRunning(false);
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+            >
+              <Play className="w-4 h-4" />
+              Generate Service-Location Pages
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Running...
+            </div>
+          )}
+        </div>
+
+        <div className="border rounded-md bg-slate-950 text-slate-100 p-4">
+          <div className="text-sm font-medium mb-2">Service-Location Pages Log</div>
+          <div className="h-32 overflow-y-auto font-mono text-xs space-y-1">
+            {slLogs.length === 0 ? (
+              <div className="text-slate-500 italic">No logs yet...</div>
+            ) : (
+              slLogs.map((log, idx) => (
+                <div key={idx} className={log.includes("Error") ? "text-red-400" : log.includes("Done") ? "text-green-400" : "text-slate-300"}>
                   {log}
                 </div>
               ))

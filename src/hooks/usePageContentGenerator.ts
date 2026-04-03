@@ -35,6 +35,14 @@ interface GenerateBatchResult {
   processed_count?: number;
 }
 
+interface GenerateServicesResult extends GenerateBatchResult {
+  page_type: "service";
+}
+
+interface GenerateServiceLocationsResult extends GenerateBatchResult {
+  page_type: "service-location";
+}
+
 export async function generateSingle(
   params: GenerateSingleParams
 ): Promise<GenerateSingleResult> {
@@ -63,7 +71,7 @@ export async function generateBatch(
     {
       body: {
         action: "generate_batch",
-        batch_limit: 3, // Always process 3 pages per call
+        batch_limit: 3,
         ...params,
       },
     }
@@ -79,4 +87,66 @@ export async function generateBatch(
   }
 
   return data as GenerateBatchResult;
+}
+
+export async function generateServices(
+  params: { force_regenerate?: boolean; batch_size?: number; cursor?: string | null } = {}
+): Promise<GenerateServicesResult> {
+  const { data, error } = await supabase.functions.invoke(
+    "page-content-generator",
+    {
+      body: {
+        action: "generate_services",
+        batch_limit: 3,
+        ...params,
+      },
+    }
+  );
+
+  if (error) {
+    return {
+      processed: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [error.message],
+      remaining: 0,
+      total_count: 0,
+      cursor: null,
+      has_more: false,
+      page_type: "service",
+    };
+  }
+
+  return data as GenerateServicesResult;
+}
+
+export async function generateServiceLocations(
+  params: { force_regenerate?: boolean; batch_size?: number; cursor?: string | null } = {}
+): Promise<GenerateServiceLocationsResult> {
+  const { data, error } = await supabase.functions.invoke(
+    "page-content-generator",
+    {
+      body: {
+        action: "generate_service_locations",
+        batch_limit: 3,
+        ...params,
+      },
+    }
+  );
+
+  if (error) {
+    return {
+      processed: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [error.message],
+      remaining: 0,
+      total_count: 0,
+      cursor: null,
+      has_more: false,
+      page_type: "service-location",
+    };
+  }
+
+  return data as GenerateServiceLocationsResult;
 }
