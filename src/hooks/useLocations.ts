@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseAdmin } from '@/integrations/supabase/client';
 import { State, City, Area } from '@/types/database';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 import { ACTIVE_STATE_SLUGS, isActiveState } from '@/lib/constants/activeStates';
@@ -8,7 +8,7 @@ export function useStates() {
   return useQuery({
     queryKey: ['states'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('states')
         .select('*')
         .eq('is_active', true)
@@ -30,16 +30,16 @@ export function useStatesWithClinics(initialData?: any[]) {
     queryFn: async (): Promise<State[]> => {
       // Fetch states, clinics, and cities IN PARALLEL
       const [statesRes, clinicsRes, citiesRes] = await Promise.all([
-        supabase
+        supabaseAdmin
           .from('states')
           .select('*')
           .eq('is_active', true)
           .in('slug', ACTIVE_STATE_SLUGS)
           .order('display_order'),
-        (supabase.from('clinics').select('city_id') as any)
+        (supabaseAdmin.from('clinics').select('city_id') as any)
           .eq('is_active', true)
           .eq('is_duplicate', false),
-        supabase
+        supabaseAdmin
           .from('cities')
           .select('id, state_id')
           .eq('is_active', true),
@@ -79,7 +79,7 @@ export function useState(slug: string, initialData?: State | null) {
   return useQuery({
     queryKey: ['state', normalized],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('states')
         .select('*')
         .eq('slug', normalized)
@@ -100,7 +100,7 @@ export function useCities(stateId?: string) {
   return useQuery({
     queryKey: ['cities', stateId],
     queryFn: async () => {
-      let query = supabase
+      let query = supabaseAdmin
         .from('cities')
         .select(`
           *,
@@ -129,7 +129,7 @@ export function useCitiesByStateSlug(stateSlug: string, initialData?: any[]) {
   return useQuery({
     queryKey: ['cities-by-state', normalized],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('cities')
         .select(`
           *,
@@ -155,7 +155,7 @@ export function useCity(slug: string, stateSlug?: string, initialData?: City | n
     queryKey: ['city', slug, normalizedStateSlug],
     queryFn: async () => {
       // Build query based on whether we have a state slug
-      let query = supabase
+      let query = supabaseAdmin
         .from('cities')
         .select(`
           *,
@@ -191,7 +191,7 @@ export function useAreas(cityId?: string) {
   return useQuery({
     queryKey: ['areas', cityId],
     queryFn: async () => {
-      let query = supabase
+      let query = supabaseAdmin
         .from('areas')
         .select(`
           *,

@@ -61,6 +61,9 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
   const { data: seoContent, isLoading: seoContentLoading, isFetching: seoContentFetching } = useSeoPageContent(seoSlug);
   const isSeoContentPending = !seoContent && (seoContentLoading || seoContentFetching);
 
+  // Debug: Log seoContent data
+  console.log('[ServicePage] seoContent:', seoContent ? { meta_title: seoContent.meta_title?.substring(0, 30), h1: seoContent.h1?.substring(0, 30), faqs_count: seoContent.faqs?.length } : 'null');
+
   const { data: treatment, isLoading: treatmentLoading } = useQuery({
     queryKey: ["treatment", serviceSlug],
     queryFn: async () => {
