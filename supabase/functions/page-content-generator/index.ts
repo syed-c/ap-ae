@@ -594,24 +594,34 @@ Return ONLY JSON with:
 }`;
 
   try {
-    const response = await callAIWithRetry([
+    const aiResponse = await callAIWithRetry([
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: prompt }
     ], aimlapiKey);
 
-    if (!response?.choices?.[0]?.message?.content) {
+    console.log("SERVICE_GEN: AI response type:", typeof aiResponse);
+    console.log("SERVICE_GEN: AI response (first 300 chars):", String(aiResponse).substring(0, 300));
+
+    if (!aiResponse) {
       return { success: false, error: "No response from AI" };
     }
 
-    const content = response.choices[0].message.content;
+    const content = String(aiResponse);
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     
     if (!jsonMatch) {
+      console.error("SERVICE_GEN: No JSON in response:", content.substring(0, 300));
       return { success: false, error: "Invalid JSON in response" };
     }
 
-    const pageDataResult = JSON.parse(jsonMatch[0]);
-    return { success: true, data: pageDataResult };
+    try {
+      const pageDataResult = JSON.parse(jsonMatch[0]);
+      console.log("SERVICE_GEN: Parsed successfully, keys:", Object.keys(pageDataResult));
+      return { success: true, data: pageDataResult };
+    } catch (parseErr) {
+      console.error("SERVICE_GEN: JSON parse error:", parseErr instanceof Error ? parseErr.message : String(parseErr));
+      return { success: false, error: "JSON parse failed" };
+    }
   } catch (err) {
     return { success: false, error: err instanceof Error ? err.message : "Generation failed" };
   }
@@ -687,24 +697,32 @@ Return ONLY JSON with:
 }`;
 
   try {
-    const response = await callAIWithRetry([
+    const aiResponse = await callAIWithRetry([
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: prompt }
     ], aimlapiKey);
 
-    if (!response?.choices?.[0]?.message?.content) {
+    console.log("SL_GEN: AI response type:", typeof aiResponse);
+
+    if (!aiResponse) {
       return { success: false, error: "No response from AI" };
     }
 
-    const content = response.choices[0].message.content;
+    const content = String(aiResponse);
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     
     if (!jsonMatch) {
+      console.error("SL_GEN: No JSON in response:", content.substring(0, 300));
       return { success: false, error: "Invalid JSON in response" };
     }
 
-    const pageDataResult = JSON.parse(jsonMatch[0]);
-    return { success: true, data: pageDataResult };
+    try {
+      const pageDataResult = JSON.parse(jsonMatch[0]);
+      return { success: true, data: pageDataResult };
+    } catch (parseErr) {
+      console.error("SL_GEN: JSON parse error:", parseErr instanceof Error ? parseErr.message : String(parseErr));
+      return { success: false, error: "JSON parse failed" };
+    }
   } catch (err) {
     return { success: false, error: err instanceof Error ? err.message : "Generation failed" };
   }
@@ -891,9 +909,23 @@ async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
   console.log(`page-content-generator: page_intro = ${pageData.hero_intro?.substring(0, 50)}`);
   console.log(`page-content-generator: faqs count = ${pageData.faqs?.length || 0}`);
   
+  // Determine page_type - use what AI returns, or derive from slug if missing
+  let pageType = pageData.page_type;
+  if (!pageType) {
+    if (pageData.page_slug?.includes("services/") && pageData.page_slug?.split("/").length === 2) {
+      pageType = "service";
+    } else if (pageData.page_slug?.includes("/services/")) {
+      pageType = "service-location";
+    } else if (pageData.page_slug?.match(/^\/[a-z]+\/[a-z-]+\/$/)) {
+      pageType = "state";
+    } else if (pageData.page_slug?.match(/^\/[a-z]+\/[a-z-]+\/[a-z-]+\/$/)) {
+      pageType = "city";
+    }
+  }
+  
   const saveData: any = {
     slug: pageData.page_slug,
-    page_type: pageData.page_type,
+    page_type: pageType || "city",
     title: pageData.h1,
     meta_title: pageData.meta_title,
     meta_description: pageData.meta_description,
@@ -1175,6 +1207,7 @@ serve(async (req) => {
 
         try {
           const result = await generateServiceContent(page, aimlapiKey, force_regenerate);
+          console.log(`page-content-generator: Service result for ${page.service_name}:`, JSON.stringify(result).substring(0, 200));
 
           if (result.success) {
             await saveSeoPage(supabase, result.data);

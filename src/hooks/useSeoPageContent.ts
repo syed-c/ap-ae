@@ -101,6 +101,12 @@ export function useSeoPageContent(slug: string | undefined) {
         return validated.length > 0 ? validated : null;
       };
 
+      // Debug: Log candidates for service pages
+      if (normalizedSlug.includes('services')) {
+        console.log(`[SEO] Service page lookup: ${slug}`);
+        console.log(`[SEO] Candidates:`, candidates);
+      }
+
       // PRIORITY 1: Check page_content table first (admin CMS editable content)
       const { data: pageContentData, error: pageContentError } = await supabase
         .from("page_content")
@@ -113,6 +119,11 @@ export function useSeoPageContent(slug: string | undefined) {
 
       if (pageContentError) {
         console.error("Error fetching page_content:", pageContentError);
+      }
+
+      // Debug: Check if we found anything in page_content
+      if (normalizedSlug.includes('services') && pageContentData) {
+        console.log(`[SEO] Found in page_content:`, pageContentData.page_slug);
       }
 
       // If we found admin-edited content, transform it to SeoPageContent format
@@ -169,6 +180,7 @@ export function useSeoPageContent(slug: string | undefined) {
 
       // If we found optimized content, return it
       if (optimizedData && optimizedData.content) {
+        console.log(`[SEO] Found optimized content for:`, normalizedSlug);
         return {
           ...optimizedData,
           faqs: parseFaqs(optimizedData.faqs),
@@ -184,6 +196,12 @@ export function useSeoPageContent(slug: string | undefined) {
         .order("updated_at", { ascending: false })
         .limit(1)
         .maybeSingle();
+
+      // Debug: Log results from seo_pages
+      if (normalizedSlug.includes('services')) {
+        console.log(`[SEO] seo_pages query result:`, anyData ? `Found: ${anyData.slug}` : 'Nothing found');
+        console.log(`[SEO] Content field value:`, anyData?.content?.substring(0, 100));
+      }
 
       if (anyError) {
         console.error("Error fetching fallback SEO content:", anyError);
