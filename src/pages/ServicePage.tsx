@@ -10,6 +10,7 @@ import { Section } from "@/components/layout/Section";
 import { SearchBox } from "@/components/SearchBox";
 import { DentistListFrame, LocationQuickLinks } from "@/components/location";
 import { SEOContentBlock } from "@/components/seo/SEOContentBlock";
+import { PageIntroSection } from "@/components/seo/PageIntroSection";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -235,6 +236,12 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
               emptyMessage="We're still adding specialists for this service."
               maxHeight={700}
               initialCount={6}
+            />
+
+            <PageIntroSection
+              title={seoContent?.h1 || null}
+              content={seoContent?.content || null}
+              isLoading={isSeoContentPending}
             />
 
             <SEOContentBlock

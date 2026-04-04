@@ -190,6 +190,12 @@ const OptimizedContentLayout = ({
            !s.heading.toLowerCase().includes('faq')
     );
 
+  // If no sections left after filtering (e.g., content only has intro with no headings), skip this block entirely
+  // The intro is already rendered in PageIntroSection
+  if (contentSections.length === 0) {
+    return null;
+  }
+
   return (
     <article 
       className="space-y-6"
