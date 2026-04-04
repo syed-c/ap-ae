@@ -5,6 +5,48 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
 
+  // Rewrite sitemap URLs to API route
+  async rewrites() {
+    return [
+      {
+        source: '/sitemap.xml',
+        destination: '/api/sitemap/sitemap.xml',
+      },
+      {
+        source: '/sitemap-static.xml',
+        destination: '/api/sitemap/sitemap-static.xml',
+      },
+      {
+        source: '/sitemap-states.xml',
+        destination: '/api/sitemap/sitemap-states.xml',
+      },
+      {
+        source: '/sitemap-cities.xml',
+        destination: '/api/sitemap/sitemap-cities.xml',
+      },
+      {
+        source: '/sitemap-services.xml',
+        destination: '/api/sitemap/sitemap-services.xml',
+      },
+      {
+        source: '/sitemap-posts.xml',
+        destination: '/api/sitemap/sitemap-posts.xml',
+      },
+      {
+        source: '/sitemap-insurance.xml',
+        destination: '/api/sitemap/sitemap-insurance.xml',
+      },
+      {
+        source: '/sitemap-service-locations.xml',
+        destination: '/api/sitemap/sitemap-service-locations.xml',
+      },
+      {
+        source: '/sitemap-profiles.xml',
+        destination: '/api/sitemap/sitemap-profiles.xml',
+      },
+    ];
+  },
+
   // Increase static page generation timeout to handle heavy pages
   staticPageGenerationTimeout: 300,
 

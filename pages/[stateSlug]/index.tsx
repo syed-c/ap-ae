@@ -4,7 +4,6 @@ import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import StatePageComponent from '@/pages/StatePage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
-// Wrapper component to render SEO meta tags server-side with FAQ data for SSR
 const BASE_URL = 'https://www.appointpanda.ae';
 
 const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1 }: {
@@ -47,7 +46,6 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
 
 export default StatePageWithSEO;
 
-// Generate static paths for all emirates at build time
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
         const supabase = createServerSupabaseAdmin();
@@ -75,7 +73,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
     }
 };
 
-// Static Site Generation with SSR FAQ data for Googlebot
 export const getStaticProps: GetStaticProps = async (ctx) => {
     const supabase = createServerSupabaseAdmin();
     const stateSlug = ctx.params?.stateSlug as string;
@@ -94,7 +91,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         };
     }
 
-    // Get state first to get its ID
     const stateData = await supabase
         .from('states')
         .select('*')
@@ -107,7 +103,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
     
-    // Direct queries instead of React Query for faster build
     const [seoContent, citiesData] = await Promise.all([
         supabase
             .from("seo_pages")

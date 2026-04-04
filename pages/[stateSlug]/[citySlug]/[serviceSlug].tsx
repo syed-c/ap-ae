@@ -105,6 +105,10 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const serviceSlug = ctx.params?.serviceSlug as string;
     const normalizedStateSlug = normalizeStateSlug(stateSlug);
 
+    if (normalizedStateSlug === 'robots.txt') {
+        return { notFound: true };
+    }
+
     if (!normalizedStateSlug || !citySlug || !serviceSlug) {
         return { notFound: true };
     }
