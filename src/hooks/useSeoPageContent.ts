@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/client";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
 
 export interface SeoPageContent {
@@ -108,7 +108,7 @@ export function useSeoPageContent(slug: string | undefined) {
       }
 
       // PRIORITY 1: Check page_content table first (admin CMS editable content)
-      const { data: pageContentData, error: pageContentError } = await supabase
+      const { data: pageContentData, error: pageContentError } = await supabaseAdmin
         .from("page_content")
         .select("*")
         .in("page_slug", candidates)
@@ -164,7 +164,7 @@ export function useSeoPageContent(slug: string | undefined) {
 
       // PRIORITY 2: Fall back to seo_pages table (legacy/generated content)
       // First try to get optimized content with actual content
-      const { data: optimizedData, error: optimizedError } = await supabase
+      const { data: optimizedData, error: optimizedError } = await supabaseAdmin
         .from("seo_pages")
         .select("*")
         .in("slug", candidates)
@@ -188,7 +188,7 @@ export function useSeoPageContent(slug: string | undefined) {
       }
 
       // Fallback: Get any page with content (even if not marked optimized)
-      const { data: anyData, error: anyError } = await supabase
+      const { data: anyData, error: anyError } = await supabaseAdmin
         .from("seo_pages")
         .select("*")
         .in("slug", candidates)
@@ -217,7 +217,7 @@ export function useSeoPageContent(slug: string | undefined) {
       // CRITICAL: Third fallback - get page with meta_title/meta_description
       // even if it has no body content. This ensures meta tags from the
       // Meta Optimizer tab are always used on the live site.
-      const { data: metaOnlyData, error: metaOnlyError } = await supabase
+      const { data: metaOnlyData, error: metaOnlyError } = await supabaseAdmin
         .from("seo_pages")
         .select("*")
         .in("slug", candidates)

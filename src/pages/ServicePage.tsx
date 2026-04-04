@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { SearchBox } from "@/components/SearchBox";
@@ -64,7 +64,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
   const { data: treatment, isLoading: treatmentLoading } = useQuery({
     queryKey: ["treatment", serviceSlug],
     queryFn: async () => {
-      const { data } = await supabase.from("treatments").select("*").eq("slug", serviceSlug).maybeSingle();
+      const { data } = await supabaseAdmin.from("treatments").select("*").eq("slug", serviceSlug).maybeSingle();
       return data;
     },
   });
@@ -72,7 +72,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
   const { data: relatedTreatments } = useQuery({
     queryKey: ["related-treatments", serviceSlug],
     queryFn: async () => {
-      const { data } = await supabase.from("treatments").select("*").eq("is_active", true).neq("slug", serviceSlug).order("display_order").limit(6);
+      const { data } = await supabaseAdmin.from("treatments").select("*").eq("is_active", true).neq("slug", serviceSlug).order("display_order").limit(6);
       return data || [];
     },
   });

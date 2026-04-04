@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseAdmin } from '@/integrations/supabase/client';
 
 export interface Profile {
   id: string;
@@ -39,7 +39,7 @@ export function useProfiles(filters: ProfileFilters = {}) {
 
       // If we have a city filter, get clinic IDs in that city first
       if (filters.cityId) {
-        const { data: cityClinics } = await supabase
+        const { data: cityClinics } = await supabaseAdmin
           .from('clinics')
           .select('id')
           .eq('city_id', filters.cityId)
@@ -56,7 +56,7 @@ export function useProfiles(filters: ProfileFilters = {}) {
       // FALLBACK: If no clinics in this city have explicit treatment records,
       // show ALL city clinics (most general dentists offer common services)
       if (filters.treatmentId) {
-        let treatmentQuery = supabase
+        let treatmentQuery = supabaseAdmin
           .from("clinic_treatments")
           .select("clinic_id, clinic:clinics!inner(id, city_id, is_active)")
           .eq("treatment_id", filters.treatmentId);
@@ -85,7 +85,7 @@ export function useProfiles(filters: ProfileFilters = {}) {
             // Treatment exists but no city clinics offer it — still fall back to city clinics
             // Re-fetch city clinics without treatment filter
             if (filters.cityId) {
-              const { data: fallbackClinics } = await supabase
+              const { data: fallbackClinics } = await supabaseAdmin
                 .from('clinics')
                 .select('id')
                 .eq('city_id', filters.cityId)
@@ -101,7 +101,7 @@ export function useProfiles(filters: ProfileFilters = {}) {
       const clinicIdArray = eligibleClinicIds ? [...eligibleClinicIds] : null;
 
       // Fetch dentists with their clinics
-      let dentistQuery = supabase
+      let dentistQuery = supabaseAdmin
         .from('dentists')
         .select(`
           *,
@@ -169,7 +169,7 @@ export function useProfiles(filters: ProfileFilters = {}) {
       }
 
       // Fetch clinics (those without dentists already added)
-      let clinicQuery = supabase
+      let clinicQuery = supabaseAdmin
         .from('clinics')
         .select(`
           *,
@@ -245,8 +245,8 @@ export function useTopDentistsPerLocation(limit: number = 8, initialData?: Profi
     queryFn: async () => {
       // Fetch all data IN PARALLEL
       const [statesRes, citiesRes] = await Promise.all([
-        supabase.from('states').select('id').eq('is_active', true),
-        supabase.from('cities').select('id, state_id').eq('is_active', true),
+        supabaseAdmin.from('states').select('id').eq('is_active', true),
+        supabaseAdmin.from('cities').select('id, state_id').eq('is_active', true),
       ]);
 
       const activeStateIds = (statesRes.data || []).map(s => s.id);
@@ -258,7 +258,7 @@ export function useTopDentistsPerLocation(limit: number = 8, initialData?: Profi
       if (activeCityIds.length === 0) return [];
 
       // Fetch clinics in parallel with other data
-      const { data: clinics } = await supabase
+      const { data: clinics } = await supabaseAdmin
         .from('clinics')
         .select(`
           id, name, slug, cover_image_url, rating, review_count,

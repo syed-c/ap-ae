@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { SearchBox } from "@/components/SearchBox";
@@ -81,7 +81,7 @@ const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, sta
   const { data: treatment, isLoading: treatmentLoading, isFetching: treatmentFetching } = useQuery({
     queryKey: ["treatment", service],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await supabaseAdmin
         .from("treatments")
         .select("*")
         .eq("slug", service)
@@ -103,7 +103,7 @@ const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, sta
   const { data: relatedServices, isLoading: relatedServicesLoading } = useQuery({
     queryKey: ["related-services", service],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await supabaseAdmin
         .from("treatments")
         .select("*")
         .eq("is_active", true)
