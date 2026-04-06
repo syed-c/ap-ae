@@ -2,9 +2,10 @@ import Link from "next/link";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { SEOHead } from "@/components/seo/SEOHead";
+import { StructuredData } from "@/components/seo/StructuredData";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useSeoPageContent } from "@/hooks/useSeoPageContent";
-import { Shield, ArrowRight, Lock, Eye, Database } from "lucide-react";
+import { Shield, ArrowRight, Lock, Eye, Database, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const PrivacyPage = () => {
@@ -48,85 +49,129 @@ We also automatically collect certain information when you use our platform, inc
 • Comply with legal obligations`
     },
     {
-      title: "3. Information Sharing",
+      title: "3. Information Sharing & Data Recipients",
       content: `We do not sell your personal information. We may share your information in the following circumstances:
 
-• With dental clinics when you request an appointment
-• With service providers who assist in our operations
-• To comply with legal obligations
-• To protect our rights and prevent fraud
-• With your consent or at your direction
+• WITH CLINIC PARTNERS: When you request an appointment, your contact details (name, phone, email) are shared with the dental clinic to facilitate your booking.
 
-When you submit an appointment request, your contact information will be shared with the relevant clinic to facilitate the booking.`
+• WITH SERVICE PROVIDERS: We work with third-party vendors who assist in our operations (hosting, analytics, customer support).
+
+• LEGAL COMPLIANCE: To comply with UAE PDPL, DHA, DOH, and MOHAP regulations.
+
+• PROTECTION: To protect our rights and prevent fraud.
+
+• WITH YOUR CONSENT: At your direction or with explicit permission.
+
+Your data is shared ONLY with clinics you explicitly request appointments with.`
     },
     {
       icon: Lock,
       title: "4. Data Security",
       content: `We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. These measures include:
 
-• Encryption of data in transit and at rest
-• Regular security assessments
-• Access controls and authentication
-• Secure data storage practices
+• Encryption of data in transit (TLS 1.3) and at rest (AES-256)
+• Regular security assessments and penetration testing
+• Role-based access controls and authentication
+• UAE-based data centers with compliance certifications
+• Incident response and breach notification procedures
 
 However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.`
     },
     {
       title: "5. Your Rights Under UAE PDPL",
-      content: `Under the UAE Personal Data Protection Law (Federal Decree-Law No. 45/2021), you have the following rights regarding your personal information:
+      content: `Under the UAE Federal Decree-Law No. 45/2021 (Personal Data Protection Law - PDPL), you have the following rights regarding your personal information:
 
-• Access: Request a copy of the personal data we hold about you
-• Correction: Request correction of inaccurate or incomplete data
-• Deletion: Request deletion of your personal data (subject to legal retention requirements)
-• Objection: Object to processing of your personal data
-• Portability: Request transfer of your data in a machine-readable format
-• Withdrawal: Withdraw consent at any time without affecting prior lawful processing
-• Restriction: Request restriction of data processing in certain circumstances
+• RIGHT TO ACCESS: Request a copy of the personal data we hold about you
+• RIGHT TO RECTIFICATION: Request correction of inaccurate or incomplete data
+• RIGHT TO ERASURE: Request deletion of your personal data (subject to legal retention requirements)
+• RIGHT TO OBJECT: Object to processing of your personal data
+• RIGHT TO DATA PORTABILITY: Request transfer of your data in a machine-readable format
+• RIGHT TO WITHDRAW CONSENT: Withdraw consent at any time without affecting prior lawful processing
+• RIGHT TO RESTRICTION: Request restriction of data processing in certain circumstances
 
-To exercise these rights, please contact our Data Protection team at ${supportEmail}. We will respond within 30 days as required by UAE law.`
+To exercise these rights, please contact our Data Protection team. We will respond within 30 days as required by UAE law.`
     },
     {
-      title: "6. Cookies",
-      content: `We use cookies and similar tracking technologies to collect and track information about your use of our platform. You can control cookies through your browser settings. For more information, please see our Cookie Policy.`
+      title: "6. Data Retention",
+      content: `We retain your personal information only as long as necessary to fulfill the purposes outlined in this policy:
+
+• Account data: Retained while your account is active + 3 years after closure
+• Appointment records: Retained for 5 years for regulatory compliance
+• Marketing preferences: Retained until you withdraw consent
+• Technical logs: Retained for 12 months for security purposes
+
+After this period, your data is securely deleted or anonymized.`
     },
     {
-      title: "7. Third-Party Links",
-      content: `Our platform may contain links to third-party websites or services. We are not responsible for the privacy practices of these third parties. We encourage you to read their privacy policies before providing any personal information.`
+      title: "7. Cookies & Tracking Technologies",
+      content: `We use cookies and similar tracking technologies to:
+
+• Keep you logged in securely
+• Remember your preferences
+• Analyze platform usage and performance
+• Improve our services
+
+You can control cookies through your browser settings. For more information, please see our Cookie Policy.`
     },
     {
-      title: "8. Children's Privacy",
+      title: "8. Third-Party Services",
+      content: `Our platform may contain links to third-party websites or services. We are not responsible for the privacy practices of these third parties. We encourage you to read their privacy policies before providing any personal information.
+
+We use the following categories of third-party service providers:
+
+• Cloud hosting (UAE-based)
+• Analytics services
+• Email and notification services
+• Payment processors (if applicable)`
+    },
+    {
+      title: "9. Children's Privacy",
       content: `Our services are not directed to children under 18 without parental consent, in accordance with UAE child protection regulations. We do not knowingly collect personal information from minors. If you believe we have collected information from a child without proper consent, please contact us immediately.`
     },
     {
-      title: "9. Changes to This Policy",
-      content: `We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on this page and updating the "Last Updated" date. We encourage you to review this policy periodically.`
+      title: "10. Changes to This Policy",
+      content: `We may update this Privacy Policy from time to time. We will notify you of any material changes by:
+
+• Posting the new policy on this page
+• Updating the "Last Updated" date
+• Sending an email notification for significant changes
+
+We encourage you to review this policy periodically. Your continued use of our platform constitutes acceptance of any updates.`
     },
     {
-      title: "10. UAE Regulatory Compliance",
-      content: `This policy is governed by:
+      title: "11. UAE Regulatory Compliance",
+      content: `This policy is governed by and complies with:
 
 • UAE Federal Decree-Law No. 45 of 2021 (Personal Data Protection Law / PDPL)
 • Dubai Health Authority (DHA) data handling guidelines
-• Department of Health Abu Dhabi (DoH) patient data regulations
+• Department of Health Abu Dhabi (DOH) patient data regulations
 • MOHAP health information privacy standards
+• TRA (Telecommunications Regulatory Authority) guidelines
 
 Data processed through our platform is stored within UAE-compliant infrastructure.`
     },
     {
-      title: "11. Contact Us",
-      content: `If you have any questions about this Privacy Policy or wish to exercise your data rights under UAE law, please contact us at:
+      title: "12. Data Protection Officer (DPO) Contact",
+      content: `For all privacy-related inquiries, data subject rights requests, or concerns:
 
-AppointPanda
+AppointPanda - Data Protection Team
 Dubai, United Arab Emirates
-Email: ${supportEmail}
-Data Protection Inquiries: privacy@AppointPanda.ae`
+
+Email: dpo@AppointPanda.ae
+General Inquiries: privacy@AppointPanda.ae
+Support: support@AppointPanda.ae
+
+For urgent data breaches, contact: breach@AppointPanda.ae
+
+We are committed to resolving your concerns within 30 days of receipt, as required by UAE PDPL.`
     }
   ];
 
   const highlights = [
-    { icon: Shield, title: "Data Protection", description: "Your data is encrypted and secure" },
+    { icon: Shield, title: "PDPL Compliant", description: "UAE Federal Decree-Law No. 45/2021" },
     { icon: Eye, title: "Transparency", description: "Clear about how we use data" },
     { icon: Lock, title: "Your Control", description: "Exercise your data rights anytime" },
+    { icon: Mail, title: "DPO Contact", description: "dpo@AppointPanda.ae" },
   ];
 
   return (
@@ -135,7 +180,12 @@ Data Protection Inquiries: privacy@AppointPanda.ae`
         title={seoContent?.meta_title || "Privacy Policy | AppointPanda Data Protection"}
         description={seoContent?.meta_description || "Learn how AppointPanda collects, uses, and protects your personal information. Read our comprehensive privacy policy for patients and dental professionals."}
         canonical="/privacy/"
-        keywords={['privacy policy', 'data protection', 'dental privacy', 'AppointPanda privacy']}
+        keywords={['privacy policy', 'data protection', 'dental privacy', 'AppointPanda privacy', 'UAE PDPL']}
+      />
+
+      {/* Privacy Policy Schema */}
+      <StructuredData 
+        type="organization"
       />
 
       {/* Dark Hero Section */}
@@ -160,7 +210,7 @@ Data Protection Inquiries: privacy@AppointPanda.ae`
               Your privacy is important to us. This policy explains how we collect, use, and protect your personal information.
             </p>
 
-            <div className="grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
               {highlights.map((item, i) => (
                 <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/10">
                   <item.icon className="h-6 w-6 text-primary mx-auto mb-2" />

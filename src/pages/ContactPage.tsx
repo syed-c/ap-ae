@@ -29,7 +29,9 @@ import {
   ArrowRight,
   CheckCircle,
   User,
-  Stethoscope
+  Stethoscope,
+  AlertTriangle,
+  MessageCircle
 } from "lucide-react";
 
 const contactSchema = z.object({
@@ -170,6 +172,55 @@ const ContactPage = () => {
     "Multi-channel assistance",
     "Expert guidance"
   ];
+
+  // Report form state
+  const [reportType, setReportType] = useState<'wrong_info' | 'fake_review' | 'booking_issue' | 'other'>('wrong_info');
+  const [reportData, setReportData] = useState({
+    clinicName: "",
+    issueDescription: "",
+    reporterEmail: ""
+  });
+  const [isReportSubmitting, setIsReportSubmitting] = useState(false);
+  const [reportSubmitted, setReportSubmitted] = useState(false);
+
+  const reportTypes = [
+    { value: 'wrong_info', label: 'Incorrect clinic information', description: 'Wrong address, phone, or hours' },
+    { value: 'fake_review', label: 'Suspicious review', description: 'Fake or misleading review' },
+    { value: 'booking_issue', label: 'Booking problem', description: 'Issue with appointment booking' },
+    { value: 'other', label: 'Other issue', description: 'Something else' }
+  ];
+
+  const handleReportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reportData.clinicName || !reportData.issueDescription) return;
+
+    setIsReportSubmitting(true);
+    try {
+      const { error } = await supabase.from("leads").insert({
+        patient_name: reportData.reporterEmail || "Anonymous",
+        patient_email: reportData.reporterEmail || "anonymous@appointpanda.ae",
+        patient_phone: "N/A",
+        message: `[REPORT: ${reportType}]\nClinic: ${reportData.clinicName}\nIssue: ${reportData.issueDescription}`,
+        source: "contact-form-report",
+        status: "new",
+      });
+
+      if (error) throw error;
+      setReportSubmitted(true);
+    } catch (error) {
+      toast({
+        title: "Failed to submit report",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsReportSubmitting(false);
+    }
+  };
+
+  // WhatsApp link - critical for UAE
+  const whatsappNumber = "+971501234567"; // Replace with actual number
+  const whatsappLink = `https://wa.me/${whatsappNumber.replace(/\+/g, '')}`;
 
   return (
     <PageLayout>
@@ -466,9 +517,26 @@ const ContactPage = () => {
                   <div>
                     <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Business Hours</p>
                     <p className="font-bold">Sun - Thu: 9AM - 6PM GST</p>
-                    <p className="text-sm text-muted-foreground mt-1">Weekend support available</p>
+                    <p className="text-sm text-muted-foreground mt-1">We reply within 24 hours</p>
                   </div>
                 </div>
+
+                {/* WhatsApp - Critical for UAE */}
+                <a
+                  href={whatsappLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-4 p-4 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 transition-colors group"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-[#25D366] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                    <MessageCircle className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">WhatsApp</p>
+                    <p className="font-bold text-[#25D366]">Chat with us</p>
+                    <p className="text-sm text-muted-foreground">Fast response on WhatsApp</p>
+                  </div>
+                </a>
               </div>
             </div>
 
@@ -496,6 +564,99 @@ const ContactPage = () => {
                 </Link>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Report Incorrect Information Section */}
+        <div className="mt-12">
+          <div className="card-modern p-5 md:p-8 shadow-elevated border-amber-200/50 bg-amber-50/30">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-amber-600" />
+              </div>
+              <div>
+                <h2 className="font-display text-xl md:text-2xl font-bold">
+                  Report Incorrect Clinic Information
+                </h2>
+                <p className="text-muted-foreground text-sm">
+                  Help us maintain accurate listings - report wrong info
+                </p>
+              </div>
+            </div>
+
+            {reportSubmitted ? (
+              <div className="text-center py-8">
+                <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                <h3 className="font-bold text-xl mb-2">Report Submitted!</h3>
+                <p className="text-muted-foreground">Thank you for helping us improve. We'll investigate and take action.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleReportSubmit} className="space-y-5">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="clinicName" className="font-bold text-sm">Clinic/Doctor Name *</Label>
+                    <Input
+                      id="clinicName"
+                      placeholder="Enter clinic name"
+                      value={reportData.clinicName}
+                      onChange={(e) => setReportData(prev => ({ ...prev, clinicName: e.target.value }))}
+                      className="mt-2 h-11 md:h-12 rounded-xl bg-muted/50 border-border/50 focus:border-primary"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="reporterEmail" className="font-bold text-sm">Your Email (optional)</Label>
+                    <Input
+                      id="reporterEmail"
+                      type="email"
+                      placeholder="For follow-up"
+                      value={reportData.reporterEmail}
+                      onChange={(e) => setReportData(prev => ({ ...prev, reporterEmail: e.target.value }))}
+                      className="mt-2 h-11 md:h-12 rounded-xl bg-muted/50 border-border/50 focus:border-primary"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="font-bold text-sm">Issue Type *</Label>
+                  <div className="grid sm:grid-cols-2 gap-3 mt-2">
+                    {reportTypes.map((type) => (
+                      <button
+                        key={type.value}
+                        type="button"
+                        onClick={() => setReportType(type.value as any)}
+                        className={`p-3 rounded-xl border text-left transition-all ${reportType === type.value
+                            ? 'border-amber-500 bg-amber-50'
+                            : 'border-border hover:bg-muted/50'
+                          }`}
+                      >
+                        <p className="font-semibold text-sm">{type.label}</p>
+                        <p className="text-xs text-muted-foreground">{type.description}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="issueDescription" className="font-bold text-sm">Describe the Issue *</Label>
+                  <Textarea
+                    id="issueDescription"
+                    placeholder="Please describe what's wrong (wrong address, outdated phone, etc.)"
+                    value={reportData.issueDescription}
+                    onChange={(e) => setReportData(prev => ({ ...prev, issueDescription: e.target.value }))}
+                    className="mt-2 rounded-xl min-h-[100px] bg-muted/50 border-border/50 focus:border-primary"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isReportSubmitting || !reportData.clinicName || !reportData.issueDescription}
+                  className="w-full rounded-2xl font-bold h-12 bg-amber-600 hover:bg-amber-700"
+                >
+                  {isReportSubmitting ? "Submitting..." : "Submit Report"}
+                  <AlertTriangle className="ml-2 h-5 w-5" />
+                </Button>
+              </form>
+            )}
           </div>
         </div>
       </Section>

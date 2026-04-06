@@ -3,6 +3,7 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/seo/SEOHead";
+import { StructuredData } from "@/components/seo/StructuredData";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useSeoPageContent } from "@/hooks/useSeoPageContent";
 import { useRealCounts } from "@/hooks/useRealCounts";
@@ -113,6 +114,8 @@ const FAQPage = () => {
     }
   ];
 
+  const allFaqs = categories.flatMap(cat => cat.faqs.map(f => ({ question: f.q, answer: f.a })));
+
   return (
     <PageLayout>
       <SEOHead
@@ -120,6 +123,13 @@ const FAQPage = () => {
         description={seoContent?.meta_description || "Find answers about DHA-licensed dentists, dental costs in AED, UAE insurance coverage, and booking appointments in Dubai, Abu Dhabi & Sharjah."}
         canonical="/faq/"
         keywords={['dental FAQ UAE', 'dentist dubai questions', 'DHA licensed dentist', 'dental cost AED', 'UAE dental insurance']}
+      />
+
+      {/* FAQ Schema for SEO */}
+      <StructuredData 
+        type="faq" 
+        questions={allFaqs}
+        includeSpeakable={true}
       />
 
       {/* Dark Hero Section */}

@@ -44,7 +44,8 @@ import {
   AlertTriangle,
   RefreshCw,
   Sparkles,
-  Percent
+  Percent,
+  MessageCircle
 } from "lucide-react";
 import { AIMatchBadge } from "@/components/ai";
 import { TrustSignalStrip, AEDPricingDisplay } from "@/components/healthcare";
@@ -557,6 +558,27 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
                 <Calendar className="h-4 w-4 mr-2" />
                 Book Appointment
               </Button>
+              {/* WhatsApp Button - Critical for UAE */}
+              {clinic?.phone && (
+                <a
+                  href={`https://wa.me/${clinic.phone.replace(/[^\d]/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#25D366] hover:bg-[#20BD5A] text-white rounded-xl font-bold transition-colors"
+                  onClick={() => {
+                    if (typeof window !== 'undefined' && (window as any).gtag) {
+                      (window as any).gtag('event', 'whatsapp_click', {
+                        clinic_name: clinic.name,
+                        clinic_id: clinic.id,
+                        conversion_type: 'whatsapp_booking'
+                      });
+                    }
+                  }}
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  WhatsApp
+                </a>
+              )}
               <div className="flex gap-2">
                 <Button variant="outline" size="icon" className="rounded-xl flex-1">
                   <Share2 className="h-4 w-4" />
@@ -896,14 +918,37 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
 
         {/* Mobile Sticky Book Button */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t border-border z-40">
-          <Button
-            className="w-full rounded-xl font-bold h-12 text-base"
-            size="lg"
-            onClick={() => handleBookClick()}
-          >
-            <Calendar className="h-5 w-5 mr-2" />
-            Book Appointment
-          </Button>
+          <div className="flex gap-3">
+            {/* WhatsApp Button - Critical for UAE */}
+            {clinic?.phone && (
+              <a
+                href={`https://wa.me/${clinic.phone.replace(/[^\d]/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-[#25D366] hover:bg-[#20BD5A] text-white rounded-xl font-bold flex-1 transition-colors"
+                onClick={() => {
+                  if (typeof window !== 'undefined' && (window as any).gtag) {
+                    (window as any).gtag('event', 'whatsapp_click', {
+                      clinic_name: clinic.name,
+                      clinic_id: clinic.id,
+                      conversion_type: 'whatsapp_booking_mobile'
+                    });
+                  }
+                }}
+              >
+                <MessageCircle className="h-5 w-5" />
+                WhatsApp
+              </a>
+            )}
+            <Button
+              className="flex-1 rounded-xl font-bold h-12 text-base"
+              size="lg"
+              onClick={() => handleBookClick()}
+            >
+              <Calendar className="h-5 w-5 mr-2" />
+              Book Now
+            </Button>
+          </div>
         </div>
       </Section>
 
