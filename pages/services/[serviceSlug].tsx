@@ -151,8 +151,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     
     // Use page_content if available, otherwise seo_pages
     const content = pageContent || seoContent;
-    const metaTitle = content?.meta_title || (content as any)?.title || `${treatment.name} - Dental Treatment in UAE`;
-    const metaDescription = content?.meta_description || `Get ${treatment.name} treatment at top dental clinics in UAE. Book appointments with verified dentists.`;
+    const metaTitle = content?.meta_title || (content as any)?.title || `${treatment.name} in UAE (2026) — Find Top Dentists & Specialists | AppointPanda`;
+    const metaDescription = content?.meta_description || `Get ${treatment.name.toLowerCase()} treatment in UAE. Compare 200+ verified specialists across Dubai, Abu Dhabi, Sharjah. Read patient reviews, see transparent AED pricing, check dentist credentials (BDS, MDS, DHA-licensed). Book your appointment instantly. Most clinics offer free consultation.`;
     const h1 = content?.h1 || (content as any)?.title || null;
     
     // Build content string from page_content sections

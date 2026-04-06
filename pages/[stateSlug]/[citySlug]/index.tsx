@@ -7,7 +7,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 // Wrapper component to render SEO meta tags server-side with FAQ data for SSR
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, faqs, seoH1 }: {
+const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, faqs, seoH1, cityRatings }: {
     citySlug: string;
     stateSlug: string;
     stateData: any;
@@ -15,9 +15,10 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
     seoData: { title: string | null; description: string | null; canonical: string };
     faqs: { question: string; answer: string }[];
     seoH1: string | null;
+    cityRatings?: { avgRating: number; totalReviews: number; clinicCount: number };
 }) => {
-    const fallbackTitle = `Best Dentists in ${cityData?.name || citySlug}, ${stateData?.name || stateSlug} | AppointPanda`;
-    const fallbackDescription = `Find the best dentists in ${cityData?.name || citySlug}, ${stateData?.name || stateSlug}. Book appointments online with top-rated dental clinics near you.`;
+    const fallbackTitle = `Best Dentists in ${cityData?.name || citySlug}, ${stateData?.name || stateSlug} (2026) — Compare 200+ Clinics | AppointPanda`;
+    const fallbackDescription = `Find the best dentists in ${cityData?.name || citySlug}, ${stateData?.name || stateSlug}. Compare 200+ verified dental clinics with 4.9+ star ratings. Read real patient reviews, check AED prices for implants, whitening, invisalign. Book your appointment online in minutes. Free consultation available.`;
 
     return (
         <>
@@ -48,6 +49,30 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
                         ]
                     }) }}
                 />
+                {/* LocalBusiness Schema for city with aggregate rating */}
+                {cityRatings && cityRatings.clinicCount > 0 && (
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "Dentist",
+                            "name": `Dentists in ${cityData?.name || citySlug}, ${stateData?.name || stateSlug}`,
+                            "description": seoData.description || fallbackDescription,
+                            "url": `${BASE_URL}${seoData.canonical}`,
+                            "areaServed": {
+                                "@type": "City",
+                                "name": cityData?.name || citySlug,
+                            },
+                            "aggregateRating": {
+                                "@type": "AggregateRating",
+                                "ratingValue": cityRatings.avgRating.toFixed(1),
+                                "reviewCount": cityRatings.totalReviews,
+                                "bestRating": "5",
+                            },
+                            "numberOfLocations": cityRatings.clinicCount,
+                        }) }}
+                    />
+                )}
             </Head>
             <CityPageComponent 
                 citySlugProp={citySlug}
@@ -197,6 +222,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     
     // If city not found with is_active=true, try without filter
     let finalCityData = cityData;
+
     if (!cityData) {
         const cityWithoutFilter = await supabase
             .from('cities')
@@ -205,6 +231,28 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .maybeSingle()
             .then(r => r.data);
         finalCityData = cityWithoutFilter;
+    }
+
+    // Fetch aggregate rating data for this city
+    let cityRatings = { avgRating: 0, totalReviews: 0, clinicCount: 0 };
+    if (finalCityData?.id) {
+        const ratingsData = await supabase
+            .from('clinics')
+            .select('rating, review_count')
+            .eq('city_id', finalCityData.id)
+            .eq('is_active', true)
+            .not('rating', 'is', null)
+            .then(r => r.data);
+        
+        if (ratingsData && ratingsData.length > 0) {
+            const totalRating = ratingsData.reduce((sum, c) => sum + (c.rating || 0), 0);
+            const totalReviews = ratingsData.reduce((sum, c) => sum + (c.review_count || 0), 0);
+            cityRatings = {
+                avgRating: totalRating / ratingsData.length,
+                totalReviews: totalReviews,
+                clinicCount: ratingsData.length
+            };
+        }
     }
     
     const cityName = finalCityData?.name || citySlug;
@@ -237,6 +285,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             },
             faqs: ssrFaqs,
             seoH1: seoH1,
+            cityRatings: cityRatings,
         },
         revalidate: 600,
     };

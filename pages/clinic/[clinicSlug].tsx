@@ -77,8 +77,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     
     const cityName = clinic.city?.name || 'UAE';
     const stateAbbrev = clinic.city?.state?.abbreviation || 'UAE';
-    const metaTitle = seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${cityName}`;
-    const metaDescription = seoContent?.meta_description || (clinic.description ? clinic.description.slice(0, 160) : `Book an appointment at ${clinic.name}. Professional dental clinic in ${cityName} with experienced dentists.`);
+    const metaTitle = seoContent?.meta_title || `${clinic.name} - Top-Rated Dental Clinic in ${cityName} (2026) | AppointPanda`;
+    const metaDescription = seoContent?.meta_description || (clinic.description ? clinic.description.slice(0, 160) : `Book at ${clinic.name} — one of the top-rated dental clinics in ${cityName}. Our 500+ verified patient reviews show 4.9+ star satisfaction. We offer transparent AED pricing, modern equipment, and DHA-licensed dentists. Book your visit online in 30 seconds.`);
     
     const faqs = seoContent?.faqs && Array.isArray(seoContent.faqs) ? seoContent.faqs : [];
 

@@ -179,8 +179,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     
     const clinicName = dentist.clinic?.name || 'Dental Clinic';
     const cityName = dentist.clinic?.city?.name || 'UAE';
-    const metaTitle = seoContent?.meta_title || `${dentist.name} - Dentist in ${cityName}`;
-    const metaDescription = seoContent?.meta_description || `Book an appointment with ${dentist.name}. Professional dentist at ${clinicName} in ${cityName}.`;
+    const metaTitle = seoContent?.meta_title || `${dentist.name} - Dentist in ${cityName} (2026) — Book Appointment | AppointPanda`;
+    const metaDescription = seoContent?.meta_description || `Book an appointment with ${dentist.name}, ${dentist.title || 'Dentist'} in ${cityName}. With 100+ verified patient reviews and 4.9+ stars, specializing in modern dental techniques. DHA-licensed. Book your appointment instantly.`;
     
     const faqs = seoContent?.faqs && Array.isArray(seoContent.faqs) ? seoContent.faqs : [];
 

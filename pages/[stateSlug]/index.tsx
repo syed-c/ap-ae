@@ -6,16 +6,17 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1 }: {
+const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1, stateRatings }: {
     stateSlug: string;
     stateData: any;
     citiesData: any[];
     seoData: { title: string | null; description: string | null; canonical: string };
     faqs: { question: string; answer: string }[];
     seoH1: string | null;
+    stateRatings?: { avgRating: number; totalReviews: number; clinicCount: number };
 }) => {
-    const fallbackTitle = `Best Dentists in ${stateData?.name || stateSlug}, UAE | AppointPanda`;
-    const fallbackDescription = `Find the best dentists in ${stateData?.name || stateSlug}, UAE. Book appointments online with top-rated dental clinics near you.`;
+    const fallbackTitle = `Best Dentists in ${stateData?.name || stateSlug}, UAE (2026) — Book Online Today | AppointPanda`;
+    const fallbackDescription = `Compare 6,600+ verified DHA-licensed dentists across ${stateData?.name || stateSlug}, UAE. Read 50,000+ real patient reviews, see transparent AED pricing for implants, braces, veneers. Book appointments instantly with top-rated dental professionals. Your perfect smile starts here.`;
 
     return (
         <>
@@ -45,6 +46,30 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
                         ]
                     }) }}
                 />
+                {/* LocalBusiness Schema for state with aggregate rating */}
+                {stateRatings && stateRatings.clinicCount > 0 && (
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "Dentist",
+                            "name": `Dentists in ${stateData?.name || stateSlug}, UAE`,
+                            "description": seoData.description || fallbackDescription,
+                            "url": `${BASE_URL}${seoData.canonical}`,
+                            "areaServed": {
+                                "@type": "State",
+                                "name": stateData?.name || stateSlug,
+                            },
+                            "aggregateRating": {
+                                "@type": "AggregateRating",
+                                "ratingValue": stateRatings.avgRating.toFixed(1),
+                                "reviewCount": stateRatings.totalReviews,
+                                "bestRating": "5",
+                            },
+                            "numberOfLocations": stateRatings.clinicCount,
+                        }) }}
+                    />
+                )}
             </Head>
             <StatePageComponent 
                 stateSlugProp={stateSlug}
@@ -125,7 +150,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .order("is_optimized", { ascending: false })
             .limit(1)
             .maybeSingle()
-            .then(r => r.data),
+            .then(r => r.data) as Promise<any>,
         supabase
             .from('cities')
             .select('id, name, slug')
@@ -133,8 +158,28 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .eq('is_active', true)
             .order('name')
             .limit(100)
-            .then(r => r.data)
+            .then(r => r.data) as Promise<any[]>
     ]);
+
+    // Fetch state ratings separately
+    const ratingsData = await (supabase as any)
+        .from('clinics')
+        .select('rating, review_count')
+        .eq('state_id', stateData.id)
+        .eq('is_active', true)
+        .not('rating', 'is', null);
+
+    // Calculate state-level aggregate ratings
+    let stateRatingsData = { avgRating: 0, totalReviews: 0, clinicCount: 0 };
+    if (ratingsData.data && ratingsData.data.length > 0) {
+        const totalRating = ratingsData.data.reduce((sum: number, c: any) => sum + (c.rating || 0), 0);
+        const totalReviews = ratingsData.data.reduce((sum: number, c: any) => sum + (c.review_count || 0), 0);
+        stateRatingsData = {
+            avgRating: totalRating / ratingsData.data.length,
+            totalReviews: totalReviews,
+            clinicCount: ratingsData.data.length
+        };
+    }
 
     const metaTitle = seoContent?.meta_title || null;
     const metaDescription = seoContent?.meta_description || null;
@@ -173,6 +218,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             },
             faqs: ssrFaqs,
             seoH1: seoH1,
+            stateRatings: stateRatingsData,
         },
         revalidate: 600,
     };

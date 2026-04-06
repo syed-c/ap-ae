@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { generateSingle, generateBatch, generateServices, generateServiceLocations } from "@/hooks/usePageContentGenerator";
-import { FileText, Play, Square, Loader2, Check, X, AlertCircle, Layers } from "lucide-react";
+import BulkMetaUpdateSection from "./BulkMetaUpdateSection";
+import { FileText, Play, Square, Loader2, Check, X, AlertCircle, Layers, RefreshCw, Settings } from "lucide-react";
 import { toast } from "sonner";
 
 interface State {
@@ -626,6 +627,23 @@ export default function PageContentGeneratorTab() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Section 5: Bulk Meta Update */}
+      <div className="bg-white rounded-lg border p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <RefreshCw className="w-5 h-5" />
+              Bulk Meta Title & Description Update
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Update meta titles and descriptions for all page types in bulk using smart templates
+            </p>
+          </div>
+        </div>
+
+        <BulkMetaUpdateSection />
       </div>
     </div>
   );
