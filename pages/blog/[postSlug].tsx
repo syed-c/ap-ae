@@ -151,6 +151,13 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .eq('is_active', true)
             .maybeSingle()
             .then(r => r.data);
+        
+        // Merge author data into postData for the component
+        if (authorData) {
+            (postData as any).author_name = authorData.name;
+            (postData as any).author_bio = authorData.bio;
+            (postData as any).author_avatar_url = authorData.avatar_url;
+        }
     }
 
     return { 

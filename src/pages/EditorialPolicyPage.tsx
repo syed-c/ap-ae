@@ -3,6 +3,7 @@ import { Section } from "@/components/layout/Section";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Shield, FileCheck, Users, AlertTriangle, RefreshCw, BookOpen } from "lucide-react";
+import Head from "next/head";
 
 const EditorialPolicyPage = () => {
   const breadcrumbs = [
@@ -17,6 +18,30 @@ const EditorialPolicyPage = () => {
         description="Learn about AppointPanda's editorial standards, fact-checking process, and commitment to accurate, evidence-based dental health information for UAE patients."
         canonical="/editorial-policy/"
       />
+      
+      {/* Trust signal schema */}
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Editorial Policy",
+            "description": "How AppointPanda ensures accurate, evidence-based dental health content through licensed dentist review, regular updates, and transparent corrections process.",
+            "url": "https://www.appointpanda.ae/editorial-policy/",
+            "mainEntity": {
+              "@type": "Organization",
+              "name": "AppointPanda",
+              "url": "https://www.appointpanda.ae"
+            },
+            "about": {
+              "@type": "Thing",
+              "name": "Medical Editorial Process",
+              "description": "Multi-step content review process including research, fact-checking, dental professional review, and editorial approval."
+            }
+          }) }}
+        />
+      </Head>
 
       <section className="bg-gradient-to-b from-background via-primary/5 to-background pt-6 pb-12">
         <div className="container">

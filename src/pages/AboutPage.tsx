@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Head from "next/head";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { SectionHeader } from "@/components/layout/SectionHeader";
@@ -55,6 +56,42 @@ const AboutPage = () => {
         canonical="/about/"
         keywords={['about AppointPanda', 'dental directory', 'find dentist', 'dental care platform']}
       />
+      
+      {/* AboutPage Schema for E-E-A-T */}
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "AboutPage",
+            "name": "About AppointPanda",
+            "description": "Learn about AppointPanda, the UAE's trusted platform connecting patients with verified dental professionals across all Emirates.",
+            "url": "https://www.appointpanda.ae/about/",
+            "mainEntity": {
+              "@type": "Organization",
+              "name": "AppointPanda",
+              "url": "https://www.appointpanda.ae",
+              "description": "The UAE's trusted platform connecting patients with verified dental professionals.",
+              " foundingDate": "2024",
+              "areaServed": {
+                "@type": "Country",
+                "name": "United Arab Emirates"
+              },
+              "serviceType": "Dental Directory",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "Customer Service",
+                "email": "hello@appointpanda.ae"
+              },
+              "sameAs": [
+                "https://www.facebook.com/appointpanda/",
+                "https://www.instagram.com/appointpanda/",
+                "https://www.linkedin.com/company/appointpanda/"
+              ]
+            }
+          }) }}
+        />
+      </Head>
 
       {/* Dark Hero Section */}
       <section className="relative bg-dark-section text-dark-section-foreground overflow-hidden">

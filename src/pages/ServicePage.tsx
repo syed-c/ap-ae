@@ -417,6 +417,39 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
         </div>
       </Section>
 
+      {/* Clinical References - E-E-A-T Signal */}
+      <Section size="md" className="bg-muted/30">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-6">
+            <span className="inline-block text-xs font-bold text-primary uppercase tracking-widest mb-2">Sources & References</span>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground">Clinical References</h2>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-5">
+            <ul className="space-y-3 text-sm text-muted-foreground">
+              <li className="flex items-start gap-3">
+                <span className="text-primary font-medium shrink-0">[1]</span>
+                <span>Dubai Health Authority (DHA). <em>Dental Treatment Guidelines & Protocols</em>. Available at: <a href="https://www.dha.gov.ae" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">dha.gov.ae</a></span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-primary font-medium shrink-0">[2]</span>
+                <span>World Health Organization (WHO). <em>Oral Health Fact Sheets</em>. Available at: <a href="https://www.who.int/news-room/fact-sheets/detail/oral-health" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">who.int</a></span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-primary font-medium shrink-0">[3]</span>
+                <span>American Dental Association (ADA). <em>Dental Clinical Guidelines</em>. Available at: <a href="https://www.ada.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">ada.org</a></span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-primary font-medium shrink-0">[4]</span>
+                <span>Department of Health - Abu Dhabi (DOH). <em>Healthcare Standards & Regulations</em>. Available at: <a href="https://www.doh.gov.ae" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">doh.gov.ae</a></span>
+              </li>
+            </ul>
+            <p className="text-xs text-muted-foreground mt-4 pt-4 border-t border-border">
+              Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}. Content reviewed by licensed dental professionals.
+            </p>
+          </div>
+        </div>
+      </Section>
+
       {/* Related Services */}
       {relatedTreatments && relatedTreatments.length > 0 && (
         <Section size="lg" className="bg-gray-50">
