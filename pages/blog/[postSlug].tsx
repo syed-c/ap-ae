@@ -5,13 +5,21 @@ import BlogPostPageComponent from '@/pages/BlogPostPage';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const BlogPostPageWithSEO = ({ postSlug, postData, seoData }: {
+const BlogPostPageWithSEO = ({ postSlug, postData, seoData, authorData }: {
     postSlug: string;
     postData: any;
     seoData: { title: string; description: string; canonical: string; ogImage?: string; author?: string; publishedAt?: string | null; modifiedAt?: string | null };
+    authorData?: { name: string; slug: string; bio?: string; credentials?: string; linkedin_url?: string; avatar_url?: string } | null;
 }) => {
     const fullTitle = seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`;
     const imageUrl = seoData.ogImage || `${BASE_URL}/og-image.png`;
+
+    const authorSchema = authorData ? {
+        "@type": "Person",
+        "name": authorData.name,
+        "url": `${BASE_URL}/blog/author/${authorData.slug}/`,
+        ...(authorData.bio && { "description": authorData.bio }),
+    } : undefined;
 
     const articleSchema: Record<string, any> = {
         "@context": "https://schema.org",
@@ -19,9 +27,9 @@ const BlogPostPageWithSEO = ({ postSlug, postData, seoData }: {
         "headline": seoData.title,
         "description": seoData.description,
         "image": imageUrl,
-        "author": {
-            "@type": "Organization",
-            "name": seoData.author || 'AppointPanda',
+        "author": authorSchema || {
+            "@type": "Person",
+            "name": seoData.author || 'AppointPanda Team',
             "url": BASE_URL,
         },
         "publisher": {
@@ -133,6 +141,18 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const canonical = `/blog/${postSlug}/`;
     const ogImage = postData.featured_image_url || null;
 
+    // Fetch author data if author_id exists
+    let authorData = null;
+    if (postData.author_id) {
+        authorData = await supabase
+            .from('blog_authors')
+            .select('name, slug, bio, avatar_url')
+            .eq('id', postData.author_id)
+            .eq('is_active', true)
+            .maybeSingle()
+            .then(r => r.data);
+    }
+
     return { 
         props: {
             postSlug,
@@ -145,8 +165,9 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 author: postData.author_name || 'AppointPanda Team',
                 publishedAt: postData.published_at || null,
                 modifiedAt: postData.updated_at || null,
-            }
+            },
+            authorData,
         },
-        revalidate: 3600
+        revalidate: 600
     };
 };

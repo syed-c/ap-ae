@@ -95,6 +95,6 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
       faqsProp: faqsProp ?? null,
       seoDataProp: seoDataProp ?? null,
     },
-    revalidate: 3600,
+    revalidate: 600,
   };
 };

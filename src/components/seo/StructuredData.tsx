@@ -74,6 +74,20 @@ export interface ServiceSchemaProps {
   areaServed?: string;
 }
 
+// MedicalProcedure Schema
+export interface MedicalProcedureSchemaProps {
+  type: 'medicalProcedure';
+  name: string;
+  description?: string;
+  url: string;
+  procedureType?: string;
+  status?: string;
+  followup?: string;
+  preparation?: string;
+  bodyLocation?: string;
+  recognizingAuthority?: { name: string; url?: string }[];
+}
+
 export type StructuredDataProps =
   | OrganizationSchemaProps
   | LocalBusinessSchemaProps
@@ -81,7 +95,8 @@ export type StructuredDataProps =
   | ArticleSchemaProps
   | FAQSchemaProps
   | BreadcrumbSchemaProps
-  | ServiceSchemaProps;
+  | ServiceSchemaProps
+  | MedicalProcedureSchemaProps;
 
 // Organization schema generator that uses settings
 const generateOrganizationSchema = (settings?: {
@@ -311,6 +326,25 @@ const generateServiceSchema = (props: ServiceSchemaProps) => ({
   serviceType: 'Dental Service',
 });
 
+const generateMedicalProcedureSchema = (props: MedicalProcedureSchemaProps) => ({
+  '@context': 'https://schema.org',
+  '@type': 'MedicalProcedure',
+  name: props.name,
+  description: props.description,
+  url: `${BASE_URL}${withTrailingSlash(props.url)}`,
+  ...(props.procedureType && { procedureType: props.procedureType }),
+  ...(props.status && { status: props.status }),
+  ...(props.bodyLocation && { bodyLocation: props.bodyLocation }),
+  ...(props.followup && { followup: props.followup }),
+  ...(props.preparation && { preparation: props.preparation }),
+  ...(props.recognizingAuthority && {
+    recognizingAuthority: props.recognizingAuthority.map(auth => ({
+      '@type': 'Organization',
+      ...auth,
+    }))
+  }),
+});
+
 export const StructuredData = (props: StructuredDataProps) => {
   const { data: schemaSettings } = useSchemaSettings();
 
@@ -337,6 +371,9 @@ export const StructuredData = (props: StructuredDataProps) => {
       break;
     case 'service':
       schema = generateServiceSchema(props);
+      break;
+    case 'medicalProcedure':
+      schema = generateMedicalProcedureSchema(props);
       break;
   }
 

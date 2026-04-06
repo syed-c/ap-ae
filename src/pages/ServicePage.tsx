@@ -159,6 +159,41 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
         provider="AppointPanda Partner Clinics"
         areaServed="United Arab Emirates"
       />
+      <StructuredData
+        type="breadcrumb"
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Services', url: '/services/' },
+          { name: treatmentName, url: serverCanonical },
+        ]}
+      />
+      <StructuredData
+        type="medicalProcedure"
+        name={treatmentName}
+        description={treatment?.description || `Professional ${treatmentName} services across the UAE`}
+        url={serverCanonical}
+        procedureType="Dental Procedure"
+        bodyLocation="Oral cavity"
+        followup="Regular dental checkups recommended every 6 months"
+        preparation="Initial consultation and dental examination required"
+        recognizingAuthority={[
+          { name: "Dubai Health Authority (DHA)", url: "https://www.dha.gov.ae" },
+          { name: "Department of Health - Abu Dhabi (DOH)", url: "https://www.doh.gov.ae" },
+          { name: "Ministry of Health and Prevention (MOHAP)", url: "https://www.mohap.gov.ae" },
+        ]}
+      />
+      <StructuredData
+        type="breadcrumb"
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Services', url: '/services/' },
+          { name: treatmentName, url: serverCanonical },
+        ]}
+      />
+      <StructuredData 
+        type="faq" 
+        questions={faqs.map(f => ({ question: f.question, answer: f.answer })).filter(f => f.question && f.answer)} 
+      />
       <StructuredData 
         type="faq" 
         questions={faqs.map(f => ({ question: f.question, answer: f.answer })).filter(f => f.question && f.answer)} 
@@ -226,7 +261,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
             {/* Price CTA */}
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
-                href={`/cost/${serviceSlug}/`}
+                href={`/services/${serviceSlug}/`}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-full hover:bg-emerald-700 transition-colors shadow-lg hover:shadow-xl"
               >
                 <BarChart3 className="h-5 w-5" />

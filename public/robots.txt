@@ -1,186 +1,115 @@
-# AppointPanda Robots.txt
-# Last updated: 2026-01-20
-# 
-# IMPORTANT: All indexable pages must be allowed.
-# Only private/utility pages are blocked.
-
 User-agent: Googlebot
 Allow: /
-# Block API endpoints from crawl budget
+# Block private/admin pages
 Disallow: /api/
-# Block Next.js data endpoints (not indexable)
 Disallow: /_next/data/
 Disallow: /_next/static/
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /dashboard-v2
-Disallow: /auth
-Disallow: /auth/callback
-Disallow: /onboarding
-Disallow: /gmb-select
-Disallow: /claim-profile
-Disallow: /list-your-practice
-Disallow: /list-your-practice/success
-Disallow: /home-v2
-Disallow: /book/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /dashboard-v2/
+Disallow: /auth/
+Disallow: /onboarding/
+Disallow: /form/
 Disallow: /appointment/
 Disallow: /review/
 Disallow: /rq/
-Disallow: /form/
-Disallow: /search
-Disallow: /find-dentist
+# Block utility pages (not SEO valuable)
+Disallow: /claim-profile/
+Disallow: /list-your-practice/
+# Block tracking params
 Disallow: /*?p=*
 Disallow: /*?utm_*
 Disallow: /*?ref=*
 Disallow: /*?source=*
 Disallow: /*?fbclid=*
-Disallow: /*?gclid=*
+Disallow: /*?gclid=
 
 User-agent: Bingbot
 Allow: /
-# Block Next.js data endpoints (not indexable)
+Disallow: /api/
 Disallow: /_next/data/
 Disallow: /_next/static/
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /dashboard-v2
-Disallow: /auth
-Disallow: /auth/callback
-Disallow: /onboarding
-Disallow: /gmb-select
-Disallow: /claim-profile
-Disallow: /list-your-practice
-Disallow: /list-your-practice/success
-Disallow: /home-v2
-Disallow: /book/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /dashboard-v2/
+Disallow: /auth/
+Disallow: /onboarding/
+Disallow: /form/
 Disallow: /appointment/
 Disallow: /review/
 Disallow: /rq/
-Disallow: /form/
-Disallow: /search
-Disallow: /find-dentist
+Disallow: /claim-profile/
+Disallow: /list-your-practice/
 Disallow: /*?p=*
 Disallow: /*?utm_*
 Disallow: /*?ref=*
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
-# AI Crawlers - explicitly allowed with llms.txt reference
-User-agent: GPTBot
-Allow: /
-Disallow: /api/
-Disallow: /_next/data/
-Disallow: /_next/static/
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /dashboard-v2
-Disallow: /home-v2
-Disallow: /auth
-
-User-agent: ChatGPT-User
-Allow: /
-Disallow: /api/
-Disallow: /_next/data/
-Disallow: /_next/static/
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /dashboard-v2
-Disallow: /home-v2
-Disallow: /auth
-
-User-agent: Claude-Web
-Allow: /
-Disallow: /api/
-Disallow: /_next/data/
-Disallow: /_next/static/
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /dashboard-v2
-Disallow: /home-v2
-Disallow: /auth
-
-User-agent: Anthropic-AI
-Allow: /
-Disallow: /api/
-Disallow: /_next/data/
-Disallow: /_next/static/
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /dashboard-v2
-Disallow: /home-v2
-Disallow: /auth
-
-User-agent: Google-Extended
-Allow: /
-Disallow: /api/
-Disallow: /_next/data/
-Disallow: /_next/static/
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /dashboard-v2
-Disallow: /home-v2
-Disallow: /auth
-
-User-agent: PerplexityBot
-Allow: /
-Disallow: /api/
-Disallow: /_next/data/
-Disallow: /_next/static/
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /dashboard-v2
-Disallow: /home-v2
-Disallow: /auth
-
-User-agent: Cohere-ai
-Allow: /
-Disallow: /api/
-Disallow: /_next/data/
-Disallow: /_next/static/
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /auth
 
 User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /_next/data/
 Disallow: /_next/static/
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /dashboard-v2
-Disallow: /auth
-Disallow: /auth/callback
-Disallow: /onboarding
-Disallow: /gmb-select
-Disallow: /claim-profile
-Disallow: /list-your-practice
-Disallow: /list-your-practice/success
-Disallow: /home-v2
-Disallow: /book/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /dashboard-v2/
+Disallow: /auth/
+Disallow: /onboarding/
+Disallow: /form/
 Disallow: /appointment/
 Disallow: /review/
 Disallow: /rq/
-Disallow: /form/
-Disallow: /search
-Disallow: /find-dentist
+Disallow: /claim-profile/
+Disallow: /list-your-practice/
 Disallow: /*?p=*
 Disallow: /*?utm_*
 Disallow: /*?ref=*
 Disallow: /*?source=*
 Disallow: /*?fbclid=*
-Disallow: /*?gclid=*
+Disallow: /*?gclid=
 
 # Sitemap
 Sitemap: https://www.appointpanda.ae/sitemap.xml
+Sitemap: https://www.appointpanda.ae/sitemap-static.xml
+Sitemap: https://www.appointpanda.ae/sitemap-states.xml
+Sitemap: https://www.appointpanda.ae/sitemap-cities.xml
+Sitemap: https://www.appointpanda.ae/sitemap-services.xml
+Sitemap: https://www.appointpanda.ae/sitemap-service-locations.xml
+Sitemap: https://www.appointpanda.ae/sitemap-profiles.xml
+Sitemap: https://www.appointpanda.ae/sitemap-posts.xml
+Sitemap: https://www.appointpanda.ae/sitemap-insurance.xml
 
-# Crawl-delay for non-Google bots (reduce server load)
-# Note: Googlebot ignores Crawl-delay
+# AI Crawlers
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+Disallow: /_next/data/
+Disallow: /_next/static/
+Disallow: /admin/
 
-# LLMs.txt for AI assistants
-# See: https://www.appointpanda.ae/llms.txt
-# Full version: https://www.appointpanda.ae/llms-full.txt
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /_next/data/
+Disallow: /_next/static/
+Disallow: /admin/
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Cohere-ai
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /

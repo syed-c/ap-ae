@@ -22,9 +22,6 @@ class MyDocument extends Document {
 
           {/* Google Search Console Verification */}
           <meta name="google-site-verification" content="QXeUyCI6vHRD4bv5ZLJCYQVSvESe4uqju4tWaamlr2A" />
-          <meta name="google-site-verification" content="H9uwPx5Kjhrqb_8-MKqMjxN9CBQkXuBaOie7Qw61Y-0" />
-          <meta name="google-site-verification" content="BSC5k9_BO_dNca0dSrKEi8KeE9p9uKCAC4vJ_eDVQxk" />
-          <meta name="google-site-verification" content="rRYuAOlERaQwgPvDUKyirGO1QMVjD43uY-eXEPn--OM" />
 
           {/* Critical preconnects for LCP */}
           <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
@@ -52,6 +49,8 @@ class MyDocument extends Document {
                   "https://www.facebook.com/appointpanda/",
                   "https://www.instagram.com/appointpanda/",
                   "https://www.linkedin.com/company/appointpanda/",
+                  // Add Google Business Profile URL when claimed:
+                  // "https://maps.google.com/?cid=XXXXXXXXXXXXXXXXX",
                 ],
               }),
             }}

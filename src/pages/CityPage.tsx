@@ -28,7 +28,6 @@ import { usePinnedProfiles, sortWithPinnedFirst } from "@/hooks/usePinnedProfile
 import { useAreaLocalContent, generateAreaIntro } from "@/hooks/useAreaLocalContent";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
 import NotFound from "./NotFound";
-import StateServicePage from "./StateServicePage";
 import {
   Star,
   Users,
@@ -94,21 +93,6 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
 
   const { data: state, isLoading: stateLoading } = useStateData(normalizedStateSlug || '', stateDataProp);
   const { data: city, isLoading: cityLoading } = useCity(citySlug || '', normalizedStateSlug || '', cityDataProp);
-
-  // Check if "citySlug" is actually a treatment slug (for state-level service pages like /dubai/teeth-whitening/)
-  const { data: treatmentMatch, isLoading: treatmentMatchLoading } = useQuery({
-    queryKey: ['treatment-match', citySlug],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('treatments')
-        .select('id, name, slug, description')
-        .eq('slug', citySlug || '')
-        .eq('is_active', true)
-        .maybeSingle();
-      return data;
-    },
-    enabled: !!citySlug,
-  });
 
   // Fetch SEO content from seo_pages table
   const seoSlug = `${normalizedStateSlug || ''}/${citySlug || ''}`;
@@ -248,10 +232,9 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
   // Check if we have data from prefetch
   const hasStateData = !!state;
   const hasCityData = !!city;
-  const hasTreatmentData = !!treatmentMatch;
 
   // Build SEO data - use existing seoSlug variable
-  const locationName = city?.name || treatmentMatch?.name || citySlug || '';
+  const locationName = city?.name || citySlug || '';
   const seoTitle = seoContent?.meta_title || null;
   const seoDescription = seoContent?.meta_description || null;
 
@@ -289,51 +272,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     );
   }
 
-  if (!state || (!city && !treatmentMatch)) {
-    // If city not found but the slug matches a treatment, render state-level service page
-    if (state && !city && treatmentMatch && !treatmentMatchLoading) {
-      return (
-        <StateServicePage
-          stateSlug={stateSlug || ''}
-          serviceSlug={citySlug || ''}
-          stateName={state.name}
-          stateId={state.id}
-          treatment={treatmentMatch}
-        />
-      );
-    }
-    // Still loading treatment check
-    if (!city && treatmentMatchLoading) {
-      // If we have server-side SEO data from getStaticProps, render meaningful SSR content
-      if (seoDataProp) {
-        return (
-          <PageLayout>
-            <SEOHead
-              title={seoDataProp.title}
-              description={seoDataProp.description}
-              canonical={seoDataProp.canonical}
-            />
-            <div className="container py-12">
-              <h1 className="text-2xl md:text-3xl font-display font-bold mb-2">{seoDataProp.title}</h1>
-              <p className="text-muted-foreground">{seoDataProp.description}</p>
-            </div>
-          </PageLayout>
-        );
-      }
-      return (
-        <PageLayout>
-          <SEOHead
-            title={seoTitle}
-            description={seoDescription}
-            canonical={`/${seoSlug}/`}
-          />
-          <div className="container py-12">
-            <Skeleton className="h-12 w-64 mb-4" />
-            <Skeleton className="h-6 w-96" />
-          </div>
-        </PageLayout>
-      );
-    }
+  if (!state || !city) {
     return <NotFound />;
   }
 

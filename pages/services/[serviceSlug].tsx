@@ -200,6 +200,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             content: contentText,
             faqs: ssrFaqs,
         },
-        revalidate: 3600,
+        revalidate: 600,
     };
 };

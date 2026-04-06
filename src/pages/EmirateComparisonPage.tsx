@@ -61,7 +61,7 @@ const EmirateComparisonPage = ({ faqsProp }: EmirateComparisonPageProps) => {
   const breadcrumbs = [
     { label: "Home", href: "/" },
     { label: "Services", href: "/services" },
-    { label: `${treatmentName} Cost`, href: `/cost/${slug}` },
+    { label: `${treatmentName}`, href: `/services/${slug}/` },
     { label: `${emirate1Name} vs ${emirate2Name}` },
   ];
 
@@ -197,7 +197,7 @@ const EmirateComparisonPage = ({ faqsProp }: EmirateComparisonPageProps) => {
             ))}
           </div>
           <div className="mt-4">
-            <Link href={`/cost/${slug}`} className="text-primary font-bold hover:underline inline-flex items-center gap-1">
+            <Link href={`/services/${slug}/`} className="text-primary font-bold hover:underline inline-flex items-center gap-1">
               View all emirates <ArrowRight className="h-3 w-3" />
             </Link>
           </div>

@@ -229,6 +229,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 canonical,
             },
         },
-        revalidate: 3600,
+        revalidate: 600,
     };
 };

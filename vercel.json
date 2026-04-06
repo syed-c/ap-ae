@@ -14,7 +14,7 @@
   ],
   "headers": [
     {
-      "source": "/((?!api/|_next/|admin|dashboard|auth|onboarding|gmb-select|claim-profile|list-your-practice|book/|appointment/|review/|rq/|form/|search|find-dentist).*)",
+      "source": "/((?!api/|_next/|admin/|dashboard/|auth/|onboarding|gmb-select|claim-profile|list-your-practice|book/|appointment/|review/|rq/|form/).*)",
       "headers": [
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
@@ -30,7 +30,7 @@
       ]
     },
     {
-      "source": "/admin",
+      "source": "/admin(.*)",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     },
     {
@@ -46,15 +46,27 @@
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     },
     {
-      "source": "/gmb-select",
+      "source": "/form/(.*)",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     },
     {
-      "source": "/search",
+      "source": "/appointment/(.*)",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     },
     {
-      "source": "/find-dentist",
+      "source": "/review/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/rq/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/claim-profile",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/list-your-practice",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     }
   ],

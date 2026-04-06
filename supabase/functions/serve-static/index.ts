@@ -53,7 +53,6 @@ const INDEXABLE_ROUTE_PATTERNS = [
   { route: '/dentist/:dentistSlug', pageType: 'dentist' },
   { route: '/blog/:postSlug', pageType: 'blog-post' },
   { route: '/insurance/:insuranceSlug', pageType: 'insurance-detail' },
-  { route: '/cost/:serviceSlug', pageType: 'cost-guide' },
   { route: '/compare/:serviceSlug/:comparison', pageType: 'comparison' },
   // Generic wildcard routes LAST (these match any slug)
   { route: '/:stateSlug', pageType: 'state' },
@@ -143,18 +142,6 @@ function classifyPath(pathname: string, coreServices: { name: string; slug: stri
 
   for (const { route, pageType } of INDEXABLE_ROUTE_PATTERNS) {
     if (matchRoute(route, normalizedPath)) {
-      // For /:stateSlug/:citySlug pattern, check if second segment is a service slug
-      // If so, reclassify as 'state-service' page (e.g., /dubai/teeth-whitening/)
-      if (pageType === 'city') {
-        const parts = normalizedPath.split('/').filter(Boolean);
-        if (parts.length === 2) {
-          const isEmirateSlug = CORE_STATES.some(s => s.slug === parts[0]);
-          const isServiceSlug = coreServices.some(s => s.slug === parts[1]);
-          if (isEmirateSlug && isServiceSlug) {
-            return { indexable: true, pageType: 'state-service' };
-          }
-        }
-      }
       return { indexable: true, pageType };
     }
   }
@@ -180,15 +167,11 @@ function extractPathInfo(path: string): { stateSlug?: string; citySlug?: string;
     return { dentistSlug: parts[1] };
   }
 
-  if (parts[0] === 'cost' && parts[1]) {
-    return { serviceSlug: parts[1] };
-  }
-
   if (parts[0] === 'compare' && parts[1]) {
     return { serviceSlug: parts[1] };
   }
 
-  if (parts.length === 1 && !['blog', 'insurance', 'services', 'about', 'contact', 'faq', 'privacy', 'terms', 'pricing', 'sitemap', 'how-it-works', 'cost', 'compare'].includes(parts[0])) {
+  if (parts.length === 1 && !['blog', 'insurance', 'services', 'about', 'contact', 'faq', 'privacy', 'terms', 'pricing', 'sitemap', 'how-it-works', 'compare'].includes(parts[0])) {
     return { stateSlug: parts[0] };
   }
 
@@ -514,17 +497,6 @@ async function generateMinimalHtmlWithContent(
     title = `${serviceName} in ${cityName}, ${stateName} | AppointPanda`;
     h1 = `${serviceName} Dentists in ${cityName}, ${stateName}`;
     description = `Find the best ${serviceName.toLowerCase()} specialists in ${cityName}, ${stateName}, UAE. Compare dentists, read reviews, check AED pricing, and book online.`;
-  } else if (pageType === 'state-service' && stateSlug && serviceSlug) {
-    const stateName = CORE_STATES.find(s => s.slug === stateSlug)?.name || formatSlugToName(stateSlug);
-    const serviceName = CORE_SERVICES_CACHE.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
-    title = `${serviceName} in ${stateName} - Best Clinics & Prices (AED) | AppointPanda`;
-    h1 = `${serviceName} in ${stateName}`;
-    description = `Find the best ${serviceName.toLowerCase()} clinics in ${stateName}, UAE. Compare verified providers, prices in AED, and book appointments online.`;
-  } else if (pageType === 'cost-guide' && serviceSlug) {
-    const serviceName = CORE_SERVICES_CACHE.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
-    title = `${serviceName} Cost in UAE - Prices by Emirate | AppointPanda`;
-    h1 = `${serviceName} Cost in UAE`;
-    description = `How much does ${serviceName.toLowerCase()} cost in the UAE? Compare AED prices across all 7 Emirates and find the best value.`;
   } else if (pageType === 'comparison' && serviceSlug) {
     const serviceName = CORE_SERVICES_CACHE.find(s => s.slug === serviceSlug)?.name || formatSlugToName(serviceSlug);
     title = `${serviceName} Price Comparison | AppointPanda`;

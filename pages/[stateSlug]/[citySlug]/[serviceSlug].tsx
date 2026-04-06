@@ -17,22 +17,28 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
     faqs: { question: string; answer: string }[];
     seoH1: string | null;
 }) => {
+    const treatmentName = treatmentData?.name || serviceSlug;
+    const cityName = cityData?.name || citySlug;
+    const stateName = stateData?.name || stateSlug;
+    const fallbackTitle = `${treatmentName} in ${cityName}, ${stateName} | AppointPanda`;
+    const fallbackDescription = `Find the best ${treatmentName.toLowerCase()} in ${cityName}, ${stateName}. Book appointments with top-rated dental clinics and specialists near you.`;
+
     return (
         <>
             <Head>
-                <title>{seoData.title || 'Loading...'}</title>
-                <meta name="description" content={seoData.description || 'Loading...'} />
-                <link rel="canonical" href={`${BASE_URL}${seoData.canonical.replace(/\/+$/, '')}`} />
+                <title>{seoData.title || fallbackTitle}</title>
+                <meta name="description" content={seoData.description || fallbackDescription} />
+                <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />
-                <meta property="og:title" content={seoData.title ? (seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`) : 'Loading...'} />
-                <meta property="og:description" content={seoData.description || 'Loading...'} />
+                <meta property="og:title" content={seoData.title ? (seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`) : fallbackTitle} />
+                <meta property="og:description" content={seoData.description || fallbackDescription} />
                 <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
                 <meta property="og:site_name" content="AppointPanda" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:url" content={`${BASE_URL}${seoData.canonical}`} />
-                <meta name="twitter:title" content={seoData.title ? (seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`) : 'Loading...'} />
-                <meta name="twitter:description" content={seoData.description || 'Loading...'} />
+                <meta name="twitter:title" content={seoData.title ? (seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`) : fallbackTitle} />
+                <meta name="twitter:description" content={seoData.description || fallbackDescription} />
                 <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
             </Head>
             <ServiceLocationPageComponent 
@@ -183,6 +189,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             faqs: ssrFaqs,
             seoH1: seoH1,
         },
-        revalidate: 3600,
+        revalidate: 600,
     };
 };

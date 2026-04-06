@@ -166,12 +166,16 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
             questions: finalFaqs.map(f => ({ question: f.q, answer: f.a })),
           },
           {
-            type: 'service',
-            name: `${treatmentName} in ${stateName}`,
+            type: 'medicalProcedure',
+            name: treatmentName,
             description: pageDescription,
             url: `/${normalizedStateSlug}/${serviceSlug}/`,
-            provider: 'AppointPanda',
-            areaServed: stateName,
+            procedureType: "Dental Procedure",
+            bodyLocation: "Oral cavity",
+            recognizingAuthority: [
+              { name: "Dubai Health Authority (DHA)", url: "https://www.dha.gov.ae" },
+              { name: "Department of Health - Abu Dhabi (DOH)", url: "https://www.doh.gov.ae" },
+            ],
           },
         ]}
         id="state-service-schema"

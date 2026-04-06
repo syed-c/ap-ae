@@ -48,7 +48,13 @@ export default function IndexPageWithSEO({
       },
       "query-input": "required name=search_term_string"
     },
-    "sameAs": [],
+    "sameAs": [
+      "https://www.facebook.com/appointpanda/",
+      "https://www.instagram.com/appointpanda/",
+      "https://www.linkedin.com/company/appointpanda/",
+      // Add Google Business Profile URL when claimed
+      // "https://maps.google.com/?cid=XXXXXXXXXXXXXXXXX",
+    ],
   };
 
   return (

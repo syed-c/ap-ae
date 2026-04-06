@@ -47,7 +47,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                     canonical: `/clinic/${clinicSlug}/`,
                 }
             },
-            revalidate: 3600,
+            revalidate: 600,
         };
     }
 
@@ -79,6 +79,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const stateAbbrev = clinic.city?.state?.abbreviation || 'UAE';
     const metaTitle = seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${cityName}`;
     const metaDescription = seoContent?.meta_description || (clinic.description ? clinic.description.slice(0, 160) : `Book an appointment at ${clinic.name}. Professional dental clinic in ${cityName} with experienced dentists.`);
+    
+    const faqs = seoContent?.faqs && Array.isArray(seoContent.faqs) ? seoContent.faqs : [];
 
     return {
         props: {
@@ -89,17 +91,19 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 description: metaDescription,
                 canonical: `/clinic/${clinicSlug}/`,
                 ogImage: clinic.cover_image_url || null,
-            }
+            },
+            faqs,
         },
-        revalidate: 3600,
+        revalidate: 600,
     };
 };
 
 // Wrapper component to render SEO meta tags server-side
-const ClinicPageWithSEO = ({ clinicSlug, clinicData, seoData }: {
+const ClinicPageWithSEO = ({ clinicSlug, clinicData, seoData, faqs }: {
     clinicSlug: string;
     clinicData: any;
     seoData: { title: string; description: string; canonical: string; ogImage?: string };
+    faqs?: { question: string; answer: string }[];
 }) => {
     const BASE_URL = 'https://www.appointpanda.ae';
 
@@ -187,6 +191,35 @@ const ClinicPageWithSEO = ({ clinicSlug, clinicData, seoData }: {
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
                 />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        itemListElement: [
+                            { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
+                            { "@type": "ListItem", position: 2, name: "Clinics", item: `${BASE_URL}/search/` },
+                            { "@type": "ListItem", position: 3, name: clinicData?.name || clinicSlug, item: `${BASE_URL}${seoData.canonical}` },
+                        ]
+                    }) }}
+                />
+                {faqs && faqs.length > 0 && (
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            mainEntity: faqs.map(f => ({
+                                "@type": "Question",
+                                name: f.question,
+                                acceptedAnswer: {
+                                    "@type": "Answer",
+                                    text: f.answer
+                                }
+                            }))
+                        }) }}
+                    />
+                )}
             </Head>
             <ClinicPageComponent 
                 clinicSlugProp={clinicSlug} 

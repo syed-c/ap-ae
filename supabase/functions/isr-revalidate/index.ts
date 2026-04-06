@@ -86,11 +86,9 @@ serve(async (req) => {
         revalidateTags.push("treatments");
         if (record?.slug) {
           revalidatePaths.push(`/services/${record.slug}/`);
-          revalidatePaths.push(`/cost/${record.slug}/`);
         }
         if (old_record?.slug && old_record.slug !== record?.slug) {
           revalidatePaths.push(`/services/${old_record.slug}/`);
-          revalidatePaths.push(`/cost/${old_record.slug}/`);
         }
         // Always revalidate services listing
         revalidatePaths.push("/services/");

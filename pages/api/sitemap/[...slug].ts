@@ -154,10 +154,12 @@ ${sitemaps.map(s => `  <sitemap>
 
   if (type === 'services') {
     const treatments = await fetchAll(supabase, 'treatments', 'slug, updated_at', { is_active: true });
-    const urls = treatments.filter(t => t.slug).flatMap(t => [
-      { loc: normalizeUrl(`/services/${t.slug}`), lastmod: t.updated_at?.split('T')[0], priority: 0.8, changefreq: 'weekly' },
-      { loc: normalizeUrl(`/cost/${t.slug}`), lastmod: t.updated_at?.split('T')[0], priority: 0.7, changefreq: 'monthly' },
-    ]);
+    const urls = treatments.filter(t => t.slug).map(t => ({
+      loc: normalizeUrl(`/services/${t.slug}`),
+      lastmod: t.updated_at?.split('T')[0],
+      priority: 0.8,
+      changefreq: 'weekly',
+    }));
     return res.send(generateSitemapXml(urls));
   }
 

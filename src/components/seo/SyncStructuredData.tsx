@@ -109,6 +109,7 @@ export interface MedicalProcedureSchemaData {
   howPerformed?: string;
   preparation?: string;
   followup?: string;
+  recognizingAuthority?: { name: string; url?: string }[];
 }
 
 export interface WebSiteSchemaData {
@@ -357,6 +358,13 @@ const generateMedicalProcedureSchema = (data: MedicalProcedureSchemaData) => ({
   ...(data.howPerformed && { howPerformed: data.howPerformed }),
   ...(data.preparation && { preparation: data.preparation }),
   ...(data.followup && { followup: data.followup }),
+  ...(data.recognizingAuthority && {
+    recognizingAuthority: data.recognizingAuthority.map(auth => ({
+      '@type': 'Organization',
+      name: auth.name,
+      ...(auth.url && { url: auth.url }),
+    }))
+  }),
 });
 
 const generateWebSiteSchema = (data: WebSiteSchemaData) => ({

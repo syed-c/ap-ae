@@ -6,23 +6,38 @@ import DentistPageComponent from '@/pages/DentistPage';
 // Wrapper component to render SEO meta tags server-side
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData }: {
+const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData, faqs }: {
     dentistSlug: string;
     dentistData: any;
     seoData: { title: string; description: string; canonical: string; ogImage?: string };
+    faqs?: { question: string; answer: string }[];
 }) => {
     const physicianSchema = {
         "@context": "https://schema.org",
-        "@type": "Dentist",
+        "@type": "Physician",
         "name": dentistData?.name || '',
         "description": seoData.description,
         "url": `${BASE_URL}/dentist/${dentistSlug}/`,
         "image": dentistData?.image_url || `${BASE_URL}/og-image.png`,
         "jobTitle": dentistData?.title || 'Dentist',
+        "medicalSpecialty": "Dentistry",
+        ...(dentistData?.qualifications ? {
+            "hasCredential": dentistData.qualifications.map((q: any) => ({
+                "@type": "EducationalOccupationalCredential",
+                "credentialCategory": q.degree || q.title,
+                "name": q.degree || q.title,
+            }))
+        } : undefined),
         "worksFor": dentistData?.clinic?.name ? {
             "@type": "Dentist",
             "name": dentistData.clinic.name,
             "url": `${BASE_URL}/clinic/${dentistData.clinic.slug}/`,
+            "address": dentistData.clinic.city ? {
+                "@type": "PostalAddress",
+                "addressLocality": dentistData.clinic.city.name,
+                "addressRegion": dentistData.clinic.city.state?.name || '',
+                "addressCountry": "AE",
+            } : undefined,
         } : undefined,
         "address": dentistData?.clinic?.city ? {
             "@type": "PostalAddress",
@@ -37,11 +52,9 @@ const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData }: {
                 "reviewCount": String(dentistData.review_count || 0),
             }
         } : {}),
-        "memberOf": [{
-            "@type": "Organization",
-            "name": "AppointPanda",
-            "url": BASE_URL,
-        }],
+        ...(dentistData?.specializations ? {
+            "knowsAbout": dentistData.specializations.map((s: string) => s)
+        } : undefined),
     };
 
     return (
@@ -49,7 +62,7 @@ const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData }: {
             <Head>
                 <title>{seoData.title}</title>
                 <meta name="description" content={seoData.description} />
-                <link rel="canonical" href={`${BASE_URL}${seoData.canonical.replace(/\/+$/, '')}`} />
+                <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
                 <meta property="og:type" content="profile" />
                 <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />
                 <meta property="og:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
@@ -65,6 +78,35 @@ const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData }: {
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(physicianSchema) }}
                 />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        itemListElement: [
+                            { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
+                            { "@type": "ListItem", position: 2, name: "Dentists", item: `${BASE_URL}/search/` },
+                            { "@type": "ListItem", position: 3, name: dentistData?.name || dentistSlug, item: `${BASE_URL}${seoData.canonical}` },
+                        ]
+                    }) }}
+                />
+                {faqs && faqs.length > 0 && (
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            mainEntity: faqs.map(f => ({
+                                "@type": "Question",
+                                name: f.question,
+                                acceptedAnswer: {
+                                    "@type": "Answer",
+                                    text: f.answer
+                                }
+                            }))
+                        }) }}
+                    />
+                )}
             </Head>
             <DentistPageComponent 
                 dentistSlugProp={dentistSlug} 
@@ -139,6 +181,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const cityName = dentist.clinic?.city?.name || 'UAE';
     const metaTitle = seoContent?.meta_title || `${dentist.name} - Dentist in ${cityName}`;
     const metaDescription = seoContent?.meta_description || `Book an appointment with ${dentist.name}. Professional dentist at ${clinicName} in ${cityName}.`;
+    
+    const faqs = seoContent?.faqs && Array.isArray(seoContent.faqs) ? seoContent.faqs : [];
 
     return { 
         props: {
@@ -149,8 +193,9 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 description: metaDescription,
                 canonical: `/dentist/${dentistSlug}/`,
                 ogImage: dentist.image_url || null,
-            }
+            },
+            faqs,
         },
-        revalidate: 3600
+        revalidate: 600
     };
 };
