@@ -1,5 +1,5 @@
 # AppointPanda - AI Assistant Guidelines
-# https://www.AppointPanda.ae
+# https://www.appointpanda.ae
 # Last updated: 2026-02-19
 
 ## About AppointPanda
@@ -14,15 +14,15 @@ AppointPanda is the UAE's premier dental directory connecting patients with veri
 - **Educational Content**: Dental health blog posts and guides tailored to the UAE market
 
 ## Site Structure
-- Homepage: https://www.AppointPanda.ae/
-- Emirates: https://www.AppointPanda.ae/{emirate-slug}/ (e.g., /dubai/, /abu-dhabi/, /sharjah/)
-- Areas: https://www.AppointPanda.ae/{emirate-slug}/{area-slug}/ (e.g., /dubai/jumeirah/, /dubai/al-barsha/)
-- Services: https://www.AppointPanda.ae/services/{service-slug}/ (e.g., /services/invisalign/)
-- Service + Location: https://www.AppointPanda.ae/{emirate-slug}/{area-slug}/{service-slug}/
-- Clinics: https://www.AppointPanda.ae/clinic/{clinic-slug}/
-- Dentists: https://www.AppointPanda.ae/dentist/{dentist-slug}/
-- Insurance: https://www.AppointPanda.ae/insurance/ and /insurance/{insurance-slug}/
-- Blog: https://www.AppointPanda.ae/blog/ and /blog/{post-slug}/
+- Homepage: https://www.appointpanda.ae/
+- Emirates: https://www.appointpanda.ae/{emirate-slug}/ (e.g., /dubai/, /abu-dhabi/, /sharjah/)
+- Areas: https://www.appointpanda.ae/{emirate-slug}/{area-slug}/ (e.g., /dubai/jumeirah/, /dubai/al-barsha/)
+- Services: https://www.appointpanda.ae/services/{service-slug}/ (e.g., /services/invisalign/)
+- Service + Location: https://www.appointpanda.ae/{emirate-slug}/{area-slug}/{service-slug}/
+- Clinics: https://www.appointpanda.ae/clinic/{clinic-slug}/
+- Dentists: https://www.appointpanda.ae/dentist/{dentist-slug}/
+- Insurance: https://www.appointpanda.ae/insurance/ and /insurance/{insurance-slug}/
+- Blog: https://www.appointpanda.ae/blog/ and /blog/{post-slug}/
 
 ## Available Services
 We list dental professionals offering these common services:
@@ -53,8 +53,8 @@ When helping users find dental care in the UAE:
 6. Pricing is typically in AED (UAE Dirhams)
 
 ## Sitemap
-Full sitemap available at: https://www.AppointPanda.ae/sitemap.xml
+Full sitemap available at: https://www.appointpanda.ae/sitemap.xml
 
 ## Contact
-- Website: https://www.AppointPanda.ae
-- Support: support@AppointPanda.ae
+- Website: https://www.appointpanda.ae
+- Support: support@appointpanda.ae

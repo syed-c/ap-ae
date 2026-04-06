@@ -7,7 +7,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 // Wrapper component to render SEO meta tags server-side with FAQ data for SSR
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, faqs, seoH1, cityRatings }: {
+const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, faqs, seoH1, cityRatings, topClinics }: {
     citySlug: string;
     stateSlug: string;
     stateData: any;
@@ -16,9 +16,14 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
     faqs: { question: string; answer: string }[];
     seoH1: string | null;
     cityRatings?: { avgRating: number; totalReviews: number; clinicCount: number };
+    topClinics?: { name: string; slug: string; rating: number; review_count: number }[];
 }) => {
-    const fallbackTitle = `Best Dentists in ${cityData?.name || citySlug}, ${stateData?.name || stateSlug} (2026) — Compare 200+ Clinics | AppointPanda`;
-    const fallbackDescription = `Find the best dentists in ${cityData?.name || citySlug}, ${stateData?.name || stateSlug}. Compare 200+ verified dental clinics with 4.9+ star ratings. Read real patient reviews, check AED prices for implants, whitening, invisalign. Book your appointment online in minutes. Free consultation available.`;
+    const cityName = cityData?.name || citySlug;
+    const stateName = stateData?.name || stateSlug;
+    const clinicCount = cityRatings?.clinicCount || 0;
+    const reviewCount = cityRatings?.totalReviews || 0;
+    const fallbackTitle = `Best Dentists in ${cityName}, ${stateName} (2026) — Compare ${clinicCount}+ Clinics | AppointPanda`;
+    const fallbackDescription = `Find the best dentists in ${cityName}, ${stateName}. Compare ${clinicCount}+ verified dental clinics with ${reviewCount.toLocaleString()}+ real patient reviews. Read ratings, check AED prices for implants, whitening, invisalign. Book your appointment online in minutes. Free consultation available.`;
 
     return (
         <>
@@ -55,21 +60,41 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
                         type="application/ld+json"
                         dangerouslySetInnerHTML={{ __html: JSON.stringify({
                             "@context": "https://schema.org",
-                            "@type": "Dentist",
-                            "name": `Dentists in ${cityData?.name || citySlug}, ${stateData?.name || stateSlug}`,
+                            "@type": "ItemList",
+                            "name": `Best Dentists in ${cityData?.name || citySlug}, ${stateData?.name || stateSlug}`,
                             "description": seoData.description || fallbackDescription,
                             "url": `${BASE_URL}${seoData.canonical}`,
-                            "areaServed": {
-                                "@type": "City",
-                                "name": cityData?.name || citySlug,
-                            },
-                            "aggregateRating": {
-                                "@type": "AggregateRating",
-                                "ratingValue": cityRatings.avgRating.toFixed(1),
-                                "reviewCount": cityRatings.totalReviews,
-                                "bestRating": "5",
-                            },
-                            "numberOfLocations": cityRatings.clinicCount,
+                            "numberOfItems": cityRatings.clinicCount,
+                            "itemListElement": (topClinics || []).slice(0, 5).map((c, i) => ({
+                                "@type": "ListItem",
+                                position: i + 1,
+                                item: {
+                                    "@type": "Dentist",
+                                    "name": c.name,
+                                    "url": `${BASE_URL}/clinic/${c.slug}/`,
+                                    "aggregateRating": c.rating ? {
+                                        "@type": "AggregateRating",
+                                        "ratingValue": c.rating.toFixed(1),
+                                        "reviewCount": c.review_count,
+                                        "bestRating": "5",
+                                    } : undefined
+                                }
+                            }))
+                        }) }}
+                    />
+                )}
+                {/* FAQPage Schema */}
+                {faqs && faqs.length > 0 && (
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            mainEntity: faqs.map(f => ({
+                                "@type": "Question",
+                                name: f.question,
+                                acceptedAnswer: { "@type": "Answer", text: f.answer }
+                            }))
                         }) }}
                     />
                 )}
@@ -235,6 +260,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     // Fetch aggregate rating data for this city
     let cityRatings = { avgRating: 0, totalReviews: 0, clinicCount: 0 };
+    let topClinics: any[] = [];
     if (finalCityData?.id) {
         const ratingsData = await supabase
             .from('clinics')
@@ -253,6 +279,18 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 clinicCount: ratingsData.length
             };
         }
+
+        // Fetch top 5 clinics for ItemList schema
+        const topClinicsData = await supabase
+            .from('clinics')
+            .select('name, slug, rating, review_count')
+            .eq('city_id', finalCityData.id)
+            .eq('is_active', true)
+            .not('rating', 'is', null)
+            .order('rating', { ascending: false })
+            .order('review_count', { ascending: false })
+            .limit(5);
+        topClinics = topClinicsData?.data || [];
     }
     
     const cityName = finalCityData?.name || citySlug;
@@ -286,6 +324,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             faqs: ssrFaqs,
             seoH1: seoH1,
             cityRatings: cityRatings,
+            topClinics: topClinics,
         },
         revalidate: 600,
     };

@@ -6,7 +6,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1, stateRatings }: {
+const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1, stateRatings, topClinics }: {
     stateSlug: string;
     stateData: any;
     citiesData: any[];
@@ -14,9 +14,13 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
     faqs: { question: string; answer: string }[];
     seoH1: string | null;
     stateRatings?: { avgRating: number; totalReviews: number; clinicCount: number };
+    topClinics?: { name: string; slug: string; rating: number; review_count: number }[];
 }) => {
-    const fallbackTitle = `Best Dentists in ${stateData?.name || stateSlug}, UAE (2026) — Book Online Today | AppointPanda`;
-    const fallbackDescription = `Compare 6,600+ verified DHA-licensed dentists across ${stateData?.name || stateSlug}, UAE. Read 50,000+ real patient reviews, see transparent AED pricing for implants, braces, veneers. Book appointments instantly with top-rated dental professionals. Your perfect smile starts here.`;
+    const stateName = stateData?.name || stateSlug;
+    const clinicCount = stateRatings?.clinicCount || 0;
+    const reviewCount = stateRatings?.totalReviews || 0;
+    const fallbackTitle = `Best Dentists in ${stateName}, UAE (2026) — Book Online Today | AppointPanda`;
+    const fallbackDescription = `Compare ${clinicCount.toLocaleString()}+ verified DHA-licensed dentists across ${stateName}, UAE. Read ${reviewCount.toLocaleString()}+ real patient reviews, see transparent AED pricing for implants, braces, veneers. Book appointments instantly with top-rated dental professionals. Your perfect smile starts here.`;
 
     return (
         <>
@@ -46,27 +50,47 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
                         ]
                     }) }}
                 />
-                {/* LocalBusiness Schema for state with aggregate rating */}
+                {/* LocalBusiness Schema for state with aggregate rating - using ItemList for directory */}
                 {stateRatings && stateRatings.clinicCount > 0 && (
                     <script
                         type="application/ld+json"
                         dangerouslySetInnerHTML={{ __html: JSON.stringify({
                             "@context": "https://schema.org",
-                            "@type": "Dentist",
-                            "name": `Dentists in ${stateData?.name || stateSlug}, UAE`,
+                            "@type": "ItemList",
+                            "name": `Best Dentists in ${stateData?.name || stateSlug}, UAE`,
                             "description": seoData.description || fallbackDescription,
                             "url": `${BASE_URL}${seoData.canonical}`,
-                            "areaServed": {
-                                "@type": "State",
-                                "name": stateData?.name || stateSlug,
-                            },
-                            "aggregateRating": {
-                                "@type": "AggregateRating",
-                                "ratingValue": stateRatings.avgRating.toFixed(1),
-                                "reviewCount": stateRatings.totalReviews,
-                                "bestRating": "5",
-                            },
-                            "numberOfLocations": stateRatings.clinicCount,
+                            "numberOfItems": stateRatings.clinicCount,
+                            "itemListElement": (topClinics || []).slice(0, 5).map((c, i) => ({
+                                "@type": "ListItem",
+                                position: i + 1,
+                                item: {
+                                    "@type": "Dentist",
+                                    "name": c.name,
+                                    "url": `${BASE_URL}/clinic/${c.slug}/`,
+                                    "aggregateRating": c.rating ? {
+                                        "@type": "AggregateRating",
+                                        "ratingValue": c.rating.toFixed(1),
+                                        "reviewCount": c.review_count,
+                                        "bestRating": "5",
+                                    } : undefined
+                                }
+                            }))
+                        }) }}
+                    />
+                )}
+                {/* FAQPage Schema */}
+                {faqs && faqs.length > 0 && (
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            mainEntity: faqs.map(f => ({
+                                "@type": "Question",
+                                name: f.question,
+                                acceptedAnswer: { "@type": "Answer", text: f.answer }
+                            }))
                         }) }}
                     />
                 )}
@@ -161,7 +185,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .then(r => r.data) as Promise<any[]>
     ]);
 
-    // Fetch state ratings separately
+    // Fetch state ratings and top clinics
     const ratingsData = await (supabase as any)
         .from('clinics')
         .select('rating, review_count')
@@ -180,6 +204,17 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             clinicCount: ratingsData.data.length
         };
     }
+
+    // Fetch top 5 clinics for ItemList schema
+    const topClinicsData = await (supabase as any)
+        .from('clinics')
+        .select('name, slug, rating, review_count')
+        .eq('state_id', stateData.id)
+        .eq('is_active', true)
+        .not('rating', 'is', null)
+        .order('rating', { ascending: false })
+        .order('review_count', { ascending: false })
+        .limit(5);
 
     const metaTitle = seoContent?.meta_title || null;
     const metaDescription = seoContent?.meta_description || null;
@@ -219,6 +254,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             faqs: ssrFaqs,
             seoH1: seoH1,
             stateRatings: stateRatingsData,
+            topClinics: topClinicsData?.data || [],
         },
         revalidate: 600,
     };

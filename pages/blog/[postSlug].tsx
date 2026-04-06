@@ -59,7 +59,7 @@ const BlogPostPageWithSEO = ({ postSlug, postData, seoData, authorData }: {
             <Head>
                 <title>{seoData.title}</title>
                 <meta name="description" content={seoData.description} />
-                <link rel="canonical" href={seoData.canonical} />
+                <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
                 <meta property="og:type" content="article" />
                 <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />
                 <meta property="og:title" content={fullTitle} />

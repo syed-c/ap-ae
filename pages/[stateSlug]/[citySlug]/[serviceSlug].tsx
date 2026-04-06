@@ -40,6 +40,34 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
                 <meta name="twitter:title" content={seoData.title ? (seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`) : fallbackTitle} />
                 <meta name="twitter:description" content={seoData.description || fallbackDescription} />
                 <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        itemListElement: [
+                            { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
+                            { "@type": "ListItem", position: 2, name: stateName, item: `${BASE_URL}/${stateSlug}/` },
+                            { "@type": "ListItem", position: 3, name: cityName, item: `${BASE_URL}/${stateSlug}/${citySlug}/` },
+                            { "@type": "ListItem", position: 4, name: treatmentName, item: `${BASE_URL}${seoData.canonical}` },
+                        ]
+                    }) }}
+                />
+                {/* FAQPage Schema */}
+                {faqs && faqs.length > 0 && (
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            mainEntity: faqs.map(f => ({
+                                "@type": "Question",
+                                name: f.question,
+                                acceptedAnswer: { "@type": "Answer", text: f.answer }
+                            }))
+                        }) }}
+                    />
+                )}
             </Head>
             <ServiceLocationPageComponent 
                 stateSlugProp={stateSlug}
