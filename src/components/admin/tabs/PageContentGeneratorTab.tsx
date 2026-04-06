@@ -466,7 +466,7 @@ export default function PageContentGeneratorTab() {
 
                   while (true) {
                     const result = await generateServices({
-                      batch_size: serviceForm.batch_size,
+                      batch_limit: serviceForm.batch_size,
                       force_regenerate: serviceForm.force_regenerate,
                       cursor,
                     });
@@ -572,7 +572,7 @@ export default function PageContentGeneratorTab() {
 
                   while (true) {
                     const result = await generateServiceLocations({
-                      batch_size: slForm.batch_size,
+                      batch_limit: slForm.batch_size,
                       force_regenerate: slForm.force_regenerate,
                       cursor,
                     });

@@ -90,7 +90,7 @@ export async function generateBatch(
 }
 
 export async function generateServices(
-  params: { force_regenerate?: boolean; batch_size?: number; cursor?: string | null } = {}
+  params: { force_regenerate?: boolean; batch_limit?: number; cursor?: string | null } = {}
 ): Promise<GenerateServicesResult> {
   const { data, error } = await supabase.functions.invoke(
     "page-content-generator",
@@ -121,7 +121,7 @@ export async function generateServices(
 }
 
 export async function generateServiceLocations(
-  params: { force_regenerate?: boolean; batch_size?: number; cursor?: string | null } = {}
+  params: { force_regenerate?: boolean; batch_limit?: number; cursor?: string | null } = {}
 ): Promise<GenerateServiceLocationsResult> {
   const { data, error } = await supabase.functions.invoke(
     "page-content-generator",

@@ -1171,7 +1171,25 @@ serve(async (req) => {
       const cursor = body.cursor || null;
       const batchLimit = body.batch_limit || 3;
 
+      console.log("page-content-generator: Fetching treatments...");
       const treatments = await fetchAllRows(supabase, "treatments", "id, slug, name", { is_active: true });
+      console.log(`page-content-generator: Found ${treatments.length} active treatments`);
+      
+      if (treatments.length === 0) {
+        return new Response(JSON.stringify({
+          processed: 0,
+          skipped: 0,
+          failed: 0,
+          errors: ["No active treatments found in database"],
+          cursor: null,
+          has_more: false,
+          remaining: 0,
+          total_count: 0,
+          page_type: "service"
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       
       // Build service pages
       const servicePages = treatments.map(t => ({
@@ -1182,7 +1200,9 @@ serve(async (req) => {
       }));
 
       // Get existing pages
+      console.log("page-content-generator: Fetching existing seo_pages...");
       const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
+      console.log(`page-content-generator: Found ${existingPages.length} existing seo_pages`);
       const existingSlugs = new Set(existingPages.map(p => p.slug));
 
       let pagesToGenerate = servicePages;

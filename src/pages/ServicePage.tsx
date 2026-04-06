@@ -1,5 +1,4 @@
 'use client';
-import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
@@ -7,20 +6,16 @@ import { motion } from "framer-motion";
 import { supabaseAdmin } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
-import { SearchBox } from "@/components/SearchBox";
-import { DentistListFrame, LocationQuickLinks } from "@/components/location";
+import { DentistListFrame } from "@/components/location";
 import { SEOContentBlock } from "@/components/seo/SEOContentBlock";
 import { PageIntroSection } from "@/components/seo/PageIntroSection";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useServicePriceRanges } from "@/hooks/useServicePriceRanges";
 import { useStates } from "@/hooks/useLocations";
-import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
+import { parseMarkdownContent } from "@/hooks/useSeoPageContent";
 import {
   Accordion,
   AccordionContent,
@@ -28,43 +23,49 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  Users,
-  Star,
-  Shield,
   MapPin,
-  Stethoscope,
-  DollarSign,
   BarChart3,
   ArrowRight,
-  TrendingUp,
+  CheckCircle2,
+  Star,
 } from "lucide-react";
-
-// Service pages are always indexable - SEO registry handles noindex for private pages
-const MIN_PROFILE_COUNT = 0; // Disabled - all service pages should be indexed
 
 interface ServicePageProps {
   serviceSlugProp?: string;
-  dehydratedStateProp?: any;
   seoDataProp?: {
     title: string;
     description: string;
     canonical: string;
   };
+  h1Prop?: string | null;
+  heroIntroProp?: string | null;
+  contentProp?: string | null;
   faqsProp?: { question: string; answer: string }[];
 }
 
-const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProps = {}) => {
+const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, contentProp, faqsProp }: ServicePageProps = {}) => {
   const router = useRouter();
   const serviceSlug = serviceSlugProp || (typeof router.query?.serviceSlug === 'string' ? router.query.serviceSlug : '');
 
   const seoSlug = `services/${serviceSlug}`;
-  const { data: seoContent, isLoading: seoContentLoading, isFetching: seoContentFetching } = useSeoPageContent(seoSlug);
-  const isSeoContentPending = !seoContent && (seoContentLoading || seoContentFetching);
 
-  // Debug: Log seoContent data
-  console.log('[ServicePage] seoContent:', seoContent ? { meta_title: seoContent.meta_title?.substring(0, 30), h1: seoContent.h1?.substring(0, 30), faqs_count: seoContent.faqs?.length } : 'null');
+  // SSR data from getStaticProps
+  const serverTitle = seoDataProp?.title || '';
+  const serverDescription = seoDataProp?.description || '';
+  const serverCanonical = seoDataProp?.canonical || `/services/${serviceSlug}/`;
+  const serverH1 = h1Prop;
+  const serverHeroIntro = heroIntroProp || null;
+  const serverContent = contentProp || null;
+  const serverFaqs = faqsProp || [];
 
-  const { data: treatment, isLoading: treatmentLoading } = useQuery({
+  console.log('[Client] serverTitle:', serverTitle?.substring(0, 40));
+  console.log('[Client] serverH1:', serverH1?.substring(0, 40));
+  console.log('[Client] serverHeroIntro:', serverHeroIntro?.substring(0, 50));
+  console.log('[Client] serverContent:', serverContent?.substring(0, 50));
+  console.log('[Client] serverFaqs count:', serverFaqs.length);
+
+  // Fetch treatment data
+  const { data: treatment } = useQuery({
     queryKey: ["treatment", serviceSlug],
     queryFn: async () => {
       const { data } = await supabaseAdmin.from("treatments").select("*").eq("slug", serviceSlug).maybeSingle();
@@ -72,6 +73,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
     },
   });
 
+  // Fetch related treatments
   const { data: relatedTreatments } = useQuery({
     queryKey: ["related-treatments", serviceSlug],
     queryFn: async () => {
@@ -80,31 +82,58 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
     },
   });
 
+  // Fetch profiles
   const { data: profiles, isLoading: profilesLoading } = useProfiles({ limit: 50 });
 
+  // Fetch states
   const { data: states } = useStates();
 
-  // Price intelligence data
+  // Fetch price ranges
   const { data: priceRanges } = useServicePriceRanges(serviceSlug);
 
   const treatmentName = treatment?.name || serviceSlug.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
 
-  const parsedContent = seoContent?.content ? parseMarkdownContent(seoContent.content) : null;
-  const seoFaqs = seoContent?.faqs && Array.isArray(seoContent.faqs) && seoContent.faqs.length > 0
-    ? seoContent.faqs
-    : seoContent?.content ? parseFaqFromContent(seoContent.content) : [];
+  // For meta tags: Use SSR data if available (guaranteed), fallback to treatment name
+  const metaTitle = serverTitle || `${treatmentName} in UAE — Find Specialists & Compare Prices`;
+  const metaDescription = serverDescription || `Find the best ${treatmentName.toLowerCase()} specialists across the UAE. Book appointments with verified dentists.`;
 
-  // SSR FAQ data takes priority, then use client-fetched SEO content, then defaults
-  const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
+  // For UI: Use SSR content or defaults
+  const displayH1 = serverH1 || `Best ${treatmentName} in UAE — Verified Specialists`;
+  const displayIntro = serverHeroIntro || treatment?.description || null;
+  const displayContent = serverContent || null;
+  
+  console.log('[ServicePage] displayH1:', displayH1?.substring(0, 40));
+  console.log('[ServicePage] displayIntro length:', displayIntro?.length);
+  console.log('[ServicePage] displayContent length:', displayContent?.length);
+  
+  const parsedContent = displayContent ? parseMarkdownContent(displayContent) : null;
 
-  const isDataReady = !treatmentLoading && !profilesLoading;
-  // Service pages are always indexable per SEO registry
-  const shouldNoIndex = false;
-
-  // Price stats
-  const uaeMin = priceRanges?.length ? Math.min(...priceRanges.map(r => r.price_min)) : 0;
-  const uaeMax = priceRanges?.length ? Math.max(...priceRanges.map(r => r.price_max)) : 0;
+  // Price data
   const sortedByPrice = [...(priceRanges || [])].sort((a, b) => a.price_min - b.price_min);
+  const minPrice = sortedByPrice.length > 0 ? Math.min(...sortedByPrice.map(r => r.price_min)) : 0;
+  const maxPrice = sortedByPrice.length > 0 ? Math.max(...sortedByPrice.map(r => r.price_max)) : 0;
+
+  // FAQs - prefer SSR data
+  const faqs = serverFaqs.length > 0 ? serverFaqs : [
+    {
+      q: `How much does ${treatmentName} cost in the UAE?`,
+      a: minPrice > 0
+        ? `${treatmentName} costs between AED ${minPrice.toLocaleString()} and AED ${maxPrice.toLocaleString()} across the UAE. Prices vary by emirate.`
+        : `Costs vary by clinic and treatment needs. We recommend booking a consultation.`,
+    },
+    {
+      q: `What is ${treatmentName}?`,
+      a: treatment?.description || `${treatmentName} is a professional dental procedure performed by certified specialists.`,
+    },
+    {
+      q: `How do I find the best ${treatmentName} specialist in the UAE?`,
+      a: `Use our directory to compare verified specialists across Dubai, Abu Dhabi, and all emirates. All dentists are DHA/DOH/MOHAP certified.`,
+    },
+    {
+      q: `Does insurance cover ${treatmentName}?`,
+      a: `Coverage depends on your insurance provider and plan. Many clinics offer flexible payment plans.`,
+    },
+  ];
 
   const breadcrumbs = [
     { label: "Home", href: "/" },
@@ -112,126 +141,136 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
     { label: treatmentName },
   ];
 
-  const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs : [
-    {
-      q: `How much does ${treatmentName} cost in the UAE?`,
-      a: uaeMin > 0
-        ? `${treatmentName} costs between AED ${uaeMin.toLocaleString()} and AED ${uaeMax.toLocaleString()} across the UAE. Prices vary by emirate, with ${sortedByPrice[0]?.state?.name || 'northern emirates'} offering the most affordable options. Visit our detailed cost guide for emirate-by-emirate pricing.`
-        : `Costs vary by clinic and treatment needs. We recommend booking a consultation. Many clinics accept insurance and offer payment plans.`,
-    },
-    {
-      q: `What is ${treatmentName}?`,
-      a: treatment?.description || `${treatmentName} is a professional dental procedure designed to improve your oral health and smile. Our qualified dentists across all 7 UAE emirates use the latest techniques.`,
-    },
-    {
-      q: `How do I find the best ${treatmentName} specialist in the UAE?`,
-      a: `Use our directory to compare ${profiles?.length || 0}+ verified specialists across Dubai, Abu Dhabi, Sharjah and all emirates. Filter by rating, location, insurance acceptance, and budget to find your ideal match.`,
-    },
-    {
-      q: `Does insurance cover ${treatmentName}?`,
-      a: `Coverage depends on your insurance provider and plan. DHA-mandated basic plans typically cover preventive procedures, while enhanced plans may cover major treatments. Check with your provider or use our Insurance Checker tool.`,
-    },
-  ];
-
-  const relatedServices = (relatedTreatments || []).map(t => ({ name: t.name, slug: t.slug }));
-
   return (
     <PageLayout>
+      {/* SEO Meta Tags - using SSR data */}
       <SEOHead
-        title={seoDataProp?.title ?? (seoContent?.meta_title || `${treatmentName} in UAE — Find Specialists & Compare Prices`)}
-        description={seoDataProp?.description ?? (seoContent?.meta_description || `Find the best ${treatmentName.toLowerCase()} specialists across the UAE. Compare prices from AED ${uaeMin.toLocaleString()}–${uaeMax.toLocaleString()}, check insurance coverage, and book verified clinics.`)}
-        canonical={seoDataProp?.canonical ?? `/services/${serviceSlug}/`}
+        title={metaTitle}
+        description={metaDescription}
+        canonical={serverCanonical}
         keywords={[`${treatmentName} UAE`, `${treatmentName} cost`, `${treatmentName} Dubai`, `best ${treatmentName} clinic UAE`]}
-        noindex={shouldNoIndex}
       />
+      
       <StructuredData
         type="service"
         name={`${treatmentName} in UAE`}
         description={treatment?.description || `Professional ${treatmentName} services across the UAE`}
-        url={`/services/${serviceSlug}/`}
+        url={serverCanonical}
         provider="AppointPanda Partner Clinics"
         areaServed="United Arab Emirates"
       />
-      <StructuredData type="faq" questions={faqs.map(f => ({ question: f.q || f.question, answer: f.a || f.answer })).filter(f => f.question && f.answer)} />
+      <StructuredData 
+        type="faq" 
+        questions={faqs.map(f => ({ question: f.question, answer: f.answer })).filter(f => f.question && f.answer)} 
+      />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-emerald-light/30 to-background pt-6 pb-10">
+      <section className="relative overflow-hidden bg-gradient-to-b from-background via-emerald-50/50 to-background pt-8 pb-12">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            className="absolute top-20 left-[10%] w-48 md:w-64 h-48 md:h-64 bg-foreground/5 rounded-full blur-3xl"
-            animate={{ scale: [1, 1.1, 1], opacity: [0.05, 0.1, 0.05] }}
-            transition={{ duration: 6, repeat: Infinity }}
+            className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.3, 0.2] }}
+            transition={{ duration: 8, repeat: Infinity }}
           />
           <motion.div
-            className="absolute bottom-10 right-[15%] w-56 md:w-80 h-56 md:h-80 bg-primary/10 rounded-full blur-3xl"
-            animate={{ scale: [1, 1.15, 1], opacity: [0.1, 0.15, 0.1] }}
-            transition={{ duration: 8, repeat: Infinity, delay: 2 }}
+            className="absolute bottom-0 right-1/4 w-80 h-80 bg-teal-200/20 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.15, 1], opacity: [0.15, 0.25, 0.15] }}
+            transition={{ duration: 10, repeat: Infinity, delay: 2 }}
           />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--foreground)/0.02)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--foreground)/0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
         </div>
 
         <div className="container relative z-10 px-4">
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-6">
             <Breadcrumbs items={breadcrumbs} />
           </div>
 
-          <div className="max-w-3xl mx-auto text-center">
-            {sortedByPrice.length > 0 && (() => {
-              const minPrice = Math.min(...sortedByPrice.map(r => r.price_min));
-              const maxPrice = Math.max(...sortedByPrice.map(r => r.price_max));
-              return (
-              <div className="grid sm:grid-cols-2 gap-4 mb-6">
-                {sortedByPrice.map((range, i) => {
-                  const barLeft = sortedByPrice.length > 1 ? ((range.price_min - minPrice) / (maxPrice - minPrice)) * 100 : 0;
-                  const barWidth = sortedByPrice.length > 1 ? ((range.price_max - range.price_min) / (maxPrice - minPrice)) * 100 : 20;
-                  return (
-                    <motion.div
-                      key={range.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="bg-card border border-border rounded-2xl p-4 hover:border-primary/30 transition-all"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <Link href={`/${range.state?.slug}/`} className="flex items-center gap-2 hover:text-primary transition-colors">
-                          <MapPin className="h-4 w-4 text-primary" />
-                          <span className="font-bold text-foreground">{range.state?.name}</span>
-                        </Link>
-                        <span className="font-bold text-primary">
-                          AED {range.price_min.toLocaleString()} – {range.price_max.toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="relative h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="absolute h-full bg-gradient-to-r from-primary/60 to-primary rounded-full"
-                          style={{ left: `${barLeft}%`, width: `${Math.max(barWidth, 5)}%` }}
-                        />
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-              );
-            })()}
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Price Cards */}
+            {sortedByPrice.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
+              >
+                {sortedByPrice.slice(0, 6).map((range, i) => (
+                  <motion.div
+                    key={range.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-2xl p-4 hover:border-emerald-300 hover:shadow-lg transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <MapPin className="h-4 w-4 text-emerald-600" />
+                      <Link href={`/${range.state?.slug}/`} className="font-semibold text-gray-800 hover:text-emerald-700 transition-colors">
+                        {range.state?.name}
+                      </Link>
+                    </div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-bold text-emerald-700">
+                        AED {range.price_min.toLocaleString()}
+                      </span>
+                      <span className="text-gray-400">-</span>
+                      <span className="text-2xl font-bold text-emerald-700">
+                        {range.price_max.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" style={{ width: '100%' }} />
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
 
-            <div className="text-center">
+            {/* Price CTA */}
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
                 href={`/cost/${serviceSlug}/`}
-                className="inline-flex items-center gap-2 text-primary font-bold hover:underline"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-full hover:bg-emerald-700 transition-colors shadow-lg hover:shadow-xl"
               >
-                <BarChart3 className="h-4 w-4" />
-                View detailed price guide & comparison
-                <ArrowRight className="h-4 w-4" />
+                <BarChart3 className="h-5 w-5" />
+                View Full Price Guide
+                <ArrowRight className="h-5 w-5" />
               </Link>
             </div>
+
+            {/* Stats */}
+            {profiles && profiles.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="flex flex-wrap items-center justify-center gap-6 mt-8"
+              >
+                <div className="flex items-center gap-2 text-gray-600">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                  <span><strong className="text-gray-900">{profiles.length}</strong> verified specialists</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Star className="h-5 w-5 text-amber-400 fill-amber-400" />
+                  <span><strong className="text-gray-900">4.8+</strong> average rating</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <MapPin className="h-5 w-5 text-emerald-500" />
+                  <span>All <strong className="text-gray-900">7 emirates</strong></span>
+                </div>
+              </motion.div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
+      {/* Page Intro - H1 + hero intro paragraph */}
+      <PageIntroSection
+        title={displayH1}
+        content={displayIntro}
+      />
+
+      {/* Dentist List */}
       <Section size="lg">
         <div className="container px-4">
-          <div className="max-w-5xl mx-auto space-y-8">
+          <div className="max-w-5xl mx-auto">
             <DentistListFrame
               profiles={profiles || []}
               isLoading={profilesLoading}
@@ -240,67 +279,62 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
               maxHeight={700}
               initialCount={6}
             />
+          </div>
+        </div>
+      </Section>
 
-            <PageIntroSection
-              title={seoContent?.h1 || null}
-              content={seoContent?.content || null}
-              isLoading={isSeoContentPending}
-            />
-
+      {/* SEO Content - full body content */}
+      <Section size="lg">
+        <div className="container px-4">
+          <div className="max-w-4xl mx-auto">
             <SEOContentBlock
               variant="service"
               locationName="UAE"
               treatmentName={treatmentName}
               clinicCount={profiles?.length || 0}
               parsedContent={parsedContent}
-              isLoading={isSeoContentPending}
             />
           </div>
         </div>
       </Section>
 
-      {/* Find by Emirate — Text-based internal links */}
+      {/* Find by Location */}
       {states && states.length > 0 && (
-        <Section size="lg" className="bg-muted/30">
+        <Section size="lg" className="bg-gradient-to-b from-gray-50 to-white">
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-6">
-              <span className="inline-block text-xs font-bold text-emerald uppercase tracking-widest mb-2">By Location</span>
-              <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-                {treatmentName} Specialists <span className="text-primary">Across the UAE</span>
+            <div className="text-center mb-8">
+              <span className="inline-block text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2">By Location</span>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                {treatmentName} in <span className="text-emerald-600">Every Emirate</span>
               </h2>
             </div>
 
-            {/* Text-based paragraph with embedded links */}
-            <div className="text-center text-muted-foreground leading-relaxed mb-6">
+            <div className="text-center text-gray-600 leading-relaxed mb-8">
               <p>
-                Looking for {treatmentName.toLowerCase()} specialists? Browse verified clinics across all 7 emirates:                 {states.map((state, i) => (
+                Find verified {treatmentName.toLowerCase()} specialists in all 7 emirates:{' '}
+                {states.map((state, i) => (
                   <span key={state.id}>
                     {i > 0 && (i === states.length - 1 ? ', and ' : ', ')}
-                    <Link
-                      href={`/${state.slug}/`}
-                      className="text-primary font-bold hover:underline"
-                    >
-                      {treatmentName} in {state.name}
+                    <Link href={`/${state.slug}/`} className="text-emerald-600 font-semibold hover:text-emerald-700 hover:underline">
+                      {state.name}
                     </Link>
                   </span>
-                ))}. Each emirate has licensed DHA, DOH, or MOHAP-certified practitioners offering quality dental care at competitive prices.
+                ))}
               </p>
             </div>
 
-            {/* Emirate Comparison Links */}
             {sortedByPrice.length > 1 && (
               <div className="text-center">
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 block">Compare Prices</span>
-                <div className="leading-loose">
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 block">Compare Prices</span>
+                <div className="flex flex-wrap justify-center gap-3">
                   {sortedByPrice.slice(0, -1).map((range, i) => {
                     const nextRange = sortedByPrice[i + 1];
                     if (!nextRange) return null;
                     return (
                       <span key={range.id}>
-                        {i > 0 && <span className="text-muted-foreground mx-2">·</span>}
                         <Link
                           href={`/compare/${serviceSlug}/${range.state?.slug}-vs-${nextRange.state?.slug}/`}
-                          className="text-primary font-bold hover:underline text-sm"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-emerald-300 hover:text-emerald-600 transition-colors"
                         >
                           {range.state?.name} vs {nextRange.state?.name}
                         </Link>
@@ -318,30 +352,68 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, faqsProp }: ServicePageProp
       <Section size="lg">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
-            <span className="inline-block text-xs font-bold text-primary uppercase tracking-widest mb-2">Have Questions?</span>
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              Frequently Asked <span className="text-primary">Questions</span>
+            <span className="inline-block text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2">FAQ</span>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+              Frequently Asked <span className="text-emerald-600">Questions</span>
             </h2>
           </div>
 
-          <Accordion type="single" collapsible defaultValue="faq-0" className="space-y-3">
+          <div className="space-y-4">
             {faqs.map((faq, i) => (
-              <AccordionItem
+              <motion.div
                 key={i}
-                value={`faq-${i}`}
-                className="bg-card border border-border rounded-2xl px-5 data-[state=open]:border-primary/30"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
               >
-                <AccordionTrigger className="text-left font-bold hover:no-underline py-4 text-sm md:text-base">
-                  {faq.q}
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-4 text-sm">
-                  {faq.a}
-                </AccordionContent>
-              </AccordionItem>
+                <Accordion type="single" collapsible className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                  <AccordionItem value={`faq-${i}`} className="border-0">
+                    <AccordionTrigger className="text-left font-semibold text-gray-800 hover:no-underline px-6 py-4 hover:bg-gray-50 transition-colors">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-gray-600 px-6 pb-4">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </motion.div>
             ))}
-          </Accordion>
+          </div>
         </div>
       </Section>
+
+      {/* Related Services */}
+      {relatedTreatments && relatedTreatments.length > 0 && (
+        <Section size="lg" className="bg-gray-50">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-8">
+              <span className="inline-block text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2">Explore More</span>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                Related <span className="text-emerald-600">Dental Services</span>
+              </h2>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedTreatments.map((t, i) => (
+                <motion.div
+                  key={t.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <Link
+                    href={`/services/${t.slug}/`}
+                    className="block p-6 bg-white rounded-2xl border border-gray-200 hover:border-emerald-300 hover:shadow-lg transition-all"
+                  >
+                    <h3 className="font-semibold text-gray-900 mb-2">{t.name}</h3>
+                    <p className="text-sm text-gray-500 line-clamp-2">{t.description}</p>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </Section>
+      )}
     </PageLayout>
   );
 };

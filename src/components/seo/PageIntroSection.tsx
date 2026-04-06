@@ -1,7 +1,3 @@
-import { motion } from "framer-motion";
-import { FileText } from "lucide-react";
-import { parseMarkdownToHtml, stripMarkdown } from "@/lib/utils/parseMarkdown";
-
 interface PageIntroSectionProps {
   title: string | null;
   content: string | null;
@@ -9,89 +5,55 @@ interface PageIntroSectionProps {
   className?: string;
 }
 
-/**
- * PageIntroSection - CMS-powered intro content section
- * Displays H2 heading and paragraph content from page_content table
- * Used on location pages (City, State, ServiceLocation) after hero
- */
 export const PageIntroSection = ({
   title,
   content,
   isLoading = false,
   className = "",
 }: PageIntroSectionProps) => {
-  // IMPORTANT: Always render section structure for SEO crawlers
-  // Even when loading, provide semantic HTML structure
-  
   if (isLoading) {
     return (
-      <section 
-        className={`py-8 md:py-10 bg-muted/30 border-y border-border ${className}`}
-        aria-busy="true"
-      >
-        <div className="container px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="hidden md:flex shrink-0 h-10 w-10 rounded-xl bg-muted animate-pulse" />
-                <div className="flex-1 space-y-3 animate-pulse">
-                  <div className="h-6 w-2/3 bg-muted rounded-lg" />
-                  <div className="space-y-2">
-                    <div className="h-4 w-full bg-muted rounded" />
-                    <div className="h-4 w-5/6 bg-muted rounded" />
-                    <div className="h-4 w-4/5 bg-muted rounded" />
-                  </div>
-                </div>
-              </div>
+      <div style={{ padding: '48px 16px', backgroundColor: '#f9fafb', borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>
+        <div style={{ maxWidth: '896px', margin: '0 auto' }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '32px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <div style={{ height: '28px', width: '66%', backgroundColor: '#e5e7eb', borderRadius: '8px', marginBottom: '16px' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ height: '16px', width: '100%', backgroundColor: '#e5e7eb', borderRadius: '4px' }} />
+              <div style={{ height: '16px', width: '83%', backgroundColor: '#e5e7eb', borderRadius: '4px' }} />
+              <div style={{ height: '16px', width: '80%', backgroundColor: '#e5e7eb', borderRadius: '4px' }} />
             </div>
           </div>
         </div>
-      </section>
+      </div>
     );
   }
 
-  // If no title AND no content, render minimal fallback for SEO structure
-  if (!title && !content) {
+  const hasContent = !!(title || content);
+
+  if (!hasContent) {
+    console.log('[PageIntroSection] No title or content, returning null');
     return null;
   }
 
+  console.log('[PageIntroSection] Rendering with title:', !!title, 'content:', !!content);
+
   return (
-    <section className={`py-8 md:py-10 bg-muted/30 border-y border-border ${className}`}>
-      <div className="container px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="max-w-4xl mx-auto"
-        >
-          <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-sm">
-            <div className="flex items-start gap-4">
-              <div className="hidden md:flex shrink-0 h-10 w-10 rounded-xl bg-primary/10 items-center justify-center">
-                <FileText className="h-5 w-5 text-primary" />
-              </div>
-              
-              <div className="flex-1 space-y-3">
-                {title && (
-                  <h2 
-                    className="text-lg md:text-xl lg:text-2xl font-bold text-foreground"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                  >
-                    {stripMarkdown(title)}
-                  </h2>
-                )}
-                
-                {content && (
-                  <div 
-                    className="text-sm md:text-base text-muted-foreground leading-relaxed prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(content) }}
-                  />
-                )}
-              </div>
+    <div style={{ padding: '48px 16px', backgroundColor: '#ffffff', borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>
+      <div style={{ maxWidth: '896px', margin: '0 auto' }}>
+        <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '32px 40px' }}>
+          {title && (
+            <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#111827', marginBottom: '20px', lineHeight: '1.3' }}>
+              {title}
+            </h1>
+          )}
+          {content && (
+            <div style={{ color: '#4b5563', lineHeight: '1.75' }}>
+              <p style={{ fontSize: '18px', margin: 0 }}>{content}</p>
             </div>
-          </div>
-        </motion.div>
+          )}
+        </div>
       </div>
-    </section>
+    </div>
   );
 };
 

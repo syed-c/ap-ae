@@ -183,13 +183,34 @@ export function useSeoPageContent(slug: string | undefined) {
         console.error("Error fetching SEO page content:", optimizedError);
       }
 
-      // If we found optimized content, return it
+      // If we found content (optimized or not), return it
       if (optimizedData && optimizedData.content) {
         console.log(`[SEO] Found optimized content for:`, normalizedSlug);
         return {
           ...optimizedData,
           faqs: parseFaqs(optimizedData.faqs),
         } as SeoPageContent;
+      }
+
+      // Also check if there's content even if is_optimized is false
+      // This handles cases where content exists but is_optimized is not set
+      if (optimizedData && !optimizedData.content) {
+        const { data: anyData } = await supabaseAdmin
+          .from("seo_pages")
+          .select("*")
+          .in("slug", candidates)
+          .not("content", "is", null)
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        if (anyData) {
+          console.log(`[SEO] Found content (not optimized) for:`, normalizedSlug);
+          return {
+            ...anyData,
+            faqs: parseFaqs(anyData.faqs),
+          } as SeoPageContent;
+        }
       }
 
       // Fallback: Get any page with content (even if not marked optimized)
