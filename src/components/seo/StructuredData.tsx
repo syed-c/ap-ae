@@ -56,6 +56,7 @@ export interface ArticleSchemaProps {
 export interface FAQSchemaProps {
   type: 'faq';
   questions: { question: string; answer: string }[];
+  includeSpeakable?: boolean;
 }
 
 // Breadcrumb Schema
@@ -280,6 +281,12 @@ const generateFAQSchema = (props: FAQSchemaProps) => ({
       text: q.answer,
     },
   })),
+  ...(props.includeSpeakable && {
+    speakable: {
+      '@type': 'SpeakableSpecification',
+      cssSelector: ['.faq-answer', '.hero-intro', '.ai-definition'],
+    },
+  }),
 });
 
 const generateBreadcrumbSchema = (props: BreadcrumbSchemaProps) => ({

@@ -546,16 +546,27 @@ SERVICE CONTEXT:
 * Patient pain points: ${serviceData.pain_points}
 * What makes UAE unique: ${serviceData.why_unique}
 
+═══════════════════════════════════════════════════════════════════════
+AI-OPTIMIZED STRUCTURE (CRITICAL FOR AI OVERVIEW EXTRACTION)
+═══════════════════════════════════════════════════════════════════════
+Your content MUST be structured to help AI systems (Google AI Overviews, Perplexity, ChatGPT) extract and cite content. Use this exact format:
+
+1. AI_DEFINITION: Start with 2-3 sentences directly answering "What is [treatment]?" - this is what AI will quote
+2. PROCESS_STEPS: Numbered step-by-step guide (6-8 steps) 
+3. COST_RANGE: AED price table with min/max for each component
+4. CHECKLIST: "Is it right for me?" - bullet points with YES/NO applicability
+5. COMPARISON: Optional - compare treatment alternatives
+
 MANDATORY RULES:
 
 1. WRITE LIKE A DENTAL EXPERT ADVISING A PATIENT:
    - Don't sell - inform and educate
-   - Include real costs ranges for UAE
+   - Include real costs ranges for UAE in AED
    - Mention realistic timelines
    - Include what to ask during consultations
 
 2. UAE-SPECIFIC CONTENT:
-   - Include cost ranges in AED
+   - Include cost ranges in AED (dirhams)
    - Mention DHA/DOH licensing requirements
    - Reference insurance coverage where relevant
    - Consider expat vs local patient perspectives
@@ -590,7 +601,11 @@ Return ONLY JSON with:
   "cta_button_text": "",
   "cta_button_url": "",
   "faqs": [],
-  "is_published": true
+  "is_published": true,
+  "ai_definition": "2-3 sentence direct answer to 'What is [treatment]?'",
+  "ai_process_steps": [{"step": 1, "title": "", "description": ""}, ...],
+  "ai_cost_range": [{"treatment": "", "min_aed": 0, "max_aed": 0, "notes": ""}, ...],
+  "ai_checklist": [{"criteria": "", "applies": true/false, "description": ""}, ...]
 }`;
 
   try {
@@ -971,6 +986,23 @@ async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
   // Only add faqs if there are actual FAQs
   if (pageData.faqs && pageData.faqs.length > 0) {
     saveData.faqs = pageData.faqs;
+  }
+
+  // AI-optimized structured content fields for AI Overview extraction
+  if (pageData.ai_definition) {
+    saveData.ai_definition = pageData.ai_definition;
+  }
+  if (pageData.ai_process_steps) {
+    saveData.ai_process_steps = pageData.ai_process_steps;
+  }
+  if (pageData.ai_cost_range) {
+    saveData.ai_cost_range = pageData.ai_cost_range;
+  }
+  if (pageData.ai_checklist) {
+    saveData.ai_checklist = pageData.ai_checklist;
+  }
+  if (pageData.ai_comparison_table) {
+    saveData.ai_comparison_table = pageData.ai_comparison_table;
   }
 
   console.log(`page-content-generator: Save data keys: ${Object.keys(saveData).join(", ")}`);

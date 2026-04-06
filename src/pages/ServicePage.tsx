@@ -23,11 +23,22 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
+  Target,
+  Heart,
+  Shield,
+  Users,
+  Award,
+  CheckCircle,
+  CheckCircle2,
+  XCircle,
+  ArrowRight,
+  Building2,
+  Sparkles,
+  Globe,
+  TrendingUp,
+  Star,
   MapPin,
   BarChart3,
-  ArrowRight,
-  CheckCircle2,
-  Star,
 } from "lucide-react";
 
 interface ServicePageProps {
@@ -41,9 +52,13 @@ interface ServicePageProps {
   heroIntroProp?: string | null;
   contentProp?: string | null;
   faqsProp?: { question: string; answer: string }[];
+  aiDefinitionProp?: string | null;
+  aiProcessStepsProp?: { step: number; title: string; description: string }[] | null;
+  aiCostRangeProp?: { treatment: string; min_aed: number; max_aed: number; notes: string }[] | null;
+  aiChecklistProp?: { criteria: string; applies: boolean; description: string }[] | null;
 }
 
-const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, contentProp, faqsProp }: ServicePageProps = {}) => {
+const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, contentProp, faqsProp, aiDefinitionProp, aiProcessStepsProp, aiCostRangeProp, aiChecklistProp }: ServicePageProps = {}) => {
   const router = useRouter();
   const serviceSlug = serviceSlugProp || (typeof router.query?.serviceSlug === 'string' ? router.query.serviceSlug : '');
 
@@ -57,6 +72,10 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
   const serverHeroIntro = heroIntroProp || null;
   const serverContent = contentProp || null;
   const serverFaqs = faqsProp || [];
+  const serverAiDefinition = aiDefinitionProp || null;
+  const serverAiProcessSteps = aiProcessStepsProp || null;
+  const serverAiCostRange = aiCostRangeProp || null;
+  const serverAiChecklist = aiChecklistProp || null;
 
   console.log('[Client] serverTitle:', serverTitle?.substring(0, 40));
   console.log('[Client] serverH1:', serverH1?.substring(0, 40));
@@ -192,11 +211,8 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
       />
       <StructuredData 
         type="faq" 
-        questions={faqs.map(f => ({ question: f.question, answer: f.answer })).filter(f => f.question && f.answer)} 
-      />
-      <StructuredData 
-        type="faq" 
-        questions={faqs.map(f => ({ question: f.question, answer: f.answer })).filter(f => f.question && f.answer)} 
+        questions={faqs.map(f => ({ question: f.question, answer: f.answer })).filter(f => f.question && f.answer)}
+        includeSpeakable={true}
       />
 
       {/* Hero Section */}
@@ -302,6 +318,109 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
         content={displayIntro}
       />
 
+      {/* AI-Optimized Structured Content Section */}
+      {serverAiDefinition && (
+        <Section size="lg">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <span className="inline-block text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2">About This Treatment</span>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                What is <span className="text-emerald-600">{treatmentName}</span>?
+              </h2>
+            </div>
+            
+            {/* AI Definition - direct answer for AI extraction */}
+            <div className="ai-definition bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 md:p-8 mb-8">
+              <p className="text-lg text-gray-700 leading-relaxed">
+                {serverAiDefinition}
+              </p>
+            </div>
+
+            {/* Process Steps - Numbered for AI */}
+            {serverAiProcessSteps && serverAiProcessSteps.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm">✓</span>
+                  Treatment Process
+                </h3>
+                <div className="space-y-4">
+                  {serverAiProcessSteps.map((step, i) => (
+                    <div key={i} className="flex gap-4">
+                      <div className="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold shrink-0">
+                        {step.step}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-800">{step.title}</h4>
+                        <p className="text-gray-600 text-sm">{step.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Cost Range Table - AED prices */}
+            {serverAiCostRange && serverAiCostRange.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-8 h-8 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center text-sm">₿</span>
+                  Cost Range (AED)
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full bg-white border border-gray-200 rounded-xl">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-700">Treatment</th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-700">Min (AED)</th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-700">Max (AED)</th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-700">Notes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {serverAiCostRange.map((cost, i) => (
+                        <tr key={i} className="border-t border-gray-100">
+                          <td className="px-4 py-3 text-gray-800">{cost.treatment}</td>
+                          <td className="px-4 py-3 text-emerald-600 font-semibold">{cost.min_aed.toLocaleString()}</td>
+                          <td className="px-4 py-3 text-emerald-600 font-semibold">{cost.max_aed.toLocaleString()}</td>
+                          <td className="px-4 py-3 text-gray-500 text-sm">{cost.notes}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Checklist - Is it right for me? */}
+            {serverAiChecklist && serverAiChecklist.length > 0 && (
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-sm">?</span>
+                  Is It Right For Me?
+                </h3>
+                <div className="space-y-3">
+                  {serverAiChecklist.map((item, i) => (
+                    <div key={i} className={`flex items-start gap-3 p-4 rounded-xl border ${item.applies ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                      {item.applies ? (
+                        <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
+                      )}
+                      <div>
+                        <span className={`font-semibold ${item.applies ? 'text-green-800' : 'text-red-800'}`}>
+                          {item.criteria}
+                        </span>
+                        <p className="text-gray-600 text-sm mt-1">{item.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </Section>
+      )}
+
       {/* Dentist List */}
       <Section size="lg">
         <div className="container px-4">
@@ -406,7 +525,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
                     <AccordionTrigger className="text-left font-semibold text-gray-800 hover:no-underline px-6 py-4 hover:bg-gray-50 transition-colors">
                       {faq.question}
                     </AccordionTrigger>
-                    <AccordionContent className="text-gray-600 px-6 pb-4">
+                    <AccordionContent className="faq-answer text-gray-600 px-6 pb-4">
                       {faq.answer}
                     </AccordionContent>
                   </AccordionItem>

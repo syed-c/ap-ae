@@ -47,7 +47,7 @@ export const PageIntroSection = ({
             </h1>
           )}
           {content && (
-            <div style={{ color: '#4b5563', lineHeight: '1.75' }}>
+            <div className="hero-intro" style={{ color: '#4b5563', lineHeight: '1.75' }}>
               <p style={{ fontSize: '18px', margin: 0 }}>{content}</p>
             </div>
           )}

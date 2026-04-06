@@ -342,6 +342,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
       <StructuredData
         type="faq"
         questions={faqs.map(f => ({ question: f.q || f.question, answer: f.a || f.answer }))}
+        includeSpeakable={true}
       />
 
       {/* SECTION 1: Hero — Dark theme matching homepage */}

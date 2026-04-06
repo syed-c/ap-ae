@@ -158,8 +158,18 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     // Build content string from page_content sections
     let contentText: string | null = null;
     let heroIntro: string | null = null;
+    let aiDefinition: string | null = null;
+    let aiProcessSteps: any[] | null = null;
+    let aiCostRange: any[] | null = null;
+    let aiChecklist: any[] | null = null;
+    
     if (pageContent) {
         heroIntro = pageContent.hero_intro || null;
+        aiDefinition = (pageContent as any).ai_definition || null;
+        aiProcessSteps = (pageContent as any).ai_process_steps || null;
+        aiCostRange = (pageContent as any).ai_cost_range || null;
+        aiChecklist = (pageContent as any).ai_checklist || null;
+        
         const sections = [];
         if (pageContent.body_content) sections.push(pageContent.body_content);
         if (pageContent.section_1_title && pageContent.section_1_content) sections.push(`## ${pageContent.section_1_title}\n\n${pageContent.section_1_content}`);
@@ -170,6 +180,11 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         // Use seo_pages: page_intro for hero, content for body
         heroIntro = seoContent.page_intro || null;
         contentText = seoContent.content || null;
+        // Also check seo_pages for AI structured content
+        aiDefinition = (seoContent as any).ai_definition || null;
+        aiProcessSteps = (seoContent as any).ai_process_steps || null;
+        aiCostRange = (seoContent as any).ai_cost_range || null;
+        aiChecklist = (seoContent as any).ai_checklist || null;
     }
 
     console.log('[SSR] final h1:', h1);
