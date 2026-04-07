@@ -6,7 +6,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs, seoH1 }: {
+const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs, seoH1, heroIntro, content, allSeoData }: {
     stateSlug: string;
     citySlug: string;
     serviceSlug: string;
@@ -16,6 +16,9 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
     seoData: { title: string | null; description: string | null; canonical: string };
     faqs: { question: string; answer: string }[];
     seoH1: string | null;
+    heroIntro?: string | null;
+    content?: string | null;
+    allSeoData?: any;
 }) => {
     const treatmentName = treatmentData?.name || serviceSlug;
     const cityName = cityData?.name || citySlug;
@@ -79,6 +82,9 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
                 seoDataProp={seoData}
                 faqsProp={faqs}
                 seoH1Prop={seoH1}
+                heroIntroProp={heroIntro}
+                contentProp={content}
+                allSeoDataProp={allSeoData}
             />
         </>
     );
@@ -173,7 +179,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .then(r => r.data),
         supabase
             .from('seo_pages')
-            .select('id, slug, meta_title, meta_description, content, is_optimized, h1, faqs')
+            .select('*')
             .eq('slug', seoSlug)
             .order('is_optimized', { ascending: false })
             .limit(1)
@@ -191,6 +197,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const metaTitle = seoContent?.meta_title || null;
     const metaDescription = seoContent?.meta_description || null;
     const seoH1 = seoContent?.h1 || null;
+    const heroIntro = seoContent?.page_intro || null;
+    const content = seoContent?.content || null;
 
     let ssrFaqs: { question: string; answer: string }[] = [];
     
@@ -216,6 +224,9 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             },
             faqs: ssrFaqs,
             seoH1: seoH1,
+            heroIntro,
+            content,
+            allSeoData: seoContent,
         },
         revalidate: 600,
     };

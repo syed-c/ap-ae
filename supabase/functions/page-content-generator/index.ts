@@ -622,21 +622,80 @@ Return ONLY JSON with:
     }
 
     const content = String(aiResponse);
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
     
-    if (!jsonMatch) {
-      console.error("SERVICE_GEN: No JSON in response:", content.substring(0, 300));
-      return { success: false, error: "Invalid JSON in response" };
+    // More robust JSON extraction
+    let jsonMatch = content.match(/\{[\s\S]*\}/);
+    
+    if (jsonMatch) {
+      try {
+        const pageDataResult = JSON.parse(jsonMatch[0]);
+        console.log("SERVICE_GEN: Parsed successfully, keys:", Object.keys(pageDataResult));
+        return { success: true, data: pageDataResult };
+      } catch (parseErr) {
+        console.error("SERVICE_GEN: First parse failed, trying alternative extraction...");
+        
+        // Try code block first
+        const codeBlockMatch = content.match(/```json\n([\s\S]*?)\n```/);
+        if (codeBlockMatch) {
+          try {
+            const pageDataResult = JSON.parse(codeBlockMatch[1]);
+            console.log("SERVICE_GEN: Parsed from code block, keys:", Object.keys(pageDataResult));
+            return { success: true, data: pageDataResult };
+          } catch (e) {
+            console.error("SERVICE_GEN: Code block parse also failed");
+          }
+        }
+        
+        // Try finding balanced JSON by tracking braces
+        const jsonStart = content.indexOf('{');
+        if (jsonStart !== -1) {
+          let depth = 0;
+          let inString = false;
+          let escape = false;
+          
+          for (let i = jsonStart; i < content.length; i++) {
+            const char = content[i];
+            
+            if (escape) {
+              escape = false;
+              continue;
+            }
+            
+            if (char === '\\') {
+              escape = true;
+              continue;
+            }
+            
+            if (char === '"') {
+              inString = !inString;
+              continue;
+            }
+            
+            if (inString) continue;
+            
+            if (char === '{') depth++;
+            else if (char === '}') depth--;
+            
+            if (depth === 0) {
+              const jsonStr = content.substring(jsonStart, i + 1);
+              try {
+                const pageDataResult = JSON.parse(jsonStr);
+                console.log("SERVICE_GEN: Parsed via balanced braces, keys:", Object.keys(pageDataResult));
+                return { success: true, data: pageDataResult };
+              } catch (e2) {
+                break;
+              }
+            }
+          }
+        }
+        
+        console.error("SERVICE_GEN: JSON parse error:", parseErr instanceof Error ? parseErr.message : String(parseErr));
+        return { success: false, error: "JSON parse failed: " + (parseErr instanceof Error ? parseErr.message : String(parseErr)) };
+      }
     }
-
-    try {
-      const pageDataResult = JSON.parse(jsonMatch[0]);
-      console.log("SERVICE_GEN: Parsed successfully, keys:", Object.keys(pageDataResult));
-      return { success: true, data: pageDataResult };
-    } catch (parseErr) {
-      console.error("SERVICE_GEN: JSON parse error:", parseErr instanceof Error ? parseErr.message : String(parseErr));
-      return { success: false, error: "JSON parse failed" };
-    }
+    
+    console.error("SERVICE_GEN: No JSON in response:", content.substring(0, 500));
+    return { success: false, error: "Invalid JSON in response" };
   } catch (err) {
     return { success: false, error: err instanceof Error ? err.message : "Generation failed" };
   }
@@ -771,7 +830,7 @@ async function callAIWithRetry(messages: { role: string; content: string }[], ai
         body: JSON.stringify({
           model: "gpt-4o-mini",
           messages,
-          max_tokens: 2000,
+          max_tokens: 4000,
           temperature: 0.7,
         }),
       });
@@ -1015,30 +1074,25 @@ async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
     throw error;
   }
 
-  // Also save to page_content for service pages
+  // Also save to page_content for service pages (non-blocking)
   if (pageType === "service" && pageData.page_slug) {
-    const pageContentData = {
-      page_slug: pageData.page_slug,
-      meta_title: pageData.meta_title,
-      meta_description: pageData.meta_description,
-      h1: pageData.h1,
-      hero_intro: pageData.hero_intro || pageData.intro_text,
-      body_content: pageData.body_content,
-      section_1_title: pageData.section_1_title,
-      section_1_content: pageData.section_1_content,
-      section_2_title: pageData.section_2_title,
-      section_2_content: pageData.section_2_content,
-      section_3_title: pageData.section_3_title,
-      section_3_content: pageData.section_3_content,
-      faqs: pageData.faqs,
-      is_published: true,
-    };
-    
-    const { error: pcError } = await supabase.from("page_content").upsert(pageContentData, { onConflict: "page_slug" });
-    if (pcError) {
-      console.error(`page-content-generator: page_content save error:`, JSON.stringify(pcError));
-    } else {
-      console.log(`page-content-generator: Successfully saved to page_content ${pageData.page_slug}`);
+    try {
+      const pageContentData = {
+        page_slug: pageData.page_slug,
+        page_type: "service",
+        meta_title: pageData.meta_title || null,
+        meta_description: pageData.meta_description || null,
+        h1: pageData.h1 || null,
+        hero_intro: pageData.hero_intro || pageData.intro_text || null,
+        body_content: pageData.body_content || null,
+        faqs: pageData.faqs || [],
+        is_published: true,
+      };
+      
+      await supabase.from("page_content").upsert(pageContentData, { onConflict: "page_slug" });
+      console.log(`page-content-generator: Saved to page_content ${pageData.page_slug}`);
+    } catch (pcError) {
+      console.warn(`page-content-generator: page_content save failed (non-blocking):`, pcError);
     }
   }
 
@@ -1064,9 +1118,10 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const body = await req.json();
-    const { action, page_type, page_slug, location_name, emirate_slug, emirate_name, force_regenerate = false, page_type_filter = "all", emirate_filter, batch_size = 10 } = body;
+    const { action, page_type, page_slug, location_name, emirate_slug, emirate_name, force_regenerate = false, page_type_filter = "all", emirate_filter, batch_size = 10, service_slug } = body;
 
-    console.log(`page-content-generator: action=${action}, page_type=${page_type}`);
+    console.log(`page-content-generator: action=${action}, page_type=${page_type}, service_slug=${service_slug}`);
+    console.log(`page-content-generator: full body keys=${Object.keys(body).join(", ")}`);
 
     if (action === "generate_single") {
       const pageData = {
@@ -1331,7 +1386,10 @@ serve(async (req) => {
 
     // Generate single service page
     if (action === "generate_single_service") {
-      const serviceSlug = body.service_slug;
+      console.log("page-content-generator: Entered generate_single_service handler");
+      const serviceSlug = body.service_slug || service_slug;
+      
+      console.log(`page-content-generator: service_slug extracted = ${serviceSlug}`);
       
       if (!serviceSlug) {
         return new Response(JSON.stringify({ success: false, error: "service_slug is required" }), {
@@ -1475,6 +1533,329 @@ serve(async (req) => {
         total_count: pagesToGenerate.length,
         page_type: "service-location"
       }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // NEW: Generate service-location pages by emirate (all areas + all services)
+    if (action === "generate_service_locations_by_emirate") {
+      const cursor = body.cursor || null;
+      const batchLimit = body.batch_limit || 5;
+      const emirateSlug = body.emirate_slug;
+
+      if (!emirateSlug) {
+        return new Response(JSON.stringify({ success: false, error: "emirate_slug is required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      console.log(`page-content-generator: Generating service-locations for emirate: ${emirateSlug}, cursor: ${cursor}`);
+
+      const states = await fetchAllRows(supabase, "states", "id, slug, name", { is_active: true });
+      const state = states.find(s => s.slug === emirateSlug);
+      
+      if (!state) {
+        return new Response(JSON.stringify({ success: false, error: `Emirate not found: ${emirateSlug}` }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const cities = await fetchAllRows(supabase, "cities", "id, slug, name, state_id", { state_id: state.id, is_active: true });
+      const treatments = await fetchAllRows(supabase, "treatments", "id, slug, name", { is_active: true });
+
+      // Build service-location pages for this emirate only
+      let slPages: any[] = [];
+      
+      for (const city of cities) {
+        for (const treatment of treatments) {
+          slPages.push({
+            slug: `/${emirateSlug}/${city.slug}/${treatment.slug}`,
+            type: "service-location",
+            state_slug: emirateSlug,
+            state_name: state.name,
+            city_slug: city.slug,
+            city_name: city.name,
+            service_slug: treatment.slug,
+            service_name: treatment.name,
+          });
+        }
+      }
+
+      // Get existing pages
+      const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
+      const existingSlugs = new Set(existingPages.map(p => p.slug));
+
+      let pagesToGenerate = slPages;
+      if (!force_regenerate) {
+        pagesToGenerate = slPages.filter(p => !existingSlugs.has(p.slug));
+      }
+
+      // Find start index based on cursor
+      let startIndex = 0;
+      if (cursor) {
+        startIndex = pagesToGenerate.findIndex(p => p.slug === cursor);
+        if (startIndex === -1) startIndex = 0;
+        else startIndex += 1;
+      }
+
+      const pagesToProcess = pagesToGenerate.slice(startIndex, startIndex + batchLimit);
+
+      let processed = 0;
+      let skipped = 0;
+      let failed = 0;
+      const errors: string[] = [];
+      let lastProcessedSlug = null;
+
+      for (const page of pagesToProcess) {
+        console.log(`page-content-generator: Generating ${page.slug}...`);
+        try {
+          const result = await generateServiceLocationContent(page, aimlapiKey, force_regenerate);
+          if (result.success) {
+            await saveSeoPage(supabase, result.data);
+            processed++;
+            lastProcessedSlug = page.slug;
+          } else {
+            failed++;
+            errors.push(`SL ${page.slug}: ${result.error}`);
+          }
+        } catch (pageErr) {
+          failed++;
+          errors.push(`Error for ${page.slug}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
+        }
+        await delay(500);
+      }
+
+      const remaining = pagesToGenerate.length - (startIndex + pagesToProcess.length);
+      const hasMore = remaining > 0;
+
+      console.log(`page-content-generator: Batch complete: ${processed} processed, ${skipped} skipped, ${failed} failed, ${remaining} remaining`);
+
+      return new Response(JSON.stringify({
+        processed,
+        skipped,
+        failed,
+        errors,
+        cursor: lastProcessedSlug,
+        has_more: hasMore,
+        remaining,
+        total_count: pagesToGenerate.length,
+        page_type: "service-location"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // NEW: Generate service-location pages by city (all services in one area)
+    if (action === "generate_service_locations_by_city") {
+      const cursor = body.cursor || null;
+      const batchLimit = body.batch_limit || 5;
+      const emirateSlug = body.emirate_slug;
+      const citySlug = body.city_slug;
+
+      if (!emirateSlug || !citySlug) {
+        return new Response(JSON.stringify({ success: false, error: "emirate_slug and city_slug are required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      console.log(`page-content-generator: Generating service-locations for city: ${citySlug}, ${emirateSlug}, cursor: ${cursor}`);
+
+      const states = await fetchAllRows(supabase, "states", "id, slug, name", { is_active: true });
+      const state = states.find(s => s.slug === emirateSlug);
+      
+      if (!state) {
+        return new Response(JSON.stringify({ success: false, error: `Emirate not found: ${emirateSlug}` }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const cities = await fetchAllRows(supabase, "cities", "id, slug, name, state_id", { state_id: state.id, is_active: true });
+      const city = cities.find(c => c.slug === citySlug);
+      
+      if (!city) {
+        return new Response(JSON.stringify({ success: false, error: `City not found: ${citySlug}` }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const treatments = await fetchAllRows(supabase, "treatments", "id, slug, name", { is_active: true });
+
+      // Build service-location pages for this city only
+      let slPages: any[] = [];
+      
+      for (const treatment of treatments) {
+        slPages.push({
+          slug: `/${emirateSlug}/${citySlug}/${treatment.slug}`,
+          type: "service-location",
+          state_slug: emirateSlug,
+          state_name: state.name,
+          city_slug: citySlug,
+          city_name: city.name,
+          service_slug: treatment.slug,
+          service_name: treatment.name,
+        });
+      }
+
+      // Get existing pages
+      const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
+      const existingSlugs = new Set(existingPages.map(p => p.slug));
+
+      let pagesToGenerate = slPages;
+      if (!force_regenerate) {
+        pagesToGenerate = slPages.filter(p => !existingSlugs.has(p.slug));
+      }
+
+      // Find start index based on cursor
+      let startIndex = 0;
+      if (cursor) {
+        startIndex = pagesToGenerate.findIndex(p => p.slug === cursor);
+        if (startIndex === -1) startIndex = 0;
+        else startIndex += 1; // Start after the cursor
+      }
+
+      const pagesToProcess = pagesToGenerate.slice(startIndex, startIndex + batchLimit);
+
+      let processed = 0;
+      let skipped = 0;
+      let failed = 0;
+      const errors: string[] = [];
+      let lastProcessedSlug = null;
+
+      for (const page of pagesToProcess) {
+        console.log(`page-content-generator: Generating ${page.slug}...`);
+        try {
+          const result = await generateServiceLocationContent(page, aimlapiKey, force_regenerate);
+          if (result.success) {
+            await saveSeoPage(supabase, result.data);
+            processed++;
+            lastProcessedSlug = page.slug;
+          } else {
+            failed++;
+            errors.push(`SL ${page.slug}: ${result.error}`);
+          }
+        } catch (pageErr) {
+          failed++;
+          errors.push(`Error for ${page.slug}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
+        }
+        await delay(500);
+      }
+
+      const remaining = pagesToGenerate.length - (startIndex + pagesToProcess.length);
+      const hasMore = remaining > 0;
+
+      console.log(`page-content-generator: Batch complete: ${processed} processed, ${skipped} skipped, ${failed} failed, ${remaining} remaining`);
+
+      return new Response(JSON.stringify({
+        processed,
+        skipped,
+        failed,
+        errors,
+        cursor: lastProcessedSlug,
+        has_more: hasMore,
+        remaining,
+        total_count: pagesToGenerate.length,
+        page_type: "service-location"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // NEW: Generate single service-location page by slug
+    if (action === "generate_single_service_location") {
+      const slug = body.slug;
+
+      if (!slug) {
+        return new Response(JSON.stringify({ success: false, error: "slug is required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      console.log(`page-content-generator: Generating single service-location: ${slug}`);
+
+      // Parse slug to get state, city, service
+      const parts = slug.split("/").filter(Boolean);
+      if (parts.length < 3) {
+        return new Response(JSON.stringify({ success: false, error: "Invalid slug format. Expected: emirate/city/service (e.g., dubai/al-barsha/general-dentistry)" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const stateSlug = parts[0];
+      const citySlug = parts[1];
+      const serviceSlug = parts[2];
+
+      // Get state, city, treatment data
+      const states = await fetchAllRows(supabase, "states", "id, slug, name", { is_active: true });
+      const state = states.find(s => s.slug === stateSlug);
+      
+      if (!state) {
+        return new Response(JSON.stringify({ success: false, error: `Emirate not found: ${stateSlug}` }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const cities = await fetchAllRows(supabase, "cities", "id, slug, name, state_id", { state_id: state.id, is_active: true });
+      const city = cities.find(c => c.slug === citySlug);
+      
+      if (!city) {
+        return new Response(JSON.stringify({ success: false, error: `City not found: ${citySlug}` }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const treatments = await fetchAllRows(supabase, "treatments", "id, slug, name", { is_active: true });
+      const treatment = treatments.find(t => t.slug === serviceSlug);
+      
+      if (!treatment) {
+        return new Response(JSON.stringify({ success: false, error: `Treatment not found: ${serviceSlug}` }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const pageData = {
+        slug: `/${stateSlug}/${citySlug}/${serviceSlug}`,
+        type: "service-location",
+        state_slug: stateSlug,
+        state_name: state.name,
+        city_slug: citySlug,
+        city_name: city.name,
+        service_slug: serviceSlug,
+        service_name: treatment.name,
+      };
+
+      // Check if already exists
+      if (!force_regenerate) {
+        const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
+        if (existingPages.some(p => p.slug === pageData.slug)) {
+          return new Response(JSON.stringify({ success: false, skipped: true, error: "Page already exists. Use force_regenerate to overwrite." }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+
+      const result = await generateServiceLocationContent(pageData, aimlapiKey, force_regenerate);
+      
+      if (!result.success) {
+        return new Response(JSON.stringify({ success: false, error: result.error }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      await saveSeoPage(supabase, result.data);
+
+      return new Response(JSON.stringify({ success: true, slug: pageData.slug }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

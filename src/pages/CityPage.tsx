@@ -1,5 +1,6 @@
 'use client';
 import { useState as useReactState, useMemo } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -33,7 +34,9 @@ import {
   Users,
   Clock,
   Stethoscope,
-  SlidersHorizontal
+  SlidersHorizontal,
+  MapPin,
+  ArrowRight
 } from "lucide-react";
 import {
   Accordion,
@@ -207,12 +210,69 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
   // Fetch treatments (cached via useTreatments hook)
   const { data: treatments, isLoading: treatmentsLoading } = useTreatments();
 
-  // Fetch nearby cities for internal linking
-  const { data: nearbyCities, isLoading: nearbyCitiesLoading } = useCitiesByStateSlug(normalizedStateSlug || '');
+  // Fetch nearby cities for internal linking - filtered by emirate using state_id
+  const { data: nearbyCities, isLoading: nearbyCitiesLoading } = useQuery({
+    queryKey: ['cities-by-emirate', normalizedStateSlug],
+    queryFn: async () => {
+      // First get the state to get its ID
+      const { data: stateData, error: stateError } = await supabase
+        .from('states')
+        .select('id')
+        .eq('slug', normalizedStateSlug)
+        .eq('is_active', true)
+        .maybeSingle();
+      
+      if (stateError || !stateData) {
+        console.error('State not found:', normalizedStateSlug, stateError);
+        return [];
+      }
+      
+      // Then get cities by state_id
+      const { data: citiesData, error: citiesError } = await supabase
+        .from('cities')
+        .select('id, name, slug')
+        .eq('state_id', stateData.id)
+        .eq('is_active', true)
+        .order('name');
+      
+      if (citiesError) {
+        console.error('Cities fetch error:', citiesError);
+        throw citiesError;
+      }
+      
+      return citiesData || [];
+    },
+    enabled: !!normalizedStateSlug,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Fetch service-location pages from seo_pages for this city (all services)
+  const { data: serviceLocationPages, isLoading: serviceLocationsLoading } = useQuery({
+    queryKey: ['service-locations', normalizedStateSlug, citySlug],
+    queryFn: async () => {
+      const slugPattern = `/${normalizedStateSlug}/${citySlug}/`;
+      const { data, error } = await supabase
+        .from('seo_pages')
+        .select('slug, title, h1, meta_title')
+        .eq('page_type', 'service-location' as any)
+        .like('slug', `%${slugPattern}%`)
+        .eq('is_published', true)
+        .order('title');
+      
+      if (error) {
+        console.error('Service locations fetch error:', error);
+        throw error;
+      }
+      
+      return data || [];
+    },
+    enabled: !!normalizedStateSlug && !!citySlug,
+    staleTime: 5 * 60 * 1000,
+  });
 
   // Signal prerender when ALL SEO-critical data loads
-  // Includes: location data, profiles (for listings), treatments, nearby cities (internal links), and SEO content
-  const isDataReady = !stateLoading && !cityLoading && !profilesLoading && !treatmentsLoading && !nearbyCitiesLoading && !seoContentLoading && !seoContentFetching;
+  // Includes: location data, profiles (for listings), treatments, nearby cities (internal links), SEO content, and service locations
+  const isDataReady = !stateLoading && !cityLoading && !profilesLoading && !treatmentsLoading && !nearbyCitiesLoading && !seoContentLoading && !seoContentFetching && !serviceLocationsLoading;
 
   if (!stateSlug || !citySlug) {
     return <NotFound />;
@@ -310,6 +370,12 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
 const shouldNoIndex = false;
 
   const popularTreatments = (treatments || []).map(t => ({ name: t.name, slug: t.slug }));
+  
+  // Get ALL cities in the emirate for "Explore Areas" section
+  const allEmirateCities = (nearbyCities || [])
+    .map(c => ({ name: c.name, slug: c.slug }));
+  
+  // Current city excluded from nearby
   const nearbyLocations = (nearbyCities || [])
     .filter(c => c.slug !== citySlug)
     .slice(0, 6)
@@ -540,23 +606,138 @@ const shouldNoIndex = false;
                 isLoading={isSeoContentPending}
               />
 
-              {/* SEO Internal Links - 8-15 contextual links for crawlability */}
-              <InternalLinkBlock
-                title="Explore Dental Care Options"
-                links={generateCityInternalLinks(
-                  normalizedStateSlug || '',
-                  citySlug || '',
-                  cityName,
-                  stateName,
-                  popularTreatments,
-                  nearbyLocations
-                )}
-                variant="grid"
-                showDescriptions
-                className="mt-8"
-              />
+              {/* NEW: All Service-Location Pages - Premium Dark Design */}
+              {(serviceLocationPages?.length || 0) > 0 ? (
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-6 px-5">
+                  {/* Background decorative elements */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[100px]" />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-teal-500/15 rounded-full blur-[80px]" />
+                  </div>
+                  
+                  <div className="relative z-10">
+                    {/* Section Header */}
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
+                        <Stethoscope className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-white">All Dental Services in {cityName}</h3>
+                        <p className="text-xs text-white/50">{serviceLocationPages?.length || 0} services available</p>
+                      </div>
+                    </div>
 
-              {/* Geographic Link Block - SEO Authority Distribution */}
+                    {/* Services Grid from seo_pages */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                      {serviceLocationPages?.map((service) => {
+                        // Extract service slug from the full slug (e.g., /abu-dhabi/al-ain/teeth-cleaning -> teeth-cleaning)
+                        const slugParts = service.slug?.split('/') || [];
+                        const serviceSlug = slugParts[slugParts.length - 1];
+                        
+                        // Get the clean service name from treatments list
+                        const treatment = treatments?.find(t => t.slug === serviceSlug);
+                        const serviceName = treatment?.name || serviceSlug?.replace(/-/g, ' ') || service.slug;
+                        
+                        return (
+                          <Link
+                            key={service.slug}
+                            href={`/${service.slug}/`}
+                            className="group flex items-center justify-center px-3 py-2.5 rounded-xl text-sm font-semibold bg-white/5 hover:bg-white/15 border border-white/10 hover:border-primary/30 text-white/80 hover:text-primary transition-all duration-300 text-center"
+                          >
+                            <span className="whitespace-normal">{serviceName}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              ) : popularTreatments.length > 0 ? (
+                /* Fallback: show all treatments if no service-location pages exist yet */
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-6 px-5">
+                  <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[100px]" />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-teal-500/15 rounded-full blur-[80px]" />
+                  </div>
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
+                        <Stethoscope className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-white">All Dental Services in {cityName}</h3>
+                        <p className="text-xs text-white/50">{popularTreatments.length} services available</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
+                      {popularTreatments.map((treatment) => (
+                        <Link
+                          key={treatment.slug}
+                          href={`/${normalizedStateSlug}/${citySlug}/${treatment.slug}/`}
+                          className="group flex items-center justify-center px-3 py-2.5 rounded-xl text-sm font-semibold bg-white/5 hover:bg-white/15 border border-white/10 hover:border-primary/30 text-white/80 hover:text-primary transition-all duration-300"
+                        >
+                          <span className="truncate">{treatment.name}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* NEW: All Areas in Emirate - Premium Card Design */}
+              {allEmirateCities.length > 0 && (
+                <div className="bg-gradient-to-br from-muted/30 to-muted/10 rounded-2xl p-5 border border-border/50">
+                  {/* Section Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                        <MapPin className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-foreground">Explore {stateName}</h3>
+                        <p className="text-xs text-muted-foreground">{allEmirateCities.length} areas available</p>
+                      </div>
+                    </div>
+                    <Link 
+                      href={`/${normalizedStateSlug}/`}
+                      className="text-sm font-medium text-primary hover:text-primary/80 flex items-center gap-1.5"
+                    >
+                      View all <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+
+                  {/* Premium Pills Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-2">
+                    {allEmirateCities.map((cityItem) => {
+                      const isCurrentCity = cityItem.slug === citySlug;
+                      return (
+                        <Link
+                          key={cityItem.slug}
+                          href={`/${normalizedStateSlug}/${cityItem.slug}/`}
+                          className={`group relative flex items-center justify-center px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 text-center ${
+                            isCurrentCity
+                              ? 'bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/25'
+                              : 'bg-white hover:bg-primary/5 border border-border hover:border-primary/30 text-foreground hover:text-primary'
+                          }`}
+                        >
+                          {isCurrentCity && (
+                            <MapPin className="h-3 w-3 mr-1.5 opacity-80 shrink-0" />
+                          )}
+                          <span className="whitespace-normal">{cityItem.name}</span>
+                          {!isCurrentCity && (
+                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Removed duplicate Nearby Cities - keeping only GeographicLinkBlock if needed */}
+
+              {/* Geographic Link Block - Show only parent state link, remove duplicate services/cities */}
               <GeographicLinkBlock
                 pageType="city"
                 stateSlug={normalizedStateSlug || ''}
@@ -565,16 +746,8 @@ const shouldNoIndex = false;
                 cityName={cityName}
                 nearbyCities={nearbyLocations}
                 services={popularTreatments}
+                showOnlyStateLink={true}
               />
-
-              {/* Nearby Cities Links */}
-              {nearbyLocations.length > 0 && (
-                <LocationQuickLinks
-                  variant="nearby"
-                  stateSlug={stateSlug}
-                  items={nearbyLocations}
-                />
-              )}
             </div>
           </div>
         </div>

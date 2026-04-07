@@ -172,3 +172,93 @@ export async function generateServiceLocations(
 
   return data as GenerateServiceLocationsResult;
 }
+
+export async function generateServiceLocationsByEmirate(
+  emirateSlug: string,
+  params: { force_regenerate?: boolean; batch_limit?: number; cursor?: string | null } = {}
+): Promise<GenerateServiceLocationsResult> {
+  const { data, error } = await supabase.functions.invoke(
+    "page-content-generator",
+    {
+      body: {
+        action: "generate_service_locations_by_emirate",
+        emirate_slug: emirateSlug,
+        batch_limit: 3,
+        ...params,
+      },
+    }
+  );
+
+  if (error) {
+    return {
+      processed: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [error.message],
+      remaining: 0,
+      total_count: 0,
+      cursor: null,
+      has_more: false,
+      page_type: "service-location",
+    };
+  }
+
+  return data as GenerateServiceLocationsResult;
+}
+
+export async function generateServiceLocationsByCity(
+  emirateSlug: string,
+  citySlug: string,
+  params: { force_regenerate?: boolean; batch_limit?: number; cursor?: string | null } = {}
+): Promise<GenerateServiceLocationsResult> {
+  const { data, error } = await supabase.functions.invoke(
+    "page-content-generator",
+    {
+      body: {
+        action: "generate_service_locations_by_city",
+        emirate_slug: emirateSlug,
+        city_slug: citySlug,
+        batch_limit: 3,
+        ...params,
+      },
+    }
+  );
+
+  if (error) {
+    return {
+      processed: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [error.message],
+      remaining: 0,
+      total_count: 0,
+      cursor: null,
+      has_more: false,
+      page_type: "service-location",
+    };
+  }
+
+  return data as GenerateServiceLocationsResult;
+}
+
+export async function generateSingleServiceLocation(
+  slug: string,
+  force_regenerate: boolean = false
+): Promise<GenerateSingleResult> {
+  const { data, error } = await supabase.functions.invoke(
+    "page-content-generator",
+    {
+      body: {
+        action: "generate_single_service_location",
+        slug: slug,
+        force_regenerate,
+      },
+    }
+  );
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  return data as GenerateSingleResult;
+}

@@ -51,9 +51,12 @@ interface ServiceLocationPageProps {
   dehydratedStateProp?: any;
   faqsProp?: { question: string; answer: string }[];
   seoH1Prop?: string | null;
+  heroIntroProp?: string | null;
+  contentProp?: string | null;
+  allSeoDataProp?: any;
 }
 
-const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, stateDataProp, cityDataProp, treatmentDataProp, seoDataProp, faqsProp, seoH1Prop }: ServiceLocationPageProps) => {
+const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, stateDataProp, cityDataProp, treatmentDataProp, seoDataProp, faqsProp, seoH1Prop, heroIntroProp, contentProp, allSeoDataProp }: ServiceLocationPageProps) => {
   const routerQuery = useRouter().query;
   const stateSlug = stateSlugProp || routerQuery.stateSlug as string || '';
   const citySlug = citySlugProp || routerQuery.citySlug as string || '';
@@ -150,20 +153,27 @@ const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, sta
     { label: treatmentName },
   ];
 
-  // Parse SEO content
-  const parsedContent = seoContent?.content ? parseMarkdownContent(seoContent.content) : null;
+  // Parse SEO content - SSR props have priority, fallback to client-fetched content, then allSeoDataProp
+  const seoDataFromProps = allSeoDataProp || seoContent;
+  const serverHeroIntro = heroIntroProp || seoDataFromProps?.page_intro || null;
+  const serverContent = contentProp || seoDataFromProps?.content || null;
+  const parsedContent = serverContent ? parseMarkdownContent(serverContent) : null;
+  
   // Use dedicated faqs column first, fallback to parsing from content for legacy pages
-  const seoFaqs = seoContent?.faqs && Array.isArray(seoContent.faqs) && seoContent.faqs.length > 0
-    ? seoContent.faqs
-    : seoContent?.content ? parseFaqFromContent(seoContent.content) : [];
+  const seoFaqs = seoDataFromProps?.faqs && Array.isArray(seoDataFromProps.faqs) && seoDataFromProps.faqs.length > 0
+    ? seoDataFromProps.faqs
+    : seoDataFromProps?.content ? parseFaqFromContent(seoDataFromProps.content) : [];
 
   // SSR FAQ data takes priority, then use client-fetched SEO content, then defaults
   const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
 
-  const pageTitle = seoContent?.meta_title || seoDataProp?.title || null;
-  const pageDescription = seoContent?.meta_description || seoDataProp?.description || null;
-  const pageH1 = seoContent?.h1 || seoH1Prop || null;
+  const pageTitle = seoDataFromProps?.meta_title || seoDataProp?.title || null;
+  const pageDescription = seoDataFromProps?.meta_description || seoDataProp?.description || null;
+  const pageH1 = seoDataFromProps?.h1 || seoH1Prop || null;
 
+  const displayH1 = pageH1 || `Best ${treatmentName} in ${locationName}`;
+  const displayIntro = serverHeroIntro || treatmentDataProp?.description || null;
+  
   const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs.map(f => ({ q: f.question, a: f.answer })) : [
     {
       q: `Where can I find ${treatmentName} specialists in ${locationName}?`,
@@ -333,7 +343,7 @@ const shouldNoIndex = false;
       {/* Page Intro Section - CMS Content */}
       <PageIntroSection
         title={parsedContent?.sections?.[0]?.heading || null}
-        content={(seoContent as any)?.page_intro || parsedContent?.intro || parsedContent?.sections?.[0]?.content || null}
+        content={serverHeroIntro || parsedContent?.intro || parsedContent?.sections?.[0]?.content || null}
         isLoading={isSeoContentPending}
       />
 

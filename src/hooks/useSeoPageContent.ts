@@ -11,6 +11,7 @@ export interface SeoPageContent {
   meta_description: string | null;
   h1: string | null;
   content: string | null;
+  page_intro: string | null;
   og_title: string | null;
   og_description: string | null;
   is_optimized: boolean;

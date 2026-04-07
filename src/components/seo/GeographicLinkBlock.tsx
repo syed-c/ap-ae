@@ -96,6 +96,8 @@ interface GeographicLinkBlockProps {
   topCities?: { name: string; slug: string }[];
   nearbyCities?: { name: string; slug: string }[];
   services?: { name: string; slug: string }[];
+  // Option to show only the parent state link (for city pages with custom sections)
+  showOnlyStateLink?: boolean;
 }
 
 export const GeographicLinkBlock = ({
@@ -109,6 +111,7 @@ export const GeographicLinkBlock = ({
   topCities = [],
   nearbyCities = [],
   services = [],
+  showOnlyStateLink = false,
 }: GeographicLinkBlockProps) => {
   const neighboringStates = NEIGHBORING_STATES[stateSlug] || [];
   const relatedServiceSlugs = serviceSlug ? RELATED_SERVICES[serviceSlug] || [] : [];
@@ -191,6 +194,39 @@ export const GeographicLinkBlock = ({
 
   // CITY PAGE: Links to services in city, nearby cities, parent state
   if (pageType === "city" && citySlug && cityName) {
+    // If showOnlyStateLink is true, return a minimal component with just the parent state link
+    if (showOnlyStateLink) {
+      return (
+        <motion.section
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-card border border-border rounded-2xl p-6"
+          aria-label="Back to emirate"
+        >
+          <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-primary" />
+            Explore More in {stateName}
+          </h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Link
+              href={`/${stateSlug}/`}
+              className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+            >
+              <span className="font-medium">All of {stateName}</span>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+            <Link
+              href="/services/"
+              className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+            >
+              <span className="font-medium">All Dental Services</span>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          </div>
+        </motion.section>
+      );
+    }
+
     return (
       <motion.section
         initial={{ opacity: 0, y: 10 }}

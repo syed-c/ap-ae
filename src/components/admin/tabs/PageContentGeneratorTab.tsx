@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { generateSingle, generateBatch, generateServices, generateServiceLocations, generateSingleService } from "@/hooks/usePageContentGenerator";
+import { generateSingle, generateBatch, generateServices, generateServiceLocations, generateSingleService, generateServiceLocationsByEmirate, generateServiceLocationsByCity, generateSingleServiceLocation } from "@/hooks/usePageContentGenerator";
 import BulkMetaUpdateSection from "./BulkMetaUpdateSection";
 import { FileText, Play, Square, Loader2, Check, X, AlertCircle, Layers, RefreshCw, Settings } from "lucide-react";
 import { toast } from "sonner";
@@ -10,6 +10,13 @@ interface State {
   id: string;
   name: string;
   slug: string;
+}
+
+interface City {
+  id: string;
+  name: string;
+  slug: string;
+  state_id: string;
 }
 
 export default function PageContentGeneratorTab() {
@@ -61,6 +68,30 @@ export default function PageContentGeneratorTab() {
   });
   const [isSingleServiceGenerating, setIsSingleServiceGenerating] = useState(false);
 
+  // Service-location by emirate state
+  const [slEmirateForm, setSlEmirateForm] = useState({
+    emirate_slug: "",
+    batch_size: 5,
+    force_regenerate: false,
+  });
+  const [isSlEmirateRunning, setIsSlEmirateRunning] = useState(false);
+
+  // Service-location by city state
+  const [slCityForm, setSlCityForm] = useState({
+    emirate_slug: "",
+    city_slug: "",
+    batch_size: 5,
+    force_regenerate: false,
+  });
+  const [isSlCityRunning, setIsSlCityRunning] = useState(false);
+
+  // Single service-location state
+  const [singleSlForm, setSingleSlForm] = useState({
+    slug: "",
+    force_regenerate: false,
+  });
+  const [isSingleSlGenerating, setIsSingleSlGenerating] = useState(false);
+
   // Auto-scroll logs
   useEffect(() => {
     if (logsScrollRef.current) {
@@ -80,6 +111,25 @@ export default function PageContentGeneratorTab() {
       if (error) throw error;
       return data as State[];
     },
+  });
+
+  // Fetch cities for dropdown (filtered by emirate)
+  const { data: cities } = useQuery({
+    queryKey: ["page-content-generator-cities", slCityForm.emirate_slug],
+    queryFn: async () => {
+      if (!slCityForm.emirate_slug) return [];
+      const state = states?.find(s => s.slug === slCityForm.emirate_slug);
+      if (!state) return [];
+      const { data, error } = await supabase
+        .from("cities")
+        .select("id, name, slug, state_id")
+        .eq("state_id", state.id)
+        .eq("is_active", true)
+        .order("name");
+      if (error) throw error;
+      return data as City[];
+    },
+    enabled: !!slCityForm.emirate_slug && !!states,
   });
 
   const handleSingleGenerate = async () => {
@@ -589,7 +639,7 @@ export default function PageContentGeneratorTab() {
       </div>
 
       {/* Section 4: Service-Location Pages Generator */}
-      <div className="bg-white rounded-lg border p-6 space-y-4">
+      <div className="bg-white rounded-lg border p-6 space-y-6">
         <div className="flex items-center gap-2">
           <Layers className="w-5 h-5 text-primary" />
           <h2 className="text-lg font-semibold">Generate Service-Location Pages</h2>
@@ -598,19 +648,289 @@ export default function PageContentGeneratorTab() {
           Generate SEO content for city + service pages (e.g., /dubai/mirdif/invisalign, /abu-dhabi/al-ain/veneers)
         </p>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Batch Size</label>
-            <input
-              type="number"
-              min={1}
-              max={10}
-              className="w-full border rounded-md px-3 py-2"
-              value={slForm.batch_size}
-              onChange={(e) => setSlForm({ ...slForm, batch_size: Math.min(10, Math.max(1, parseInt(e.target.value) || 3)) })}
-            />
+        {/* 4a: Generate by Emirate - All Areas */}
+        <div className="border rounded-lg p-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold">Generate by Emirate (All Areas)</h3>
           </div>
-          <div className="flex items-center">
+          <p className="text-sm text-muted-foreground">
+            Generate content for all service-location pages in a specific emirate (e.g., all Dubai areas + all services)
+          </p>
+          <div className="flex flex-wrap gap-4 items-end">
+            <div className="min-w-[200px]">
+              <label className="block text-sm font-medium mb-1">Select Emirate</label>
+              <select
+                className="w-full border rounded-md px-3 py-2"
+                value={slEmirateForm.emirate_slug}
+                onChange={(e) => setSlEmirateForm({ ...slEmirateForm, emirate_slug: e.target.value })}
+              >
+                <option value="">Select Emirate...</option>
+                {states?.map((state) => (
+                  <option key={state.id} value={state.slug}>
+                    {state.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="w-24">
+              <label className="block text-sm font-medium mb-1">Batch</label>
+              <input
+                type="number"
+                min={1}
+                max={20}
+                className="w-full border rounded-md px-3 py-2"
+                value={slEmirateForm.batch_size}
+                onChange={(e) => setSlEmirateForm({ ...slEmirateForm, batch_size: Math.min(20, Math.max(1, parseInt(e.target.value) || 5)) })}
+              />
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={slEmirateForm.force_regenerate}
+                onChange={(e) => setSlEmirateForm({ ...slEmirateForm, force_regenerate: e.target.checked })}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium">Force</span>
+            </label>
+            <button
+              onClick={async () => {
+                if (!slEmirateForm.emirate_slug) {
+                  toast.error("Please select an emirate");
+                  return;
+                }
+                setIsSlEmirateRunning(true);
+                setSlLogs([]);
+                let totalProcessed = 0;
+                let totalSkipped = 0;
+                let totalFailed = 0;
+                try {
+                  setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Starting generation for emirate: ${slEmirateForm.emirate_slug}...`]);
+                  let cursor: string | null = null;
+                  while (true) {
+                    const result = await generateServiceLocationsByEmirate(
+                      slEmirateForm.emirate_slug,
+                      { batch_limit: slEmirateForm.batch_size, force_regenerate: slEmirateForm.force_regenerate, cursor }
+                    );
+                    totalProcessed += result.processed;
+                    totalSkipped += result.skipped;
+                    totalFailed += result.failed;
+                    setSlLogs((prev) => [
+                      ...prev,
+                      `[${new Date().toLocaleTimeString()}] Batch: ${result.processed} processed, ${result.skipped} skipped, ${result.failed} failed, ${result.remaining || 0} remaining`
+                    ]);
+                    if (!result.has_more) {
+                      setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Done! Total: ${totalProcessed} processed, ${totalSkipped} skipped, ${totalFailed} failed`]);
+                      break;
+                    }
+                    if (result.processed === 0 && result.remaining > 0) break;
+                    cursor = result.cursor;
+                  }
+                } catch (err) {
+                  setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Error: ${err}`]);
+                } finally {
+                  setIsSlEmirateRunning(false);
+                }
+              }}
+              disabled={isSlEmirateRunning || !slEmirateForm.emirate_slug}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50"
+            >
+              {isSlEmirateRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+              Generate All Areas in Emirate
+            </button>
+          </div>
+        </div>
+
+        {/* 4b: Generate by City - All Services */}
+        <div className="border rounded-lg p-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold">Generate by City/Area (All Services)</h3>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Generate content for all service pages in a specific area (e.g., all services in Al Barsha, Dubai)
+          </p>
+          <div className="flex flex-wrap gap-4 items-end">
+            <div className="min-w-[150px]">
+              <label className="block text-sm font-medium mb-1">Emirate</label>
+              <select
+                className="w-full border rounded-md px-3 py-2"
+                value={slCityForm.emirate_slug}
+                onChange={(e) => setSlCityForm({ ...slCityForm, emirate_slug: e.target.value, city_slug: "" })}
+              >
+                <option value="">Select Emirate...</option>
+                {states?.map((state) => (
+                  <option key={state.id} value={state.slug}>
+                    {state.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="min-w-[200px]">
+              <label className="block text-sm font-medium mb-1">Area/City</label>
+              <select
+                className="w-full border rounded-md px-3 py-2"
+                value={slCityForm.city_slug}
+                onChange={(e) => setSlCityForm({ ...slCityForm, city_slug: e.target.value })}
+                disabled={!slCityForm.emirate_slug}
+              >
+                <option value="">Select Area...</option>
+                {cities?.map((city) => (
+                  <option key={city.id} value={city.slug}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="w-24">
+              <label className="block text-sm font-medium mb-1">Batch</label>
+              <input
+                type="number"
+                min={1}
+                max={20}
+                className="w-full border rounded-md px-3 py-2"
+                value={slCityForm.batch_size}
+                onChange={(e) => setSlCityForm({ ...slCityForm, batch_size: Math.min(20, Math.max(1, parseInt(e.target.value) || 5)) })}
+              />
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={slCityForm.force_regenerate}
+                onChange={(e) => setSlCityForm({ ...slCityForm, force_regenerate: e.target.checked })}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium">Force</span>
+            </label>
+            <button
+              onClick={async () => {
+                if (!slCityForm.emirate_slug || !slCityForm.city_slug) {
+                  toast.error("Please select emirate and area");
+                  return;
+                }
+                setIsSlCityRunning(true);
+                setSlLogs([]);
+                let totalProcessed = 0;
+                let totalSkipped = 0;
+                let totalFailed = 0;
+                let cursor: string | null = null;
+                try {
+                  setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Starting generation for ${slCityForm.city_slug}, ${slCityForm.emirate_slug}...`]);
+                  while (true) {
+                    const result = await generateServiceLocationsByCity(
+                      slCityForm.emirate_slug,
+                      slCityForm.city_slug,
+                      { batch_limit: slCityForm.batch_size, force_regenerate: slCityForm.force_regenerate, cursor }
+                    );
+                    totalProcessed += result.processed;
+                    totalSkipped += result.skipped;
+                    totalFailed += result.failed;
+                    setSlLogs((prev) => [
+                      ...prev,
+                      `[${new Date().toLocaleTimeString()}] Batch: ${result.processed} processed, ${result.skipped} skipped, ${result.failed} failed, ${result.remaining || 0} remaining`
+                    ]);
+                    if (!result.has_more) {
+                      setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Done! Total: ${totalProcessed} processed, ${totalSkipped} skipped, ${totalFailed} failed`]);
+                      break;
+                    }
+                    if (result.processed === 0 && result.remaining > 0) break;
+                    cursor = result.cursor;
+                  }
+                } catch (err) {
+                  setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Error: ${err}`]);
+                } finally {
+                  setIsSlCityRunning(false);
+                }
+              }}
+              disabled={isSlCityRunning || !slCityForm.emirate_slug || !slCityForm.city_slug}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50"
+            >
+              {isSlCityRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+              Generate All Services in Area
+            </button>
+          </div>
+        </div>
+
+        {/* 4c: Generate Single Service-Location Page */}
+        <div className="border rounded-lg p-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            <h3 className="font-semibold">Generate Single Service-Location Page</h3>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Generate content for a specific service-location page (e.g., /dubai/al-barsha/general-dentistry)
+          </p>
+          <div className="flex flex-wrap gap-4 items-end">
+            <div className="flex-1 min-w-[300px]">
+              <input
+                type="text"
+                placeholder="Enter slug (e.g., dubai/al-barsha/general-dentistry)"
+                className="w-full border rounded-md px-3 py-2"
+                value={singleSlForm.slug}
+                onChange={(e) => setSingleSlForm({ ...singleSlForm, slug: e.target.value })}
+              />
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={singleSlForm.force_regenerate}
+                onChange={(e) => setSingleSlForm({ ...singleSlForm, force_regenerate: e.target.checked })}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium">Force</span>
+            </label>
+            <button
+              onClick={async () => {
+                if (!singleSlForm.slug) {
+                  toast.error("Please enter a slug");
+                  return;
+                }
+                setIsSingleSlGenerating(true);
+                try {
+                  const result = await generateSingleServiceLocation(singleSlForm.slug, singleSlForm.force_regenerate);
+                  if (result.success) {
+                    if (result.skipped) {
+                      toast.info(`Content already exists for /${singleSlForm.slug} (skipped)`);
+                    } else {
+                      toast.success(`Generated: /${singleSlForm.slug}`);
+                    }
+                  } else {
+                    toast.error(result.error || "Generation failed");
+                  }
+                } catch (err) {
+                  toast.error("Error: " + err);
+                } finally {
+                  setIsSingleSlGenerating(false);
+                }
+              }}
+              disabled={isSingleSlGenerating || !singleSlForm.slug}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+            >
+              {isSingleSlGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+              Generate
+            </button>
+          </div>
+        </div>
+
+        {/* 4d: Generate All Service-Location Pages (existing) */}
+        <div className="border rounded-lg p-4 space-y-4 bg-slate-50">
+          <div className="flex items-center gap-2">
+            <Layers className="w-4 h-4" />
+            <h3 className="font-semibold">Generate All Service-Location Pages</h3>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Generate content for ALL service-location pages across all emirates and cities (use with caution)
+          </p>
+          <div className="flex flex-wrap gap-4 items-end">
+            <div className="w-24">
+              <label className="block text-sm font-medium mb-1">Batch</label>
+              <input
+                type="number"
+                min={1}
+                max={10}
+                className="w-full border rounded-md px-3 py-2"
+                value={slForm.batch_size}
+                onChange={(e) => setSlForm({ ...slForm, batch_size: Math.min(10, Math.max(1, parseInt(e.target.value) || 3)) })}
+              />
+            </div>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -618,13 +938,8 @@ export default function PageContentGeneratorTab() {
                 onChange={(e) => setSlForm({ ...slForm, force_regenerate: e.target.checked })}
                 className="w-4 h-4"
               />
-              <span className="text-sm font-medium">Force Regenerate</span>
+              <span className="text-sm font-medium">Force</span>
             </label>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {!isSlRunning ? (
             <button
               onClick={async () => {
                 setIsSlRunning(true);
@@ -632,30 +947,24 @@ export default function PageContentGeneratorTab() {
                 let totalProcessed = 0;
                 let totalFailed = 0;
                 let cursor: string | null = null;
-
                 try {
                   setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Starting service-location pages generation...`]);
-
                   while (true) {
                     const result = await generateServiceLocations({
                       batch_limit: slForm.batch_size,
                       force_regenerate: slForm.force_regenerate,
                       cursor,
                     });
-
                     totalProcessed += result.processed;
                     totalFailed += result.failed;
-
                     setSlLogs((prev) => [
                       ...prev,
                       `[${new Date().toLocaleTimeString()}] Batch: ${result.processed} processed, ${result.failed} failed, ${result.remaining} remaining`
                     ]);
-
                     if (!result.has_more) {
                       setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Done! Total: ${totalProcessed} processed, ${totalFailed} failed`]);
                       break;
                     }
-
                     cursor = result.cursor;
                     if (result.processed === 0) break;
                   }
@@ -665,19 +974,16 @@ export default function PageContentGeneratorTab() {
                   setIsSlRunning(false);
                 }
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+              disabled={isSlRunning}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
             >
-              <Play className="w-4 h-4" />
-              Generate Service-Location Pages
+              {isSlRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+              Generate All (Careful!)
             </button>
-          ) : (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Running...
-            </div>
-          )}
+          </div>
         </div>
 
+        {/* Logs */}
         <div className="border rounded-md bg-slate-950 text-slate-100 p-4">
           <div className="text-sm font-medium mb-2">Service-Location Pages Log</div>
           <div className="h-32 overflow-y-auto font-mono text-xs space-y-1">
