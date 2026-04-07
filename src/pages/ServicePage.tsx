@@ -275,6 +275,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
             )}
 
             {/* Price CTA */}
+            {/*
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
                 href={`/services/${serviceSlug}/`}
@@ -285,6 +286,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
                 <ArrowRight className="h-5 w-5" />
               </Link>
             </div>
+            */}
 
             {/* Stats */}
             {profiles && profiles.length > 0 && (

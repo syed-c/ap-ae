@@ -146,26 +146,42 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     
     // Use page_content if available, otherwise seo_pages
     const content = pageContent || seoContent;
+    
+    console.log('[SSR] serviceSlug:', serviceSlug);
+    console.log('[SSR] pageContent found:', !!pageContent);
+    console.log('[SSR] seoContent found:', !!seoContent);
+    console.log('[SSR] pageContent slug:', pageContent?.page_slug);
+    console.log('[SSR] seoContent slug:', seoContent?.slug);
+    console.log('[SSR] pageContent content:', pageContent?.body_content?.substring(0, 50));
+    console.log('[SSR] seoContent content:', seoContent?.content?.substring(0, 50));
+    
     const totalClinics = allClinics?.count || 0;
     const metaTitle = content?.meta_title || (content as any)?.title || `${treatment.name} in UAE (2026) — Find Top Dentists & Specialists | AppointPanda`;
     const metaDescription = content?.meta_description || `Get ${treatment.name.toLowerCase()} treatment in UAE. Compare ${totalClinics.toLocaleString()}+ verified specialists across Dubai, Abu Dhabi, Sharjah. Read patient reviews, see transparent AED pricing, check dentist credentials (BDS, MDS, DHA-licensed). Book your appointment instantly. Most clinics offer free consultation.`;
     const h1 = content?.h1 || (content as any)?.title || null;
     
     // Build content string from page_content sections
-    let contentText: string | null = null;
     let heroIntro: string | null = null;
+    let contentText: string | null = null;
     
+    // Build content from page_content first, then supplement with seo_pages
     if (pageContent) {
         heroIntro = pageContent.hero_intro || null;
         
-        const sections = [];
+        const sections: string[] = [];
         if (pageContent.body_content) sections.push(pageContent.body_content);
         if (pageContent.section_1_title && pageContent.section_1_content) sections.push(`## ${pageContent.section_1_title}\n\n${pageContent.section_1_content}`);
         if (pageContent.section_2_title && pageContent.section_2_content) sections.push(`## ${pageContent.section_2_title}\n\n${pageContent.section_2_content}`);
         if (pageContent.section_3_title && pageContent.section_3_content) sections.push(`## ${pageContent.section_3_title}\n\n${pageContent.section_3_content}`);
-        contentText = sections.filter(Boolean).join('\n\n') || null;
-    } else if (seoContent) {
-        heroIntro = seoContent.page_intro || null;
+        
+        if (sections.length > 0) {
+            contentText = sections.filter(Boolean).join('\n\n');
+        }
+    }
+    
+    // If no content from page_content, try seo_pages
+    if (!contentText && seoContent) {
+        heroIntro = heroIntro || seoContent.page_intro || null;
         contentText = seoContent.content || null;
     }
 

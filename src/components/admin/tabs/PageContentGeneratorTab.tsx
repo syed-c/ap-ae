@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { generateSingle, generateBatch, generateServices, generateServiceLocations } from "@/hooks/usePageContentGenerator";
+import { generateSingle, generateBatch, generateServices, generateServiceLocations, generateSingleService } from "@/hooks/usePageContentGenerator";
 import BulkMetaUpdateSection from "./BulkMetaUpdateSection";
 import { FileText, Play, Square, Loader2, Check, X, AlertCircle, Layers, RefreshCw, Settings } from "lucide-react";
 import { toast } from "sonner";
@@ -53,6 +53,13 @@ export default function PageContentGeneratorTab() {
   });
   const [isSlRunning, setIsSlRunning] = useState(false);
   const [slLogs, setSlLogs] = useState<string[]>([]);
+
+  // Single service generation state
+  const [singleServiceForm, setSingleServiceForm] = useState({
+    service_slug: "",
+    force_regenerate: false,
+  });
+  const [isSingleServiceGenerating, setIsSingleServiceGenerating] = useState(false);
 
   // Auto-scroll logs
   useEffect(() => {
@@ -521,6 +528,64 @@ export default function PageContentGeneratorTab() {
             )}
           </div>
         </div>
+
+        {/* Section 3b: Single Service Generation */}
+        <div className="bg-white rounded-lg border p-6 space-y-4 mt-6">
+          <div className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold">Generate Single Service Page</h2>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Generate content for a specific service (e.g., general-dentistry, invisalign, dental-implants)
+          </p>
+
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Enter service slug (e.g., general-dentistry)"
+                className="w-full border rounded-md px-3 py-2"
+                onChange={(e) => setSingleServiceForm({ ...singleServiceForm, service_slug: e.target.value })}
+              />
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={singleServiceForm.force_regenerate}
+                onChange={(e) => setSingleServiceForm({ ...singleServiceForm, force_regenerate: e.target.checked })}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium">Force</span>
+            </label>
+            <button
+              onClick={async () => {
+                if (!singleServiceForm.service_slug) {
+                  toast.error("Please enter a service slug");
+                  return;
+                }
+                setIsSingleServiceGenerating(true);
+                try {
+                  const result = await generateSingleService(singleServiceForm.service_slug, singleServiceForm.force_regenerate);
+                  if (result.success) {
+                    toast.success(`Generated: ${singleServiceForm.service_slug}`);
+                  } else {
+                    toast.error(result.error || "Generation failed");
+                  }
+                } catch (err) {
+                  toast.error("Error: " + err);
+                } finally {
+                  setIsSingleServiceGenerating(false);
+                }
+              }}
+              disabled={isSingleServiceGenerating || !singleServiceForm.service_slug}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+            >
+              {isSingleServiceGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+              Generate
+            </button>
+          </div>
+        </div>
+
       </div>
 
       {/* Section 4: Service-Location Pages Generator */}

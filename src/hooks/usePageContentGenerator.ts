@@ -120,6 +120,28 @@ export async function generateServices(
   return data as GenerateServicesResult;
 }
 
+export async function generateSingleService(
+  serviceSlug: string,
+  force_regenerate: boolean = false
+): Promise<GenerateSingleResult> {
+  const { data, error } = await supabase.functions.invoke(
+    "page-content-generator",
+    {
+      body: {
+        action: "generate_single_service",
+        service_slug: serviceSlug,
+        force_regenerate,
+      },
+    }
+  );
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  return data as GenerateSingleResult;
+}
+
 export async function generateServiceLocations(
   params: { force_regenerate?: boolean; batch_limit?: number; cursor?: string | null } = {}
 ): Promise<GenerateServiceLocationsResult> {

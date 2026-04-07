@@ -190,9 +190,19 @@ const OptimizedContentLayout = ({
            !s.heading.toLowerCase().includes('faq')
     );
 
-  // If no sections left after filtering (e.g., content only has intro with no headings), skip this block entirely
-  // The intro is already rendered in PageIntroSection
-  if (contentSections.length === 0) {
+  // If no sections left after filtering but there IS intro content, still show it
+  // This ensures content appears even if it has no headings
+  const showFullContent = contentSections.length === 0 && parsedContent.intro.trim().length > 0;
+  
+  // If there's content but no sections, use the intro as a section
+  const displaySections = showFullContent 
+    ? [{ heading: '', content: parsedContent.intro, level: 2 } as ParsedSection]
+    : contentSections;
+  
+  // Also show if there are sections
+  const shouldShow = displaySections.length > 0;
+  
+  if (!shouldShow) {
     return null;
   }
 
@@ -233,20 +243,22 @@ const OptimizedContentLayout = ({
 
           {/* Main Sections - Rendered as semantic HTML for SEO */}
           <div className="space-y-6">
-            {contentSections.slice(0, 4).map((section, idx) => (
+            {displaySections.slice(0, 4).map((section, idx) => (
               <section key={idx} className="border-l-2 border-primary/20 pl-4 md:pl-6">
-                {section.level === 2 ? (
-                  <h2 
-                    className="text-xl font-bold text-foreground mb-3"
-                    itemProp="headline"
-                  >
-                    {stripMarkdown(section.heading)}
-                  </h2>
-                ) : (
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    {stripMarkdown(section.heading)}
-                  </h3>
-                )}
+                {section.heading ? (
+                  section.level === 2 ? (
+                    <h2 
+                      className="text-xl font-bold text-foreground mb-3"
+                      itemProp="headline"
+                    >
+                      {stripMarkdown(section.heading)}
+                    </h2>
+                  ) : (
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                      {stripMarkdown(section.heading)}
+                    </h3>
+                  )
+                ) : null}
                 <div 
                   className="text-muted-foreground leading-relaxed prose prose-sm max-w-none [&_table]:my-4 [&_th]:text-left [&_td]:align-top"
                   dangerouslySetInnerHTML={{ 

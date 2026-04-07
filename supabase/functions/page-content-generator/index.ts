@@ -1007,12 +1007,41 @@ async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
 
   console.log(`page-content-generator: Save data keys: ${Object.keys(saveData).join(", ")}`);
   
+  // Save to seo_pages
   const { error } = await supabase.from("seo_pages").upsert(saveData, { onConflict: "slug" });
 
   if (error) {
     console.error(`page-content-generator: Save error details:`, JSON.stringify(error));
     throw error;
   }
+
+  // Also save to page_content for service pages
+  if (pageType === "service" && pageData.page_slug) {
+    const pageContentData = {
+      page_slug: pageData.page_slug,
+      meta_title: pageData.meta_title,
+      meta_description: pageData.meta_description,
+      h1: pageData.h1,
+      hero_intro: pageData.hero_intro || pageData.intro_text,
+      body_content: pageData.body_content,
+      section_1_title: pageData.section_1_title,
+      section_1_content: pageData.section_1_content,
+      section_2_title: pageData.section_2_title,
+      section_2_content: pageData.section_2_content,
+      section_3_title: pageData.section_3_title,
+      section_3_content: pageData.section_3_content,
+      faqs: pageData.faqs,
+      is_published: true,
+    };
+    
+    const { error: pcError } = await supabase.from("page_content").upsert(pageContentData, { onConflict: "page_slug" });
+    if (pcError) {
+      console.error(`page-content-generator: page_content save error:`, JSON.stringify(pcError));
+    } else {
+      console.log(`page-content-generator: Successfully saved to page_content ${pageData.page_slug}`);
+    }
+  }
+
   console.log(`page-content-generator: Successfully saved ${pageData.page_slug}`);
 }
 
@@ -1205,6 +1234,7 @@ serve(async (req) => {
 
       console.log("page-content-generator: Fetching treatments...");
       const treatments = await fetchAllRows(supabase, "treatments", "id, slug, name", { is_active: true });
+      console.log("page-content-generator: Found treatments:", treatments.map(t => `${t.name}->${t.slug}`).join(", "));
       console.log(`page-content-generator: Found ${treatments.length} active treatments`);
       
       if (treatments.length === 0) {
@@ -1230,6 +1260,9 @@ serve(async (req) => {
         service_slug: t.slug,
         service_name: t.name,
       }));
+
+      console.log("page-content-generator: All treatments:", treatments.map(t => `${t.name} (${t.slug})`).join(", "));
+      console.log("page-content-generator: All service pages slugs:", servicePages.map(p => p.slug).join(", "));
 
       // Get existing pages
       console.log("page-content-generator: Fetching existing seo_pages...");
@@ -1292,6 +1325,64 @@ serve(async (req) => {
         total_count: pagesToGenerate.length,
         page_type: "service"
       }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Generate single service page
+    if (action === "generate_single_service") {
+      const serviceSlug = body.service_slug;
+      
+      if (!serviceSlug) {
+        return new Response(JSON.stringify({ success: false, error: "service_slug is required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      console.log(`page-content-generator: Generating single service: ${serviceSlug}`);
+
+      // Get treatment
+      const treatments = await fetchAllRows(supabase, "treatments", "id, slug, name", { is_active: true });
+      const treatment = treatments.find(t => t.slug === serviceSlug);
+      
+      if (!treatment) {
+        return new Response(JSON.stringify({ success: false, error: `Treatment not found: ${serviceSlug}` }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const pageData = {
+        slug: `services/${serviceSlug}`,
+        type: "service",
+        service_slug: serviceSlug,
+        service_name: treatment.name,
+      };
+
+      // Check if already exists
+      if (!force_regenerate) {
+        const existing = await fetchAllRows(supabase, "seo_pages", "slug", {});
+        if (existing.some(p => p.slug === pageData.slug)) {
+          return new Response(JSON.stringify({ success: false, error: "Page already exists. Use force_regenerate to overwrite." }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+
+      const result = await generateServiceContent(pageData, aimlapiKey, force_regenerate);
+      
+      if (!result.success) {
+        return new Response(JSON.stringify({ success: false, error: result.error }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      await saveSeoPage(supabase, result.data);
+
+      return new Response(JSON.stringify({ success: true, slug: pageData.slug }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
