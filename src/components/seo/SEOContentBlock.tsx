@@ -122,8 +122,126 @@ export const SEOContentBlock = ({
     );
   }
 
-  // No optimized content from database - show nothing (no fallback)
-  // This forces content generation via admin panel before pages go live
+  // No optimized content from database - show fallback content for SEO value
+  // This ensures city pages have substantive content even when clinic data is sparse
+  if (variant === "city" && clinicCount === 0) {
+     return (
+       <article 
+         className="space-y-6"
+         itemScope 
+         itemType="https://schema.org/Article"
+       >
+         {/* Main Content Card */}
+         <motion.div
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm"
+         >
+           {/* Header */}
+           <div className="p-4 md:p-6 border-b border-border bg-gradient-to-r from-primary/5 to-transparent">
+             <div className="flex items-center gap-3">
+               <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                 <MapPin className="h-5 w-5 text-primary" />
+               </div>
+               <div>
+                 <span className="text-xs font-bold text-primary uppercase tracking-widest">
+                   Dental Care in {locationName}
+                 </span>
+                 <p className="text-sm text-muted-foreground">Essential oral health information for {stateName}</p>
+               </div>
+             </div>
+           </div>
+
+           {/* Content Body */}
+           <div className="p-6 md:p-8">
+             {/* Main Sections - Rendered as semantic HTML for SEO */}
+             <div className="space-y-8">
+               {/* Section 1: General Dental Care Information */}
+               <section className="border-l-2 border-primary/20 pl-4 md:pl-6">
+                 <h2 className="text-xl font-bold text-foreground mb-3" itemProp="headline">
+                   Essential Dental Care Guidance for {locationName}
+                 </h2>
+                 <div className="text-muted-foreground leading-relaxed prose prose-sm max-w-none">
+                   <p>Maintaining good oral health is essential for overall wellbeing, especially in the {stateName} region where climate and lifestyle factors can impact dental health.</p>
+                   <p>The dental care landscape in {locationName} continues to evolve, with increasing focus on preventive care, cosmetic dentistry, and advanced treatment options. Regular dental check-ups are recommended every 6 months to maintain optimal oral health.</p>
+                   <p>Even without specific clinic listings in our database, residents of {locationName} have access to quality dental care through various channels including government hospitals, private clinics, and specialized dental centers.</p>
+                 </div>
+               </section>
+               
+               {/* Section 2: Oral Health Tips for UAE Climate */}
+               <section className="border-l-2 border-primary/20 pl-4 md:pl-6">
+                 <h2 className="text-xl font-bold text-foreground mb-3" itemProp="headline">
+                   Oral Health Tips for {stateName} Residents
+                 </h2>
+                 <div className="text-muted-foreground leading-relaxed prose prose-sm max-w-none">
+                   <ul className="space-y-2">
+                     <li><strong>Stay Hydrated:</strong> The {stateName} climate can lead to dry mouth, increasing cavity risk. Drink plenty of water throughout the day.</li>
+                     <li><strong>Sun Protection:</strong> Use lip balm with SPF to protect lips from UV damage, which can increase oral cancer risk.</li>
+                     <li><strong>Diet Awareness:</strong> Limit sugary beverages and foods, especially during hot weather when consumption tends to increase.</li>
+                     <li><strong>Regular Check-ups:</strong> Visit a dentist every 6 months for preventive care and early detection of issues.</li>
+                     <li><strong>Proper Brushing:</strong> Brush twice daily with fluoride toothpaste for at least 2 minutes each time.</li>
+                     <li><strong>Floss Daily:</strong> Clean between teeth daily to remove plaque and food particles that brushing misses.</li>
+                   </ul>
+                 </div>
+               </section>
+               
+               {/* Section 3: Finding Dental Care in {locationName} */}
+               <section className="border-l-2 border-primary/20 pl-4 md:pl-6">
+                 <h2 className="text-xl font-bold text-foreground mb-3" itemProp="headline">
+                   How to Find Quality Dental Care in {locationName}
+                 </h2>
+                 <div className="text-muted-foreground leading-relaxed prose prose-sm max-w-none">
+                   <p>When searching for a dental provider in {locationName}, consider these factors:</p>
+                   <ul className="space-y-2">
+                     <li><strong>Credentials:</strong> Ensure the dentist is licensed by UAE health authorities (DHA, MOHAP, or relevant emirate health authority)</li>
+                     <li><strong>Services Offered:</strong> Look for clinics that provide the specific treatments you need, from general dentistry to specialized care</li>
+                     <li><strong>Patient Reviews:</strong> Check verified patient feedback to gauge quality of care and patient satisfaction</li>
+                     <li><strong>Technology & Hygiene:</strong> Modern clinics use advanced sterilization techniques and up-to-date equipment</li>
+                     <li><strong>Accessibility:</strong> Consider location, parking, and appointment availability that fits your schedule</li>
+                   </ul>
+                   <p>AppointPanda is continuously expanding our database of verified dental clinics across the UAE. While we may not have specific listings for {locationName} yet, we encourage you to:</p>
+                   <ul className="space-y-2">
+                     <li>Check nearby emirates for available dental care options</li>
+                     <li>Consult with your insurance provider for in-network dental clinics</li>
+                     <li>Ask for recommendations from friends, family, or healthcare providers</li>
+                     <li>Visit government health authority websites for lists of licensed dental practitioners</li>
+                   </ul>
+                 </div>
+               </section>
+               
+               {/* Section 4: Nearby Cities with Dental Care */}
+               {nearbyLocations && nearbyLocations.length > 0 && (
+                 <section className="border-l-2 border-primary/20 pl-4 md:pl-6">
+                   <h2 className="text-xl font-bold text-foreground mb-3" itemProp="headline">
+                     Nearby Areas with Available Dental Care
+                   </h2>
+                   <div className="text-muted-foreground leading-relaxed prose prose-sm max-w-none">
+                     <p>While specific clinic listings for {locationName} may be limited in our database, residents can access quality dental care in nearby cities within {stateName}:</p>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 my-4">
+                       {nearbyLocations.slice(0, 8).map((loc, index) => (
+                         <Link
+                           key={loc.slug}
+                           href={stateSlug && citySlug ? `/${stateSlug}/${loc.slug}/` : loc.slug.startsWith('/') ? loc.slug : `/${loc.slug}/`}
+                           className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors"
+                         >
+                           <MapPin className="h-4 w-4 text-primary shrink-0" />
+                           <div>
+                             <div className="font-medium text-foreground">{loc.name}</div>
+                           </div>
+                         </Link>
+                       ))}
+                     </div>
+                     <p><em>Note: For the most current information on dental care availability, we recommend contacting local health authorities or using our search feature to check nearby locations.</em></p>
+                   </div>
+                 </section>
+               )}
+             </div>
+           </div>
+         </motion.div>
+       </article>
+     );
+   }
+    
   return null;
 };
 

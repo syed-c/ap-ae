@@ -36,7 +36,8 @@ import {
   Stethoscope,
   SlidersHorizontal,
   MapPin,
-  ArrowRight
+  ArrowRight,
+  Shield
 } from "lucide-react";
 import {
   Accordion,
@@ -385,51 +386,21 @@ const shouldNoIndex = false;
 
   const hasActiveFilters = filters.maxBudget !== null || filters.minRating > 0 || filters.verifiedOnly;
 
-  return (
-    <PageLayout>
-      <SEOHead
-        title={seoDataProp?.title ?? pageTitle}
-        description={seoDataProp?.description ?? pageDescription}
-        canonical={seoDataProp?.canonical ?? `/${normalizedStateSlug}/${citySlug}/`}
-        keywords={[`dentists ${cityName}`, `dental clinics ${cityName} ${stateAbbr}`, `best dentist ${cityName}`]}
-        noindex={shouldNoIndex}
-      />
-      {/* Synchronous JSON-LD structured data for SEO */}
-      <SyncStructuredData
-        data={[
-          {
-            type: 'breadcrumb',
-            items: [
-              { name: 'Home', url: '/' },
-              { name: stateName, url: `/${normalizedStateSlug}/` },
-              { name: cityName, url: `/${normalizedStateSlug}/${citySlug}/` },
-            ],
-          },
-          {
-            type: 'faq',
-            questions: faqs.map(f => ({ question: f.q || f.question, answer: f.a || f.answer })).filter(f => f.question && f.answer),
-          },
-          {
-            type: 'itemList',
-            name: `Dentists in ${cityName}, ${stateAbbr}`,
-            description: `Top-rated dental clinics and dentists in ${cityName}`,
-            items: (profiles || []).slice(0, 10).map((p, i) => ({
-              name: p.name,
-              url: `/clinic/${p.slug}/`,
-              position: i + 1,
-              image: p.image,
-            })),
-          },
-          {
-            type: 'place' as const,
-            name: cityName,
-            description: `Find the best dentists and dental clinics in ${cityName}, ${stateName}`,
-            url: `/${normalizedStateSlug}/${citySlug}/`,
-            containedInPlace: stateName,
-          },
-        ]}
-        id="city-page-schema"
-      />
+   return (
+     <PageLayout>
+       {/* Synchronous JSON-LD structured data for SEO - avoid duplicating what's in wrapper */}
+       <SyncStructuredData
+         data={[
+           {
+             type: 'place' as const,
+             name: cityName,
+             description: `Find the best dentists and dental clinics in ${cityName}, ${stateName}`,
+             url: `/${normalizedStateSlug}/${citySlug}/`,
+             containedInPlace: stateName,
+           },
+         ]}
+         id="city-page-schema"
+       />
 
       {/* Hero Section — Dark theme matching homepage */}
       <section className="relative overflow-hidden min-h-[45vh] flex items-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -491,28 +462,50 @@ const shouldNoIndex = false;
               <SearchBox variant="hero" stateSlug={stateSlug} defaultCity={`${citySlug}|${stateSlug}`} />
             </motion.div>
 
-            {/* Stats */}
+            {/* Stats - Show meaningful info even when 0 clinics */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
               className="flex flex-wrap justify-center gap-2 md:gap-3"
             >
-              <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
-                <Users className="h-4 w-4 text-primary" />
-                <span className="font-bold text-sm text-white">{profiles?.length || 0}+</span>
-                <span className="text-xs text-white/50 hidden sm:inline">Specialists</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
-                <Star className="h-4 w-4 text-gold fill-gold" />
-                <span className="font-bold text-sm text-white">4.8</span>
-                <span className="text-xs text-white/50 hidden sm:inline">Avg. Rating</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
-                <Clock className="h-4 w-4 text-primary" />
-                <span className="font-bold text-sm text-white">60s</span>
-                <span className="text-xs text-white/50 hidden sm:inline">to Book</span>
-              </div>
+              {(totalClinicCount || profiles?.length || 0) > 0 ? (
+                <>
+                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
+                    <Users className="h-4 w-4 text-primary" />
+                    <span className="font-bold text-sm text-white">{profiles?.length || 0}+</span>
+                    <span className="text-xs text-white/50 hidden sm:inline">Specialists</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
+                    <Star className="h-4 w-4 text-gold fill-gold" />
+                    <span className="font-bold text-sm text-white">4.8</span>
+                    <span className="text-xs text-white/50 hidden sm:inline">Avg. Rating</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span className="font-bold text-sm text-white">60s</span>
+                    <span className="text-xs text-white/50 hidden sm:inline">to Book</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
+                    <Shield className="h-4 w-4 text-primary" />
+                    <span className="font-bold text-sm text-white"> DHA Licensed</span>
+                    <span className="text-xs text-white/50 hidden sm:inline">Dentists</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
+                    <Star className="h-4 w-4 text-gold fill-gold" />
+                    <span className="font-bold text-sm text-white">Verified</span>
+                    <span className="text-xs text-white/50 hidden sm:inline">Clinics</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span className="font-bold text-sm text-white">24/7</span>
+                    <span className="text-xs text-white/50 hidden sm:inline">Support</span>
+                  </div>
+                </>
+              )}
             </motion.div>
           </div>
         </div>
@@ -587,6 +580,8 @@ const shouldNoIndex = false;
                 profiles={profiles}
                 isLoading={profilesLoading}
                 locationName={cityName}
+                stateSlug={normalizedStateSlug}
+                nearbyLocations={nearbyLocations}
                 hasActiveFilters={hasActiveFilters}
                 onClearFilters={() => setFilters({ maxBudget: null, minRating: 0, verifiedOnly: false, selectedServices: [] })}
                 maxHeight={700}

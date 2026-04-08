@@ -11,20 +11,24 @@ import {
   ChevronUp,
   Users,
   MapPin,
-  X
+  X,
+  Search,
+  Phone,
+  ArrowRight
 } from "lucide-react";
+import Link from "next/link";
 
 interface DentistListFrameProps {
   profiles: any[];
   isLoading: boolean;
   locationName: string;
+  stateSlug?: string;
+  nearbyLocations?: { name: string; slug: string }[];
   emptyMessage?: string;
   showFilters?: boolean;
   hasActiveFilters?: boolean;
   onClearFilters?: () => void;
-  /** Max height of the scrollable container (in px). Default: 600 */
   maxHeight?: number;
-  /** Initial number of profiles to show before expand. Default: 6 */
   initialCount?: number;
 }
 
@@ -37,6 +41,8 @@ export const DentistListFrame = ({
   profiles,
   isLoading,
   locationName,
+  stateSlug = "",
+  nearbyLocations = [],
   emptyMessage,
   showFilters = false,
   hasActiveFilters = false,
@@ -100,24 +106,74 @@ export const DentistListFrame = ({
             <h3 className="font-bold text-lg">Dentists & Clinics</h3>
           </div>
         </div>
-        <div className="p-8 text-center">
-          <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-foreground mb-2">No dentists found</h3>
-          <p className="text-muted-foreground mb-4">
-            {emptyMessage || (hasActiveFilters
-              ? "Try adjusting your filters to see more results."
-              : `We're still adding dentists in ${locationName}. Check back soon!`
+        <div className="p-8">
+          {/* Primary message */}
+          <div className="text-center mb-6">
+            <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-foreground mb-2">No dentists found</h3>
+            <p className="text-muted-foreground mb-4">
+              {emptyMessage || (hasActiveFilters
+                ? "Try adjusting your filters to see more results."
+                : `We're still adding dentists in ${locationName}. Check back soon!`
+              )}
+            </p>
+          </div>
+          
+          {/* SEO-rich fallback content for empty states */}
+          <div className="bg-muted/30 rounded-2xl p-6 space-y-4">
+            <h4 className="font-semibold text-foreground flex items-center gap-2">
+              <Search className="h-4 w-4 text-primary" />
+              Find Dental Care Near {locationName}
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              While we're adding dental clinics to {locationName}, here are some ways to find quality dental care:
+            </p>
+            <ul className="text-sm text-muted-foreground space-y-2">
+              <li className="flex items-start gap-2">
+                <ArrowRight className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <span>Check nearby areas in {stateSlug || "this emirate"} for available dental clinics</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Phone className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <span>Contact local hospitals or health centers for dental service referrals</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <span>Visit government health authority websites for licensed practitioners</span>
+              </li>
+            </ul>
+            
+            {/* Links to nearby locations */}
+            {nearbyLocations && nearbyLocations.length > 0 && (
+              <div className="pt-4 border-t border-border">
+                <h5 className="font-medium text-foreground mb-3">Nearby Areas with Dental Care:</h5>
+                <div className="flex flex-wrap gap-2">
+                  {nearbyLocations.slice(0, 6).map((loc) => (
+                    <Link
+                      key={loc.slug}
+                      href={stateSlug ? `/${stateSlug}/${loc.slug}/` : `/${loc.slug}/`}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium hover:bg-primary/20 transition-colors"
+                    >
+                      <MapPin className="h-3 w-3" />
+                      {loc.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             )}
-          </p>
+          </div>
+          
           {hasActiveFilters && onClearFilters && (
-            <Button
-              variant="outline"
-              className="rounded-xl"
-              onClick={onClearFilters}
-            >
-              <X className="h-4 w-4 mr-2" />
-              Clear All Filters
-            </Button>
+            <div className="mt-4 text-center">
+              <Button
+                variant="outline"
+                className="rounded-xl"
+                onClick={onClearFilters}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Clear All Filters
+              </Button>
+            </div>
           )}
         </div>
       </div>
