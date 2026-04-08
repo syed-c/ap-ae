@@ -1,4 +1,5 @@
 import { GetStaticProps } from 'next';
+import Head from 'next/head';
 import dynamic from 'next/dynamic';
 
 const AdminDashboard = dynamic(() => import('@/pages/admin/AdminDashboard'), {
@@ -10,7 +11,16 @@ const AdminDashboard = dynamic(() => import('@/pages/admin/AdminDashboard'), {
     )
 });
 
-export default AdminDashboard;
+export default function DashboardWithNoIndex() {
+    return (
+        <>
+            <Head>
+                <meta name="robots" content="noindex, nofollow" />
+            </Head>
+            <AdminDashboard />
+        </>
+    );
+}
 
 export const getStaticProps: GetStaticProps = async () => {
     return { props: {} };

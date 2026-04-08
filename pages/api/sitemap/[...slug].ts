@@ -166,8 +166,8 @@ ${sitemaps.map(s => `  <sitemap>
   if (type === 'service-locations') {
     // Get states and cities separately to avoid join issues
     const states = await fetchAll(supabase, 'states', 'id, slug', { is_active: true });
-    const cities = await fetchAll(supabase, 'cities', 'id, slug, state_id', { is_active: true });
-    const treatments = await fetchAll(supabase, 'treatments', 'id, slug', { is_active: true });
+    const cities = await fetchAll(supabase, 'cities', 'id, slug, state_id, updated_at', { is_active: true });
+    const treatments = await fetchAll(supabase, 'treatments', 'id, slug, updated_at', { is_active: true });
     
     const stateSlugMap = new Map(states.map(s => [s.id, s.slug]));
     
@@ -177,7 +177,8 @@ ${sitemaps.map(s => `  <sitemap>
       if (!city.slug || !stateSlug) continue;
       for (const treatment of treatments) {
         if (!treatment.slug) continue;
-        urls.push({ loc: normalizeUrl(`/${stateSlug}/${city.slug}/${treatment.slug}`), priority: 0.7, changefreq: 'weekly' });
+        const lastmod = city.updated_at || treatment.updated_at;
+        urls.push({ loc: normalizeUrl(`/${stateSlug}/${city.slug}/${treatment.slug}`), lastmod: lastmod?.split('T')[0], priority: 0.7, changefreq: 'weekly' });
       }
     }
     return res.send(generateSitemapXml(urls));
@@ -185,7 +186,7 @@ ${sitemaps.map(s => `  <sitemap>
 
   if (type === 'profiles') {
     const clinics = await fetchAll(supabase, 'clinics', 'slug, updated_at', { is_active: true, is_duplicate: false });
-    const urls = clinics.filter(c => c.slug).map(c => ({ loc: normalizeUrl(`/clinic/${c.slug}`), lastmod: c.updated_at?.split('T')[0], priority: 0.7, changefreq: 'weekly' }));
+    const urls = clinics.filter(c => c.slug).map(c => ({ loc: normalizeUrl(`/clinic/${c.slug}`), lastmod: c.updated_at?.split('T')[0], priority: 0.9, changefreq: 'weekly' }));
     return res.send(generateSitemapXml(urls));
   }
 

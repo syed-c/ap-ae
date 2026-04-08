@@ -298,10 +298,10 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const cityName = finalCityData?.name || citySlug;
     const stateName = stateData?.name || normalizedStateSlug;
     
-    // Only use SEO content if it actually exists in DB
-    const metaTitle = seoContent?.meta_title || null;
-    const metaDescription = seoContent?.meta_description || null;
-    const seoH1 = seoContent?.h1 || null;
+    // Always generate meta - either from DB or auto-generated
+    const metaTitle = seoContent?.meta_title || `Best Dentists in ${cityName}, ${stateName} (2026) — Book Now | AppointPanda`;
+    const metaDescription = seoContent?.meta_description || `Find verified dental clinics in ${cityName}, ${stateName}. Compare ratings, prices, and book your appointment online.`;
+    const seoH1 = seoContent?.h1 || `Best Dentists in ${cityName}, ${stateName}`;
 
     let ssrFaqs: { question: string; answer: string }[] = [];
     

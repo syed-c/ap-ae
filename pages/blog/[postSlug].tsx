@@ -78,6 +78,18 @@ const BlogPostPageWithSEO = ({ postSlug, postData, seoData, authorData }: {
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
                 />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        itemListElement: [
+                            { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
+                            { "@type": "ListItem", position: 2, name: "Blog", item: `${BASE_URL}/blog/` },
+                            { "@type": "ListItem", position: 3, name: postData?.title || postSlug, item: `${BASE_URL}${seoData.canonical}` },
+                        ]
+                    }) }}
+                />
             </Head>
             <BlogPostPageComponent 
                 postSlugProp={postSlug}

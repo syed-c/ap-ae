@@ -6,14 +6,14 @@ compatibility: opencode
 metadata:
   project: appointpanda
   market: uae-dental
-  domain: appointpanda.ae
+  domain: www.appointpanda.ae
 ---
 
 # SEO Expert — AppointPanda UAE Dental Marketplace
 
 ## Project SEO Context
 
-- **Domain:** AppointPanda.ae
+- **Domain:** www.appointpanda.ae
 - **Market:** UAE — Dubai, Abu Dhabi, Sharjah + 7 Emirates, 69 Areas
 - **Business:** Dental clinic directory + appointment booking SaaS
 - **Data:** 1,172+ clinics, 250+ dentists, 50+ treatments, 30+ cities, 69 areas
@@ -64,15 +64,15 @@ import Head from 'next/head'
   {/* Primary */}
   <title>{pageTitle} | AppointPanda UAE</title>
   <meta name="description" content={metaDescription} />
-  <link rel="canonical" href={`https://appointpanda.ae${canonicalPath}`} />
+  <link rel="canonical" href={`https://www.appointpanda.ae${canonicalPath}`} />
   <meta name="robots" content="index, follow" />
 
   {/* Open Graph */}
   <meta property="og:title" content={pageTitle} />
   <meta property="og:description" content={metaDescription} />
-  <meta property="og:url" content={`https://appointpanda.ae${canonicalPath}`} />
+  <meta property="og:url" content={`https://www.appointpanda.ae${canonicalPath}`} />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content={ogImage ?? 'https://appointpanda.ae/og-default.jpg'} />
+  <meta property="og:image" content={ogImage ?? 'https://www.appointpanda.ae/og-default.jpg'} />
   <meta property="og:site_name" content="AppointPanda UAE" />
   <meta property="og:locale" content="en_AE" />
 
@@ -80,7 +80,7 @@ import Head from 'next/head'
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={pageTitle} />
   <meta name="twitter:description" content={metaDescription} />
-  <meta name="twitter:image" content={ogImage ?? 'https://appointpanda.ae/og-default.jpg'} />
+  <meta name="twitter:image" content={ogImage ?? 'https://www.appointpanda.ae/og-default.jpg'} />
 </Head>
 ```
 
@@ -117,7 +117,7 @@ const structuredData = {
   "@type": ["LocalBusiness", "Dentist"],
   "name": clinic.name,
   "description": clinic.description,
-  "url": `https://appointpanda.ae/clinic/${clinic.slug}`,
+  "url": `https://www.appointpanda.ae/clinic/${clinic.slug}`,
   "telephone": clinic.phone,
   "address": {
     "@type": "PostalAddress",
@@ -154,9 +154,9 @@ const breadcrumbData = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://appointpanda.ae" },
-    { "@type": "ListItem", "position": 2, "name": emirateName, "item": `https://appointpanda.ae/${emirateSlug}` },
-    { "@type": "ListItem", "position": 3, "name": areaName, "item": `https://appointpanda.ae/${emirateSlug}/${areaSlug}` }
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.appointpanda.ae" },
+    { "@type": "ListItem", "position": 2, "name": emirateName, "item": `https://www.appointpanda.ae/${emirateSlug}` },
+    { "@type": "ListItem", "position": 3, "name": areaName, "item": `https://www.appointpanda.ae/${emirateSlug}/${areaSlug}` }
   ]
 }
 ```
@@ -166,17 +166,17 @@ const breadcrumbData = {
 ## Canonical URL Rules
 
 - Every page has exactly one canonical URL.
-- Canonical always uses `https://appointpanda.ae` (no www).
+- Canonical always uses `https://www.appointpanda.ae`.
 - For paginated listings: canonical points to page 1 (no `?page=2` in canonical).
 - No trailing slashes in canonical except homepage.
 - For filtered/sorted views: canonical is the base URL without query params.
 
 ```typescript
 // Build canonical correctly
-const canonical = `https://appointpanda.ae/clinic/${clinic.slug}`
+const canonical = `https://www.appointpanda.ae/clinic/${clinic.slug}`
 // NOT: https://www.appointpanda.ae/clinic/...
-// NOT: https://appointpanda.ae/clinic/${slug}?ref=search
-// NOT: https://appointpanda.ae/clinic/${slug}/
+// NOT: https://www.appointpanda.ae/clinic/${slug}?ref=search
+// NOT: https://www.appointpanda.ae/clinic/${slug}/
 ```
 
 ---
@@ -220,7 +220,7 @@ Disallow: /admin
 Disallow: /dashboard
 Disallow: /auth
 Disallow: /appointment
-Sitemap: https://appointpanda.ae/sitemap.xml
+Sitemap: https://www.appointpanda.ae/sitemap.xml
 ```
 
 ---

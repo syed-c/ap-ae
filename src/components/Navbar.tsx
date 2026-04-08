@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, supabaseAdmin } from "@/integrations/supabase/client";
 import { useStates, useCities } from "@/hooks/useLocations";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
@@ -27,7 +27,7 @@ export function Navbar() {
   const { data: treatments } = useQuery({
     queryKey: ['treatments'],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await supabaseAdmin
         .from('treatments')
         .select('name, slug')
         .eq('is_active', true)

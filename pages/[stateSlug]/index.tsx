@@ -218,9 +218,10 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         .order('review_count', { ascending: false })
         .limit(5);
 
-    const metaTitle = seoContent?.meta_title || null;
-    const metaDescription = seoContent?.meta_description || null;
-    const seoH1 = seoContent?.h1 || null;
+    // Always generate meta - either from DB or auto-generated
+    const metaTitle = seoContent?.meta_title || `Best Dentists in ${stateData?.name || normalizedStateSlug}, UAE (2026) — Compare & Book | AppointPanda`;
+    const metaDescription = seoContent?.meta_description || `Find verified dental clinics in ${stateData?.name || normalizedStateSlug}. Compare ratings, read reviews, check AED prices for implants, braces, whitening. Book your appointment online.`;
+    const seoH1 = seoContent?.h1 || `Best Dentists in ${stateData?.name || normalizedStateSlug}, UAE`;
 
     let ssrFaqs: { question: string; answer: string }[] = [];
     

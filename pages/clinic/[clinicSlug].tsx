@@ -164,7 +164,7 @@ const ClinicPageWithSEO = ({ clinicSlug, clinicData, seoData, faqs }: {
                 "reviewCount": String(clinicData.review_count || 0),
             }
         } : {}),
-        "priceRange": clinicData?.price_range || "$$",
+        "priceRange": clinicData?.price_range ? `AED ${clinicData.price_range}` : "AED $$",
         ...(clinicData?.city?.name ? {
             "areaServed": { "@type": "City", "name": clinicData.city.name }
         } : {}),
