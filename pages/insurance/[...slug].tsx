@@ -1,6 +1,6 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
-import { createServerSupabase } from '@/lib/supabaseServer';
+import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import InsuranceDetailPageComponent from '@/pages/InsuranceDetailPage';
 
 const BASE_URL = 'https://www.appointpanda.ae';
@@ -62,7 +62,7 @@ export default InsuranceDetailWrapper;
 // State/city combinations will be ISR (fallback: 'blocking')
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
-        const supabase = createServerSupabase();
+const supabase = createServerSupabaseAdmin();
         
         if (!supabase) {
             return { paths: [], fallback: 'blocking' };
@@ -87,7 +87,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
-    const supabase = createServerSupabase();
+    const supabase = createServerSupabaseAdmin();
     
     const slugSegments = (ctx.params?.slug as string[]) || [];
     const insuranceSlug = slugSegments[0] || '';

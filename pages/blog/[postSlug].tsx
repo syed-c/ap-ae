@@ -1,6 +1,6 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
-import { createServerSupabase } from '@/lib/supabaseServer';
+import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import BlogPostPageComponent from '@/pages/BlogPostPage';
 
 const BASE_URL = 'https://www.appointpanda.ae';
@@ -93,7 +93,7 @@ export default BlogPostPageWithSEO;
 // Generate static paths - use fallback blocking to avoid build timeouts
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
-        const supabase = createServerSupabase();
+const supabase = createServerSupabaseAdmin();
         
         if (!supabase) {
             return { paths: [], fallback: 'blocking' };
@@ -116,7 +116,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 // Convert to Static Site Generation
 export const getStaticProps: GetStaticProps = async (ctx) => {
-    const supabase = createServerSupabase();
+    const supabase = createServerSupabaseAdmin();
     const postSlug = ctx.params?.postSlug as string;
 
     if (!postSlug) {

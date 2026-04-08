@@ -1,11 +1,11 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
-import { createServerSupabase } from '@/lib/supabaseServer';
+import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import ClinicPageComponent from '@/pages/ClinicPage';
 
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
-        const supabase = createServerSupabase();
+const supabase = createServerSupabaseAdmin();
         
         if (!supabase) {
             return { paths: [], fallback: 'blocking' };
@@ -30,7 +30,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 // Static Site Generation - prefetch ALL critical data for SEO
 export const getStaticProps: GetStaticProps = async (ctx) => {
-    const supabase = createServerSupabase();
+    const supabase = createServerSupabaseAdmin();
     const clinicSlug = ctx.params?.clinicSlug as string;
 
     if (!clinicSlug) {

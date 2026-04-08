@@ -1,7 +1,7 @@
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import IndexPage from '@/pages/Index';
-import { createServerSupabase } from '@/lib/supabaseServer';
+import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import { ACTIVE_STATE_SLUGS } from '@/lib/constants/activeStates';
 
 const BASE_URL = 'https://www.appointpanda.ae';
@@ -90,7 +90,7 @@ export default function IndexPageWithSEO({
 }
 
 export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
-  const supabase = createServerSupabase();
+  const supabase = createServerSupabaseAdmin();
 
   if (!supabase) {
     return {

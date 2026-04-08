@@ -1,6 +1,6 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Head from 'next/head';
-import { createServerSupabase } from '@/lib/supabaseServer';
+import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import DentistPageComponent from '@/pages/DentistPage';
 
 // Wrapper component to render SEO meta tags server-side
@@ -121,7 +121,7 @@ export default DentistPageWithSEO;
 
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
-        const supabase = createServerSupabase();
+const supabase = createServerSupabaseAdmin();
         
         if (!supabase) {
             return { paths: [], fallback: 'blocking' };
@@ -146,7 +146,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 // Convert to Static Site Generation with SEO data
 export const getStaticProps: GetStaticProps = async (ctx) => {
-    const supabase = createServerSupabase();
+    const supabase = createServerSupabaseAdmin();
     const dentistSlug = ctx.params?.dentistSlug as string;
 
     if (!dentistSlug) {
