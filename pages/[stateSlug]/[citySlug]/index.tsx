@@ -107,6 +107,8 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
                 seoDataProp={seoData}
                 faqsProp={faqs}
                 seoH1Prop={seoH1}
+                cityRatingsProp={cityRatings}
+                topClinicsProp={topClinics}
             />
         </>
     );

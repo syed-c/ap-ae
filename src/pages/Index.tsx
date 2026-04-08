@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTopDentistsPerLocation } from "@/hooks/useProfiles";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, supabaseAdmin } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { SyncStructuredData } from "@/components/seo/SyncStructuredData";
@@ -242,7 +242,7 @@ const Index = ({ seoDataProp, realCountsProp, topProfilesProp, statesWithClinics
   const { data: treatments } = useQuery({
     queryKey: ['homepage-treatments'],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await supabaseAdmin
         .from('treatments')
         .select('id, name, slug')
         .eq('is_active', true)

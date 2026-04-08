@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, supabaseAdmin } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
@@ -51,9 +51,11 @@ interface StatePageProps {
   };
   faqsProp?: { question: string; answer: string }[];
   seoH1Prop?: string | null;
+  stateRatingsProp?: { avgRating: number; totalReviews: number; clinicCount: number };
+  topClinicsProp?: { name: string; slug: string; rating: number; review_count: number }[];
 }
 
-const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, faqsProp, seoH1Prop }: StatePageProps = {}) => {
+const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, faqsProp, seoH1Prop, stateRatingsProp, topClinicsProp }: StatePageProps = {}) => {
   const router = useRouter();
   const isServerRender = typeof window === 'undefined';
   const stateSlug = isServerRender
@@ -96,7 +98,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
     queryFn: async () => {
       if (!cityIds.length) return {} as Record<string, number>;
 
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from("clinics")
         .select("city_id")
         .in("city_id", cityIds)
@@ -125,7 +127,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
       const pinnedIds = (pinnedProfiles || []).map(p => p.id);
 
       // Get city IDs for this state
-      const { data: stateCities } = await supabase
+      const { data: stateCities } = await supabaseAdmin
         .from('cities')
         .select('id')
         .eq('state_id', state.id);
@@ -135,7 +137,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
       const stateCityIds = stateCities.map(c => c.id);
 
       // Get clinics in these cities
-      const { data: clinics } = await supabase
+      const { data: clinics } = await supabaseAdmin
         .from('clinics')
         .select(`
           id, name, slug, description, cover_image_url, rating, review_count,
@@ -153,7 +155,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
 
       let pinnedClinics: any[] = [];
       if (missingPinnedIds.length > 0) {
-        const { data: extraPinned } = await supabase
+        const { data: extraPinned } = await supabaseAdmin
           .from('clinics')
           .select(`
             id, name, slug, description, cover_image_url, rating, review_count,

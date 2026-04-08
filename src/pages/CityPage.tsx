@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import dynamic from 'next/dynamic';
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, supabaseAdmin } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { generateCityQA } from "@/lib/ai-seo/generateQAContent";
 import { Section } from "@/components/layout/Section";
@@ -77,9 +77,11 @@ interface CityPageProps {
   };
   faqsProp?: { question: string; answer: string }[];
   seoH1Prop?: string | null;
+  cityRatingsProp?: { avgRating: number; totalReviews: number; clinicCount: number };
+  topClinicsProp?: { name: string; slug: string; rating: number; review_count: number }[];
 }
 
-const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp, faqsProp, seoH1Prop }: CityPageProps = {}) => {
+const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp, faqsProp, seoH1Prop, cityRatingsProp, topClinicsProp }: CityPageProps = {}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isServerRender = typeof window === 'undefined';
@@ -115,7 +117,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     queryKey: ['city-clinic-count', city?.id],
     queryFn: async () => {
       if (!city) return 0;
-      const { count, error } = await supabase
+      const { count, error } = await supabaseAdmin
         .from('clinics')
         .select('id', { count: 'exact', head: true })
         .eq('city_id', city.id)
@@ -134,7 +136,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
 
       const pinnedIds = (pinnedProfiles || []).map(p => p.id);
 
-      const { data: clinics } = await supabase
+      const { data: clinics } = await supabaseAdmin
         .from('clinics')
         .select(`
           id, name, slug, description, cover_image_url, rating, review_count,
@@ -151,7 +153,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
 
       let pinnedClinics: any[] = [];
       if (missingPinnedIds.length > 0) {
-        const { data: extraPinned } = await supabase
+        const { data: extraPinned } = await supabaseAdmin
           .from('clinics')
           .select(`
             id, name, slug, description, cover_image_url, rating, review_count,
@@ -215,7 +217,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     queryKey: ['cities-by-emirate', normalizedStateSlug],
     queryFn: async () => {
       // First get the state to get its ID
-      const { data: stateData, error: stateError } = await supabase
+      const { data: stateData, error: stateError } = await supabaseAdmin
         .from('states')
         .select('id')
         .eq('slug', normalizedStateSlug)
@@ -228,7 +230,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
       }
       
       // Then get cities by state_id
-      const { data: citiesData, error: citiesError } = await supabase
+      const { data: citiesData, error: citiesError } = await supabaseAdmin
         .from('cities')
         .select('id, name, slug')
         .eq('state_id', stateData.id)
@@ -251,7 +253,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     queryKey: ['service-locations', normalizedStateSlug, citySlug],
     queryFn: async () => {
       const slugPattern = `/${normalizedStateSlug}/${citySlug}/`;
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('seo_pages')
         .select('slug, title, h1, meta_title')
         .eq('page_type', 'service-location' as any)

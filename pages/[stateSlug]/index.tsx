@@ -102,6 +102,8 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
                 seoDataProp={seoData}
                 faqsProp={faqs}
                 seoH1Prop={seoH1}
+                stateRatingsProp={stateRatings}
+                topClinicsProp={topClinics}
             />
         </>
     );
