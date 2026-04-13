@@ -14,6 +14,17 @@ interface ListingConfirmationRequest {
   phone: string;
 }
 
+function minifyHtml(html: string): string {
+  return html
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\r\n/g, '')
+    .replace(/\r/g, '')
+    .replace(/\n/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/>\s+</g, '><')
+    .trim();
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -21,6 +32,15 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { clinicName, dentistName, email, phone }: ListingConfirmationRequest = await req.json();
+
+    // Validate required fields
+    if (!email || !clinicName) {
+      console.error("Missing required fields: email and clinicName are required");
+      return new Response(
+        JSON.stringify({ success: false, error: "Missing required fields: email and clinicName are required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     
@@ -33,15 +53,24 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Get branding from database
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error("Missing Supabase configuration");
+      return new Response(
+        JSON.stringify({ success: false, error: "Server configuration error" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const supabase = createClient(supabaseUrl, supabaseKey);
     const branding = await getBranding(supabase);
 
     // Generate email body content
     const bodyContent = `
       <h2 style="color: #1e293b; margin: 0 0 16px 0; font-size: 22px; font-weight: 600;">
-        Dear ${dentistName},
+        Dear ${dentistName || 'Doctor'},
       </h2>
       
       <p style="color: #475569; font-size: 16px; line-height: 1.7; margin: 0 0 24px 0;">
@@ -54,8 +83,8 @@ const handler = async (req: Request): Promise<Response> => {
             <h3 style="margin: 0 0 16px; color: #0d9488; font-size: 18px;">What happens next?</h3>
             <ol style="margin: 0; padding-left: 20px; color: #374151; font-size: 14px; line-height: 1.8;">
               <li>Our team will review your submission within 24-48 hours</li>
-              <li>We may contact you at <strong>${phone}</strong> for verification</li>
-              <li>Once approved, you'll receive login credentials</li>
+              <li>We may contact you at <strong>${phone || email}</strong> for verification</li>
+              <li>Once approved, you'll receive an email with your login credentials</li>
               <li>Your profile will go live and patients can start booking</li>
             </ol>
           </td>
@@ -63,7 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
       </table>
       
       <p style="color: #475569; font-size: 16px; line-height: 1.7; margin: 0 0 24px 0;">
-        If you have any questions, feel free to reply to this email or contact our support team.
+        If you have any questions, feel free to reply to this email or contact our support team at ${branding.supportEmail}.
       </p>
       
       <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0;">
@@ -73,6 +102,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const emailHtml = wrapEmailContent(branding, '🎉 Submission Received!', '🎉', bodyContent);
+    const minifiedHtml = minifyHtml(emailHtml);
 
     // Use fetch to call Resend API directly
     const emailResponse = await fetch("https://api.resend.com/emails", {
@@ -85,12 +115,22 @@ const handler = async (req: Request): Promise<Response> => {
         from: getFromAddress(branding),
         to: [email],
         subject: `Your Practice Listing Request Received - ${branding.siteName}`,
-        html: emailHtml,
+        html: minifiedHtml,
       }),
     });
 
+    // Check if email was sent successfully
+    if (!emailResponse.ok) {
+      const errorText = await emailResponse.text();
+      console.error("Failed to send email via Resend:", emailResponse.status, errorText);
+      return new Response(
+        JSON.stringify({ success: false, error: `Resend API error: ${emailResponse.status}` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const result = await emailResponse.json();
-    console.log("Confirmation email sent:", result);
+    console.log("Confirmation email sent successfully:", result);
 
     return new Response(JSON.stringify({ success: true, data: result }), {
       status: 200,

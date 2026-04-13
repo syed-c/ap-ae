@@ -74,11 +74,13 @@ serve(async (req) => {
     const website = listingData.website || "";
     const description = listingData.description || "";
     const serviceIds = listingData.serviceIds || [];
+    
+    // Use submitted password or generate one as fallback
+    const submittedPassword = listingData.password;
+    const passwordToUse = submittedPassword || generateTempPassword();
+    const isTempPassword = !submittedPassword;
 
-    // 2. Generate temporary password
-    const tempPassword = generateTempPassword();
-
-    // 3. Check if user already exists
+    // 2. Check if user already exists
     const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
     const existingUser = existingUsers?.users?.find(u => u.email === email);
 
@@ -88,13 +90,13 @@ serve(async (req) => {
       // User exists, update their password
       userId = existingUser.id;
       await supabaseAdmin.auth.admin.updateUserById(userId, {
-        password: tempPassword,
+        password: passwordToUse,
       });
     } else {
       // Create new user
       const { data: newUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
         email,
-        password: tempPassword,
+        password: passwordToUse,
         email_confirm: true,
         user_metadata: {
           full_name: dentistName,
@@ -248,6 +250,11 @@ serve(async (req) => {
         const branding = await getBranding(supabaseAdmin);
         const siteUrl = branding.siteUrl;
 
+        const passwordLabel = isTempPassword ? "Temporary Password" : "Your Password";
+        const passwordWarning = isTempPassword 
+          ? '<p style="margin: 8px 0 0; color: #dc2626; font-size: 14px;">⚠️ Please change your password after logging in.</p>'
+          : '';
+
         const bodyContent = `
           <h2 style="color: #1e293b; margin: 0 0 16px 0; font-size: 22px; font-weight: 600;">
             Welcome to ${branding.siteName}!
@@ -266,8 +273,8 @@ serve(async (req) => {
               <td style="padding: 24px;">
                 <h3 style="margin: 0 0 16px; color: #166534; font-size: 18px;">Your Login Credentials</h3>
                 <p style="margin: 0 0 8px; color: #374151;"><strong>Email:</strong> ${email}</p>
-                <p style="margin: 0 0 8px; color: #374151;"><strong>Temporary Password:</strong> ${tempPassword}</p>
-                <p style="margin: 0; color: #dc2626; font-size: 14px;">⚠️ Please change your password after logging in.</p>
+                <p style="margin: 0 0 8px; color: #374151;"><strong>${passwordLabel}:</strong> ${passwordToUse}</p>
+                ${passwordWarning}
               </td>
             </tr>
           </table>

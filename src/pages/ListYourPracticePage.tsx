@@ -56,6 +56,12 @@ const formSchema = z.object({
   dentistName: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
   email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
   phone: z.string().trim().min(9, "Please enter a valid UAE phone number").max(20, "Phone number must be less than 20 characters"),
+  password: z.string()
+    .trim()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
   streetAddress: z.string().trim().max(500, "Address must be less than 500 characters").optional(),
   website: z.string().trim().url("Invalid website URL").max(255, "Website must be less than 255 characters").optional().or(z.literal("")),
   description: z.string().trim().max(2000, "Description must be less than 2000 characters").optional(),
@@ -85,6 +91,7 @@ const ListYourPracticePage = () => {
     dentistName: "",
     email: user?.email || "",
     phone: "",
+    password: "",
     streetAddress: "",
     website: "",
     description: "",
@@ -153,7 +160,7 @@ const ListYourPracticePage = () => {
     const stepFields: Record<number, string[]> = {
       1: ["clinicName", "dentistName"],
       2: ["email", "phone"],
-      3: [],
+      3: ["password"],
     };
 
     // For step 1, also validate location
@@ -245,6 +252,7 @@ const ListYourPracticePage = () => {
           type: 'practice_listing',
           clinicName: formData.clinicName,
           dentistName: formData.dentistName,
+          password: formData.password, // Store password for account creation
           state: selectedLocation?.stateName || '',
           stateId: selectedLocation?.stateId || '',
           city: selectedLocation?.cityName || '',
@@ -262,17 +270,38 @@ const ListYourPracticePage = () => {
 
       if (error) throw error;
 
-      // Send confirmation email
+      // Send confirmation email to dentist
       try {
         await supabase.functions.invoke('send-listing-confirmation', {
           body: {
             email: formData.email,
             clinicName: formData.clinicName,
             dentistName: formData.dentistName,
+            phone: formData.phone,
           },
         });
       } catch (emailError) {
-        console.error('Failed to send confirmation email:', emailError);
+        console.error('Failed to send confirmation email to dentist:', emailError);
+      }
+
+      // Notify admin about new listing request
+      try {
+        await supabase.functions.invoke('notify-admin-new-listing', {
+          body: {
+            leadId: null, // Will be set by the function if needed
+            clinicName: formData.clinicName,
+            dentistName: formData.dentistName,
+            email: formData.email,
+            phone: formData.phone,
+            city: selectedLocation?.cityName || '',
+            state: selectedLocation?.stateName || '',
+            services: selectedServiceNames,
+            website: formData.website,
+            description: formData.description,
+          },
+        });
+      } catch (adminNotifyError) {
+        console.error('Failed to notify admin:', adminNotifyError);
       }
 
       toast({
@@ -596,8 +625,41 @@ const ListYourPracticePage = () => {
                       {step === 3 && (
                         <div className="space-y-6">
                           <div>
-                            <h2 className="font-display text-2xl font-bold">Services Offered</h2>
-                            <p className="text-muted-foreground">Select the services you provide</p>
+                            <h2 className="font-display text-2xl font-bold">Account Setup</h2>
+                            <p className="text-muted-foreground">Set up your login credentials</p>
+                          </div>
+
+                          <div className="space-y-4">
+                            {/* Password Field */}
+                            <div>
+                              <Label htmlFor="password" className="font-bold">Create Password *</Label>
+                              <div className="relative mt-2">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                </div>
+                                <Input
+                                  id="password"
+                                  name="password"
+                                  type="password"
+                                  placeholder="Create a strong password"
+                                  value={formData.password}
+                                  onChange={handleChange}
+                                  className={`pl-12 h-12 rounded-xl ${errors.password ? "border-destructive" : ""}`}
+                                />
+                              </div>
+                              {errors.password ? (
+                                <p className="text-sm text-destructive mt-1">{errors.password}</p>
+                              ) : (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Min 8 characters with uppercase, lowercase, and number
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="border-t pt-6">
+                            <h2 className="font-display text-xl font-bold mb-2">Services Offered</h2>
+                            <p className="text-muted-foreground text-sm mb-4">Select the services you provide</p>
                           </div>
 
                           <div className="space-y-4">
@@ -618,7 +680,15 @@ const ListYourPracticePage = () => {
                                   >
                                     <Checkbox
                                       checked={selectedServices.includes(treatment.id)}
-                                      onCheckedChange={() => handleServiceToggle(treatment.id)}
+                                      onCheckedChange={(isChecked) => {
+                                        setSelectedServices(prev => {
+                                          if (isChecked) {
+                                            return prev.includes(treatment.id) ? prev : [...prev, treatment.id];
+                                          } else {
+                                            return prev.filter(id => id !== treatment.id);
+                                          }
+                                        });
+                                      }}
                                     />
                                     <span className="text-sm font-medium">{treatment.name}</span>
                                   </label>
