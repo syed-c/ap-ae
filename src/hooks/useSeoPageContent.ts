@@ -17,6 +17,36 @@ export interface SeoPageContent {
   is_optimized: boolean;
   faq_json?: { question: string; answer: string }[] | null;
   faqs?: { question: string; answer: string }[] | null;
+  // Price range fields
+  price_min?: number | null;
+  price_max?: number | null;
+  price_note?: string | null;
+  price_last_updated?: string | null;
+  // Process steps
+  process_steps?: any[] | null;
+  process_time_months?: string | null;
+  process_time_note?: string | null;
+  // Treatment options
+  treatment_options?: any[] | null;
+  comparison_table?: any | null;
+  // Benefits and candidates
+  benefits?: any[] | null;
+  candidates?: any[] | null;
+  alternatives?: any[] | null;
+  // E-E-A-T
+  last_reviewed_by?: string | null;
+  last_reviewed_date?: string | null;
+  medical_accuracy_verified?: boolean | null;
+  expert_credential?: string | null;
+  // AIO optimization
+  quick_answer?: string | null;
+  ai_summary?: string | null;
+  related_questions?: any[] | null;
+  // Additional
+  preparation_tips?: any[] | null;
+  recovery_info?: any | null;
+  warning_text?: string | null;
+  updated_at?: string | null;
 }
 
 /**

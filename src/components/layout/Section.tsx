@@ -31,7 +31,7 @@ export const Section = forwardRef<HTMLElement, SectionProps>(
         className={cn(sizeClasses[size], variantClasses[variant], className)}
         {...props}
       >
-        <div className="container">
+        <div className="container px-4 md:px-6 lg:px-8 max-w-[1800px] mx-auto">
           {children}
         </div>
       </section>

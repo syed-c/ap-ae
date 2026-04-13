@@ -5,44 +5,44 @@
 @layer base {
   :root {
     /* ============================================
-       HEALTHCARE DESIGN SYSTEM
-       Calm · Clean · Trustworthy · Professional
+       DENTAL MARKETPLACE DESIGN SYSTEM
+       Off-White Primary · Dark Secondary · Green Accent (#2ab3a3)
        ============================================ */
     
-    /* Background & Surface */
-    --background: 210 20% 98%;
-    --foreground: 210 40% 14%;
+    /* Background & Surface - Off-white primary */
+    --background: 40 20% 97%;
+    --foreground: 220 15% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 40% 14%;
+    --card-foreground: 220 15% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 40% 14%;
+    --popover-foreground: 220 15% 12%;
 
-    /* Primary — Calm dental teal-blue */
-    --primary: 186 50% 42%;
+    /* Primary — Green accent (#2ab3a3) */
+    --primary: 174 59% 44%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary — Warm neutral */
-    --secondary: 210 18% 95%;
-    --secondary-foreground: 210 40% 14%;
+    /* Secondary — Mate dark (deep charcoal) */
+    --secondary: 220 15% 10%;
+    --secondary-foreground: 40 20% 95%;
 
-    /* Muted — Soft grey */
-    --muted: 210 14% 93%;
-    --muted-foreground: 210 12% 50%;
+    /* Muted — Soft warm grey */
+    --muted: 40 15% 90%;
+    --muted-foreground: 220 10% 45%;
 
-    /* Accent — Soft sky */
-    --accent: 196 40% 94%;
-    --accent-foreground: 186 50% 32%;
+    /* Accent — Green light */
+    --accent: 174 50% 94%;
+    --accent-foreground: 174 59% 30%;
 
     /* Destructive */
     --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 210 18% 88%;
-    --input: 210 18% 91%;
-    --ring: 186 50% 42%;
+    --border: 40 15% 85%;
+    --input: 40 15% 90%;
+    --ring: 174 59% 44%;
 
     /* Radius — Rounded but not bubbly */
     --radius: 0.625rem;
@@ -51,6 +51,12 @@
        ACCENT PALETTE
        ============================================ */
     
+    /* Green - Primary accent (#2ab3a3) */
+    --green: 174 59% 44%;
+    --green-light: 174 50% 94%;
+    --green-dark: 174 60% 35%;
+    --green-foreground: 0 0% 100%;
+
     /* Teal - Primary family */
     --teal: 186 50% 42%;
     --teal-light: 186 40% 95%;
@@ -152,39 +158,40 @@
     /* ============================================
        SIDEBAR — Clean professional
        ============================================ */
-    --sidebar-background: 210 35% 11%;
-    --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 186 50% 48%;
-    --sidebar-primary-foreground: 210 35% 11%;
-    --sidebar-accent: 210 30% 18%;
-    --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 210 25% 18%;
-    --sidebar-ring: 186 50% 48%;
+    --sidebar-background: 220 15% 10%;
+    --sidebar-foreground: 40 20% 95%;
+    --sidebar-primary: 174 59% 44%;
+    --sidebar-primary-foreground: 220 15% 10%;
+    --sidebar-accent: 174 50% 94%;
+    --sidebar-accent-foreground: 174 59% 30%;
+    --sidebar-border: 220 10% 18%;
+    --sidebar-ring: 174 59% 44%;
   }
 
   .dark {
-    --background: 210 30% 8%;
-    --foreground: 210 18% 96%;
-    --card: 210 30% 12%;
-    --card-foreground: 210 18% 96%;
-    --popover: 210 30% 12%;
-    --popover-foreground: 210 18% 96%;
-    --primary: 186 45% 48%;
-    --primary-foreground: 210 30% 8%;
-    --secondary: 210 20% 18%;
-    --secondary-foreground: 210 18% 96%;
-    --muted: 210 18% 16%;
-    --muted-foreground: 210 12% 58%;
-    --accent: 210 20% 18%;
-    --accent-foreground: 210 18% 96%;
+    /* Dark mode - inverted scheme */
+    --background: 220 15% 8%;
+    --foreground: 40 20% 95%;
+    --card: 220 15% 12%;
+    --card-foreground: 40 20% 95%;
+    --popover: 220 15% 12%;
+    --popover-foreground: 40 20% 95%;
+    --primary: 174 59% 44%;
+    --primary-foreground: 220 15% 8%;
+    --secondary: 40 15% 18%;
+    --secondary-foreground: 40 20% 95%;
+    --muted: 220 10% 16%;
+    --muted-foreground: 40 10% 60%;
+    --accent: 174 50% 94%;
+    --accent-foreground: 174 59% 30%;
     --destructive: 0 55% 40%;
-    --destructive-foreground: 210 18% 96%;
-    --border: 210 18% 18%;
-    --input: 210 18% 18%;
-    --ring: 186 45% 48%;
-    --dark-section: 210 30% 12%;
-    --dark-section-foreground: 0 0% 100%;
-    --dashboard-bg: 210 30% 8%;
+    --destructive-foreground: 40 20% 95%;
+    --border: 220 10% 20%;
+    --input: 220 10% 18%;
+    --ring: 186 45% 45%;
+    --dark-section: 220 15% 10%;
+    --dark-section-foreground: 40 20% 95%;
+    --dashboard-bg: 220 15% 8%;
   }
 }
 

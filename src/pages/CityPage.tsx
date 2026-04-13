@@ -402,118 +402,98 @@ const shouldNoIndex = false;
          id="city-page-schema"
        />
 
-      {/* Hero Section — Dark theme matching homepage */}
-      <section className="relative overflow-hidden min-h-[45vh] flex items-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-primary/15 rounded-full blur-[120px]" />
-          <div className="absolute -bottom-40 -left-40 w-[400px] h-[400px] bg-teal/10 rounded-full blur-[100px]" />
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }} />
+      {/* Hero Section — Full viewport with Luminous Atelier design */}
+      <section className="relative h-[85vh] flex items-center overflow-hidden bg-[#0e0e0e] mx-4 mb-4 rounded-[3rem]">
+        <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
+          <div className="absolute top-0 right-0 w-full h-full border-r border-b border-white/10 [mask-image:radial-gradient(ellipse_at_center,black,transparent)]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-white/5 rounded-full rotate-45" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/5 rounded-full -rotate-12" />
         </div>
 
-        <div className="container relative z-10 py-14 md:py-18 px-4">
+        <div className="relative z-10 max-w-5xl mx-auto w-full text-center space-y-12 p-8 md:p-12">
           <div className="flex justify-center mb-4">
             <Breadcrumbs items={breadcrumbs} className="[&_a]:text-white/60 [&_span]:text-white/40 [&_svg]:text-white/30" />
           </div>
 
-          <div className="max-w-3xl mx-auto text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 bg-primary/15 backdrop-blur-md border border-primary/30 rounded-full px-4 py-2 mb-4"
-            >
-              <Stethoscope className="h-4 w-4 text-primary" />
-              <span className="text-xs md:text-sm font-bold text-primary">Licensed Dental Specialists</span>
-            </motion.div>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[#73ebdc] mx-auto mb-6">
+            <Shield className="text-sm h-4 w-4" />
+            <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Verified Provider Directory</span>
+          </div>
 
+          <div className="space-y-6">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-3xl md:text-4xl lg:text-5xl font-black text-center mb-4"
+              className="text-4xl md:text-6xl font-extrabold text-white leading-tight tracking-tight max-w-4xl mx-auto"
             >
               {pageH1 && pageH1.includes(cityName) ? (
                 <>
-                  <span className="text-white">{pageH1.split(cityName)[0]}</span>
-                  <span className="text-primary">{cityName}</span>
-                  <span className="text-white">{pageH1.split(cityName)[1] || ''}</span>
+                  {pageH1.split(cityName)[0]}
+                  <span className="text-[#73ebdc]">{cityName}</span>
+                  {pageH1.split(cityName)[1] || ''}
                 </>
               ) : (
-                <span className="text-white">{pageH1 || 'Loading...'}</span>
+                pageH1 || 'Loading...'
               )}
             </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="text-sm md:text-base lg:text-lg text-white/40 mb-6 max-w-2xl mx-auto px-2"
-            >
-              {pageDescription}
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="max-w-xl md:max-w-2xl mx-auto mb-6"
-            >
-              <SearchBox variant="hero" stateSlug={stateSlug} defaultCity={`${citySlug}|${stateSlug}`} />
-            </motion.div>
-
-            {/* Stats - Show meaningful info even when 0 clinics */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="flex flex-wrap justify-center gap-2 md:gap-3"
-            >
-              {(totalClinicCount || profiles?.length || 0) > 0 ? (
-                <>
-                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
-                    <Users className="h-4 w-4 text-primary" />
-                    <span className="font-bold text-sm text-white">{profiles?.length || 0}+</span>
-                    <span className="text-xs text-white/50 hidden sm:inline">Specialists</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
-                    <Star className="h-4 w-4 text-gold fill-gold" />
-                    <span className="font-bold text-sm text-white">4.8</span>
-                    <span className="text-xs text-white/50 hidden sm:inline">Avg. Rating</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <span className="font-bold text-sm text-white">60s</span>
-                    <span className="text-xs text-white/50 hidden sm:inline">to Book</span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
-                    <Shield className="h-4 w-4 text-primary" />
-                    <span className="font-bold text-sm text-white"> DHA Licensed</span>
-                    <span className="text-xs text-white/50 hidden sm:inline">Dentists</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
-                    <Star className="h-4 w-4 text-gold fill-gold" />
-                    <span className="font-bold text-sm text-white">Verified</span>
-                    <span className="text-xs text-white/50 hidden sm:inline">Clinics</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl px-3 py-2">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <span className="font-bold text-sm text-white">24/7</span>
-                    <span className="text-xs text-white/50 hidden sm:inline">Support</span>
-                  </div>
-                </>
-              )}
-            </motion.div>
           </div>
-        </div>
 
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 80" fill="none" className="w-full h-12 md:h-16" preserveAspectRatio="none">
-            <path d="M0 80V40C240 10 480 0 720 20C960 40 1200 50 1440 30V80H0Z" className="fill-background" />
-          </svg>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-sm md:text-base lg:text-lg text-white/50 mb-8 max-w-2xl mx-auto px-2"
+          >
+            {pageDescription}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="max-w-4xl mx-auto"
+          >
+            <SearchBox variant="hero" stateSlug={stateSlug} defaultCity={`${citySlug}|${stateSlug}`} />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="flex flex-wrap justify-center gap-8 md:gap-16 pt-8"
+          >
+            {(totalClinicCount || profiles?.length || 0) > 0 ? (
+              <>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-black text-white">{profiles?.length || 0}+</span>
+                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Verified<br/>Clinics</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-black text-white">{(profiles?.length || 0) * 5}+</span>
+                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Active<br/>Specialists</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-black text-white">4.8</span>
+                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Average<br/>Rating</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-black text-white">DHA</span>
+                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Licensed<br/>Dentists</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-black text-white">Verified</span>
+                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Clinic<br/>Profiles</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-black text-white">24/7</span>
+                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Patient<br/>Support</span>
+                </div>
+              </>
+            )}
+          </motion.div>
         </div>
       </section>
 

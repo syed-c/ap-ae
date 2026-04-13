@@ -1,6 +1,349 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// ========================== COMPETITOR ANALYSIS CONSTANTS ==========================
+const SERPAPI_DELAY_MS = 2000;      // 2s delay between SerpApi calls
+const MAX_URLS_TO_CRAWL = 5;         // Top 5 URLs per query
+const MAX_RETRIES = 3;               // 3 fetch retries per URL
+const RETRY_DELAY_MS = 3000;         // 3s delay between retries
+const CRAWL_TIMEOUT_MS = 30000;      // 30s timeout per page
+
+// ========================== COMPETITOR ANALYSIS TYPES ==========================
+interface CompetitorInsight {
+  url: string;
+  h1: string[];
+  h2: string[];
+  faqs: { question: string; answer: string }[];
+  priceMentions: string[];
+  schemaTypes: string[];
+  wordCount: number;
+  sectionCount: number;
+}
+
+interface ConsolidatedAnalysis {
+  queriesUsed: string[];
+  urlsAnalyzed: string[];
+  faqQuestions: string[];
+  priceRangeFound: string;
+  commonSections: string[];
+  missingSections: string[];
+  schemaTypesUsed: string[];
+  contentGaps: string[];
+}
+
+// ========================== COMPETITOR ANALYSIS FUNCTIONS ==========================
+
+/**
+ * Search Google via SerpApi and get top 5 organic results
+ */
+async function searchGoogleWithSerpApi(query: string, apiKey: string): Promise<string[]> {
+  try {
+    const encodedQuery = encodeURIComponent(query);
+    const url = `https://serpapi.com/search.json?q=${encodedQuery}&num=5&api_key=${apiKey}`;
+    
+    console.log(`SerpApi: Searching for "${query}"`);
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      console.error(`SerpApi error: ${response.status}`);
+      return [];
+    }
+    
+    const data = await response.json();
+    const organicResults = data?.organic_results || [];
+    
+    const urls = organicResults
+      .slice(0, MAX_URLS_TO_CRAWL)
+      .map((result: any) => result.link)
+      .filter(Boolean);
+    
+    console.log(`SerpApi: Found ${urls.length} URLs for "${query}"`);
+    return urls;
+  } catch (error) {
+    console.error(`SerpApi search failed for "${query}":`, error);
+    return [];
+  }
+}
+
+/**
+ * Deduplicate URLs - normalize and remove duplicates
+ */
+function deduplicateUrls(urls: string[]): string[] {
+  const normalized = urls.map(url => {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.href.replace(/\/$/, '').toLowerCase();
+    } catch {
+      return url.toLowerCase().replace(/\/$/, '');
+    }
+  });
+  
+  return [...new Set(normalized)];
+}
+
+/**
+ * Fetch URL with retry logic (3 retries, 3s delay)
+ */
+async function fetchWithRetry(url: string, maxRetries = MAX_RETRIES): Promise<string | null> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), CRAWL_TIMEOUT_MS);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5',
+        },
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (response.ok) {
+        const html = await response.text();
+        console.log(`Fetched: ${url} (${html.length} bytes)`);
+        return html;
+      }
+      
+      lastError = new Error(`HTTP ${response.status}`);
+      console.warn(`Fetch attempt ${attempt} failed for ${url}: ${response.status}`);
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      console.warn(`Fetch attempt ${attempt} error for ${url}: ${lastError.message}`);
+    }
+    
+    if (attempt < maxRetries) {
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+    }
+  }
+  
+  console.error(`All ${maxRetries} retries failed for ${url}:`, lastError?.message);
+  return null;
+}
+
+/**
+ * Analyze a competitor page and extract insights
+ */
+function analyzeCompetitorPage(html: string, url: string): CompetitorInsight {
+  const insight: CompetitorInsight = {
+    url,
+    h1: [],
+    h2: [],
+    faqs: [],
+    priceMentions: [],
+    schemaTypes: [],
+    wordCount: 0,
+    sectionCount: 0,
+  };
+  
+  try {
+    // Extract H1 tags
+    const h1Matches = html.match(/<h1[^>]*>([^<]+)<\/h1>/gi) || [];
+    insight.h1 = h1Matches.map(m => m.replace(/<[^>]+>/g, '').trim());
+    
+    // Extract H2 tags
+    const h2Matches = html.match(/<h2[^>]*>([^<]+)<\/h2>/gi) || [];
+    insight.h2 = h2Matches.map(m => m.replace(/<[^>]+>/g, '').trim());
+    insight.sectionCount = h2Matches.length;
+    
+    // Extract FAQ questions (common patterns)
+    const faqPatterns = [
+      /<dt[^>]*>([^<]+)<\/dt>/gi,
+      /<div[^>]*class="[^"]*faq[^"]*"[^>]*>.*?<strong>([^<]+)<\/strong>/gi,
+      /<h3[^>]*>([^<]*(?:FAQ|question|how much|how long|is|can|does|will)[^<]*)<\/h3>/gi,
+    ];
+    
+    for (const pattern of faqPatterns) {
+      const matches = html.match(pattern) || [];
+      for (const match of matches) {
+        const question = match.replace(/<[^>]+>/g, '').trim();
+        if (question.length > 10 && question.length < 200) {
+          insight.faqQuestions.push({ question, answer: '' });
+        }
+      }
+    }
+    
+    // Extract price mentions (AED patterns)
+    const pricePattern = /AED\s*[\d,]+(?:\s*-\s*AED\s*[\d,]+)?/gi;
+    const priceMatches = html.match(pricePattern) || [];
+    insight.priceMentions = [...new Set(priceMatches.map(p => p.trim()))];
+    
+    // Extract JSON-LD schema types
+    const schemaPattern = /"@type"\s*:\s*"([^"]+)"/g;
+    const schemaMatches = html.match(schemaPattern) || [];
+    insight.schemaTypes = [...new Set(schemaMatches.map(m => m.replace(/"/g, '').replace('@type: ', '')))];
+    
+    // Count words (simplified)
+    const textContent = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+    insight.wordCount = textContent.split(' ').filter(w => w.length > 0).length;
+    
+  } catch (error) {
+    console.error(`Error analyzing page ${url}:`, error);
+  }
+  
+  return insight;
+}
+
+/**
+ * Analyze multiple competitor pages and consolidate insights
+ */
+function consolidateCompetitorInsights(insights: CompetitorInsight[]): ConsolidatedAnalysis {
+  const allFaqs: string[] = [];
+  const allPrices: string[] = [];
+  const allSections: string[] = [];
+  const allSchemas: string[] = [];
+  const allUrls: string[] = [];
+  
+  for (const insight of insights) {
+    allUrls.push(insight.url);
+    
+    // Collect FAQs
+    for (const faq of insight.faqs) {
+      if (faq.question) allFaqs.push(faq.question);
+    }
+    
+    // Collect prices
+    allPrices.push(...insight.priceMentions);
+    
+    // Collect sections
+    allSections.push(...insight.h2.slice(0, 10));
+    
+    // Collect schema types
+    allSchemas.push(...insight.schemaTypes);
+  }
+  
+  // Find most common sections
+  const sectionCounts: Record<string, number> = {};
+  for (const section of allSections) {
+    const normalized = section.toLowerCase().substring(0, 50);
+    sectionCounts[normalized] = (sectionCounts[normalized] || 0) + 1;
+  }
+  
+  const commonSections = Object.entries(sectionCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([section]) => section);
+  
+  // Identify missing sections (based on common SEO patterns)
+  const knownSections = ['pricing', 'cost', 'process', 'how it works', 'benefits', 'faq', 'faq', 'contact', 'appointment', 'booking'];
+  const missingSections = knownSections.filter(
+    s => !commonSections.some(cs => cs.includes(s))
+  );
+  
+  // Extract price range
+  let priceRangeFound = '';
+  if (allPrices.length > 0) {
+    const prices = allPrices.map(p => parseInt(p.replace(/[^0-9]/g, ''))).filter(p => !isNaN(p) && p > 0);
+    if (prices.length > 0) {
+      const min = Math.min(...prices);
+      const max = Math.max(...prices);
+      priceRangeFound = `AED ${min.toLocaleString()} - AED ${max.toLocaleString()}`;
+    }
+  }
+  
+  return {
+    queriesUsed: [],
+    urlsAnalyzed: deduplicateUrls(allUrls),
+    faqQuestions: [...new Set(allFaqs)].slice(0, 15),
+    priceRangeFound,
+    commonSections,
+    missingSections,
+    schemaTypesUsed: [...new Set(allSchemas)],
+    contentGaps: missingSections.slice(0, 5),
+  };
+}
+
+/**
+ * Generate two search queries for a service-location
+ */
+function generateSearchQueries(serviceName: string, cityName: string, stateName: string): { commercial: string; informational: string } {
+  const service = serviceName.toLowerCase();
+  const city = cityName.toLowerCase().replace(/-/g, ' ');
+  const state = stateName.toLowerCase();
+  
+  // Commercial intent - people looking to book
+  const commercial = `${service} ${city} ${state}`;
+  
+  // Informational intent - people researching
+  const informational = `${service} cost ${state}`.replace('cost cost', 'cost');
+  
+  return { commercial, informational };
+}
+
+/**
+ * Build dynamic prompt with competitor insights
+ */
+function buildCompetitorBasedPrompt(
+  analysis: ConsolidatedAnalysis | null,
+  pageData: {
+    state_slug: string;
+    state_name: string;
+    city_slug: string;
+    city_name: string;
+    service_slug: string;
+    service_name: string;
+  },
+  basePrompt: string
+): string {
+  let competitorSection = '';
+  
+  if (analysis && analysis.urlsAnalyzed.length > 0) {
+    competitorSection = `
+═══════════════════════════════════════════════════════════════
+COMPETITOR ANALYSIS (from SERP research)
+═══════════════════════════════════════════════════════════════
+
+URLs Analyzed: ${analysis.urlsAnalyzed.length}
+${analysis.urlsAnalyzed.map((u, i) => `${i + 1}. ${u}`).join('\n')}
+
+FAQ QUESTIONS FOUND ON TOP RANKING PAGES:
+${analysis.faqQuestions.slice(0, 10).map((q, i) => `${i + 1}. ${q}`).join('\n')}
+
+PRICE RANGES FOUND ON COMPETITORS: ${analysis.priceRangeFound || 'Not found'}
+
+COMMON SECTIONS ON TOP PAGES: ${analysis.commonSections.join(', ') || 'None detected'}
+
+MISSING SECTIONS (CONTENT GAPS): ${analysis.contentGaps.join(', ') || 'None'}
+
+SCHEMA TYPES USED BY COMPETITORS: ${analysis.schemaTypesUsed.join(', ') || 'None'}
+
+═══════════════════════════════════════════════════════════════
+YOUR TASK: Create content that OUTPERFORMS these competitors
+═══════════════════════════════════════════════════════════════
+
+1. INCLUDE ALL FAQ QUESTIONS that competitors use (listed above)
+2. ADD these sections that competitors are MISSING: ${analysis.contentGaps.join(', ')}
+3. MENTION price range: ${analysis.priceRangeFound || 'AED 5,000 - 20,000'}
+4. USE these schema types: FAQPage, HowTo, Product
+5. ADD unique value props AppointPanda offers:
+   - Verified DHA-licensed dentists
+   - Transparent AED pricing
+   - Real patient reviews (4.9+ rating)
+   - Free booking consultation
+6. MAKE content MORE comprehensive than competitors (aim for 1500+ words)
+
+Write content that will rank HIGHER than these competitor pages.
+`;
+  } else {
+    competitorSection = `
+═══════════════════════════════════════════════════════════════
+COMPETITOR ANALYSIS: Not available (generation without SERP research)
+═══════════════════════════════════════════════════════════════
+`;
+  }
+  
+  // Replace placeholder in base prompt or append
+  return basePrompt + competitorSection;
+}
+
+// ========================== MAIN SYSTEM PROMPT ==========================
+
 const SYSTEM_PROMPT = `You are the senior SEO content strategist for AppointPanda — the UAE's dental clinic discovery and booking platform. Your task is to write TRULY UNIQUE content that sounds like a local expert wrote it — NOT a template with location names swapped.
 
 ═══════════════════════════════════════
@@ -710,7 +1053,7 @@ async function generateServiceLocationContent(pageData: any, aimlapiKey: string,
   const serviceData = getServicePrompt(serviceSlug);
   const areaData = getAreaData(stateSlug, citySlug);
   
-  const prompt = `Generate a service-location page for ${serviceSlug.replace(/-/g, " ")} in ${pageData.city_name}, ${pageData.state_name}.
+  const prompt = `Generate a comprehensive service-location page for ${serviceSlug.replace(/-/g, " ")} in ${pageData.city_name}, ${pageData.state_name}.
 
 LOCATION CONTEXT:
 * City character: ${areaData.character}
@@ -751,6 +1094,25 @@ MANDATORY RULES:
 6. GRAMMAR:
    - No em-dashes (—)
 
+7. COMPREHENSIVE SEO FIELDS:
+   You MUST include these additional fields for enhanced SEO and AI optimization:
+   - price_min: Minimum price in AED (number)
+   - price_max: Maximum price in AED (number)
+   - price_note: Short note about pricing (string)
+   - price_last_updated: Date string like "April 2026"
+   - process_steps: Array of {step, title, description, duration} objects (5-6 steps)
+   - process_time_months: String like "12-24 months" or "2-3 visits"
+   - treatment_options: Array of {type, name, price_min, price_max, duration, visibility, best_for} objects
+   - benefits: Array of {title, description, icon} objects (5-6 benefits)
+   - candidates: Array of {description, is_suitable, conditions} objects
+   - alternatives: Array of {name, slug, reason} objects
+   - quick_answer: 50-100 word AI summary for featured snippets
+   - related_questions: Array of {question, answer} objects (4 questions)
+   - last_reviewed_by: Name of dental expert who reviewed
+   - last_reviewed_date: Date string like "April 2026"
+   - medical_accuracy_verified: Boolean (default true)
+   - expert_credential: String like "DHA Licensed Orthodontist"
+
 OUTPUT:
 Return ONLY JSON with:
 {
@@ -767,6 +1129,22 @@ Return ONLY JSON with:
   "cta_button_text": "",
   "cta_button_url": "",
   "faqs": [],
+  "price_min": 5000,
+  "price_max": 15000,
+  "price_note": "Price ranges vary by clinic and case complexity",
+  "price_last_updated": "April 2026",
+  "process_steps": [],
+  "process_time_months": "12-24 months",
+  "treatment_options": [],
+  "benefits": [],
+  "candidates": [],
+  "alternatives": [],
+  "quick_answer": "",
+  "related_questions": [],
+  "last_reviewed_by": "Dr. [Name]",
+  "last_reviewed_date": "April 2026",
+  "medical_accuracy_verified": true,
+  "expert_credential": "DHA Licensed Dentist",
   "is_published": true
 }`;
 
@@ -802,6 +1180,292 @@ Return ONLY JSON with:
   }
 }
 
+/**
+ * Generate service-location content with competitor analysis
+ */
+async function generateServiceLocationContentWithAnalysis(
+  pageData: any, 
+  aimlapiKey: string, 
+  analysis: ConsolidatedAnalysis | null,
+  forceRegenerate: boolean
+): Promise<any> {
+  const parts = pageData.slug.split("/").filter(Boolean);
+  const stateSlug = parts[0];
+  const citySlug = parts[1];
+  const serviceSlug = parts[2];
+  
+  const serviceData = getServicePrompt(serviceSlug);
+  const areaData = getAreaData(stateSlug, citySlug);
+  
+  // Build base prompt
+  let prompt = `Generate a comprehensive service-location page for ${serviceSlug.replace(/-/g, " ")} in ${pageData.city_name}, ${pageData.state_name}.
+
+LOCATION CONTEXT:
+* City character: ${areaData.character}
+* Demographics: ${areaData.demographics}
+* What locals say: ${areaData.narrative}
+
+SERVICE CONTEXT:
+* Treatment: ${serviceSlug}
+* Patient concerns: ${serviceData.pain_points}
+* UAE perspective: ${serviceData.why_unique}
+
+MANDATORY RULES:
+
+1. COMBINE LOCATION + SERVICE:
+   - How does this area's character affect dental needs for this service?
+   - What do residents here specifically need for this treatment?
+   - Reference local clinics or patterns
+
+2. LOCATION-SPECIFIC INSIGHTS:
+   - What type of patients seek this service in this area?
+   - Are there more premium or budget options here?
+   - What are the local considerations?
+
+3. UAE-SPECIFIC:
+   - Cost ranges in AED
+   - DHA/DOH requirements
+   - Insurance patterns
+   - Expat considerations
+
+4. FAQ UNIQUENESS:
+   - 10 FAQs specific to this location + service combination
+   - Include local area references
+
+5. NO GENERIC CONTENT:
+   - Don't swap location names into templates
+   - Must be specific insights
+
+6. GRAMMAR:
+   - No em-dashes (—)
+
+7. COMPREHENSIVE SEO FIELDS:
+   You MUST include these additional fields for enhanced SEO and AI optimization:
+   - price_min: Minimum price in AED (number)
+   - price_max: Maximum price in AED (number)
+   - price_note: Short note about pricing (string)
+   - price_last_updated: Date string like "April 2026"
+   - process_steps: Array of {step, title, description, duration} objects (5-6 steps)
+   - process_time_months: String like "12-24 months" or "2-3 visits"
+   - treatment_options: Array of {type, name, price_min, price_max, duration, visibility, best_for} objects
+   - benefits: Array of {title, description, icon} objects (5-6 benefits)
+   - candidates: Array of {description, is_suitable, conditions} objects
+   - alternatives: Array of {name, slug, reason} objects
+   - quick_answer: 50-100 word AI summary for featured snippets
+   - related_questions: Array of {question, answer} objects (4 questions)
+   - last_reviewed_by: Name of dental expert who reviewed
+   - last_reviewed_date: Date string like "April 2026"
+   - medical_accuracy_verified: Boolean (default true)
+   - expert_credential: String like "DHA Licensed Orthodontist"
+
+OUTPUT:
+Return ONLY JSON with:
+{
+  "page_type": "service-location",
+  "page_slug": "/${stateSlug}/${citySlug}/${serviceSlug}",
+  "meta_title": "",
+  "meta_description": "",
+  "keywords": [],
+  "h1": "",
+  "hero_subtitle": "",
+  "hero_intro": "",
+  "body_content": "",
+  "cta_text": "",
+  "cta_button_text": "",
+  "cta_button_url": "",
+  "faqs": [],
+  "price_min": 5000,
+  "price_max": 15000,
+  "price_note": "Price ranges vary by clinic and case complexity",
+  "price_last_updated": "April 2026",
+  "process_steps": [],
+  "process_time_months": "12-24 months",
+  "treatment_options": [],
+  "benefits": [],
+  "candidates": [],
+  "alternatives": [],
+  "quick_answer": "",
+  "related_questions": [],
+  "last_reviewed_by": "Dr. [Name]",
+  "last_reviewed_date": "April 2026",
+  "medical_accuracy_verified": true,
+  "expert_credential": "DHA Licensed Dentist",
+  "is_published": true
+}`;
+
+  // If we have competitor analysis, append the competitor section to the prompt
+  if (analysis && analysis.urlsAnalyzed.length > 0) {
+    prompt += `
+
+═══════════════════════════════════════════════════════════════
+COMPETITOR ANALYSIS (from SERP research)
+═══════════════════════════════════════════════════════════════
+
+URLs Analyzed: ${analysis.urlsAnalyzed.length}
+${analysis.urlsAnalyzed.map((u, i) => `${i + 1}. ${u}`).join('\n')}
+
+FAQ QUESTIONS FOUND ON TOP RANKING PAGES:
+${analysis.faqQuestions.slice(0, 10).map((q, i) => `${i + 1}. ${q}`).join('\n')}
+
+PRICE RANGES FOUND ON COMPETITORS: ${analysis.priceRangeFound || 'Not found'}
+
+COMMON SECTIONS ON TOP PAGES: ${analysis.commonSections.join(', ') || 'None detected'}
+
+MISSING SECTIONS (CONTENT GAPS): ${analysis.contentGaps.join(', ') || 'None'}
+
+SCHEMA TYPES USED BY COMPETITORS: ${analysis.schemaTypesUsed.join(', ') || 'None'}
+
+═══════════════════════════════════════════════════════════════
+YOUR TASK: Create content that OUTPERFORMS these competitors
+═══════════════════════════════════════════════════════════════
+
+1. INCLUDE ALL FAQ QUESTIONS that competitors use (listed above)
+2. ADD these sections that competitors are MISSING: ${analysis.contentGaps.join(', ')}
+3. MENTION price range: ${analysis.priceRangeFound || 'AED 5,000 - 20,000'}
+4. USE these schema types: FAQPage, HowTo, Product
+5. ADD unique value props AppointPanda offers:
+   - Verified DHA-licensed dentists
+   - Transparent AED pricing
+   - Real patient reviews (4.9+ rating)
+   - Free booking consultation
+6. MAKE content MORE comprehensive than competitors (aim for 1500+ words)
+
+Write content that will rank HIGHER than these competitor pages.
+`;
+  }
+
+  try {
+    const aiResponse = await callAIWithRetry([
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: prompt }
+    ], aimlapiKey);
+
+    console.log("SL_GEN: AI response type:", typeof aiResponse);
+
+    if (!aiResponse) {
+      return { success: false, error: "No response from AI" };
+    }
+
+    const content = String(aiResponse);
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    
+    if (!jsonMatch) {
+      console.error("SL_GEN: No JSON in response:", content.substring(0, 300));
+      return { success: false, error: "Invalid JSON in response" };
+    }
+
+    try {
+      const pageDataResult = JSON.parse(jsonMatch[0]);
+      return { success: true, data: pageDataResult };
+    } catch (parseErr) {
+      console.error("SL_GEN: JSON parse error:", parseErr instanceof Error ? parseErr.message : String(parseErr));
+      return { success: false, error: "JSON parse failed" };
+    }
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Generation failed" };
+  }
+}
+
+/**
+ * Save SEO page with competitor analysis data
+ */
+async function saveSeoPageWithCompetitorAnalysis(supabase: any, pageData: any, analysis: ConsolidatedAnalysis | null): Promise<void> {
+  // Use the existing saveSeoPage function but add competitor_analysis
+  const saveData: any = {
+    slug: pageData.page_slug || pageData.page_slug,
+    page_type: pageData.page_type || "service-location",
+    title: pageData.h1,
+    meta_title: pageData.meta_title,
+    meta_description: pageData.meta_description,
+    h1: pageData.h1,
+    page_intro: pageData.hero_intro || pageData.intro_text,
+    is_published: true,
+    is_optimized: true,
+    optimized_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  // Build combined content field
+  const contentParts = [];
+  if (pageData.hero_intro || pageData.hero_subtitle) {
+    contentParts.push(pageData.hero_intro || pageData.hero_subtitle || "");
+  }
+  if (pageData.body_content) {
+    contentParts.push(pageData.body_content);
+  }
+  if (contentParts.length > 0) {
+    saveData.content = contentParts.filter(Boolean).join("\n\n");
+  }
+
+  // Add FAQs if present
+  if (pageData.faqs && pageData.faqs.length > 0) {
+    saveData.faqs = pageData.faqs;
+  }
+
+  // Add all SEO fields from pageData
+  if (pageData.price_min) saveData.price_min = pageData.price_min;
+  if (pageData.price_max) saveData.price_max = pageData.price_max;
+  if (pageData.price_note) saveData.price_note = pageData.price_note;
+  // Convert date string to proper format or skip if invalid
+  if (pageData.price_last_updated) {
+    const priceDate = new Date(pageData.price_last_updated);
+    if (!isNaN(priceDate.getTime())) {
+      saveData.price_last_updated = priceDate.toISOString().split('T')[0];
+    }
+  }
+  if (pageData.process_steps) saveData.process_steps = pageData.process_steps;
+  if (pageData.process_time_months) saveData.process_time_months = pageData.process_time_months;
+  if (pageData.process_time_note) saveData.process_time_note = pageData.process_time_note;
+  if (pageData.treatment_options) saveData.treatment_options = pageData.treatment_options;
+  if (pageData.comparison_table) saveData.comparison_table = pageData.comparison_table;
+  if (pageData.benefits) saveData.benefits = pageData.benefits;
+  if (pageData.candidates) saveData.candidates = pageData.candidates;
+  if (pageData.alternatives) saveData.alternatives = pageData.alternatives;
+  if (pageData.last_reviewed_by) saveData.last_reviewed_by = pageData.last_reviewed_by;
+  // Convert date string to proper format or skip if invalid
+  if (pageData.last_reviewed_date) {
+    const reviewDate = new Date(pageData.last_reviewed_date);
+    if (!isNaN(reviewDate.getTime())) {
+      saveData.last_reviewed_date = reviewDate.toISOString().split('T')[0];
+    }
+  }
+  if (pageData.medical_accuracy_verified !== undefined) saveData.medical_accuracy_verified = pageData.medical_accuracy_verified;
+  if (pageData.expert_credential) saveData.expert_credential = pageData.expert_credential;
+  if (pageData.quick_answer) saveData.quick_answer = pageData.quick_answer;
+  if (pageData.ai_summary) saveData.ai_summary = pageData.ai_summary;
+  if (pageData.related_questions) saveData.related_questions = pageData.related_questions;
+  if (pageData.preparation_tips) saveData.preparation_tips = pageData.preparation_tips;
+  if (pageData.recovery_info) saveData.recovery_info = pageData.recovery_info;
+  if (pageData.warning_text) saveData.warning_text = pageData.warning_text;
+
+  // Add competitor analysis data
+  if (analysis) {
+    saveData.competitor_analysis = {
+      queries_used: analysis.queriesUsed,
+      urls_analyzed: analysis.urlsAnalyzed,
+      faq_questions: analysis.faqQuestions,
+      price_range_found: analysis.priceRangeFound,
+      common_sections: analysis.commonSections,
+      missing_sections: analysis.contentGaps,
+      schema_types_used: analysis.schemaTypesUsed,
+      generated_at: new Date().toISOString(),
+    };
+  }
+
+  console.log(`page-content-generator: Saving page with competitor analysis: ${pageData.page_slug}`);
+  console.log(`page-content-generator: Competitor analysis: ${analysis ? 'included' : 'none'}`);
+
+  // Save to seo_pages
+  const { error } = await supabase.from("seo_pages").upsert(saveData, { onConflict: "slug" });
+
+  if (error) {
+    console.error(`page-content-generator: Save error:`, JSON.stringify(error));
+    throw error;
+  }
+
+  console.log(`page-content-generator: Successfully saved ${pageData.page_slug} with competitor analysis`);
+}
+
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -810,12 +1474,12 @@ function getRandomItem<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-async function callAIWithRetry(messages: { role: string; content: string }[], aimlapiKey: string, maxRetries = 3): Promise<any> {
+async function callAIWithRetry(messages: { role: string; content: string }[], aimlapiKey: string, maxRetries = 5): Promise<any> {
   let lastError: Error | null = null;
   
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     if (attempt > 0) {
-      const backoff = Math.pow(2, attempt) * 1000;
+      const backoff = Math.pow(2, attempt) * 2000;
       console.log(`page-content-generator: Retry attempt ${attempt + 1}/${maxRetries} after ${backoff}ms`);
       await delay(backoff);
     }
@@ -853,6 +1517,7 @@ async function callAIWithRetry(messages: { role: string; content: string }[], ai
       console.warn(`page-content-generator: Network error: ${lastError.message}`);
     }
   }
+  console.error(`page-content-generator: AI failed after ${maxRetries} retries:`, lastError?.message);
   throw lastError || new Error("AI failed after retries");
 }
 
@@ -1064,6 +1729,80 @@ async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
     saveData.ai_comparison_table = pageData.ai_comparison_table;
   }
 
+  // NEW: Enhanced service-location fields for SEO optimization
+  if (pageData.price_min) {
+    saveData.price_min = pageData.price_min;
+  }
+  if (pageData.price_max) {
+    saveData.price_max = pageData.price_max;
+  }
+  if (pageData.price_note) {
+    saveData.price_note = pageData.price_note;
+  }
+  if (pageData.price_last_updated) {
+    const priceDate = new Date(pageData.price_last_updated);
+    if (!isNaN(priceDate.getTime())) {
+      saveData.price_last_updated = priceDate.toISOString().split('T')[0];
+    }
+  }
+  if (pageData.process_steps) {
+    saveData.process_steps = pageData.process_steps;
+  }
+  if (pageData.process_time_months) {
+    saveData.process_time_months = pageData.process_time_months;
+  }
+  if (pageData.process_time_note) {
+    saveData.process_time_note = pageData.process_time_note;
+  }
+  if (pageData.treatment_options) {
+    saveData.treatment_options = pageData.treatment_options;
+  }
+  if (pageData.comparison_table) {
+    saveData.comparison_table = pageData.comparison_table;
+  }
+  if (pageData.benefits) {
+    saveData.benefits = pageData.benefits;
+  }
+  if (pageData.candidates) {
+    saveData.candidates = pageData.candidates;
+  }
+  if (pageData.alternatives) {
+    saveData.alternatives = pageData.alternatives;
+  }
+  if (pageData.last_reviewed_by) {
+    saveData.last_reviewed_by = pageData.last_reviewed_by;
+  }
+  if (pageData.last_reviewed_date) {
+    const reviewDate = new Date(pageData.last_reviewed_date);
+    if (!isNaN(reviewDate.getTime())) {
+      saveData.last_reviewed_date = reviewDate.toISOString().split('T')[0];
+    }
+  }
+  if (pageData.medical_accuracy_verified !== undefined) {
+    saveData.medical_accuracy_verified = pageData.medical_accuracy_verified;
+  }
+  if (pageData.expert_credential) {
+    saveData.expert_credential = pageData.expert_credential;
+  }
+  if (pageData.quick_answer) {
+    saveData.quick_answer = pageData.quick_answer;
+  }
+  if (pageData.ai_summary) {
+    saveData.ai_summary = pageData.ai_summary;
+  }
+  if (pageData.related_questions) {
+    saveData.related_questions = pageData.related_questions;
+  }
+  if (pageData.preparation_tips) {
+    saveData.preparation_tips = pageData.preparation_tips;
+  }
+  if (pageData.recovery_info) {
+    saveData.recovery_info = pageData.recovery_info;
+  }
+  if (pageData.warning_text) {
+    saveData.warning_text = pageData.warning_text;
+  }
+
   console.log(`page-content-generator: Save data keys: ${Object.keys(saveData).join(", ")}`);
   
   // Save to seo_pages
@@ -1234,7 +1973,7 @@ serve(async (req) => {
 
       for (const page of pagesToProcess) {
         const locationName = page.type === "state" ? page.state_name : page.city_name;
-        console.log(`page-content-generator: Generating for ${locationName} (${page.slug})...`);
+        console.log(`page-content-generator: Generating ${page.slug}...`);
 
         try {
           const result = await generateContentForPage(page, aimlapiKey, force_regenerate);
@@ -1448,7 +2187,7 @@ serve(async (req) => {
     // NEW: Generate service-location pages (e.g., /dubai/mirdif/invisalign)
     if (action === "generate_service_locations") {
       const cursor = body.cursor || null;
-      const batchLimit = body.batch_limit || 3;
+      const batchLimit = body.batch_limit || 1;
 
       const states = await fetchAllRows(supabase, "states", "id, slug, name", { is_active: true });
       const cities = await fetchAllRows(supabase, "cities", "id, slug, name, state_id, states(slug, name)", { is_active: true });
@@ -1540,8 +2279,9 @@ serve(async (req) => {
     // NEW: Generate service-location pages by emirate (all areas + all services)
     if (action === "generate_service_locations_by_emirate") {
       const cursor = body.cursor || null;
-      const batchLimit = body.batch_limit || 5;
+      const batchLimit = body.batch_limit || 1;
       const emirateSlug = body.emirate_slug;
+      const force_regenerate = body.force_regenerate || false;
 
       if (!emirateSlug) {
         return new Response(JSON.stringify({ success: false, error: "emirate_slug is required" }), {
@@ -1650,9 +2390,10 @@ serve(async (req) => {
     // NEW: Generate service-location pages by city (all services in one area)
     if (action === "generate_service_locations_by_city") {
       const cursor = body.cursor || null;
-      const batchLimit = body.batch_limit || 5;
+      const batchLimit = body.batch_limit || 1;
       const emirateSlug = body.emirate_slug;
       const citySlug = body.city_slug;
+      const force_regenerate = body.force_regenerate || false;
 
       if (!emirateSlug || !citySlug) {
         return new Response(JSON.stringify({ success: false, error: "emirate_slug and city_slug are required" }), {
@@ -1856,6 +2597,291 @@ serve(async (req) => {
       await saveSeoPage(supabase, result.data);
 
       return new Response(JSON.stringify({ success: true, slug: pageData.slug }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // NEW: Generate single service-location with optional competitor analysis
+    if (action === "generate_competitor_content") {
+      const emirateSlug = body.emirate_slug;
+      const citySlug = body.city_slug;
+      const serviceSlug = body.service_slug;
+      const useCompetitorAnalysis = body.use_competitor_analysis ?? true;
+      const forceRegenerate = body.force_regenerate ?? false;
+
+      if (!emirateSlug || !citySlug || !serviceSlug) {
+        return new Response(JSON.stringify({ success: false, error: "emirate_slug, city_slug, and service_slug are required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      console.log(`page-content-generator: Generating competitor-based content for ${emirateSlug}/${citySlug}/${serviceSlug}`);
+      console.log(`page-content-generator: Use competitor analysis: ${useCompetitorAnalysis}`);
+
+      // Get state, city, treatment data
+      const states = await fetchAllRows(supabase, "states", "id, slug, name", { is_active: true });
+      const state = states.find(s => s.slug === emirateSlug);
+      
+      if (!state) {
+        return new Response(JSON.stringify({ success: false, error: `Emirate not found: ${emirateSlug}` }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const cities = await fetchAllRows(supabase, "cities", "id, slug, name, state_id", { state_id: state.id, is_active: true });
+      const city = cities.find(c => c.slug === citySlug);
+      
+      if (!city) {
+        return new Response(JSON.stringify({ success: false, error: `City not found: ${citySlug}` }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const treatments = await fetchAllRows(supabase, "treatments", "id, slug, name", { is_active: true });
+      const treatment = treatments.find(t => t.slug === serviceSlug);
+      
+      if (!treatment) {
+        return new Response(JSON.stringify({ success: false, error: `Treatment not found: ${serviceSlug}` }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const serpApiKey = Deno.env.get("SERPAPI_KEY");
+      
+      // Perform competitor analysis if flag is enabled
+      let analysis: ConsolidatedAnalysis | null = null;
+      
+      if (useCompetitorAnalysis && serpApiKey) {
+        console.log("page-content-generator: Starting competitor analysis...");
+        
+        // Generate search queries
+        const queries = generateSearchQueries(treatment.name, city.name, state.name);
+        console.log(`page-content-generator: Queries - Commercial: "${queries.commercial}", Informational: "${queries.informational}"`);
+        
+        // Search both queries (2s delay between)
+        const commercialUrls = await searchGoogleWithSerpApi(queries.commercial, serpApiKey);
+        await new Promise(resolve => setTimeout(resolve, SERPAPI_DELAY_MS));
+        
+        const informationalUrls = await searchGoogleWithSerpApi(queries.informational, serpApiKey);
+        
+        // Combine and deduplicate
+        const allUrls = deduplicateUrls([...commercialUrls, ...informationalUrls]);
+        console.log(`page-content-generator: Total unique URLs: ${allUrls.length}`);
+        
+        // Limit to crawl budget
+        const urlsToCrawl = allUrls.slice(0, MAX_URLS_TO_CRAWL);
+        
+        // Crawl and analyze pages
+        const insights: CompetitorInsight[] = [];
+        
+        for (const url of urlsToCrawl) {
+          console.log(`page-content-generator: Crawling ${url}...`);
+          const html = await fetchWithRetry(url);
+          
+          if (html) {
+            const insight = analyzeCompetitorPage(html, url);
+            insights.push(insight);
+            console.log(`page-content-generator: Analyzed ${url} - ${insight.h2.length} sections, ${insight.faqQuestions.length} FAQs`);
+          }
+        }
+        
+        // Consolidate insights
+        if (insights.length > 0) {
+          analysis = consolidateCompetitorInsights(insights);
+          analysis.queriesUsed = [queries.commercial, queries.informational];
+          console.log(`page-content-generator: Consolidated analysis - ${analysis.urlsAnalyzed.length} URLs, ${analysis.faqQuestions.length} FAQs`);
+        }
+      } else if (!serpApiKey) {
+        console.warn("page-content-generator: SERPAPI_KEY not configured, skipping competitor analysis");
+      }
+
+      // Build page data
+      const pageData = {
+        slug: `/${emirateSlug}/${citySlug}/${serviceSlug}`,
+        type: "service-location",
+        state_slug: emirateSlug,
+        state_name: state.name,
+        city_slug: citySlug,
+        city_name: city.name,
+        service_slug: serviceSlug,
+        service_name: treatment.name,
+      };
+
+      // Generate content with competitor-based prompt
+      const result = await generateServiceLocationContentWithAnalysis(pageData, aimlapiKey, analysis, forceRegenerate);
+      
+      if (!result.success) {
+        return new Response(JSON.stringify({ success: false, error: result.error }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Save with competitor analysis data
+      await saveSeoPageWithCompetitorAnalysis(supabase, result.data, analysis);
+
+      return new Response(JSON.stringify({ 
+        success: true, 
+        slug: pageData.slug,
+        competitor_analysis: analysis ? {
+          queries_used: analysis.queriesUsed,
+          urls_analyzed: analysis.urlsAnalyzed.length,
+          faq_count: analysis.faqQuestions.length,
+          price_range: analysis.priceRangeFound,
+        } : null
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // NEW: Bulk generate all service-locations with competitor analysis
+    if (action === "generate_all_competitor_content") {
+      const useCompetitorAnalysis = body.use_competitor_analysis ?? true;
+      const emirateFilter = body.emirate_filter || null;
+      const batchSize = body.batch_size || 1;
+      const cursor = body.cursor || null;
+      const forceRegenerate = body.force_regenerate ?? false;
+
+      console.log(`page-content-generator: Bulk competitor content generation`);
+      console.log(`page-content-generator: Use competitor analysis: ${useCompetitorAnalysis}, Emirate filter: ${emirateFilter}, Batch: ${batchSize}`);
+
+      // Get all states
+      const states = await fetchAllRows(supabase, "states", "id, slug, name", { is_active: true });
+      
+      // Filter states if needed
+      let targetStates = states;
+      if (emirateFilter) {
+        targetStates = states.filter(s => s.slug === emirateFilter);
+      }
+
+      // Get all cities
+      const allCities = await fetchAllRows(supabase, "cities", "id, slug, name, state_id", { is_active: true });
+      
+      // Get all treatments
+      const treatments = await fetchAllRows(supabase, "treatments", "id, slug, name", { is_active: true });
+
+      // Build all service-location combinations
+      let slPages: any[] = [];
+      
+      for (const state of targetStates) {
+        const stateCities = allCities.filter(c => c.state_id === state.id);
+        
+        for (const city of stateCities) {
+          for (const treatment of treatments) {
+            slPages.push({
+              slug: `/${state.slug}/${city.slug}/${treatment.slug}`,
+              type: "service-location",
+              state_slug: state.slug,
+              state_name: state.name,
+              city_slug: city.slug,
+              city_name: city.name,
+              service_slug: treatment.slug,
+              service_name: treatment.name,
+            });
+          }
+        }
+      }
+
+      // Filter existing if not force regenerating
+      if (!forceRegenerate) {
+        const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
+        const existingSlugs = new Set(existingPages.map(p => p.slug));
+        slPages = slPages.filter(p => !existingSlugs.has(p.slug));
+      }
+
+      // Find start position for cursor
+      let startIndex = 0;
+      if (cursor) {
+        startIndex = slPages.findIndex(p => p.slug === cursor);
+        if (startIndex === -1) startIndex = 0;
+        else startIndex += 1;
+      }
+
+      const pagesToProcess = slPages.slice(startIndex, startIndex + batchSize);
+      
+      console.log(`page-content-generator: Processing ${pagesToProcess.length} of ${slPages.length} pages`);
+
+      const serpApiKey = Deno.env.get("SERPAPI_KEY");
+      let processed = 0;
+      let failed = 0;
+      const errors: string[] = [];
+      let lastProcessedSlug = null;
+
+      for (let i = 0; i < pagesToProcess.length; i++) {
+        const page = pagesToProcess[i];
+        console.log(`page-content-generator: [${i + 1}/${pagesToProcess.length}] Processing ${page.slug}...`);
+        
+        try {
+          // Perform competitor analysis (with rate limiting)
+          let analysis: ConsolidatedAnalysis | null = null;
+          
+          if (useCompetitorAnalysis && serpApiKey) {
+            const queries = generateSearchQueries(page.service_name, page.city_name, page.state_name);
+            
+            const commercialUrls = await searchGoogleWithSerpApi(queries.commercial, serpApiKey);
+            await new Promise(resolve => setTimeout(resolve, SERPAPI_DELAY_MS));
+            
+            const informationalUrls = await searchGoogleWithSerpApi(queries.informational, serpApiKey);
+            
+            const allUrls = deduplicateUrls([...commercialUrls, ...informationalUrls]);
+            const urlsToCrawl = allUrls.slice(0, MAX_URLS_TO_CRAWL);
+            
+            const insights: CompetitorInsight[] = [];
+            
+            for (const url of urlsToCrawl) {
+              const html = await fetchWithRetry(url);
+              if (html) {
+                insights.push(analyzeCompetitorPage(html, url));
+              }
+            }
+            
+            if (insights.length > 0) {
+              analysis = consolidateCompetitorInsights(insights);
+              analysis.queriesUsed = [queries.commercial, queries.informational];
+            }
+          } else if (!serpApiKey) {
+            console.warn("page-content-generator: SERPAPI_KEY not configured");
+          }
+
+          // Generate content
+          const result = await generateServiceLocationContentWithAnalysis(page, aimlapiKey, analysis, true);
+          
+          if (result.success) {
+            await saveSeoPageWithCompetitorAnalysis(supabase, result.data, analysis);
+            processed++;
+            lastProcessedSlug = page.slug;
+          } else {
+            failed++;
+            errors.push(`${page.slug}: ${result.error}`);
+          }
+        } catch (pageError) {
+          failed++;
+          errors.push(`${page.slug}: ${pageError instanceof Error ? pageError.message : String(pageError)}`);
+        }
+        
+        // Small delay between pages
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      const remaining = slPages.length - (startIndex + pagesToProcess.length);
+      const hasMore = remaining > 0;
+
+      console.log(`page-content-generator: Batch complete - ${processed} processed, ${failed} failed, ${remaining} remaining`);
+
+      return new Response(JSON.stringify({
+        processed,
+        failed,
+        errors: errors.slice(0, 10), // Limit errors to 10
+        cursor: lastProcessedSlug,
+        has_more: hasMore,
+        remaining,
+        total_count: slPages.length,
+        use_competitor_analysis: useCompetitorAnalysis,
+      }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
