@@ -74,6 +74,7 @@ const PromotionBanner = dynamic(
 interface ClinicPageProps {
   clinicSlugProp?: string;
   clinicDataProp?: any;
+  clinicTreatmentsDataProp?: any[];
   dehydratedStateProp?: any;
   seoDataProp?: {
     title: string;
@@ -82,7 +83,7 @@ interface ClinicPageProps {
   };
 }
 
-const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageProps = {}) => {
+const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, seoDataProp }: ClinicPageProps = {}) => {
   const router = useRouter();
   // Always trust clinicSlugProp for SSR - it's passed from getStaticProps
   // Only fall back to router.query for client-side navigations after initial SSR
@@ -95,14 +96,11 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
   const [selectedDentistId, setSelectedDentistId] = useState<string | undefined>();
   const { trackProfileView } = useAnalytics();
 
-  // Fetch SEO content from seo_pages table
-  const seoSlug = `clinic/${slug}`;
-  const { data: seoContent } = useSeoPageContent(seoSlug);
-  const parsedContent = seoContent?.content ? parseMarkdownContent(seoContent.content) : null;
-  // Use dedicated faqs column first, fallback to parsing from content for legacy pages
-  const seoFaqs = seoContent?.faqs && Array.isArray(seoContent.faqs) && seoContent.faqs.length > 0
-    ? seoContent.faqs
-    : seoContent?.content ? parseFaqFromContent(seoContent.content) : [];
+  // SEO content from seo_pages table - only use if already loaded (no additional fetch)
+  // Content is fetched server-side via getStaticProps - no client-side trigger
+  const seoContent = null; // Use static data only, no client fetch
+  const parsedContent = null;
+  const seoFaqs = [];
 
   // Fetch clinic data - only exact slug match
   const { data: clinic, isLoading, error } = useQuery({
@@ -246,23 +244,20 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, seoDataProp }: ClinicPageP
   const hasSeoContent = !!seoContent;
 
   // Signal prerender when ALL SEO-critical data is ready
-  // This includes clinic data, treatments (for services list), and SEO content
-  const isDataReady = !isLoading && !!clinic &&
-    !!treatments && // Services list is SEO-critical
-    (!!seoContent || !seoSlug); // SEO content loaded or not expected
+  // This includes clinic data, treatments (for services list) - SEO content handled server-side
+  const isDataReady = !isLoading && !!clinic && !!treatments;
 
   // Build metaDescription from available data
   const fallbackDescription = clinic?.description 
     ? clinic.description.slice(0, 160) 
     : "Find the best dental clinic in UAE. Book appointments with verified dentists and clinics.";
 
-  // Always render SEOHead - use real data if available, fallback only if truly loading without prefetch
-  // Use server-side SEO data if provided (from getStaticProps), otherwise use client-side data
+  // Always render SEOHead - use server-side data from getStaticProps
   const seoTitle = seoDataProp?.title 
     ? seoDataProp.title
     : (clinic 
-        ? (seoContent?.meta_title || `${clinic.name} - Dental Clinic in ${clinic.city?.name || 'UAE'}`)
-        : (seoContent?.meta_title || "Dental Clinic"));
+        ? `${clinic.name} - Dental Clinic in ${clinic.city?.name || 'UAE'}`
+        : "Dental Clinic");
   const seoDescription = seoDataProp?.description
     ? seoDataProp.description
     : (clinic

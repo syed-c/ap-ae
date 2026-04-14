@@ -89,9 +89,11 @@ export function AEDPricingDisplay({
 
       <div className={cn(
         'grid gap-2',
-        compact ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
+        compact ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
       )}>
-        {treatments.slice(0, compact ? 5 : 12).map((treatment) => {
+        {treatments.map((treatment, index) => {
+          if (!treatment.name) return null;
+          
           const benchmark = PRICE_RANGES[treatment.slug];
           const displayPrice = treatment.priceAed
             ? formatAED(treatment.priceAed)
@@ -101,7 +103,7 @@ export function AEDPricingDisplay({
 
           return (
             <div
-              key={treatment.slug}
+              key={treatment.slug || `treatment-${index}`}
               className="flex items-center justify-between p-3 rounded-xl bg-muted/50 border border-border/50 hover:border-primary/20 transition-colors"
             >
               <div className="min-w-0">
@@ -112,9 +114,13 @@ export function AEDPricingDisplay({
                   </Badge>
                 )}
               </div>
-              {displayPrice && (
+              {displayPrice ? (
                 <span className="text-sm font-bold text-primary whitespace-nowrap ml-3">
                   {displayPrice}
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground whitespace-nowrap ml-3">
+                  Contact for pricing
                 </span>
               )}
             </div>
@@ -122,11 +128,9 @@ export function AEDPricingDisplay({
         })}
       </div>
 
-      {treatments.length > (compact ? 5 : 12) && (
-        <p className="text-xs text-muted-foreground text-center">
-          + {treatments.length - (compact ? 5 : 12)} more services available
-        </p>
-      )}
+      <p className="text-xs text-muted-foreground text-center">
+        Showing {treatments.length} service{treatments.length !== 1 ? 's' : ''}
+      </p>
     </div>
   );
 }

@@ -27,13 +27,13 @@ interface SMTPSettings {
 }
 
 async function getSmtpSettings(supabaseClient: any): Promise<SMTPSettings | null> {
-  const { data: settings } = await supabaseClient
+  const { data: settings, error } = await supabaseClient
     .from('global_settings')
     .select('key, value')
     .eq('key', 'smtp')
-    .single();
+    .maybeSingle();
 
-  if (!settings || !settings.value) return null;
+  if (error || !settings || !settings.value) return null;
 
   const smtp = settings.value as Record<string, any>;
 
@@ -46,7 +46,7 @@ async function getSmtpSettings(supabaseClient: any): Promise<SMTPSettings | null
     port: parseInt(smtp.port?.toString() || '587'),
     user: smtp.username,
     pass: smtp.password,
-    from: smtp.from_email ? `${smtp.from_name || 'AppointPanda'} <${smtp.from_email}>` : 'AppointPanda <no-reply@AppointPanda.ae>',
+    from: smtp.from_email ? `${smtp.from_name || 'AppointPanda'} <${smtp.from_email}>` : 'AppointPanda <noreply@appointpanda.ae>',
     secure: smtp.port === 465,
   };
 }
@@ -137,13 +137,13 @@ const handler = async (req: Request): Promise<Response> => {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     // Get clinic info
-    const { data: clinic } = await supabaseClient
+    const { data: clinic, error: clinicError } = await supabaseClient
       .from("clinics")
       .select("name, email")
       .eq("id", clinicId)
-      .single();
+      .maybeSingle();
 
-    if (!clinic) {
+    if (clinicError || !clinic) {
       return new Response(JSON.stringify({ error: "Clinic not found" }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -278,7 +278,7 @@ const handler = async (req: Request): Promise<Response> => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "AppointPanda <no-reply@AppointPanda.ae>",
+          from: "AppointPanda <noreply@appointpanda.ae>",
           to: [emailToSend],
           subject: `Your Verification Code: ${otp} - AppointPanda`,
           html: emailHtml,

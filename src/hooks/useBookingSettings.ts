@@ -28,9 +28,9 @@ export function useBookingSettings(clinicId: string | null) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('dentist_settings')
-        .select('*')
+        .select('id, clinic_id, booking_enabled, booking_require_approval, allow_same_day_booking, allow_guest_booking, min_advance_booking_hours, max_advance_booking_days, confirmation_email_enabled, reminder_sms_enabled, reminder_hours_before, cancellation_policy, booking_notes')
         .eq('clinic_id', clinicId!)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       return data as DentistSettings | null;
@@ -42,12 +42,11 @@ export function useBookingSettings(clinicId: string | null) {
     mutationFn: async (updates: Partial<DentistSettings>) => {
       if (!clinicId) throw new Error('No clinic ID');
 
-      // Check if settings exist
       const { data: existing } = await supabase
         .from('dentist_settings')
         .select('id')
         .eq('clinic_id', clinicId)
-        .single();
+        .maybeSingle();
 
       if (existing) {
         const { data, error } = await supabase
@@ -55,7 +54,7 @@ export function useBookingSettings(clinicId: string | null) {
           .update(updates)
           .eq('clinic_id', clinicId)
           .select()
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         return data;
@@ -64,7 +63,7 @@ export function useBookingSettings(clinicId: string | null) {
           .from('dentist_settings')
           .insert({ clinic_id: clinicId, ...updates })
           .select()
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         return data;

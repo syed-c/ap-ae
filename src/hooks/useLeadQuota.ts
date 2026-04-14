@@ -22,9 +22,9 @@ export function useLeadQuota(clinicId?: string) {
 
       const { data, error } = await supabase
         .from('lead_quotas')
-        .select('*')
+        .select('id, clinic_id, plan_id, quota_limit, leads_used, period_start, period_end')
         .eq('clinic_id', clinicId)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       return data as LeadQuota | null;

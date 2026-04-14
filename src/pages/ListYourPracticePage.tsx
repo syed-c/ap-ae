@@ -1,5 +1,5 @@
 'use client';
-import { useState } from "react";
+import React, { useState } from "react";
 import { SEOHead } from "@/components/seo/SEOHead";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -66,6 +66,31 @@ const formSchema = z.object({
   website: z.string().trim().url("Invalid website URL").max(255, "Website must be less than 255 characters").optional().or(z.literal("")),
   description: z.string().trim().max(2000, "Description must be less than 2000 characters").optional(),
 });
+
+interface ServiceCheckboxProps {
+  treatment: { id?: string; name: string; [key: string]: unknown };
+  isSelected: boolean;
+  onToggle: (id: string, checked: boolean) => void;
+  index: number;
+}
+
+const ServiceCheckbox = React.memo<ServiceCheckboxProps>(({ treatment, isSelected, onToggle, index }) => {
+  // Use id, treatment_id, or index as fallback key
+  const treatmentKey = treatment.id || (treatment as any).treatment_id || `treatment-${index}`;
+  
+  return (
+    <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${isSelected ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
+      <input
+        type="checkbox"
+        checked={isSelected}
+        onChange={(e) => onToggle(treatmentKey, e.target.checked)}
+        className="w-5 h-5 rounded border-border text-primary focus:ring-primary cursor-pointer"
+      />
+      <span className="text-sm font-medium">{treatment.name}</span>
+    </label>
+  );
+});
+ServiceCheckbox.displayName = 'ServiceCheckbox';
 
 const ListYourPracticePage = () => {
   const { user } = useAuth();
@@ -149,11 +174,24 @@ const ListYourPracticePage = () => {
   };
 
   const handleServiceToggle = (serviceId: string) => {
-    setSelectedServices(prev =>
-      prev.includes(serviceId)
+    setSelectedServices(prev => {
+      const newServices = prev.includes(serviceId)
         ? prev.filter(id => id !== serviceId)
-        : [...prev, serviceId]
-    );
+        : [...prev, serviceId];
+      console.log('Service toggle:', serviceId, 'New selection:', newServices);
+      return newServices;
+    });
+  };
+
+  const handleCheckboxChange = (serviceId: string, isChecked: boolean) => {
+    console.log('Checkbox change:', serviceId, isChecked);
+    setSelectedServices(prev => {
+      const newServices = isChecked
+        ? [...prev, serviceId]
+        : prev.filter(id => id !== serviceId);
+      console.log('New selection:', newServices);
+      return newServices;
+    });
   };
 
   const validateStep = (currentStep: number) => {
@@ -239,9 +277,50 @@ const ListYourPracticePage = () => {
     setIsSubmitting(true);
 
     try {
+      console.log('[ListingSubmit] selectedServices:', selectedServices);
+      console.log('[ListingSubmit] treatments[0]:', treatments[0]);
+      
+      // Build service IDs - use the same logic as the checkbox key
+      const serviceIdsToSave = selectedServices.map(serviceId => {
+        // Find the treatment by its key
+        const treatment = treatments.find((t: any) => {
+          const key = t.id || (t as any).treatment_id || `treatment-${treatments.indexOf(t)}`;
+          return key === serviceId;
+        });
+        return treatment?.id || serviceId;
+      });
+      
+      console.log('[ListingSubmit] serviceIdsToSave:', serviceIdsToSave);
+
       const selectedServiceNames = treatments
         .filter((t: any) => selectedServices.includes(t.id))
         .map((t: any) => t.name);
+
+      console.log('[ListingSubmit] selectedServiceNames:', selectedServiceNames);
+
+      // Create user account with their password (account will be activated on approval)
+      let userId: string | null = null;
+      try {
+        const userResult = await supabase.functions.invoke('create-listing-user', {
+          body: {
+            email: formData.email,
+            password: formData.password,
+            dentistName: formData.dentistName,
+            phone: formData.phone,
+          },
+        });
+        
+        if (userResult?.data?.success) {
+          userId = userResult.data.userId;
+          console.log('User account created:', userId);
+        } else if (userResult?.error) {
+          console.error('Failed to create user account:', userResult.error);
+          // Continue anyway - lead will be saved for manual processing
+        }
+      } catch (userError) {
+        console.error('Error creating user account:', userError);
+        // Continue anyway - lead will be saved for manual processing
+      }
 
       // Create lead for follow-up
       const { error } = await supabase.from("leads").insert({
@@ -252,7 +331,8 @@ const ListYourPracticePage = () => {
           type: 'practice_listing',
           clinicName: formData.clinicName,
           dentistName: formData.dentistName,
-          password: formData.password, // Store password for account creation
+          password: formData.password,
+          userId: userId, // Store userId if created
           state: selectedLocation?.stateName || '',
           stateId: selectedLocation?.stateId || '',
           city: selectedLocation?.cityName || '',
@@ -261,7 +341,7 @@ const ListYourPracticePage = () => {
           streetAddress: formData.streetAddress,
           website: formData.website,
           services: selectedServiceNames,
-          serviceIds: selectedServices,
+          serviceIds: serviceIdsToSave, // Use properly extracted UUIDs
           description: formData.description,
         }),
         source: "list-your-practice",
@@ -663,36 +743,25 @@ const ListYourPracticePage = () => {
                           </div>
 
                           <div className="space-y-4">
-                            {/* Services Grid */}
+                            {/* Services Grid - Using native checkboxes */}
                             <div>
                               <Label className="font-bold flex items-center gap-2 mb-3">
                                 <Stethoscope className="h-4 w-4" />
                                 Select Your Services
                               </Label>
                               <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto p-1">
-                                {treatments.map((treatment: any) => (
-                                  <label
-                                    key={treatment.id}
-                                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${selectedServices.includes(treatment.id)
-                                      ? 'border-primary bg-primary/5'
-                                      : 'border-border hover:border-primary/30'
-                                      }`}
-                                  >
-                                    <Checkbox
-                                      checked={selectedServices.includes(treatment.id)}
-                                      onCheckedChange={(isChecked) => {
-                                        setSelectedServices(prev => {
-                                          if (isChecked) {
-                                            return prev.includes(treatment.id) ? prev : [...prev, treatment.id];
-                                          } else {
-                                            return prev.filter(id => id !== treatment.id);
-                                          }
-                                        });
-                                      }}
+                                {treatments.map((treatment: any, index: number) => {
+                                  const treatmentKey = treatment.id || (treatment as any).treatment_id || `treatment-${index}`;
+                                  return (
+                                    <ServiceCheckbox
+                                      key={treatmentKey}
+                                      treatment={treatment}
+                                      index={index}
+                                      isSelected={selectedServices.includes(treatmentKey)}
+                                      onToggle={(id, checked) => handleCheckboxChange(id, checked)}
                                     />
-                                    <span className="text-sm font-medium">{treatment.name}</span>
-                                  </label>
-                                ))}
+                                  );
+                                })}
                               </div>
                               {selectedServices.length > 0 && (
                                 <p className="text-xs text-muted-foreground mt-2">

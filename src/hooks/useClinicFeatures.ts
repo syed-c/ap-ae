@@ -79,7 +79,7 @@ export function useClinicFeatures(clinicId?: string) {
           .from('subscription_plans')
           .select('id')
           .eq('slug', 'free')
-          .single();
+          .maybeSingle();
         
         if (!freePlan) return [];
         

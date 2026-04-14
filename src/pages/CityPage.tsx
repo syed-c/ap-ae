@@ -80,9 +80,11 @@ interface CityPageProps {
   seoH1Prop?: string | null;
   cityRatingsProp?: { avgRating: number; totalReviews: number; clinicCount: number };
   topClinicsProp?: { name: string; slug: string; rating: number; review_count: number }[];
+  allSeoDataProp?: any;
+  pageContentDataProp?: any;
 }
 
-const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp, faqsProp, seoH1Prop, cityRatingsProp, topClinicsProp }: CityPageProps = {}) => {
+const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp, faqsProp, seoH1Prop, cityRatingsProp, topClinicsProp, allSeoDataProp, pageContentDataProp }: CityPageProps = {}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isServerRender = typeof window === 'undefined';

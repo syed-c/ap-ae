@@ -7,7 +7,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 // Wrapper component to render SEO meta tags server-side with FAQ data for SSR
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, faqs, seoH1, cityRatings, topClinics }: {
+const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, faqs, seoH1, cityRatings, topClinics, allSeoData, pageContentDataProp }: {
     citySlug: string;
     stateSlug: string;
     stateData: any;
@@ -17,6 +17,8 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
     seoH1: string | null;
     cityRatings?: { avgRating: number; totalReviews: number; clinicCount: number };
     topClinics?: { name: string; slug: string; rating: number; review_count: number }[];
+    allSeoData?: any;
+    pageContentDataProp?: any;
 }) => {
     const cityName = cityData?.name || citySlug;
     const stateName = stateData?.name || stateSlug;
@@ -109,6 +111,8 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
                 seoH1Prop={seoH1}
                 cityRatingsProp={cityRatings}
                 topClinicsProp={topClinics}
+                allSeoDataProp={allSeoData}
+                pageContentDataProp={pageContentDataProp}
             />
         </>
     );
@@ -216,7 +220,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const seoSlug = `${normalizedStateSlug}/${citySlug}`;
 
     // Direct queries instead of React Query for faster build
-    const [stateData, cityData, seoContent] = await Promise.all([
+const [stateData, cityData, seoContent, pageContent] = await Promise.all([
         supabase
             .from('states')
             .select('*')
@@ -238,7 +242,15 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .order("is_optimized", { ascending: false })
             .limit(1)
             .maybeSingle()
-            .then(r => r.data)
+            .then(r => r.data) as Promise<any>,
+        supabase
+            .from('page_content')
+            .select('*')
+            .eq('page_type', 'city')
+            .in('page_slug', [citySlug, `/${citySlug}`, `${normalizedStateSlug}/${citySlug}`, `/${normalizedStateSlug}/${citySlug}`])
+            .eq('is_published', true)
+            .maybeSingle()
+            .then(r => r.data) as Promise<any>
     ]);
 
     // Also check cityData - return 404 if state is missing (but allow inactive cities)
@@ -327,6 +339,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             seoH1: seoH1,
             cityRatings: cityRatings,
             topClinics: topClinics,
+            allSeoData: seoContent,
+            pageContentDataProp: pageContent,
         },
         revalidate: 600,
     };

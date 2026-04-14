@@ -104,10 +104,10 @@ export function useClinic(id: string) {
           area:areas(*)
         `)
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
-      return data as unknown as Clinic;
+      return data as unknown as Clinic | null;
     },
     enabled: !!id,
   });

@@ -58,6 +58,14 @@ const extractEmailDomain = (email: string): string | null => {
   return parts.length === 2 ? parts[1] : null;
 };
 
+// Sanitize search input to prevent SQL injection
+const sanitizeSearch = (input: string): string => {
+  return input
+    .replace(/[%_]/g, '') // Remove wildcard chars
+    .replace(/[^\w\s-]/g, '') // Remove special chars except hyphen
+    .slice(0, 100); // Limit length
+};
+
 const ClaimProfilePage = () => {
   const router = useRouter(); const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const prefilledClinic = searchParams.get("clinic");
@@ -109,18 +117,21 @@ const ClaimProfilePage = () => {
     queryFn: async () => {
       if (!searchQuery || searchQuery.length < 2) return [];
 
+      const sanitized = sanitizeSearch(searchQuery);
+      if (!sanitized) return [];
+
       if (searchType === "clinic") {
         const { data } = await supabase
           .from("clinics")
           .select("id, name, slug, address, email, phone, website, claim_status, verification_status, claim_emails, city:cities(name)")
-          .ilike("name", `%${searchQuery}%`)
+          .ilike("name", `%${sanitized}%`)
           .limit(10);
         return data || [];
       } else {
         const { data } = await supabase
           .from("dentists")
           .select("id, name, slug, title, clinic:clinics(id, name, slug, website, claim_emails)")
-          .ilike("name", `%${searchQuery}%`)
+          .ilike("name", `%${sanitized}%`)
           .limit(10);
         return data || [];
       }

@@ -14,6 +14,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { buildUrl } from "@/lib/url/buildProfileUrl";
 
 interface PriceOption {
   type: string;
@@ -268,7 +269,7 @@ export const TreatmentPriceRange = ({
                 </Button>
                 {stateSlug && citySlug && serviceSlug && (
                   <Button asChild variant="ghost" className="rounded-xl text-muted-foreground">
-                    <Link href={`/${stateSlug}/${citySlug}/`}>
+                    <Link href={buildUrl(stateSlug, citySlug)}>
                       View All {locationName} Services
                     </Link>
                   </Button>

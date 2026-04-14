@@ -21,7 +21,7 @@ export function useTreatments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('treatments')
-        .select('*')
+        .select('id, name, slug, description, icon, image_url, display_order, is_active')
         .eq('is_active', true)
         .order('display_order');
       
@@ -39,12 +39,12 @@ export function useTreatment(id: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('treatments')
-        .select('*')
+        .select('id, name, slug, description, icon, image_url, display_order, is_active')
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
-      return data as unknown as Treatment;
+      return data as unknown as Treatment | null;
     },
     enabled: !!id,
   });

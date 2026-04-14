@@ -124,7 +124,7 @@ export function useUpsertPageContent() {
           .from('page_content')
           .insert([content as never])
           .select('id')
-          .single();
+          .maybeSingle();
         
         if (error) throw error;
         

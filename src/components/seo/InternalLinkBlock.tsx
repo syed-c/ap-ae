@@ -12,6 +12,7 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { buildUrl } from "@/lib/url/buildProfileUrl";
 
 interface InternalLink {
   label: string;
@@ -115,7 +116,7 @@ export const generateCityInternalLinks = (
   treatments.slice(0, 4).forEach((t) => {
     links.push({
       label: `${t.name} in ${cityName}`,
-      href: `/${stateSlug}/${citySlug}/${t.slug}/`,
+      href: buildUrl(stateSlug, citySlug, t.slug),
       description: `Find ${t.name.toLowerCase()} specialists in ${cityName}, ${stateName}`,
     });
   });
@@ -169,7 +170,7 @@ export const generateServiceLocationInternalLinks = (
   // City page link
   links.push({
     label: `All Dentists in ${cityName}`,
-    href: `/${stateSlug}/${citySlug}/`,
+    href: buildUrl(stateSlug, citySlug),
     description: `View all dental clinics in ${cityName}`,
   });
   
@@ -178,7 +179,7 @@ export const generateServiceLocationInternalLinks = (
     if (s.slug !== serviceSlug) {
       links.push({
         label: `${s.name} in ${cityName}`,
-        href: `/${stateSlug}/${citySlug}/${s.slug}/`,
+        href: buildUrl(stateSlug, citySlug, s.slug),
         description: `Find ${s.name.toLowerCase()} specialists locally`,
       });
     }
@@ -236,7 +237,7 @@ export const generateClinicInternalLinks = (
     // City page link
     links.push({
       label: `Dentists in ${cityName}`,
-      href: `/${stateSlug}/${citySlug}/`,
+      href: buildUrl(stateSlug, citySlug),
       description: `View all dental clinics in ${cityName}`,
     });
     
@@ -244,7 +245,7 @@ export const generateClinicInternalLinks = (
     services.slice(0, 4).forEach((s) => {
       links.push({
         label: `${s.name} in ${cityName}`,
-        href: `/${stateSlug}/${citySlug}/${s.slug}/`,
+        href: buildUrl(stateSlug, citySlug, s.slug),
         description: `Find ${s.name.toLowerCase()} specialists`,
       });
     });

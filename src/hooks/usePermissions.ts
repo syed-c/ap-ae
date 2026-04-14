@@ -265,9 +265,9 @@ export function useHasPermission(permission: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('global_settings')
-        .select('*')
+        .select('key, value')
         .eq('key', 'role_permissions')
-        .single();
+        .maybeSingle();
       if (error && error.code !== 'PGRST116') throw error;
       return data?.value as Record<string, string[]> | null;
     },

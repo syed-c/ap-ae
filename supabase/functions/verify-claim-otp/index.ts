@@ -69,7 +69,7 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("clinic_id", clinicId)
       .eq("user_id", user.id)
       .eq("status", "pending")
-      .single();
+      .maybeSingle();
 
     if (claimError || !claimRequest) {
       return new Response(JSON.stringify({ error: "No pending claim request found" }), {

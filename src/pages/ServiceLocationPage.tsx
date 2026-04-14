@@ -11,7 +11,7 @@ import { useProfiles } from "@/hooks/useProfiles";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { SyncStructuredData } from "@/components/seo/SyncStructuredData";
 import { useState as useStateData, useCity } from "@/hooks/useLocations";
-import { useSeoPageContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
+import { parseFaqFromContent } from "@/hooks/useSeoPageContent";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
 
 import { 
@@ -48,10 +48,29 @@ interface ServiceLocationPageProps {
   seoH1Prop?: string | null;
   heroIntroProp?: string | null;
   contentProp?: string | null;
+  // Additional section props for server-side rendering
+  section1TitleProp?: string | null;
+  section1ContentProp?: string | null;
+  section2TitleProp?: string | null;
+  section2ContentProp?: string | null;
+  section3TitleProp?: string | null;
+  section3ContentProp?: string | null;
   allSeoDataProp?: any;
 }
 
-const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, stateDataProp, cityDataProp, treatmentDataProp, seoDataProp, allSeoDataProp }: ServiceLocationPageProps) => {
+const ServiceLocationPage = ({ 
+  stateSlugProp, citySlugProp, serviceSlugProp, 
+  stateDataProp, cityDataProp, treatmentDataProp, 
+  seoDataProp, allSeoDataProp,
+  heroIntroProp,
+  contentProp,
+  section1TitleProp,
+  section1ContentProp,
+  section2TitleProp,
+  section2ContentProp,
+  section3TitleProp,
+  section3ContentProp,
+}: ServiceLocationPageProps) => {
   const routerQuery = useRouter().query;
   const stateSlug = stateSlugProp || routerQuery.stateSlug as string || '';
   const citySlug = citySlugProp || routerQuery.citySlug as string || '';
@@ -62,8 +81,12 @@ const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, sta
   const { data: state } = useStateData(normalizedStateSlug || '', stateDataProp);
   const { data: city } = useCity(citySlug || '', normalizedStateSlug || '', cityDataProp);
 
-  const seoSlug = `${normalizedStateSlug || ""}/${citySlug || ""}/${serviceSlug || ""}`;
-  const { data: seoContent, isLoading: seoContentLoading, isFetching: seoContentFetching } = useSeoPageContent(seoSlug);
+  // SEO content is loaded server-side via getStaticProps - no client-side fetch needed
+  // This prevents any "flash of fallback content" - all content is in the initial HTML
+  // allSeoDataProp comes from getStaticProps and contains all SEO content from DB
+  const seoContent = allSeoDataProp;
+  const seoContentLoading = false;
+  const seoContentFetching = false;
 
   const { data: treatment } = useQuery({
     queryKey: ["treatment", service],
@@ -97,17 +120,27 @@ const ServiceLocationPage = ({ stateSlugProp, citySlugProp, serviceSlugProp, sta
     return router.replace(`/${normalizedStateSlug}/${citySlug}/${serviceSlug}/`);
   }
 
-  // Get ALL data from DB
+  // Get ALL data from DB - PRIORITIZE server-side props for SEO
+  // Server-side data (allSeoDataProp) comes from getStaticProps - Google can see this!
+  // Client-side only is fallback
   const seoDataFromProps = allSeoDataProp || seoContent;
+  
+  // Build comprehensive content from server-side sections first
+  const section1Title = section1TitleProp || seoDataFromProps?.section_1_title || null;
+  const section1Content = section1ContentProp || seoDataFromProps?.section_1_content || null;
+  const section2Title = section2TitleProp || seoDataFromProps?.section_2_title || null;
+  const section2Content = section2ContentProp || seoDataFromProps?.section_2_content || null;
+  const section3Title = section3TitleProp || seoDataFromProps?.section_3_title || null;
+  const section3Content = section3ContentProp || seoDataFromProps?.section_3_content || null;
   
   // H1 from DB
   const displayH1 = seoDataFromProps?.h1 || `Best ${treatmentName} in ${locationName}`;
   
-  // Page intro from DB (for hero)
-  const pageIntro = seoDataFromProps?.page_intro || null;
+  // Page intro from DB (for hero) - use server-side prop first
+  const pageIntro = heroIntroProp || seoDataFromProps?.page_intro || null;
   
-  // Content from DB
-  const pageContent = seoDataFromProps?.content || null;
+  // Content from DB - combine server-side content with DB content
+  const pageContent = contentProp || seoDataFromProps?.content || null;
   
   // FAQs from DB
   const seoFaqs = seoDataFromProps?.faqs && Array.isArray(seoDataFromProps.faqs) && seoDataFromProps.faqs.length > 0

@@ -14,6 +14,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { withTrailingSlash } from "@/lib/url/withTrailingSlash";
+import { buildUrl } from "@/lib/url/buildProfileUrl";
 import { parseMarkdownToHtml, stripMarkdown } from "@/lib/utils/parseMarkdown";
 
 interface ParsedSection {
@@ -221,7 +222,7 @@ export const SEOContentBlock = ({
                        {nearbyLocations.slice(0, 8).map((loc, index) => (
                          <Link
                            key={loc.slug}
-                           href={stateSlug && citySlug ? `/${stateSlug}/${loc.slug}/` : loc.slug.startsWith('/') ? loc.slug : `/${loc.slug}/`}
+                           href={stateSlug && citySlug ? buildUrl(stateSlug, loc.slug) : loc.slug.startsWith('/') ? loc.slug : `/${loc.slug}/`}
                            className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors"
                          >
                            <MapPin className="h-4 w-4 text-primary shrink-0" />
@@ -405,7 +406,7 @@ const OptimizedContentLayout = ({
             {popularTreatments.slice(0, 8).map((t) => (
               <Link
                 key={t.slug}
-                href={withTrailingSlash(citySlug ? `/${stateSlug}/${citySlug}/${t.slug}` : `/services/${t.slug}`)}
+                href={stateSlug && citySlug ? buildUrl(stateSlug, citySlug, t.slug) : buildUrl('services', t.slug)}
                 className="bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium hover:bg-primary/20 transition-colors"
               >
                 {t.name}

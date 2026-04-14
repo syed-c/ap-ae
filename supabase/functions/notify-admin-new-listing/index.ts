@@ -198,9 +198,11 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const emailHtml = wrapEmailContent(branding, '📋 New Practice Listing Request', '📋', bodyContent);
+    const minifiedHtml = minifyHtml(emailHtml);
 
-    // Send email to all admin emails
-    const emailPromises = adminEmails.map(async (adminEmail) => {
+    // Send email to all admin emails using Resend API
+    const sendResults = [];
+    for (const adminEmail of adminEmails) {
       const emailResponse = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -209,24 +211,28 @@ const handler = async (req: Request): Promise<Response> => {
         },
         body: JSON.stringify({
           from: getFromAddress(branding),
-          to: [adminEmail],
+          to: adminEmail,
           subject: `📋 New Listing Request: ${clinicName} - ${branding.siteName}`,
-          html: minifyHtml(emailHtml),
+          html: minifiedHtml,
         }),
       });
-      
-      const result = await emailResponse.json();
-      console.log(`Admin notification email sent to ${adminEmail}:`, result);
-      return result;
-    });
 
-    const results = await Promise.all(emailPromises);
+      if (!emailResponse.ok) {
+        const errorText = await emailResponse.text();
+        console.error(`Failed to send email to ${adminEmail}:`, errorText);
+        sendResults.push({ email: adminEmail, success: false, error: errorText });
+      } else {
+        const result = await emailResponse.json();
+        console.log(`Admin notification email sent to ${adminEmail}:`, result);
+        sendResults.push({ email: adminEmail, success: true, data: result });
+      }
+    }
 
     return new Response(JSON.stringify({ 
       success: true, 
       message: `Notification sent to ${adminEmails.length} admin(s)`,
       recipients: adminEmails,
-      results 
+      results: sendResults 
     }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

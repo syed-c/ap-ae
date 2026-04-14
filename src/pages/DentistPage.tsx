@@ -35,6 +35,26 @@ import {
 import { TrustSignalStrip, AEDPricingDisplay, CredentialsBadge } from "@/components/healthcare";
 import { proxyImageUrl } from "@/lib/proxyImageUrl";
 
+interface TreatmentData {
+  id: string;
+  treatment_id: string;
+  price_from: number | null;
+  price_to: number | null;
+  treatment: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+}
+
+interface ReviewData {
+  id: string;
+  patient_name: string;
+  rating: number;
+  content: string;
+  created_at: string;
+}
+
 interface DentistPageProps {
   dentistSlugProp?: string;
   dentistDataProp?: any;
@@ -44,9 +64,11 @@ interface DentistPageProps {
     description: string;
     canonical: string;
   };
+  treatmentsData?: TreatmentData[];
+  reviewsData?: ReviewData[];
 }
 
-const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistPageProps = {}) => {
+const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp, treatmentsData, reviewsData }: DentistPageProps = {}) => {
   const router = useRouter();
   const isServerRender = typeof window === 'undefined';
   const dentistSlug = isServerRender
@@ -61,7 +83,7 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistP
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { trackProfileView } = useAnalytics();
-  const { data: seoContent } = useSeoPageContent(`dentist/${slug}`);
+  // SEO content is already in seoDataProp from getStaticProps - no client-side fetch needed
 
   // Fetch dentist data - only exact slug match
   const { data: dentist, isLoading, error } = useQuery({
@@ -80,28 +102,29 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistP
     enabled: !!slug && !slug.includes('/'),
   });
 
-  // Fetch treatments via clinic_treatments if dentist has a clinic
+  // Use server-side treatments data when available, otherwise fetch client-side
   const { data: treatments } = useQuery({
     queryKey: ["dentist-clinic-treatments", dentist?.clinic_id],
     queryFn: async () => {
       if (!dentist?.clinic_id) return [];
       const { data } = await supabase
         .from("clinic_treatments")
-        .select("*, treatment:treatments(*)")
+        .select("id, treatment_id, price_from, price_to, treatment:treatments(id, name, slug)")
         .eq("clinic_id", dentist.clinic_id);
       return data || [];
     },
+    initialData: treatmentsData,
     enabled: !!dentist?.clinic_id,
   });
 
-  // Fetch reviews from review_funnel_events via clinic
+  // Use server-side reviews data when available, otherwise fetch client-side
   const { data: reviews } = useQuery({
     queryKey: ["dentist-reviews", dentist?.clinic_id],
     queryFn: async () => {
       if (!dentist?.clinic_id) return [];
       const { data } = await supabase
         .from("review_funnel_events")
-        .select("*")
+        .select("id, rating, comment, created_at, visitor_id")
         .eq("clinic_id", dentist.clinic_id)
         .eq("event_type", "rating_submitted")
         .order("created_at", { ascending: false })
@@ -148,20 +171,36 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistP
     }
   };
 
+  const getLikedDentists = (): string[] => {
+    try {
+      const stored = localStorage.getItem('likedDentists');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const setLikedDentists = (ids: string[]) => {
+    try {
+      localStorage.setItem('likedDentists', JSON.stringify(ids));
+    } catch {
+      // Silently fail if localStorage is unavailable
+    }
+  };
+
   // Handle like functionality
   const handleLike = () => {
     setIsLiked(!isLiked);
     setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
 
-    // Store in localStorage for persistence
-    const likedDentists = JSON.parse(localStorage.getItem('likedDentists') || '[]');
+    const likedDentists = getLikedDentists();
     if (isLiked) {
       const updated = likedDentists.filter((id: string) => id !== dentist?.id);
-      localStorage.setItem('likedDentists', JSON.stringify(updated));
+      setLikedDentists(updated);
       toast({ title: "Removed from favorites" });
     } else {
       likedDentists.push(dentist?.id);
-      localStorage.setItem('likedDentists', JSON.stringify(likedDentists));
+      setLikedDentists(likedDentists);
       toast({ title: "Added to favorites!", description: "Find your favorites in your profile" });
     }
   };
@@ -169,7 +208,7 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistP
   // Check if already liked on mount
   useEffect(() => {
     if (dentist?.id) {
-      const likedDentists = JSON.parse(localStorage.getItem('likedDentists') || '[]');
+      const likedDentists = getLikedDentists();
       setIsLiked(likedDentists.includes(dentist.id));
     }
   }, [dentist?.id]);
@@ -266,8 +305,8 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistP
   return (
     <PageLayout>
       <SEOHead
-        title={seoDataProp?.title ?? (seoContent?.meta_title || `${dentist.name}${dentist.title ? `, ${dentist.title}` : ''} - Dentist in ${locationDisplay}`)}
-        description={seoDataProp?.description ?? (seoContent?.meta_description || dentist.bio || `Book an appointment with ${dentist.name}. ${dentist.years_experience ? `${dentist.years_experience}+ years of experience.` : ''} Verified dental professional in ${locationDisplay}.`)}
+        title={seoDataProp?.title || `${dentist.name}${dentist.title ? `, ${dentist.title}` : ''} - Dentist in ${locationDisplay}`}
+        description={seoDataProp?.description || dentist.bio || `Book an appointment with ${dentist.name}. ${dentist.years_experience ? `${dentist.years_experience}+ years of experience.` : ''} Verified dental professional in ${locationDisplay}.`}
         canonical={seoDataProp?.canonical ?? `/dentist/${dentist.slug}/`}
         keywords={[dentist.name, `dentist ${cityName}`, dentist.title || 'dental specialist']}
         ogType="profile"
@@ -428,10 +467,10 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp }: DentistP
             {treatments && treatments.length > 0 && (
               <div className="card-modern p-6">
                 <AEDPricingDisplay
-                  treatments={treatments.map((dt) => ({
+                  treatments={treatments.map((dt: any) => ({
                     name: dt.treatment?.name || '',
                     slug: dt.treatment?.slug || '',
-                    priceAed: dt.price_aed || null,
+                    priceAed: dt.price_from || dt.price_to || null,
                   }))}
                 />
               </div>

@@ -74,29 +74,37 @@ serve(async (req) => {
     const website = listingData.website || "";
     const description = listingData.description || "";
     const serviceIds = listingData.serviceIds || [];
-    
-    // Use submitted password or generate one as fallback
-    const submittedPassword = listingData.password;
-    const passwordToUse = submittedPassword || generateTempPassword();
-    const isTempPassword = !submittedPassword;
+    const userIdFromLead = listingData.userId;
 
-    // 2. Check if user already exists
+    console.log('[approve-listing] Listing data serviceIds:', serviceIds, 'Full listingData:', JSON.stringify(listingData));
+
+    // Find the existing user (created during listing submission)
     const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
     const existingUser = existingUsers?.users?.find(u => u.email === email);
 
     let userId: string;
 
     if (existingUser) {
-      // User exists, update their password
+      // User was created during listing submission - use their existing account
       userId = existingUser.id;
-      await supabaseAdmin.auth.admin.updateUserById(userId, {
-        password: passwordToUse,
-      });
+      console.log("Activating existing user:", userId);
+    } else if (userIdFromLead) {
+      // Try to find by userId
+      userId = userIdFromLead;
     } else {
-      // Create new user
+      // No existing user found - this shouldn't happen with new listings
+      // But create one as fallback with their password
+      const submittedPassword = listingData.password;
+      if (!submittedPassword) {
+        return new Response(
+          JSON.stringify({ success: false, error: "No existing user found and no password provided" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       const { data: newUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
         email,
-        password: passwordToUse,
+        password: submittedPassword,
         email_confirm: true,
         user_metadata: {
           full_name: dentistName,
@@ -115,7 +123,7 @@ serve(async (req) => {
       userId = newUser.user.id;
     }
 
-    // 4. Assign dentist role
+    // Assign dentist role (this activates their account)
     const { error: roleError } = await supabaseAdmin
       .from("user_roles")
       .upsert({ user_id: userId, role: "dentist" }, { onConflict: "user_id,role" });
@@ -124,7 +132,13 @@ serve(async (req) => {
       console.error("Failed to assign role:", roleError);
     }
 
-    // 5. Create clinic slug (unique, no random codes)
+    // Update pending listing status if exists
+    await supabaseAdmin
+      .from("pending_listing_users")
+      .update({ status: "approved", approved_at: new Date().toISOString() })
+      .eq("user_id", userId);
+
+    // Create clinic slug (unique, no random codes)
     const baseSlug = clinicName
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
@@ -182,13 +196,21 @@ serve(async (req) => {
     }
 
     // 7. Add clinic treatments
+    console.log('[approve-listing] Adding treatments for clinic:', clinic.id, 'Service IDs:', serviceIds);
     if (serviceIds.length > 0) {
       const treatmentInserts = serviceIds.map((treatmentId: string) => ({
         clinic_id: clinic.id,
         treatment_id: treatmentId,
       }));
 
-      await supabaseAdmin.from("clinic_treatments").insert(treatmentInserts);
+      const { data: insertedTreatments, error: treatmentError } = await supabaseAdmin.from("clinic_treatments").insert(treatmentInserts);
+      if (treatmentError) {
+        console.error('[approve-listing] Error inserting treatments:', treatmentError);
+      } else {
+        console.log('[approve-listing] Treatments inserted successfully:', insertedTreatments);
+      }
+    } else {
+      console.log('[approve-listing] No service IDs provided in listing data');
     }
 
     // 8. Create primary dentist record with unique slug
@@ -244,16 +266,11 @@ serve(async (req) => {
       })
       .eq("id", leadId);
 
-    // 11. Send email with login credentials
+    // 11. Send email with login confirmation
     if (resendApiKey && email) {
       try {
         const branding = await getBranding(supabaseAdmin);
         const siteUrl = branding.siteUrl;
-
-        const passwordLabel = isTempPassword ? "Temporary Password" : "Your Password";
-        const passwordWarning = isTempPassword 
-          ? '<p style="margin: 8px 0 0; color: #dc2626; font-size: 14px;">⚠️ Please change your password after logging in.</p>'
-          : '';
 
         const bodyContent = `
           <h2 style="color: #1e293b; margin: 0 0 16px 0; font-size: 22px; font-weight: 600;">
@@ -265,16 +282,15 @@ serve(async (req) => {
           </p>
           
           <p style="color: #475569; font-size: 16px; line-height: 1.7; margin: 0 0 24px 0;">
-            Great news! Your practice listing for <strong>${clinicName}</strong> has been approved.
+            Great news! Your practice listing for <strong>${clinicName}</strong> has been approved. Your account is now active!
           </p>
           
           <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f0fdf4; border: 2px solid #86efac; border-radius: 12px; margin-bottom: 24px;">
             <tr>
               <td style="padding: 24px;">
-                <h3 style="margin: 0 0 16px; color: #166534; font-size: 18px;">Your Login Credentials</h3>
-                <p style="margin: 0 0 8px; color: #374151;"><strong>Email:</strong> ${email}</p>
-                <p style="margin: 0 0 8px; color: #374151;"><strong>${passwordLabel}:</strong> ${passwordToUse}</p>
-                ${passwordWarning}
+                <h3 style="margin: 0 0 16px; color: #166534; font-size: 18px;">Your Account is Active!</h3>
+                <p style="margin: 0 0 8px; color: #374151;">Log in with the credentials you created when you submitted your listing:</p>
+                <p style="margin: 0; color: #374151;"><strong>Email:</strong> ${email}</p>
               </td>
             </tr>
           </table>
@@ -303,7 +319,8 @@ serve(async (req) => {
 
         const emailHtml = wrapEmailContent(branding, '🎉 Your Practice Has Been Approved!', '🎉', bodyContent);
 
-        await fetch("https://api.resend.com/emails", {
+        // Send email using Resend API
+        const emailResponse = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${resendApiKey}`,
@@ -316,6 +333,14 @@ serve(async (req) => {
             html: emailHtml,
           }),
         });
+
+        if (!emailResponse.ok) {
+          const errorText = await emailResponse.text();
+          console.error("Failed to send email:", emailResponse.status, errorText);
+        } else {
+          const result = await emailResponse.json();
+          console.log("Approval email sent:", result);
+        }
       } catch (emailError) {
         console.error("Failed to send email:", emailError);
       }
@@ -377,12 +402,3 @@ serve(async (req) => {
     );
   }
 });
-
-function generateTempPassword(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
-  let password = "";
-  for (let i = 0; i < 12; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-}

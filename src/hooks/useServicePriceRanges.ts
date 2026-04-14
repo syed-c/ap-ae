@@ -72,7 +72,7 @@ export function useBudgetRanges() {
     queryFn: async () => {
       const { data, error } = await supabaseAdmin
         .from('budget_ranges')
-        .select('*')
+        .select('id, name, slug, min_value, max_value, display_order, is_active')
         .eq('is_active', true)
         .order('display_order');
       if (error) throw error;

@@ -26,7 +26,7 @@ const DEFAULT_BRANDING: SiteBranding = {
   // Favicon with cache-busting version to force Google re-indexing
   faviconUrl: 'https://www.AppointPanda.ae/favicon.png?v=5',
   supportEmail: 'support@AppointPanda.ae',
-  fromEmail: 'no-reply@AppointPanda.ae',
+  fromEmail: 'onboarding@resend.dev', // Use Resend's verified address for testing
   fromName: 'AppointPanda',
   primaryColor: '#0d9488',
   copyrightText: `© ${new Date().getFullYear()} AppointPanda. All rights reserved by Quick Commerce LLC FZ.`,

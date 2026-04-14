@@ -34,7 +34,7 @@ async function getEmailSettings(supabase: any): Promise<EmailSettings> {
   }
 
   return {
-    from_email: 'no-reply@AppointPanda.ae',
+    from_email: 'noreply@appointpanda.ae',
     from_name: 'AppointPanda'
   };
 }

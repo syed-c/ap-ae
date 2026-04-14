@@ -53,27 +53,37 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     const seoSlug = `clinic/${clinicSlug}`;
 
-    // Direct queries instead of React Query for faster build
-    const [clinic, seoContent] = await Promise.all([
-        supabase
-            .from("clinics")
-            .select("*, city:cities(name, slug, state:states(name, slug, abbreviation)), area:areas(name, slug)")
-            .eq("slug", clinicSlug)
-            .maybeSingle()
-            .then(r => r.data),
-        supabase
-            .from("seo_pages")
-            .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
-            .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
-            .order("is_optimized", { ascending: false })
-            .limit(1)
-            .maybeSingle()
-            .then(r => r.data)
-    ]);
+    // Fetch clinic first - need clinic.id for treatments query
+    const { data: clinic, error: clinicError } = await supabase
+        .from("clinics")
+        .select("*, city:cities(name, slug, state:states(name, slug, abbreviation)), area:areas(name, slug)")
+        .eq("slug", clinicSlug)
+        .maybeSingle();
 
-    if (!clinic) {
+    if (clinicError || !clinic) {
+        console.error('[getStaticProps] Error fetching clinic:', clinicError);
         return { notFound: true };
     }
+
+    // Fetch treatments - critical for services display
+    const { data: clinicTreatments, error: treatmentsError } = await supabase
+        .from("clinic_treatments")
+        .select("*, treatment:treatments(*)")
+        .eq("clinic_id", clinic.id);
+
+    if (treatmentsError) {
+        console.error('[getStaticProps] Error fetching treatments:', treatmentsError);
+    }
+
+    // Fetch SEO content (parallel)
+    const seoContent = await supabase
+        .from("seo_pages")
+        .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
+        .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
+        .order("is_optimized", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+        .then(r => r.data);
     
     const cityName = clinic.city?.name || 'UAE';
     const stateAbbrev = clinic.city?.state?.abbreviation || 'UAE';
@@ -86,6 +96,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         props: {
             clinicSlug,
             clinicData: clinic,
+            clinicTreatmentsData: clinicTreatments || [],
             seoData: {
                 title: metaTitle,
                 description: metaDescription,
@@ -99,9 +110,10 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 };
 
 // Wrapper component to render SEO meta tags server-side
-const ClinicPageWithSEO = ({ clinicSlug, clinicData, seoData, faqs }: {
+const ClinicPageWithSEO = ({ clinicSlug, clinicData, clinicTreatmentsData, seoData, faqs }: {
     clinicSlug: string;
     clinicData: any;
+    clinicTreatmentsData: any[];
     seoData: { title: string; description: string; canonical: string; ogImage?: string };
     faqs?: { question: string; answer: string }[];
 }) => {
@@ -224,6 +236,7 @@ const ClinicPageWithSEO = ({ clinicSlug, clinicData, seoData, faqs }: {
             <ClinicPageComponent 
                 clinicSlugProp={clinicSlug} 
                 clinicDataProp={clinicData}
+                clinicTreatmentsDataProp={clinicTreatmentsData}
                 seoDataProp={seoData}
             />
         </>

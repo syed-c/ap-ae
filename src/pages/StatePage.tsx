@@ -53,9 +53,11 @@ interface StatePageProps {
   seoH1Prop?: string | null;
   stateRatingsProp?: { avgRating: number; totalReviews: number; clinicCount: number };
   topClinicsProp?: { name: string; slug: string; rating: number; review_count: number }[];
+  allSeoDataProp?: any;
+  pageContentDataProp?: any;
 }
 
-const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, faqsProp, seoH1Prop, stateRatingsProp, topClinicsProp }: StatePageProps = {}) => {
+const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, faqsProp, seoH1Prop, stateRatingsProp, topClinicsProp, allSeoDataProp, pageContentDataProp }: StatePageProps = {}) => {
   const router = useRouter();
   const isServerRender = typeof window === 'undefined';
   const stateSlug = isServerRender
@@ -82,11 +84,18 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
   // Use SSR data if available, otherwise fetch client-side
   const { data: cities, isLoading: citiesLoading } = useCitiesByStateSlug(normalizedStateSlug || '', citiesDataProp);
 
-  // Fetch SEO content from seo_pages table
-  const { data: seoContent, isLoading: seoContentLoading, isFetching: seoContentFetching } = useSeoPageContent(normalizedStateSlug || '');
-
-  // IMPORTANT: Don't hide content during background refetches - only show loading state when no data exists
-  const isSeoContentPending = !seoContent && (seoContentLoading || seoContentFetching);
+  // SEO content is passed from getStaticProps - no client-side fetch needed
+  const seoContent = allSeoDataProp; // From seo_pages table
+  const pageContent = pageContentDataProp; // From page_content table
+  
+  // DEBUG: Log pageContent to verify data is received
+  if (typeof window !== 'undefined' && pageContent) {
+    console.log('[DEBUG] pageContent received:', pageContent?.hero_intro?.substring(0, 50));
+  }
+  
+  const seoContentLoading = false;
+  const seoContentFetching = false;
+  const isSeoContentPending = false;
 
   // Fetch pinned profiles for this state page
   const { data: pinnedProfiles } = usePinnedProfiles('state', normalizedStateSlug);
@@ -300,7 +309,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
   // Use SEO content if optimized, otherwise use defaults
   const pageTitle = seoContent?.meta_title || seoDataProp?.title || null;
   const pageDescription = seoContent?.meta_description || seoDataProp?.description || null;
-  const pageH1 = seoContent?.h1 || null;
+  const pageH1 = pageContent?.h1 || seoContent?.h1 || null;
 
   // Use SEO FAQs if available, otherwise use defaults
   // Note: parseFaqFromContent now returns { q, a }[] format
@@ -421,10 +430,10 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
         </div>
       </section>
 
-      {/* Page Intro Section - CMS Content */}
+      {/* Page Intro Section - CMS Content from page_content table */}
       <PageIntroSection
-        title={parsedContent?.sections?.[0]?.heading || null}
-        content={(seoContent as any)?.page_intro || parsedContent?.intro || parsedContent?.sections?.[0]?.content || null}
+        title={pageContent?.section_1_title || parsedContent?.sections?.[0]?.heading || seoContent?.h1 || null}
+        content={pageContent?.hero_intro || pageContent?.section_1_content || parsedContent?.intro || parsedContent?.sections?.[0]?.content || null}
         isLoading={isSeoContentPending}
       />
 
@@ -542,34 +551,18 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
         </div>
       </Section>
 
-      {/* SECTION 5: FAQ */}
-      <Section size="lg" className="bg-muted/30">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-10">
-            <span className="inline-block text-xs font-bold text-primary uppercase tracking-widest mb-2">Have Questions?</span>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-              Frequently Asked <span className="text-primary">Questions</span>
-            </h2>
+      {/* Content Section - from page_content body_content */}
+      {pageContent?.body_content && (
+        <Section size="md">
+          <div className="container px-4 max-w-4xl mx-auto">
+            <div className="prose max-w-none">
+              <div dangerouslySetInnerHTML={{ __html: pageContent.body_content
+                .replace(/^##\s+(.+)$/gm, '<h2 class="text-2xl font-bold mb-4 mt-8">$1</h2>')
+                .replace(/\n/g, '<br/>') }} />
+            </div>
           </div>
-
-          <Accordion type="single" collapsible defaultValue="faq-0" className="space-y-4">
-            {faqs.map((faq, i) => (
-              <AccordionItem
-                key={i}
-                value={`faq-${i}`}
-                className="bg-card border border-border rounded-2xl px-6 data-[state=open]:border-primary/30"
-              >
-                <AccordionTrigger className="text-left font-bold hover:no-underline py-5">
-                  {faq.q}
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-5">
-                  {faq.a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      </Section>
+        </Section>
+      )}
 
       {/* SECTION 6: Geographic Link Block - SEO Authority Distribution */}
       <Section size="md">
@@ -603,6 +596,22 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
                   </Link>
                   {idx < treatments.length - 1 && <span className="text-muted-foreground ml-2">·</span>}
                 </span>
+              ))}
+            </div>
+          </div>
+        </Section>
+      )}
+
+      {/* FAQs Section from page_content - after Browse Services */}
+      {pageContent?.faqs && Array.isArray(pageContent.faqs) && pageContent.faqs.length > 0 && (
+        <Section size="md">
+          <div className="container px-4 max-w-4xl mx-auto">
+            <div className="space-y-4">
+              {pageContent.faqs.map((faq: any, index: number) => (
+                <div key={index} className="bg-card rounded-xl p-4">
+                  <h3 className="font-semibold mb-2">{faq.question || faq.q}</h3>
+                  <p className="text-muted-foreground">{faq.answer || faq.a}</p>
+                </div>
               ))}
             </div>
           </div>

@@ -6,7 +6,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs, seoH1, heroIntro, content, allSeoData }: {
+const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs, seoH1, heroIntro, content, section1Title, section1Content, section2Title, section2Content, section3Title, section3Content, allSeoData }: {
     stateSlug: string;
     citySlug: string;
     serviceSlug: string;
@@ -18,6 +18,12 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
     seoH1: string | null;
     heroIntro?: string | null;
     content?: string | null;
+    section1Title?: string | null;
+    section1Content?: string | null;
+    section2Title?: string | null;
+    section2Content?: string | null;
+    section3Title?: string | null;
+    section3Content?: string | null;
     allSeoData?: any;
 }) => {
     const treatmentName = treatmentData?.name || serviceSlug;
@@ -84,6 +90,12 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
                 seoH1Prop={seoH1}
                 heroIntroProp={heroIntro}
                 contentProp={content}
+                section1TitleProp={section1Title}
+                section1ContentProp={section1Content}
+                section2TitleProp={section2Title}
+                section2ContentProp={section2Content}
+                section3TitleProp={section3Title}
+                section3ContentProp={section3Content}
                 allSeoDataProp={allSeoData}
             />
         </>
@@ -194,11 +206,22 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const stateName = stateData.name;
     const cityName = cityData?.name || citySlug;
     const treatmentName = treatmentData?.name || serviceSlug;
-    const metaTitle = seoContent?.meta_title || null;
-    const metaDescription = seoContent?.meta_description || null;
-    const seoH1 = seoContent?.h1 || null;
-    const heroIntro = seoContent?.page_intro || null;
+    
+    // Extract ALL SEO content fields for server-side rendering
+    const metaTitle = seoContent?.meta_title || `${treatmentName} in ${cityName}, ${stateName} (2026) — Book Now | AppointPanda`;
+    const metaDescription = seoContent?.meta_description || `Get ${treatmentName.toLowerCase()} treatment in ${cityName}, ${stateName}. Compare top clinics, check AED prices, read verified reviews. Book your appointment today.`;
+    const seoH1 = seoContent?.h1 || `Best ${treatmentName} in ${cityName}`;
+    const heroIntro = seoContent?.page_intro || seoContent?.content?.substring(0, 200) || null;
     const content = seoContent?.content || null;
+    
+    // Extract additional sections - cast to any for flexibility
+    const seoContentAny = seoContent as any;
+    const section1Title = seoContentAny?.section_1_title || null;
+    const section1Content = seoContentAny?.section_1_content || null;
+    const section2Title = seoContentAny?.section_2_title || null;
+    const section2Content = seoContentAny?.section_2_content || null;
+    const section3Title = seoContentAny?.section_3_title || null;
+    const section3Content = seoContentAny?.section_3_content || null;
 
     let ssrFaqs: { question: string; answer: string }[] = [];
     
@@ -226,6 +249,13 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             seoH1: seoH1,
             heroIntro,
             content,
+            // Additional sections for SEO
+            section1Title,
+            section1Content,
+            section2Title,
+            section2Content,
+            section3Title,
+            section3Content,
             allSeoData: seoContent,
         },
         revalidate: 600,

@@ -6,7 +6,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1, stateRatings, topClinics }: {
+const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1, stateRatings, topClinics, pageContentData, allSeoData }: {
     stateSlug: string;
     stateData: any;
     citiesData: any[];
@@ -15,6 +15,8 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
     seoH1: string | null;
     stateRatings?: { avgRating: number; totalReviews: number; clinicCount: number };
     topClinics?: { name: string; slug: string; rating: number; review_count: number }[];
+    pageContentData?: any;
+    allSeoData?: any;
 }) => {
     const stateName = stateData?.name || stateSlug;
     const clinicCount = stateRatings?.clinicCount || 0;
@@ -95,7 +97,7 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
                     />
                 )}
             </Head>
-            <StatePageComponent 
+<StatePageComponent 
                 stateSlugProp={stateSlug}
                 stateDataProp={stateData}
                 citiesDataProp={citiesData}
@@ -104,6 +106,8 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
                 seoH1Prop={seoH1}
                 stateRatingsProp={stateRatings}
                 topClinicsProp={topClinics}
+                allSeoDataProp={allSeoData}
+                pageContentDataProp={pageContentData}
             />
         </>
     );
@@ -168,7 +172,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
     
-    const [seoContent, citiesData] = await Promise.all([
+    const [seoContent, citiesData, pageContent] = await Promise.all([
         supabase
             .from("seo_pages")
             .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
@@ -184,7 +188,15 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .eq('is_active', true)
             .order('name')
             .limit(100)
-            .then(r => r.data) as Promise<any[]>
+            .then(r => r.data) as Promise<any[]>,
+        supabase
+            .from('page_content')
+            .select('*')
+            .eq('page_type', 'state')
+            .in('page_slug', [normalizedStateSlug, `/${normalizedStateSlug}`])
+            .eq('is_published', true)
+            .maybeSingle()
+            .then(r => r.data) as Promise<any>
     ]);
 
     // Fetch state ratings and top clinics
@@ -258,6 +270,10 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             seoH1: seoH1,
             stateRatings: stateRatingsData,
             topClinics: topClinicsData?.data || [],
+            // Pass full SEO content for component to use (no client fetch)
+            allSeoData: seoContent,
+            // Pass page_content for state pages
+            pageContentData: pageContent,
         },
         revalidate: 600,
     };

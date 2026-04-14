@@ -6,11 +6,13 @@ import DentistPageComponent from '@/pages/DentistPage';
 // Wrapper component to render SEO meta tags server-side
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData, faqs }: {
+const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData, faqs, treatmentsData, reviewsData }: {
     dentistSlug: string;
     dentistData: any;
     seoData: { title: string; description: string; canonical: string; ogImage?: string };
     faqs?: { question: string; answer: string }[];
+    treatmentsData?: any[];
+    reviewsData?: any[];
 }) => {
     const physicianSchema = {
         "@context": "https://schema.org",
@@ -112,6 +114,8 @@ const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData, faqs }: {
                 dentistSlugProp={dentistSlug} 
                 dentistDataProp={dentistData}
                 seoDataProp={seoData}
+                treatmentsData={treatmentsData}
+                reviewsData={reviewsData}
             />
         </>
     );
@@ -155,27 +159,49 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     const seoSlug = `dentist/${dentistSlug}`;
 
-    // Direct queries instead of React Query for faster build
-    const [dentist, seoContent] = await Promise.all([
-        supabase
-            .from("dentists")
-            .select("*, clinic:clinics(name, slug, city:cities(name, slug, state:states(name, slug, abbreviation)))")
-            .eq("slug", dentistSlug)
-            .maybeSingle()
-            .then(r => r.data),
-        supabase
-            .from("seo_pages")
-            .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
-            .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
-            .order("is_optimized", { ascending: false })
-            .limit(1)
-            .maybeSingle()
-            .then(r => r.data)
-    ]);
+    // Fetch dentist and SEO content
+    const dentist = await supabase
+        .from("dentists")
+        .select("*, clinic:clinics(id, name, slug, city:cities(name, slug, state:states(name, slug, abbreviation)))")
+        .eq("slug", dentistSlug)
+        .maybeSingle()
+        .then(r => r.data);
 
     if (!dentist) {
         return { notFound: true };
     }
+
+    const seoContent = await supabase
+        .from("seo_pages")
+        .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
+        .or(`slug.eq.${seoSlug},slug.eq./${seoSlug}`)
+        .order("is_optimized", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+        .then(r => r.data);
+
+    // Fetch treatments for this dentist's clinic (for SEO)
+    const treatments = dentist.clinic_id ? await supabase
+        .from("clinic_treatments")
+        .select("*, treatment:treatments(id, name, slug)")
+        .eq("clinic_id", dentist.clinic_id)
+        .then(r => r.data || []) : [];
+
+    // Fetch reviews for this dentist's clinic (for SEO) - limit to 10 most recent
+    const reviews = dentist.clinic_id ? await supabase
+        .from("review_funnel_events")
+        .select("id, rating, comment, created_at, visitor_id")
+        .eq("clinic_id", dentist.clinic_id)
+        .eq("event_type", "rating_submitted")
+        .order("created_at", { ascending: false })
+        .limit(10)
+        .then(r => (r.data || []).map((review: any) => ({
+            id: review.id,
+            patient_name: review.visitor_id || 'Anonymous',
+            rating: review.rating || 5,
+            content: review.comment || '',
+            created_at: review.created_at,
+        }))) : [];
     
     const clinicName = dentist.clinic?.name || 'Dental Clinic';
     const cityName = dentist.clinic?.city?.name || 'UAE';
@@ -195,6 +221,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 ogImage: dentist.image_url || null,
             },
             faqs,
+            treatmentsData: treatments,
+            reviewsData: reviews,
         },
         revalidate: 600
     };

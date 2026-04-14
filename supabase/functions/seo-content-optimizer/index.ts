@@ -107,7 +107,6 @@ serve(async (req) => {
     });
 
     // DISABLED CODE BELOW - Keeping for reference during transition period
-    /*
     // Helper to call AI with retries for transient errors (502, 503, 504) and connection errors
     async function callAIWithRetry(body: object, maxRetries = 4): Promise<Response> {
       let lastError: Error | null = null;

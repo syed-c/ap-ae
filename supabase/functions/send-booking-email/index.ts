@@ -34,14 +34,24 @@ async function getEmailSettings(supabase: any): Promise<EmailSettings | null> {
     .eq('key', 'email')
     .single();
 
+  let fromEmail = '';
+  
   if (data?.value) {
     const settings = data.value as unknown as EmailSettings;
-    return settings;
+    fromEmail = settings.from_email?.trim() || '';
+    // Ensure sender is using verified domain - must have @ and domain after @
+    if (fromEmail && fromEmail.includes('@') && fromEmail.split('@')[1]?.length > 0) {
+      console.log('Using from_email from global_settings:', fromEmail);
+      return settings;
+    }
   }
 
-  // Default sender should be on your verified domain.
+  // CRITICAL: Must use verified domain - Resend 403 if sender not on verified domain
+  // Ensure lowercase domain: appointpanda.ae (not AppointPanda.ae)
+  fromEmail = 'noreply@appointpanda.ae';
+  console.log('Using default verified sender:', fromEmail);
   return {
-    from_email: 'no-reply@AppointPanda.ae',
+    from_email: fromEmail,
     from_name: 'AppointPanda',
   };
 }
@@ -68,7 +78,7 @@ async function sendEmailViaResend(
     const cleanHtml = minifyHtml(html);
 
     const fromName = (settings.from_name || 'AppointPanda').trim() || 'AppointPanda';
-    const fromEmail = (settings.from_email || '').trim() || 'no-reply@AppointPanda.ae';
+    const fromEmail = (settings.from_email || '').trim().toLowerCase() || 'noreply@appointpanda.ae';
 
     const send = async () => {
       const response = await fetch('https://api.resend.com/emails', {

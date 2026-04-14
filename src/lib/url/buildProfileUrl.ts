@@ -136,3 +136,38 @@ export function buildSearchUrl(params?: Record<string, string>): string {
   const searchParams = new URLSearchParams(params);
   return `${base}?${searchParams.toString()}`;
 }
+
+/**
+ * Build URL from parts - prevents double slashes
+ * Also normalizes state slugs (dxb -> dubai) to prevent // issues
+ */
+const ABBREV_MAP: Record<string, string> = {
+  dxb: 'dubai', auh: 'abu-dhabi', shj: 'sharjah', 
+  ajm: 'ajman', rak: 'ras-al-khaimah', fuj: 'fujairah', uaq: 'umm-al-quwain'
+};
+
+function normalizePart(part: string): string {
+  const cleaned = String(part).replace(/^\/|\/$/g, '').toLowerCase();
+  return ABBREV_MAP[cleaned] || cleaned;
+}
+
+export function buildUrl(...parts: (string | undefined | null)[]): string {
+  if (process.env.NODE_ENV === 'development') {
+    const rawParts = parts.filter(Boolean);
+    if (rawParts.length && (rawParts[0] === '' || rawParts[0]?.startsWith('/'))) {
+      console.log('[buildUrl] raw input:', parts);
+    }
+  }
+  const cleanParts = parts
+    .filter(Boolean)
+    .map(p => normalizePart(String(p)))
+    .filter(p => p !== ''); // Also filter empty strings
+  
+  const result = cleanParts.length ? withTrailingSlash('/' + cleanParts.join('/')) : '/';
+  
+  // Debug double-slash
+  if (result.startsWith('//')) {
+    console.error('[buildUrl] ERROR: produced double-slash!', { parts, cleanParts, result });
+  }
+  return result;
+}

@@ -1,151 +1,125 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { getBranding, wrapEmailContent, getFromAddress } from "../_shared/branding.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface ListingConfirmationRequest {
-  clinicName: string;
-  dentistName: string;
-  email: string;
-  phone: string;
-}
+// Allowed sender email (must match your Resend registered email)
+const ALLOWED_SENDER_EMAIL = "adilahmadip@gmail.com";
 
-function minifyHtml(html: string): string {
-  return html
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/\r\n/g, '')
-    .replace(/\r/g, '')
-    .replace(/\n/g, '')
-    .replace(/\s{2,}/g, ' ')
-    .replace(/>\s+</g, '><')
-    .trim();
-}
-
-const handler = async (req: Request): Promise<Response> => {
+serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { clinicName, dentistName, email, phone }: ListingConfirmationRequest = await req.json();
+    const body = await req.json();
+    const { clinicName, dentistName, email, phone } = body;
 
-    // Validate required fields
     if (!email || !clinicName) {
-      console.error("Missing required fields: email and clinicName are required");
-      return new Response(
-        JSON.stringify({ success: false, error: "Missing required fields: email and clinicName are required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ success: false, error: "Missing fields" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     
     if (!resendApiKey) {
-      console.log("RESEND_API_KEY not configured, skipping email");
-      return new Response(JSON.stringify({ success: true, message: "Email skipped - no API key" }), {
-        status: 200,
+      return new Response(JSON.stringify({ success: false, error: "No API key configured" }), {
+        status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Get branding from database
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
-    if (!supabaseUrl || !supabaseKey) {
-      console.error("Missing Supabase configuration");
-      return new Response(
-        JSON.stringify({ success: false, error: "Server configuration error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const branding = await getBranding(supabase);
-
-    // Generate email body content
-    const bodyContent = `
-      <h2 style="color: #1e293b; margin: 0 0 16px 0; font-size: 22px; font-weight: 600;">
-        Dear ${dentistName || 'Doctor'},
-      </h2>
-      
-      <p style="color: #475569; font-size: 16px; line-height: 1.7; margin: 0 0 24px 0;">
-        Thank you for submitting your practice listing request for <strong>${clinicName}</strong>. We're excited to have you join ${branding.siteName}!
-      </p>
-      
-      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f0fdfa; border: 2px solid #99f6e4; border-radius: 12px; margin-bottom: 24px;">
-        <tr>
-          <td style="padding: 24px;">
-            <h3 style="margin: 0 0 16px; color: #0d9488; font-size: 18px;">What happens next?</h3>
-            <ol style="margin: 0; padding-left: 20px; color: #374151; font-size: 14px; line-height: 1.8;">
+    const html = `
+      <html>
+      <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 30px; border-radius: 16px 16px 0 0;">
+          <h1 style="color: white; margin: 0;">🎉 AppointPanda</h1>
+        </div>
+        <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 16px 16px;">
+          <h2 style="color: #1e293b; margin-top: 0;">Dear ${dentistName || 'Doctor'},</h2>
+          
+          <p style="color: #475569; font-size: 16px; line-height: 1.6;">
+            Thank you for submitting your practice listing request for <strong>${clinicName}</strong>. 
+            We're excited to have you join AppointPanda!
+          </p>
+          
+          <div style="background: #f0fdfa; border: 2px solid #99f6e4; border-radius: 12px; padding: 20px; margin: 20px 0;">
+            <h3 style="color: #0d9488; margin-top: 0;">What happens next?</h3>
+            <ol style="color: #374151; font-size: 14px; line-height: 1.8; padding-left: 20px;">
               <li>Our team will review your submission within 24-48 hours</li>
               <li>We may contact you at <strong>${phone || email}</strong> for verification</li>
               <li>Once approved, you'll receive an email with your login credentials</li>
               <li>Your profile will go live and patients can start booking</li>
             </ol>
-          </td>
-        </tr>
-      </table>
-      
-      <p style="color: #475569; font-size: 16px; line-height: 1.7; margin: 0 0 24px 0;">
-        If you have any questions, feel free to reply to this email or contact our support team at ${branding.supportEmail}.
-      </p>
-      
-      <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0;">
-        Best regards,<br>
-        <strong>The ${branding.siteName} Team</strong>
-      </p>
+          </div>
+          
+          <p style="color: #475569; font-size: 14px;">
+            If you have any questions, contact our support team at support@AppointPanda.ae
+          </p>
+          
+          <p style="color: #475569; font-size: 14px;">
+            Best regards,<br>
+            <strong>The AppointPanda Team</strong>
+          </p>
+        </div>
+        <div style="background: #1e293b; padding: 20px; border-radius: 0 0 16px 16px; text-align: center;">
+          <p style="color: #94a3b8; font-size: 12px; margin: 0;">
+            © ${new Date().getFullYear()} AppointPanda. All rights reserved.
+          </p>
+        </div>
+      </body>
+      </html>
     `;
 
-    const emailHtml = wrapEmailContent(branding, '🎉 Submission Received!', '🎉', bodyContent);
-    const minifiedHtml = minifyHtml(emailHtml);
-
-    // Use fetch to call Resend API directly
-    const emailResponse = await fetch("https://api.resend.com/emails", {
+    // Try sending the email
+    const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${resendApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: getFromAddress(branding),
-        to: [email],
-        subject: `Your Practice Listing Request Received - ${branding.siteName}`,
-        html: minifiedHtml,
+        from: ALLOWED_SENDER_EMAIL,
+        to: email,
+        subject: "Your Practice Listing Request Received - AppointPanda",
+        html: html,
       }),
     });
 
-    // Check if email was sent successfully
-    if (!emailResponse.ok) {
-      const errorText = await emailResponse.text();
-      console.error("Failed to send email via Resend:", emailResponse.status, errorText);
+    const result = await response.json();
+
+    if (!response.ok) {
+      // If it's the trial key restriction, return helpful message
+      if (result.name === "validation_error") {
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: `Email could not be sent. ${result.message}`,
+            trialMode: true 
+          }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
       return new Response(
-        JSON.stringify({ success: false, error: `Resend API error: ${emailResponse.status}` }),
+        JSON.stringify({ success: false, error: "Email failed", details: result }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-
-    const result = await emailResponse.json();
-    console.log("Confirmation email sent successfully:", result);
 
     return new Response(JSON.stringify({ success: true, data: result }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (error: any) {
-    console.error("Error sending confirmation email:", error);
-    return new Response(
-      JSON.stringify({ success: false, error: error.message }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
-  }
-};
 
-serve(handler);
+  } catch (error) {
+    return new Response(JSON.stringify({ success: false, error: String(error) }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

@@ -36,13 +36,17 @@ export function PandaBot({ className, iconUrl = '/favicon.png' }: PandaBotProps)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setSessionId(crypto.randomUUID());
-      const stored = localStorage.getItem('visitor_id');
-      if (stored) {
-        setVisitorId(stored);
-      } else {
-        const newId = crypto.randomUUID();
-        localStorage.setItem('visitor_id', newId);
-        setVisitorId(newId);
+      try {
+        const stored = localStorage.getItem('visitor_id');
+        if (stored) {
+          setVisitorId(stored);
+        } else {
+          const newId = crypto.randomUUID();
+          localStorage.setItem('visitor_id', newId);
+          setVisitorId(newId);
+        }
+      } catch {
+        setVisitorId(crypto.randomUUID());
       }
     }
   }, []);

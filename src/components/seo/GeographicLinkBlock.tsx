@@ -19,6 +19,7 @@ import {
   Building2,
   Navigation
 } from "lucide-react";
+import { buildUrl } from "@/lib/url/buildProfileUrl";
 
 // Neighboring emirate/state relationships (UAE + existing US states)
 const NEIGHBORING_STATES: Record<string, { name: string; slug: string }[]> = {
@@ -141,7 +142,7 @@ export const GeographicLinkBlock = ({
               {topCities.slice(0, 6).map((city) => (
                 <Link
                   key={city.slug}
-                  href={`/${stateSlug}/${city.slug}/`}
+                  href={buildUrl(stateSlug, city.slug)}
                   className="block text-sm text-foreground hover:text-primary transition-colors"
                 >
                   Dentists in {city.name} →
@@ -209,7 +210,7 @@ export const GeographicLinkBlock = ({
           </h3>
           <div className="grid md:grid-cols-2 gap-4">
             <Link
-              href={`/${stateSlug}/`}
+              href={buildUrl(stateSlug)}
               className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
             >
               <span className="font-medium">All of {stateName}</span>
@@ -249,7 +250,7 @@ export const GeographicLinkBlock = ({
               {services.slice(0, 6).map((service) => (
                 <Link
                   key={service.slug}
-                  href={`/${stateSlug}/${citySlug}/${service.slug}/`}
+                  href={buildUrl(stateSlug, citySlug, service.slug)}
                   className="block text-sm text-foreground hover:text-primary transition-colors"
                 >
                   {service.name} →
@@ -267,7 +268,7 @@ export const GeographicLinkBlock = ({
               {nearbyCities.slice(0, 6).map((city) => (
                 <Link
                   key={city.slug}
-                  href={`/${stateSlug}/${city.slug}/`}
+                  href={buildUrl(stateSlug, city.slug)}
                   className="block text-sm text-foreground hover:text-primary transition-colors"
                 >
                   Dentists in {city.name} →
@@ -283,7 +284,7 @@ export const GeographicLinkBlock = ({
             </h4>
             <nav className="space-y-1.5">
               <Link
-                href={`/${stateSlug}/`}
+                href={buildUrl(stateSlug)}
                 className="block text-sm text-foreground hover:text-primary transition-colors"
               >
                 All cities in {stateName} →
@@ -328,7 +329,7 @@ export const GeographicLinkBlock = ({
               {nearbyCities.slice(0, 5).map((city) => (
                 <Link
                   key={city.slug}
-                  href={`/${stateSlug}/${city.slug}/${serviceSlug}/`}
+                  href={buildUrl(stateSlug, city.slug, serviceSlug)}
                   className="block text-sm text-foreground hover:text-primary transition-colors"
                 >
                   {serviceName} in {city.name} →
@@ -346,14 +347,14 @@ export const GeographicLinkBlock = ({
               {relatedServices.map((service) => (
                 <Link
                   key={service.slug}
-                  href={`/${stateSlug}/${citySlug}/${service.slug}/`}
+                  href={buildUrl(stateSlug, citySlug, service.slug)}
                   className="block text-sm text-foreground hover:text-primary transition-colors"
                 >
                   {service.name} →
                 </Link>
               ))}
               <Link
-                href={`/${stateSlug}/${citySlug}/`}
+                href={buildUrl(stateSlug, citySlug)}
                 className="block text-sm text-primary hover:underline font-medium mt-2"
               >
                 All services in {cityName} →
@@ -368,13 +369,13 @@ export const GeographicLinkBlock = ({
             </h4>
             <nav className="space-y-1.5">
               <Link
-                href={`/${stateSlug}/${citySlug}/`}
+                href={buildUrl(stateSlug, citySlug)}
                 className="block text-sm text-foreground hover:text-primary transition-colors"
               >
                 All dentists in {cityName} →
               </Link>
               <Link
-                href={`/${stateSlug}/`}
+                href={buildUrl(stateSlug)}
                 className="block text-sm text-foreground hover:text-primary transition-colors"
               >
                 All cities in {stateName} →

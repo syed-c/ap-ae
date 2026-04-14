@@ -266,10 +266,15 @@ export function SearchBox({
         router.push(`/insurance/${insurance}?${params.toString()}/`);
         return;
       }
-      if (treatment) {
-        router.push(`/${targetStateSlug}/${citySlug}/${treatment}/`);
+      if (targetStateSlug && citySlug) {
+        const path = treatment 
+          ? `/${targetStateSlug}/${citySlug}/${treatment}/`
+          : `/${targetStateSlug}/${citySlug}/`;
+        router.push(path);
+      } else if (stateContext) {
+        router.push(`/${stateContext}/`);
       } else {
-        router.push(`/${targetStateSlug}/${citySlug}/`);
+        router.push('/search/');
       }
     } else if (insurance) {
       router.push(`/insurance/${insurance}/`);

@@ -119,9 +119,14 @@ export function useSiteSettings() {
           return DEFAULT_SITE_SETTINGS;
         }
 
+        // If no data, return defaults
+        if (!data || data.length === 0) {
+          return DEFAULT_SITE_SETTINGS;
+        }
+
         // Parse settings into a map
         const settingsMap: Record<string, Record<string, unknown>> = {};
-        data?.forEach(s => {
+        data?.forEach((s: { key: string; value: unknown }) => {
           settingsMap[s.key] = s.value as Record<string, unknown>;
         });
 

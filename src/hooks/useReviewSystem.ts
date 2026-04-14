@@ -135,7 +135,7 @@ export function useReviewRequestByCode(shortCode: string) {
           clinic:clinics(id, name, slug, google_place_id, cover_image_url)
         `)
         .eq('short_code', shortCode)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       return data as unknown as ReviewRequest;
@@ -208,7 +208,7 @@ export function useReviewClicks(clinicId?: string) {
     queryFn: async () => {
       let query = supabase
         .from('review_clicks')
-        .select('*')
+        .select('id, clinic_id, action, request_id, user_agent, created_at')
         .order('created_at', { ascending: false });
       
       if (clinicId) {
