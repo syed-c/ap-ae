@@ -631,56 +631,76 @@ const CONTENT_ANGLES = [
 ];
 
 // Service-specific prompts for generating unique service pages
-const SERVICE_PROMPTS: Record<string, { angle: string; pain_points: string; why_unique: string }> = {
+const SERVICE_PROMPTS: Record<string, { angle: string; pain_points: string; why_unique: string; clinical_notes: string; insurance_note: string }> = {
   "invisalign": {
-    angle: "invisible orthodontic solution for professionals",
-    pain_points: "Adults don't want metal braces in business meetings, concerns about treatment duration, unsure about effectiveness vs traditional braces",
-    why_unique: "Unlike braces, aligners are removable for meetings and eating - most clinics offer free consultations"
+    angle: "invisible orthodontic treatment for adults who cannot or do not want metal braces",
+    pain_points: "Adults feel self-conscious about metal braces in professional or social settings. Many are unsure whether aligners are as effective as traditional braces. Cost is a significant concern — Invisalign is premium-priced. Patients worry about discipline (remembering to wear aligners) and about whether their case is too complex for aligners.",
+    why_unique: "Aligners are removable, which matters in UAE's professional and social culture. Most DHA-licensed orthodontists offer Invisalign. Free consultations are common. Different Invisalign tiers exist — Lite, Moderate, Comprehensive — and patients are often sold a tier higher than they need. Case complexity is genuinely important.",
+    clinical_notes: "Invisalign is effective for mild to moderate orthodontic issues including crowding, spacing, and some bite correction. Severe skeletal malocclusions typically require traditional braces or surgical intervention. Aligners must be worn 20 to 22 hours per day for results. Treatment duration ranges from 6 months (Lite) to 24 months (Comprehensive). Attachments (small tooth-coloured bumps) are often used to improve aligner grip.",
+    insurance_note: "Orthodontic treatment is partially covered by some UAE corporate insurance plans, typically up to AED 3,000 to 5,000 lifetime maximum. Invisalign is usually not fully covered. Check your Daman, AXA, or ADNIC plan specifically."
   },
   "dental-implants": {
-    angle: "permanent tooth replacement solution",
-    pain_points: "Fear of surgery, cost concerns, unsure about implant brands, recovery time worries",
-    why_unique: "Implants feel like natural teeth - different brands have different warranties, some offer same-day implants"
+    angle: "permanent tooth replacement for adults who have lost one or more teeth",
+    pain_points: "Fear of surgery and pain. Concern about the multi-month process — most implant cases involve 3 to 6 months of healing between stages. Cost is the primary barrier — implants are among the most expensive dental treatments. Patients are confused by different implant brands and unsure how to evaluate quality. Some have been told they do not have enough bone.",
+    why_unique: "UAE has a wide range of implant quality — from budget Korean or Chinese brands at community clinics to premium Swiss brands (Straumann, Nobel Biocare) at specialist centres. The same implant procedure can cost AED 4,000 to AED 12,000+ depending on brand, clinic, and case complexity. Bone grafting adds cost and time and is genuinely required for some cases.",
+    clinical_notes: "Implants are titanium posts surgically placed into the jawbone, which fuse with bone through osseointegration over 3 to 6 months. A crown is placed on top. Success rates exceed 95% in patients with adequate bone density and healthy gums. Implants are not appropriate for patients with uncontrolled diabetes, heavy smokers, or patients with inadequate bone without grafting. All-on-4 and all-on-6 are valid options for patients needing multiple replacements.",
+    insurance_note: "Dental implants are rarely covered by UAE insurance plans. A few premium corporate plans include partial implant coverage. Most patients pay out of pocket. Payment plans are available at many specialist clinics."
   },
   "veneers": {
-    angle: "instant smile transformation",
-    pain_points: "Cost per tooth, fear of tooth reduction, unsure about longevity, different material options (porcelain vs composite)",
-    why_unique: "Veneers can transform your smile in 2 visits - but quality varies significantly by clinic and material"
+    angle: "cosmetic smile enhancement through thin porcelain or composite shells bonded to front teeth",
+    pain_points: "Cost per tooth is a shock for many patients — porcelain veneers can run AED 1,500 to AED 3,500 per tooth. Patients fear irreversible tooth reduction. They are uncertain about material differences (porcelain vs composite). They are also unsure about longevity and maintenance. And they worry about looking unnatural.",
+    why_unique: "Composite veneers are significantly cheaper but last 3 to 5 years versus 10 to 15 for porcelain. Many UAE clinics upsell patients from composite to porcelain unnecessarily. Minimal-prep and no-prep veneers are available at premium clinics and preserve more natural tooth structure. The quality of the ceramist and dental technician matters enormously for natural appearance.",
+    clinical_notes: "Traditional porcelain veneers require 0.3 to 0.7mm of enamel removal, which is irreversible. No-prep veneers (e.g., Lumineers) require little to no reduction but are thicker and may appear bulkier. Composite veneers are applied directly chairside in one visit. Porcelain veneers require two visits and are crafted by a lab technician. Veneers are not suitable for patients with bruxism unless a night guard is used.",
+    insurance_note: "Veneers are cosmetic and not covered by UAE insurance plans. Full out-of-pocket cost."
   },
   "teeth-whitening": {
-    angle: "quick cosmetic improvement",
-    pain_points: "Sensitivity concerns, results not lasting, in-office vs at-home options, unsafe whitening products",
-    why_unique: "Professional whitening is safer and faster than DIY kits - results can last 1-3 years with proper care"
+    angle: "fast cosmetic improvement of tooth colour for individuals unhappy with staining or discolouration",
+    pain_points: "Sensitivity during or after treatment is the most common concern. Results vary significantly by cause of staining — external stains whiten well, intrinsic discolouration does not respond the same way. Patients are confused by the many at-home products on the market. Longevity concerns — coffee, tea, red wine, and smoking all cause re-staining.",
+    why_unique: "In-office whitening in UAE typically uses Zoom or Philips systems, taking 60 to 90 minutes. Results are visible immediately. Take-home trays are a cost-effective alternative and often produce equally good results with less sensitivity over 2 to 4 weeks. Laser whitening is marketed heavily but the laser primarily activates the gel — the gel does the work. Tetracycline-stained or fluorosed teeth respond poorly to whitening.",
+    clinical_notes: "Professional whitening uses hydrogen peroxide (in-office: 25% to 40%) or carbamide peroxide (take-home: 10% to 22%). Sensitivity is a known side effect, usually resolving within 24 to 48 hours. Crowns, veneers, and composite fillings do not whiten. Patients should avoid staining foods and drinks for 48 hours post-treatment. Results typically last 6 to 18 months depending on lifestyle habits.",
+    insurance_note: "Teeth whitening is cosmetic and not covered by any standard UAE insurance plan."
   },
   "root-canal": {
-    angle: "saving damaged teeth",
-    pain_points: "Fear of pain, multiple visits needed, crown needed after, cost vs extraction",
-    why_unique: "Root canals save your natural tooth - modern techniques make it virtually painless"
+    angle: "saving a severely decayed or infected tooth by removing the pulp and sealing the canal",
+    pain_points: "Patients fear the procedure is painful — this is the most common dental phobia. Many also consider simply extracting the tooth because it seems simpler or cheaper. Multiple visits concern time-strapped patients. The cost of both the root canal and the crown required afterward surprises many.",
+    why_unique: "Modern root canal treatment with good anaesthesia is typically no more painful than a filling. Single-visit root canals are available at many UAE clinics. The follow-up crown is essential — root canal-treated teeth become brittle and fracture without a crown. A root canal + crown is still usually cheaper than extraction + implant, and preserving natural teeth is always the better long-term outcome.",
+    clinical_notes: "Root canal treatment (endodontic therapy) removes infected or inflamed pulp tissue, shapes the canal, and fills it with gutta-percha. Success rates exceed 90% for straightforward cases. Complex cases may require referral to an endodontist. Post-procedure, a crown is almost always necessary to prevent fracture. Swelling and mild soreness are expected for 2 to 3 days post-procedure.",
+    insurance_note: "Root canal treatment is typically covered by UAE dental insurance as a restorative procedure. Coverage levels and co-pays vary significantly by plan. The crown required afterward may be partially covered or capped."
   },
   "dental-crowns": {
-    angle: "protecting damaged teeth",
-    pain_points: "Cost differences between materials, same-day vs multiple visits, durability concerns",
-    why_unique: "Crowns protect weak teeth - same-day crowns now available at many clinics using CAD/CAM technology"
+    angle: "restoring damaged, decayed, or weakened teeth with a tooth-shaped cap",
+    pain_points: "Patients are confused by the many material options — porcelain-fused-to-metal (PFM), full zirconia, eMax ceramic. Cost varies by material. Same-day crowns versus lab-made crowns create questions about quality and timing. Patients also worry about the preparation process — the tooth is reshaped, which is irreversible.",
+    why_unique: "CAD/CAM technology allows same-day crowns at many UAE clinics — the crown is designed digitally and milled in the clinic within a few hours. This eliminates the temporary crown stage. Zirconia crowns are now the most commonly placed as they combine strength and aesthetics. PFM crowns show a dark line at the gum over time. eMax is preferred for front teeth aesthetics.",
+    clinical_notes: "Crown placement requires reducing the tooth by 1 to 2mm on all surfaces to accommodate the crown. Local anaesthesia is used. A temporary crown protects the tooth while the lab fabricates the permanent one (typically 5 to 10 days). Same-day CEREC crowns are available at equipped clinics. Crown lifespan ranges from 10 to 25 years depending on material, occlusion, and oral hygiene.",
+    insurance_note: "Crowns for restorative purposes (after root canal, for fractured teeth) are typically covered by UAE insurance as restorative treatment. Cosmetic crown placement is not covered. Pre-authorisation is often required."
   },
   "braces": {
-    angle: "traditional orthodontic treatment",
-    pain_points: "Appearance concerns, food restrictions, cleaning difficulties, treatment duration",
-    why_unique: "Modern braces are smaller and less visible - lingual braces hide completely behind teeth"
+    angle: "traditional orthodontic treatment using brackets and wires to align teeth and correct bite",
+    pain_points: "Appearance is the primary concern for adults — metal braces are visible. Food restrictions cause frustration. Oral hygiene around brackets is difficult. Treatment duration (18 to 36 months) feels daunting. Patients are often unsure whether they should do braces or Invisalign.",
+    why_unique: "Modern braces are smaller and lower-profile than older generations. Ceramic (tooth-coloured) braces are available for less visible treatment. Lingual braces (placed on the inner surface of teeth) are completely invisible but significantly more expensive and complex. Braces are often more effective than aligners for complex cases including significant bite issues.",
+    clinical_notes: "Traditional metal braces use stainless steel brackets bonded to teeth and connected by archwires that are adjusted monthly. Ceramic braces use tooth-coloured brackets and are less visible but slightly more fragile. Lingual braces are bonded to the inner tooth surface. Self-ligating braces reduce friction and may shorten treatment time. Retainers are essential after treatment to prevent relapse.",
+    insurance_note: "Orthodontic coverage varies significantly by UAE plan. Some plans cover up to AED 5,000 lifetime for orthodontics. Many plans exclude adults over 18. Pre-authorisation and a formal treatment plan are typically required before coverage is confirmed."
   },
   "tooth-extraction": {
-    angle: "removing problem teeth",
-    pain_points: "Pain concerns, swelling management, wisdom teeth complications, cost differences",
-    why_unique: "Wisdom teeth removal is common - costs vary significantly based on complexity and anesthesia type"
+    angle: "removing a damaged, decayed, infected, or impacted tooth when preservation is not possible",
+    pain_points: "Fear of pain during the procedure. Concerns about post-extraction pain and swelling management. Wisdom tooth extractions are particularly anxiety-inducing. Patients are unsure whether they need a simple extraction or a surgical one. Cost differences between simple and surgical extractions surprise many.",
+    why_unique: "Simple extractions (fully erupted teeth) are straightforward and typically completed in one visit. Wisdom tooth extractions vary enormously in complexity — impacted wisdom teeth require surgical extraction, sometimes under sedation. In UAE, sedation options are available at oral surgery centres. Recovery typically takes 3 to 7 days. Dry socket (alveolar osteitis) is the most common complication, affecting roughly 2 to 5% of cases.",
+    clinical_notes: "Simple extractions use local anaesthesia and take 10 to 30 minutes. Surgical extractions may require an incision and bone removal for impacted teeth, taking 30 to 60 minutes. Post-operative care: bite on gauze for 30 to 60 minutes, avoid smoking, rinsing, or straws for 24 hours, soft food diet for several days. Antibiotics are prescribed in infection cases. Pain management with ibuprofen and paracetamol is typically sufficient.",
+    insurance_note: "Extractions are generally covered by UAE dental insurance as restorative or oral surgery procedures. Surgical extractions may require pre-authorisation. Wisdom teeth extractions are covered by most plans if clinically indicated."
   },
   "dental-check-up": {
-    angle: "preventive dental care",
-    pain_points: "Finding time, cost of x-rays, what to expect, how often to visit",
-    why_unique: "Regular checkups prevent major problems - most clinics offer free first consultations"
+    angle: "routine preventive dental examination and cleaning to maintain oral health and catch problems early",
+    pain_points: "Adults in UAE often delay checkups due to time pressure, cost concerns, or dental anxiety. Many have not been in years and fear judgment or a long list of needed treatments. Others are uncertain about how often to go, what a checkup includes, or whether X-rays are necessary every visit.",
+    why_unique: "Routine checkups in UAE typically include examination, scale and polish, and X-rays as needed. Costs are reasonable for what is included — AED 150 to AED 400 for a basic check-up and cleaning at a well-equipped clinic. Many UAE clinics offer free first consultations. Preventive care is consistently the most cost-effective dental investment. Insurance often covers 1 to 2 checkups per year.",
+    clinical_notes: "A comprehensive checkup includes visual examination, periodontal probing (measuring gum pockets), X-rays (bitewing or panoramic as needed), and oral cancer screening. Scale and polish removes calculus and plaque. The dentist assesses for cavities, gum disease, bite issues, and soft tissue abnormalities. Recommended frequency is every 6 months for most adults, every 3 months for patients with active gum disease.",
+    insurance_note: "Most UAE dental insurance plans cover 1 to 2 routine checkups and cleanings per year at 100% or with a small co-pay. This is one of the most consistently covered dental services across all plan types."
   },
   "pediatric-dentistry": {
-    angle: "children's dental care",
-    pain_points: "Child afraid of dentist, finding pediatric specialist, behavior management techniques",
-    why_unique: "Pediatric dentists specialize in children - first visit should be by age 1"
+    angle: "dental care specifically designed for infants, children, and adolescents, including behaviour management",
+    pain_points: "Parents' primary concern is a child developing dental fear. Finding a dentist who can actually manage child behaviour (not just ask the child to sit still) is the real challenge. Parents are also uncertain about when to bring children for their first visit, how to handle dental emergencies in children, and whether orthodontic assessment should happen early.",
+    why_unique: "Paediatric dentists in UAE are DHA-licensed specialists who have completed additional training in child behaviour management, growth and development, and treating children with special needs. Techniques include tell-show-do, nitrous oxide (laughing gas), and in severe cases, general anaesthesia. The first dental visit is recommended by age 1 or when the first tooth erupts, whichever comes first.",
+    clinical_notes: "Paediatric dentistry encompasses preventive care (fluoride applications, sealants), early orthodontic monitoring, cavity treatment adapted for children, management of dental trauma, and space maintainers for premature tooth loss. Nitrous oxide sedation is commonly used for anxious children and is safe and well-studied. General anaesthesia is reserved for very young children or those with significant special needs, and is performed in hospital settings.",
+    insurance_note: "Children under 18 are typically included in family dental insurance plans in UAE. Preventive care (checkups, fluoride, sealants) is generally well-covered. Orthodontic coverage for children varies by plan. Sedation may or may not be covered depending on medical necessity."
   }
 };
 
@@ -796,7 +816,9 @@ function getServicePrompt(serviceSlug: string) {
   return SERVICE_PROMPTS[serviceSlug] || {
     angle: "dental procedure",
     pain_points: "cost concerns, finding qualified providers, treatment options",
-    why_unique: "quality and experience vary significantly between providers"
+    why_unique: "UAE dental market has wide variation in quality and pricing",
+    clinical_notes: "Treatment effectiveness depends on case complexity and provider expertise. Always verify DHA or DOH licensing.",
+    insurance_note: "Coverage varies significantly by plan. Check with your provider for specific benefits."
   };
 }
 
@@ -804,61 +826,138 @@ async function generateServiceContent(pageData: any, aimlapiKey: string, forceRe
   const serviceSlug = pageData.slug.replace("services/", "");
   const serviceData = getServicePrompt(serviceSlug);
   
-  const prompt = `Generate a service page for ${serviceSlug.replace(/-/g, " ")} in UAE.
+const prompt = `Generate a service page for ${serviceSlug.replace(/-/g, " ")} in UAE.
 
 SERVICE CONTEXT:
 * Treatment type: ${serviceSlug}
 * Focus angle: ${serviceData.angle}
 * Patient pain points: ${serviceData.pain_points}
 * What makes UAE unique: ${serviceData.why_unique}
+* Clinical notes: ${serviceData.clinical_notes}
+* Insurance coverage: ${serviceData.insurance_note}
 
-═══════════════════════════════════════════════════════════════════════
-AI-OPTIMIZED STRUCTURE (CRITICAL FOR AI OVERVIEW EXTRACTION)
-═══════════════════════════════════════════════════════════════════════
-Your content MUST be structured to help AI systems (Google AI Overviews, Perplexity, ChatGPT) extract and cite content. Use this exact format:
+================================================================
+PAGE PURPOSE — READ THIS CAREFULLY
+================================================================
 
-1. AI_DEFINITION: Start with 2-3 sentences directly answering "What is [treatment]?" - this is what AI will quote
-2. PROCESS_STEPS: Numbered step-by-step guide (6-8 steps) 
-3. COST_RANGE: AED price table with min/max for each component
-4. CHECKLIST: "Is it right for me?" - bullet points with YES/NO applicability
-5. COMPARISON: Optional - compare treatment alternatives
+This is an informational-commercial hybrid page. That means:
 
-MANDATORY RULES:
+INFORMATIONAL (70% of the content):
+- What is this treatment, explained accurately
+- How the procedure actually works, step by step
+- Realistic cost ranges in AED
+- How long it takes — total treatment time and individual visits
+- Who is a good candidate and who is not
+- What the recovery or aftercare looks like
+- What can go wrong and how good clinics prevent it
+- How to evaluate whether a clinic is trustworthy for this treatment
 
-1. WRITE LIKE A DENTAL EXPERT ADVISING A PATIENT:
-   - Don't sell - inform and educate
-   - Include real costs ranges for UAE in AED
-   - Mention realistic timelines
-   - Include what to ask during consultations
+COMMERCIAL (30% of the content):
+- Why AppointPanda makes finding the right clinic easier
+- The value of comparing multiple DHA or DOH licensed clinics
+- A clear, low-pressure CTA
 
-2. UAE-SPECIFIC CONTENT:
-   - Include cost ranges in AED (dirhams)
-   - Mention DHA/DOH licensing requirements
-   - Reference insurance coverage where relevant
-   - Consider expat vs local patient perspectives
+The ratio matters. If this reads like a sales page, it will not rank. If it reads like a genuine guide, it will.
 
-3. FAQ UNIQUENESS:
-   - 10 FAQs about this specific procedure
-   - Include UAE-specific questions (insurance, licensing, location)
-   - Answer questions patients actually ask
+================================================================
+CLINICAL ACCURACY — MANDATORY
+================================================================
 
-4. NO GENERIC MARKETING:
-   - Don't say "world-class care"
-   - Don't say "book your appointment today"
-   - Don't use template language
+Every procedural claim must be accurate. Use the following as your accuracy benchmark:
 
-5. GRAMMAR RULE:
-   - NEVER use em-dashes (—)
-   - Use proper punctuation
+- Describe the treatment process in the correct clinical sequence
+- Do not exaggerate benefits or downplay legitimate risks
+- If a treatment has common side effects, mention them honestly (e.g., sensitivity after whitening, swelling after extractions)
+- Frame all price ranges as estimates, not guarantees: "typically between AED X and AED Y depending on case complexity and clinic"
+- Reference DHA (Dubai) or DOH (Abu Dhabi) licensing as the standard patients should check
+- Do not invent statistics. Use observable framing: "most patients..." or "in straightforward cases..."
 
-OUTPUT:
-Return ONLY JSON with:
+================================================================
+AI OVERVIEW OPTIMISATION
+================================================================
+
+Google's AI Overviews, Perplexity, and similar systems extract directly answerable content. Structure your output to feed them:
+
+FIELD: ai_definition
+Write 2 to 3 sentences that directly and completely answer "What is [treatment]?" Imagine Google pulling these sentences into a featured snippet. They must be self-contained, accurate, and clear without context.
+
+FIELD: ai_process_steps
+Write 6 to 8 numbered steps describing exactly what happens during the treatment process, from first consultation to final outcome. Each step should have a title, a 2-sentence description, and an honest duration estimate.
+
+FIELD: ai_cost_range
+Provide a breakdown table of costs in AED. Include different scenarios or components (e.g., per arch, per tooth, consultation fee). Frame everything as typical ranges, not fixed prices. Be honest — do not artificially narrow the range to seem more affordable.
+
+FIELD: ai_checklist
+Create 6 to 8 criteria that help the reader decide if this treatment is right for them. Each item should have a clear condition, a yes or no applicability note, and one sentence of explanation. Be clinically accurate — do not encourage people to pursue treatments that may not suit them.
+
+================================================================
+UAE-SPECIFIC CONTENT — REQUIRED IN EVERY SERVICE PAGE
+================================================================
+
+Every service page must address these UAE realities:
+
+1. REGULATORY CONTEXT
+Mention that all practising dentists in UAE must hold a licence from DHA (Dubai), DOH (Abu Dhabi), or the relevant emirate authority. Briefly explain what patients should check and why it matters.
+
+2. COST REALITY
+UAE dental pricing is not standardised. Premium clinics in Dubai Marina charge significantly more than community clinics in Sharjah for the same procedure. Acknowledge this honestly. Give a realistic low-to-high range that reflects actual UAE market prices.
+
+3. INSURANCE COVERAGE
+Many UAE residents have employer-provided dental insurance. Mention whether this treatment is typically covered, partially covered, or not covered by standard UAE plans. Be accurate — cosmetic treatments are almost never covered, while restorative treatments sometimes are.
+
+4. EXPAT PERSPECTIVE
+A large proportion of UAE residents are expatriates. Many compare local care to what they received in their home country. Address this where relevant — standards, pricing context, or what to look for when choosing a clinic as someone new to the UAE.
+
+================================================================
+CONTENT QUALITY REQUIREMENTS
+================================================================
+
+- hero_intro: 80 to 120 words. The most informative, specific paragraph on the page. No filler. No marketing language.
+- body_content: Minimum 500 words. Must include the informational substance described above.
+- Each FAQ answer: Minimum 60 words. Specific. Useful. Not a redirect to "consult your dentist."
+- No generic phrases: "smile brighter," "transform your smile," "expert team," "cutting-edge technology," "best in UAE"
+- No em-dashes (—) anywhere
+- No fabricated clinic names, doctor names, or invented patient stories
+- All cost figures framed as ranges with an honest explanation of variability
+
+================================================================
+FAQ REQUIREMENTS — 10 QUESTIONS MINIMUM
+================================================================
+
+Generate exactly 10 FAQs. Each must be:
+
+- A question a real UAE patient would type into Google
+- Specific to this treatment (not generic dental questions)
+- Answered with genuine detail (60 words minimum per answer)
+- Varied in topic across: cost, process, duration, candidacy, insurance, aftercare, risks, UAE-specific considerations, comparison to alternatives
+
+================================================================
+FAIL CONDITIONS
+================================================================
+
+- Any em-dash (—) in output
+- ai_definition does not directly answer "What is [treatment]?"
+- Cost ranges are suspiciously narrow or clearly inaccurate for UAE market
+- Clinical procedure steps are described incorrectly
+- Any fabricated statistic presented as fact
+- Generic marketing language present
+- Fewer than 10 FAQs
+- body_content under 500 words
+- Any FAQ answer under 60 words
+
+================================================================
+OUTPUT
+================================================================
+
+Return ONLY this JSON. No markdown. No preamble. No explanation.
+
 {
   "page_type": "service",
   "page_slug": "/services/${serviceSlug}",
   "meta_title": "",
   "meta_description": "",
   "keywords": [],
+  "noindex": false,
   "h1": "",
   "hero_subtitle": "",
   "hero_intro": "",
@@ -866,12 +965,12 @@ Return ONLY JSON with:
   "cta_text": "",
   "cta_button_text": "",
   "cta_button_url": "",
-  "faqs": [],
+  "faqs": [{"question": "", "answer": ""}],
   "is_published": true,
-  "ai_definition": "2-3 sentence direct answer to 'What is [treatment]?'",
-  "ai_process_steps": [{"step": 1, "title": "", "description": ""}, ...],
-  "ai_cost_range": [{"treatment": "", "min_aed": 0, "max_aed": 0, "notes": ""}, ...],
-  "ai_checklist": [{"criteria": "", "applies": true/false, "description": ""}, ...]
+  "ai_definition": "",
+  "ai_process_steps": [{"step": 1, "title": "", "description": "", "duration": ""}],
+  "ai_cost_range": [{"treatment": "", "min_aed": 0, "max_aed": 0, "notes": ""}],
+  "ai_checklist": [{"criteria": "", "applies": true, "description": ""}]
 }`;
 
   try {
@@ -976,74 +1075,144 @@ async function generateServiceLocationContent(pageData: any, aimlapiKey: string,
   const serviceData = getServicePrompt(serviceSlug);
   const areaData = getAreaData(stateSlug, citySlug);
   
-  const prompt = `Generate a comprehensive service-location page for ${serviceSlug.replace(/-/g, " ")} in ${pageData.city_name}, ${pageData.state_name}.
+const prompt = `Generate a service-location page for ${serviceSlug.replace(/-/g, " ")} in ${pageData.city_name}, ${pageData.state_name}.
 
-LOCATION CONTEXT:
-* City character: ${areaData.character}
-* Demographics: ${areaData.demographics}
-* What locals say: ${areaData.narrative}
+This is the most granular page type in the AppointPanda system. It targets someone who already knows they want this treatment and is now looking for it specifically in their area. They are close to booking. Give them everything they need to make a confident, informed choice without leaving this page.
 
-SERVICE CONTEXT:
-* Treatment: ${serviceSlug}
-* Patient concerns: ${serviceData.pain_points}
-* UAE perspective: ${serviceData.why_unique}
+================================================================
+LOCATION DATA
+================================================================
 
-MANDATORY RULES:
+Area character: ${areaData.character}
+Demographics: ${areaData.demographics}
+Key landmarks: ${areaData.landmarks}
+What locals observe: ${areaData.narrative}
 
-1. COMBINE LOCATION + SERVICE:
-   - How does this area's character affect dental needs for this service?
-   - What do residents here specifically need for this treatment?
-   - Reference local clinics or patterns
+================================================================
+SERVICE DATA
+================================================================
 
-2. LOCATION-SPECIFIC INSIGHTS:
-   - What type of patients seek this service in this area?
-   - Are there more premium or budget options here?
-   - What are the local considerations?
+Treatment: ${serviceSlug.replace(/-/g, " ")}
+Patient concerns: ${serviceData.pain_points}
+UAE-specific context: ${serviceData.why_unique}
+Primary patient profile: ${serviceData.angle}
+Clinical notes: ${serviceData.clinical_notes}
+Insurance coverage: ${serviceData.insurance_note}
 
-3. UAE-SPECIFIC:
-   - Cost ranges in AED
-   - DHA/DOH requirements
-   - Insurance patterns
-   - Expat considerations
+================================================================
+THE CORE TASK — GENUINE COMBINATION, NOT TEMPLATE INSERTION
+================================================================
 
-4. FAQ UNIQUENESS:
-   - 10 FAQs specific to this location + service combination
-   - Include local area references
+This page must genuinely combine the location and the service into something that could only exist for this exact combination.
 
-5. NO GENERIC CONTENT:
-   - Don't swap location names into templates
-   - Must be specific insights
+It is NOT enough to write a service page and insert the city name.
+It is NOT enough to write a city page and insert the service name.
 
-6. GRAMMAR:
-   - No em-dashes (—)
+You must answer: What is it actually like to get ${serviceSlug.replace(/-/g, " ")} as someone who lives or works in ${pageData.city_name}?
 
-7. COMPREHENSIVE SEO FIELDS:
-   You MUST include these additional fields for enhanced SEO and AI optimization:
-   - price_min: Minimum price in AED (number)
-   - price_max: Maximum price in AED (number)
-   - price_note: Short note about pricing (string)
-   - price_last_updated: Date string like "April 2026"
-   - process_steps: Array of {step, title, description, duration} objects (5-6 steps)
-   - process_time_months: String like "12-24 months" or "2-3 visits"
-   - treatment_options: Array of {type, name, price_min, price_max, duration, visibility, best_for} objects
-   - benefits: Array of {title, description, icon} objects (5-6 benefits)
-   - candidates: Array of {description, is_suitable, conditions} objects
-   - alternatives: Array of {name, slug, reason} objects
-   - quick_answer: 50-100 word AI summary for featured snippets
-   - related_questions: Array of {question, answer} objects (4 questions)
-   - last_reviewed_by: Name of dental expert who reviewed
-   - last_reviewed_date: Date string like "April 2026"
-   - medical_accuracy_verified: Boolean (default true)
-   - expert_credential: String like "DHA Licensed Orthodontist"
+That means:
+- What types of clinics in this area offer this treatment (premium, mid-range, community)?
+- What does a typical patient profile look like here for this service?
+- Are there specific local considerations that affect this treatment's cost, availability, or approach?
+- What does the area's character mean for how patients navigate this specific decision?
 
-OUTPUT:
-Return ONLY JSON with:
+================================================================
+LOCATION-SERVICE INTERSECTION — MANDATORY CONTENT AREAS
+================================================================
+
+AREA 1: LOCAL PATIENT PROFILE FOR THIS TREATMENT
+Who, specifically, seeks ${serviceSlug.replace(/-/g, " ")} in ${pageData.city_name}? What drives them to it — appearance, pain, professional context, insurance? How does the area's demographic shape the demand?
+
+AREA 2: CLINIC LANDSCAPE IN THIS AREA
+What is the realistic range of clinic types available? Premium, mid-range, budget? Are there specialists in this area or do residents typically travel? What should someone in this area expect in terms of quality range and price range?
+
+AREA 3: LOCAL COST REALITY
+Provide realistic price ranges in AED that reflect this area's clinic landscape. A treatment in DIFC will cost differently from the same treatment in International City. Be honest about this variation. Give a low, mid, and high estimate with context.
+
+AREA 4: ACCESS AND LOGISTICS
+How does someone in ${pageData.city_name} practically access this treatment? Parking? Public transport near good clinics? Timing — can they get appointments outside working hours? Does the area have any access advantages or disadvantages?
+
+AREA 5: THE HONEST ADVICE SECTION
+Include one section that gives genuinely opinionated, specific advice for someone in ${pageData.city_name} seeking this treatment. Not marketing. Real guidance. What to look for, what to watch out for, what question to ask first.
+
+================================================================
+CLINICAL CONTENT — REQUIRED AND ACCURATE
+================================================================
+
+process_steps: Write 5 to 6 steps describing what actually happens from first consultation to final result. Each step must have a realistic duration. Do not skip steps or combine them inaccurately.
+
+treatment_options: List the real variants of this treatment available in UAE. For example, Invisalign has different tier products. Implants come from different manufacturers. Whitening ranges from in-office to take-home. Be accurate about the differences.
+
+candidates: Who is genuinely suitable for this treatment and who is not? Include 5 to 6 criteria. Be honest — if someone has advanced gum disease, implants are typically not appropriate until that is resolved. Say so.
+
+benefits: List 5 to 6 genuine, clinically accurate benefits. Do not inflate. "Improved chewing function" is a legitimate benefit of implants. "Perfect smile" is not a clinical benefit.
+
+alternatives: List 2 to 3 real alternatives to this treatment with honest comparisons. If a cheaper alternative is genuinely appropriate for some patients, say so.
+
+================================================================
+STRUCTURED DATA FIELDS — ALL REQUIRED
+================================================================
+
+quick_answer:
+Write 60 to 80 words that directly answer the implicit question of this page: "Where can I get [treatment] in [city] and what should I know?" This is designed for Google's featured snippets and AI Overviews. It must be self-contained, accurate, and written in plain language. Do not start with "AppointPanda..." — start with the answer.
+
+related_questions:
+Write 4 questions that a person researching this treatment in this specific area would ask next. Each answer should be 50 to 80 words. Location-specific where possible.
+
+price_min, price_max, price_note:
+Set realistic AED figures that reflect this area's clinic landscape. The note must explain what affects the price (case complexity, clinic type, material choice). Never give a false sense of precision.
+
+last_reviewed_by, expert_credential:
+Use a realistic but non-specific name format: "Dr. A. Rahman, DHA Licensed Orthodontist" — do not invent a full verifiable identity. The credential must match the service (orthodontist for Invisalign/braces, oral surgeon for implants/extractions, cosmetic dentist for veneers/whitening, general dentist for checkups/root canals/crowns/pediatric).
+
+================================================================
+FAQ REQUIREMENTS — 10 QUESTIONS
+================================================================
+
+All 10 FAQs must be location-AND-service specific. Not just service. Not just location. The combination.
+
+Example of WRONG (service only): "How much does Invisalign cost in UAE?"
+Example of WRONG (location only): "Are there good dentists in Al Barsha?"
+Example of RIGHT: "How much does Invisalign typically cost in Al Barsha, and are there budget options near Mall of Emirates?"
+
+Every answer must be at least 60 words. Honest. Specific. Genuinely useful.
+
+================================================================
+CONTENT LENGTH REQUIREMENTS
+================================================================
+
+- hero_intro: 80 to 120 words. Specific to this location-service combination. No filler.
+- body_content: Minimum 600 words. Must include local insights, clinical information, and practical guidance.
+- Each FAQ answer: Minimum 60 words.
+- Each process_step description: Minimum 30 words with a duration.
+- Each benefit description: Minimum 25 words.
+- Each candidate description: Minimum 20 words with conditions.
+
+================================================================
+ABSOLUTE PROHIBITIONS
+================================================================
+
+- No em-dashes (—) anywhere
+- No fabricated clinic names, addresses, or doctor full identities
+- No invented statistics ("83% of residents...")
+- No generic marketing phrases ("world-class care," "state-of-the-art," "comprehensive range")
+- No content that could work for a different city-service combination with only the names swapped
+- No clinically inaccurate procedural descriptions
+- No misleading price ranges that do not reflect UAE market reality
+
+================================================================
+OUTPUT
+================================================================
+
+Return ONLY this JSON. No markdown. No preamble. No explanation.
+
 {
   "page_type": "service-location",
   "page_slug": "/${stateSlug}/${citySlug}/${serviceSlug}",
   "meta_title": "",
   "meta_description": "",
   "keywords": [],
+  "noindex": false,
   "h1": "",
   "hero_subtitle": "",
   "hero_intro": "",
@@ -1051,168 +1220,23 @@ Return ONLY JSON with:
   "cta_text": "",
   "cta_button_text": "",
   "cta_button_url": "",
-  "faqs": [],
-  "price_min": 5000,
-  "price_max": 15000,
-  "price_note": "Price ranges vary by clinic and case complexity",
+  "faqs": [{"question": "", "answer": ""}],
+  "price_min": 0,
+  "price_max": 0,
+  "price_note": "",
   "price_last_updated": "April 2026",
-  "process_steps": [],
-  "process_time_months": "12-24 months",
-  "treatment_options": [],
-  "benefits": [],
-  "candidates": [],
-  "alternatives": [],
+  "process_steps": [{"step": 1, "title": "", "description": "", "duration": ""}],
+  "process_time_months": "",
+  "treatment_options": [{"type": "", "name": "", "price_min": 0, "price_max": 0, "duration": "", "visibility": "", "best_for": ""}],
+  "benefits": [{"title": "", "description": "", "icon": ""}],
+  "candidates": [{"description": "", "is_suitable": true, "conditions": ""}],
+  "alternatives": [{"name": "", "slug": "", "reason": ""}],
   "quick_answer": "",
-  "related_questions": [],
-  "last_reviewed_by": "Dr. [Name]",
+  "related_questions": [{"question": "", "answer": ""}],
+  "last_reviewed_by": "",
   "last_reviewed_date": "April 2026",
   "medical_accuracy_verified": true,
-  "expert_credential": "DHA Licensed Dentist",
-  "is_published": true
-}`;
-
-  try {
-    const aiResponse = await callAIWithRetry([
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: prompt }
-    ], aimlapiKey);
-
-    console.log("SL_GEN: AI response type:", typeof aiResponse);
-
-    if (!aiResponse) {
-      return { success: false, error: "No response from AI" };
-    }
-
-    const content = String(aiResponse);
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    
-    if (!jsonMatch) {
-      console.error("SL_GEN: No JSON in response:", content.substring(0, 300));
-      return { success: false, error: "Invalid JSON in response" };
-    }
-
-    try {
-      const pageDataResult = JSON.parse(jsonMatch[0]);
-      return { success: true, data: pageDataResult };
-    } catch (parseErr) {
-      console.error("SL_GEN: JSON parse error:", parseErr instanceof Error ? parseErr.message : String(parseErr));
-      return { success: false, error: "JSON parse failed" };
-    }
-  } catch (err) {
-    return { success: false, error: err instanceof Error ? err.message : "Generation failed" };
-  }
-}
-
-/**
- * Generate service-location content with competitor analysis
- */
-async function generateServiceLocationContentWithAnalysis(
-  pageData: any, 
-  aimlapiKey: string, 
-  analysis: ConsolidatedAnalysis | null,
-  forceRegenerate: boolean
-): Promise<any> {
-  const parts = pageData.slug.split("/").filter(Boolean);
-  const stateSlug = parts[0];
-  const citySlug = parts[1];
-  const serviceSlug = parts[2];
-  
-  const serviceData = getServicePrompt(serviceSlug);
-  const areaData = getAreaData(stateSlug, citySlug);
-  
-  // Build base prompt
-  let prompt = `Generate a comprehensive service-location page for ${serviceSlug.replace(/-/g, " ")} in ${pageData.city_name}, ${pageData.state_name}.
-
-LOCATION CONTEXT:
-* City character: ${areaData.character}
-* Demographics: ${areaData.demographics}
-* What locals say: ${areaData.narrative}
-
-SERVICE CONTEXT:
-* Treatment: ${serviceSlug}
-* Patient concerns: ${serviceData.pain_points}
-* UAE perspective: ${serviceData.why_unique}
-
-MANDATORY RULES:
-
-1. COMBINE LOCATION + SERVICE:
-   - How does this area's character affect dental needs for this service?
-   - What do residents here specifically need for this treatment?
-   - Reference local clinics or patterns
-
-2. LOCATION-SPECIFIC INSIGHTS:
-   - What type of patients seek this service in this area?
-   - Are there more premium or budget options here?
-   - What are the local considerations?
-
-3. UAE-SPECIFIC:
-   - Cost ranges in AED
-   - DHA/DOH requirements
-   - Insurance patterns
-   - Expat considerations
-
-4. FAQ UNIQUENESS:
-   - 10 FAQs specific to this location + service combination
-   - Include local area references
-
-5. NO GENERIC CONTENT:
-   - Don't swap location names into templates
-   - Must be specific insights
-
-6. GRAMMAR:
-   - No em-dashes (—)
-
-7. COMPREHENSIVE SEO FIELDS:
-   You MUST include these additional fields for enhanced SEO and AI optimization:
-   - price_min: Minimum price in AED (number)
-   - price_max: Maximum price in AED (number)
-   - price_note: Short note about pricing (string)
-   - price_last_updated: Date string like "April 2026"
-   - process_steps: Array of {step, title, description, duration} objects (5-6 steps)
-   - process_time_months: String like "12-24 months" or "2-3 visits"
-   - treatment_options: Array of {type, name, price_min, price_max, duration, visibility, best_for} objects
-   - benefits: Array of {title, description, icon} objects (5-6 benefits)
-   - candidates: Array of {description, is_suitable, conditions} objects
-   - alternatives: Array of {name, slug, reason} objects
-   - quick_answer: 50-100 word AI summary for featured snippets
-   - related_questions: Array of {question, answer} objects (4 questions)
-   - last_reviewed_by: Name of dental expert who reviewed
-   - last_reviewed_date: Date string like "April 2026"
-   - medical_accuracy_verified: Boolean (default true)
-   - expert_credential: String like "DHA Licensed Orthodontist"
-
-OUTPUT:
-Return ONLY JSON with:
-{
-  "page_type": "service-location",
-  "page_slug": "/${stateSlug}/${citySlug}/${serviceSlug}",
-  "meta_title": "",
-  "meta_description": "",
-  "keywords": [],
-  "h1": "",
-  "hero_subtitle": "",
-  "hero_intro": "",
-  "body_content": "",
-  "cta_text": "",
-  "cta_button_text": "",
-  "cta_button_url": "",
-  "faqs": [],
-  "price_min": 5000,
-  "price_max": 15000,
-  "price_note": "Price ranges vary by clinic and case complexity",
-  "price_last_updated": "April 2026",
-  "process_steps": [],
-  "process_time_months": "12-24 months",
-  "treatment_options": [],
-  "benefits": [],
-  "candidates": [],
-  "alternatives": [],
-  "quick_answer": "",
-  "related_questions": [],
-  "last_reviewed_by": "Dr. [Name]",
-  "last_reviewed_date": "April 2026",
-  "medical_accuracy_verified": true,
-  "expert_credential": "DHA Licensed Dentist",
+  "expert_credential": "",
   "is_published": true
 }`;
 
@@ -1220,40 +1244,53 @@ Return ONLY JSON with:
   if (analysis && analysis.urlsAnalyzed.length > 0) {
     prompt += `
 
-═══════════════════════════════════════════════════════════════
-COMPETITOR ANALYSIS (from SERP research)
-═══════════════════════════════════════════════════════════════
+================================================================
+COMPETITOR INTELLIGENCE — USE TO OUTPERFORM, NOT COPY
+================================================================
 
-URLs Analyzed: ${analysis.urlsAnalyzed.length}
-${analysis.urlsAnalyzed.map((u, i) => `${i + 1}. ${u}`).join('\n')}
+The following data comes from analysing the top-ranking pages for this query. Use it to build something better — not to replicate what already exists.
 
-FAQ QUESTIONS FOUND ON TOP RANKING PAGES:
-${analysis.faqQuestions.slice(0, 10).map((q, i) => `${i + 1}. ${q}`).join('\n')}
+COMPETITOR PAGES ANALYSED: ${analysis.urlsAnalyzed.length}
+SEARCH QUERIES USED: ${analysis.queriesUsed?.join(", ") || "service-location queries"}
 
-PRICE RANGES FOUND ON COMPETITORS: ${analysis.priceRangeFound || 'Not found'}
+----------------------------------------------------------------
+QUESTIONS COMPETITORS ARE ANSWERING (you must answer all of these AND more):
+${analysis.faqQuestions.slice(0, 10).map((q, i) => `${i + 1}. ${q}`).join("\n")}
 
-COMMON SECTIONS ON TOP PAGES: ${analysis.commonSections.join(', ') || 'None detected'}
+----------------------------------------------------------------
+PRICE INFORMATION FROM COMPETITORS:
+${analysis.priceRangeFound || "Not found"}
 
-MISSING SECTIONS (CONTENT GAPS): ${analysis.contentGaps.join(', ') || 'None'}
+Note: Do not copy competitor price ranges. Cross-reference with your knowledge of UAE dental market pricing and provide ranges that are honest and accurate. If competitor prices seem low or suspiciously uniform, reflect real market variability.
 
-SCHEMA TYPES USED BY COMPETITORS: ${analysis.schemaTypesUsed.join(', ') || 'None'}
+----------------------------------------------------------------
+SECTIONS APPEARING ON MOST COMPETITOR PAGES (you must include all of these):
+${(analysis.commonSections || []).join("\n- ") || "process, benefits, pricing, faq"}
 
-═══════════════════════════════════════════════════════════════
-YOUR TASK: Create content that OUTPERFORMS these competitors
-═══════════════════════════════════════════════════════════════
+----------------------------------------------------------------
+SECTIONS MISSING FROM COMPETITOR PAGES (your opportunity to be more comprehensive):
+${(analysis.contentGaps || []).join("\n- ") || "local specific insights, insurance details"}
 
-1. INCLUDE ALL FAQ QUESTIONS that competitors use (listed above)
-2. ADD these sections that competitors are MISSING: ${analysis.contentGaps.join(', ')}
-3. MENTION price range: ${analysis.priceRangeFound || 'AED 5,000 - 20,000'}
-4. USE these schema types: FAQPage, HowTo, Product
-5. ADD unique value props AppointPanda offers:
-   - Verified DHA-licensed dentists
-   - Transparent AED pricing
-   - Real patient reviews (4.9+ rating)
-   - Free booking consultation
-6. MAKE content MORE comprehensive than competitors (aim for 1500+ words)
+These gaps are your competitive advantage. A page that covers what no competitor covers — and covers it well — earns the ranking. Write these missing sections with genuine depth.
 
-Write content that will rank HIGHER than these competitor pages.
+----------------------------------------------------------------
+SCHEMA TYPES USED BY COMPETITORS:
+${(analysis.schemaTypesUsed || []).join(", ") || "FAQPage, HowTo, Product"}
+
+Note: Schema is applied at the infrastructure level, not in content. Use this as reference only.
+
+----------------------------------------------------------------
+YOUR COMPETITIVE MANDATE:
+
+1. Answer every FAQ question from competitors — and answer it better (more specifically, more honestly, more usefully)
+2. Cover every common section with greater depth and local specificity
+3. Add every missing section with genuine substance — not thin filler content
+4. Aim for a body_content length of at least 700 words
+5. Every additional section must earn its place by being genuinely useful, not just present
+
+The goal is not to be longer than competitors. The goal is to be more useful than competitors.
+
+================================================================
 `;
   }
 
