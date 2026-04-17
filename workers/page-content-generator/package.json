@@ -1,0 +1,20 @@
+{
+  "name": "page-content-generator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --env production"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.47.0",
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "wrangler": "^3.93.0",
+    "typescript": "^5.7.0"
+  }
+}

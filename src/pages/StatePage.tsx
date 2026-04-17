@@ -307,9 +307,9 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
   const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
 
   // Use SEO content if optimized, otherwise use defaults
-  const pageTitle = seoContent?.meta_title || seoDataProp?.title || null;
-  const pageDescription = seoContent?.meta_description || seoDataProp?.description || null;
-  const pageH1 = pageContent?.h1 || seoContent?.h1 || null;
+  const pageTitle = pageContentDataProp?.meta_title || seoContent?.meta_title || seoDataProp?.title || null;
+  const pageDescription = pageContentDataProp?.meta_description || seoContent?.meta_description || seoDataProp?.description || null;
+  const pageH1 = pageContentDataProp?.h1 || seoContent?.h1 || seoH1Prop || null;
 
   // Use SEO FAQs if available, otherwise use defaults
   // Note: parseFaqFromContent now returns { q, a }[] format
@@ -430,10 +430,10 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
         </div>
       </section>
 
-      {/* Page Intro Section - CMS Content from page_content table */}
+      {/* Page Intro Section - CMS Content from page_content table - ONLY hero_intro, no heading */}
       <PageIntroSection
-        title={pageContent?.section_1_title || parsedContent?.sections?.[0]?.heading || seoContent?.h1 || null}
-        content={pageContent?.hero_intro || pageContent?.section_1_content || parsedContent?.intro || parsedContent?.sections?.[0]?.content || null}
+        title={null}
+        content={pageContent?.hero_intro || null}
         isLoading={isSeoContentPending}
       />
 

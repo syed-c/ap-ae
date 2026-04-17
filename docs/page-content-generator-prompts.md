@@ -30,6 +30,8 @@ The generator creates content for different page types:
 - **Insight Depth:** Include specific, observable insights (not vague statements)
 - **Grammar Rule:** Never use em-dashes (—)
 - **FAQ Uniqueness:** 10 FAQs per location with local specifics
+- **Keyword Research:** Uses SerpApi to research keywords for each location - generates unique primary/secondary keywords
+- **Heading Uniqueness:** Section titles must be different for each page - no generic headings like "Dental Services in [Location]"
 
 ### Output Fields Required:
 ```json

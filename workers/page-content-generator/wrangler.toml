@@ -1,0 +1,22 @@
+name = "page-content-generator"
+compatibility_date = "2026-04-16"
+main = "src/index.ts"
+account_id = "955d46764a4db4c91b83c30ef6495f44"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = false
+persist = true
+head_sampling_rate = 1
+
+[vars]
+ENVIRONMENT = "production"

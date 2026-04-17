@@ -1,5 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
+const CF_WORKER_URL = "https://page-content-generator.syedrayyan7117.workers.dev/";
+
 interface GenerateSingleParams {
   page_type: "state" | "city";
   page_slug: string;
@@ -177,24 +179,25 @@ export async function generateServiceLocationsByEmirate(
   emirateSlug: string,
   params: { force_regenerate?: boolean; batch_limit?: number; cursor?: string | null } = {}
 ): Promise<GenerateServiceLocationsResult> {
-  const { data, error } = await supabase.functions.invoke(
-    "page-content-generator",
-    {
-      body: {
-        action: "generate_service_locations_by_emirate",
-        emirate_slug: emirateSlug,
-        batch_limit: 3,
-        ...params,
-      },
-    }
-  );
+  const response = await fetch(CF_WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "generate_service_locations_by_emirate",
+      emirate_slug: emirateSlug,
+      batch_limit: params.batch_limit || 3,
+      force_regenerate: params.force_regenerate || false,
+      cursor: params.cursor || null,
+    }),
+  });
 
-  if (error) {
+  if (!response.ok) {
+    const errorText = await response.text();
     return {
       processed: 0,
       skipped: 0,
       failed: 0,
-      errors: [error.message],
+      errors: [errorText],
       remaining: 0,
       total_count: 0,
       cursor: null,
@@ -203,6 +206,7 @@ export async function generateServiceLocationsByEmirate(
     };
   }
 
+  const data = await response.json();
   return data as GenerateServiceLocationsResult;
 }
 
@@ -211,25 +215,26 @@ export async function generateServiceLocationsByCity(
   citySlug: string,
   params: { force_regenerate?: boolean; batch_limit?: number; cursor?: string | null } = {}
 ): Promise<GenerateServiceLocationsResult> {
-  const { data, error } = await supabase.functions.invoke(
-    "page-content-generator",
-    {
-      body: {
-        action: "generate_service_locations_by_city",
-        emirate_slug: emirateSlug,
-        city_slug: citySlug,
-        batch_limit: 3,
-        ...params,
-      },
-    }
-  );
+  const response = await fetch(CF_WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "generate_service_locations_by_city",
+      emirate_slug: emirateSlug,
+      city_slug: citySlug,
+      batch_limit: params.batch_limit || 3,
+      force_regenerate: params.force_regenerate || false,
+      cursor: params.cursor || null,
+    }),
+  });
 
-  if (error) {
+  if (!response.ok) {
+    const errorText = await response.text();
     return {
       processed: 0,
       skipped: 0,
       failed: 0,
-      errors: [error.message],
+      errors: [errorText],
       remaining: 0,
       total_count: 0,
       cursor: null,
@@ -238,6 +243,7 @@ export async function generateServiceLocationsByCity(
     };
   }
 
+  const data = await response.json();
   return data as GenerateServiceLocationsResult;
 }
 

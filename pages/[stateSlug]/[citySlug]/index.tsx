@@ -245,7 +245,7 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
             .then(r => r.data) as Promise<any>,
         supabase
             .from('page_content')
-            .select('*')
+            .select('meta_title, meta_description, h1, hero_intro, body_content, section_1_title, section_1_content, section_2_title, section_2_content, section_3_title, section_3_content')
             .eq('page_type', 'city')
             .in('page_slug', [citySlug, `/${citySlug}`, `${normalizedStateSlug}/${citySlug}`, `/${normalizedStateSlug}/${citySlug}`])
             .eq('is_published', true)
@@ -310,10 +310,10 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
     const cityName = finalCityData?.name || citySlug;
     const stateName = stateData?.name || normalizedStateSlug;
     
-    // Always generate meta - either from DB or auto-generated
-    const metaTitle = seoContent?.meta_title || `Best Dentists in ${cityName}, ${stateName} (2026) — Book Now | AppointPanda`;
-    const metaDescription = seoContent?.meta_description || `Find verified dental clinics in ${cityName}, ${stateName}. Compare ratings, prices, and book your appointment online.`;
-    const seoH1 = seoContent?.h1 || `Best Dentists in ${cityName}, ${stateName}`;
+    // Always generate meta - either from page_content, seo_pages, or auto-generated
+    const metaTitle = pageContent?.meta_title || seoContent?.meta_title || `Best Dentists in ${cityName}, ${stateName} (2026) — Book Now | AppointPanda`;
+    const metaDescription = pageContent?.meta_description || seoContent?.meta_description || `Find verified dental clinics in ${cityName}, ${stateName}. Compare ratings, prices, and book your appointment online.`;
+    const seoH1 = pageContent?.h1 || seoContent?.h1 || `Best Dentists in ${cityName}, ${stateName}`;
 
     let ssrFaqs: { question: string; answer: string }[] = [];
     

@@ -260,6 +260,89 @@ function consolidateCompetitorInsights(insights: CompetitorInsight[]): Consolida
 }
 
 /**
+ * Research keywords for a city/state page using SerpApi
+ */
+interface KeywordResearch {
+  primaryKeyword: string;
+  secondaryKeywords: string[];
+}
+
+async function researchKeywordsForLocation(
+  locationName: string,
+  emirateName: string,
+  emirateSlug: string,
+  citySlug: string,
+  serpApiKey: string
+): Promise<KeywordResearch> {
+  const keywords: string[] = [];
+  
+  const searchQueries = [
+    `dentist ${locationName} ${emirateName}`,
+    `dental clinic ${locationName}`,
+    `best dentist ${emirateSlug}`,
+  ];
+  
+  for (const query of searchQueries.slice(0, 2)) {
+    try {
+      const encodedQuery = encodeURIComponent(query);
+      const url = `https://serpapi.com/search.json?q=${encodedQuery}&num=5&api_key=${serpApiKey}&related_questions=true`;
+      
+      const response = await fetch(url);
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.related_questions) {
+          for (const rq of data.related_questions.slice(0, 2)) {
+            const question = rq.question || "";
+            if (question && !keywords.some(k => k.toLowerCase() === question.toLowerCase())) {
+              keywords.push(question);
+            }
+          }
+        }
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.warn(`Keyword research failed for "${query}":`, error);
+    }
+  }
+  
+  const allTerms = [
+    `dentist in ${locationName}`,
+    `dental clinic ${locationName}`,
+    `dentist ${emirateName}`,
+    `dental care ${locationName}`,
+    `emergency dental ${locationName}`,
+  ];
+  
+  const shuffled = allTerms.sort(() => Math.random() - 0.5);
+  const primaryKeyword = shuffled[0] || `dentist in ${locationName}`;
+  const secondaryKeywords = [shuffled[1], shuffled[2]].filter(Boolean);
+  
+  if (keywords.length === 0) {
+    return { primaryKeyword, secondaryKeywords };
+  }
+  
+  const extractedTerms: string[] = [];
+  for (const k of keywords.slice(0, 6)) {
+    const term = k.toLowerCase().replace(/^what is|^how much|^is|^are|^can|^does|^should/i, '').trim();
+    if (term.length > 5 && term.length < 50) {
+      extractedTerms.push(term);
+    }
+  }
+  
+  if (extractedTerms.length >= 3) {
+    return {
+      primaryKeyword: extractedTerms[0],
+      secondaryKeywords: [extractedTerms[1], extractedTerms[2]],
+    };
+  }
+  
+  return { primaryKeyword, secondaryKeywords };
+}
+
+/**
  * Generate two search queries for a service-location
  */
 function generateSearchQueries(serviceName: string, cityName: string, stateName: string): { commercial: string; informational: string } {
@@ -419,13 +502,39 @@ FACTUAL ACCURACY — HARD RULES
 SEO — INTEGRATED, NEVER STUFFED
 ================================================================
 
-- Primary keyword: Use naturally in the H1, once in the meta title, once in the first paragraph, and 2 to 3 times in the body
-- Secondary keywords: Weave in where they fit the sentence naturally
+===============================================================
+KEYWORD RESEARCH — UNIQUE FOR THIS LOCATION
+===============================================================
+
+You MUST use these exact keywords for this specific page:
+
+PRIMARY KEYWORD: {primary_keyword}
+- Use naturally in H1 (1 time)
+- Use once in meta title
+- Use once in the hero_intro/first paragraph
+- Use 2-3 times naturally in body content
+
+SECONDARY KEYWORDS (use each ONCE naturally):
+- {secondary_keyword_1}
+- {secondary_keyword_2}
+
+SEO RULES:
+- Do NOT use primary/secondary keywords in section titles or headings — use ONLY in body paragraphs
+- Never use primary keyword more than 4 times total across the entire page
+- Never use secondary keywords more than once each
+- Keywords must be woven into sentences naturally, never forced
+- If keyword doesn't fit naturally, rewrite the sentence rather than forcing it
+
+Example CORRECT: "The dental clinics in this area understand that professionals need flexible scheduling."
+Example WRONG: "Looking for a dentist in {location_name}? Find the best dentist in {location_name} here!"
+
+===============================================================
+
 - Meta title: Under 60 characters. Clear. Specific. No keyword stuffing.
 - Meta description: Under 155 characters. Reads like a human wrote it. Includes a reason to click.
-- Keywords array: 8 to 12 terms, mix of head and long-tail
+- Keywords array: EXACTLY 3 terms only — 1 primary keyword + 2 supporting keywords. Format: ["primary keyword", "supporting keyword 1", "supporting keyword 2"]
 
-================================================================
+===============================================================
 FAQ STANDARDS
 ================================================================
 
@@ -519,50 +628,96 @@ Mention at least one specific landmark from the context provided. Do not just na
 REQUIREMENT 5 — ONE HONEST LOCAL OPINION
 Include one clear, grounded observation that takes a position. Not a sales claim. A genuine local perspective.
 
+===============================================================
+HEADING UNIQUENESS — NEVER REUSE SAME HEADINGS
+===============================================================
+
+Your section titles MUST be DIFFERENT from other pages. Do NOT use these common generic headings:
+- "Dental Services in [Location]"
+- "Popular Dental Services"
+- "Common Dental Treatments"
+- "Dental Care in [Location]"
+- "Services We Offer"
+
+INSTEAD, create unique, specific headings that match your chosen ANGLE:
+
+For ANGLE A (Time-strapped professional):
+- "When Your Calendar Doesn't Leave Room for a Long Wait"
+- "Evening Appointments That Actually Work"
+- "Quick Consultations Near Your Office"
+
+For ANGLE B (Families):
+- "Finding a Dentist Your Kids Won't Fear"
+- "Managing Three Checkups in One Afternoon"
+- "Saturday Morning Checkups Without the Rush"
+
+For ANGLE C (Expats):
+- "What Your Home Country Insurance Actually Covers Here"
+- "Understanding DHA Licenses Without the Confusion"
+- "Clinics That Speak Your Language"
+
+For ANGLE D (Value-conscious):
+- "Where to Get Real Value Without Cutting Corners"
+- "What a Fair Price Actually Looks Like"
+- "Avoiding the Upsell Without Skipping Care"
+
+For ANGLE E (Premium):
+- "What Luxury Actually Means in Dental Care"
+- "Clinics Worth the Premium"
+- "Beyond the Lobby: What You're Really Paying For"
+
+Each section title should feel like it could ONLY work for this specific location and angle combination.
+
 ================================================================
 STRUCTURE — CHOOSE ONE FORMAT AND COMMIT
 ================================================================
 
-Do not use the same structure for every page. Rotate between these:
+Your page MUST have at least 4 major sections (H2 headings) plus body content. Do not use the same structure for every page. Rotate between these:
 
 FORMAT 1 — LIFESTYLE FIRST
-Opening: Describe the area's rhythm and who lives there.
-Section 1: What dental care looks like in this context.
-Section 2: What to look for and what to avoid.
-Section 3: Practical realities — cost, hours, insurance, language.
-Body: Deepen the story. Add the unique section here.
+Opening (hero_intro): Describe the area's rhythm and who lives there.
+Section 1 (section_1): What dental care looks like in this context.
+Section 2 (section_2): What to look for and what to avoid.
+Section 3 (section_3): Practical realities — cost, hours, insurance, language.
+Section 4 (section_4): The unique section that could ONLY exist for this location.
+Body (body_content): Additional depth, examples, local specifics. Minimum 200 words.
 CTA: Specific to the angle you chose.
 
 FORMAT 2 — PROBLEM FIRST
-Opening: Lead with the main dental challenge this area's residents face.
-Section 1: Why that challenge exists here.
-Section 2: What good options exist despite the challenge.
-Section 3: How to navigate it.
-Body: Round out with practical tips.
+Opening (hero_intro): Lead with the main dental challenge this area's residents face.
+Section 1 (section_1): Why that challenge exists here.
+Section 2 (section_2): What good options exist despite the challenge.
+Section 3 (section_3): How to navigate it.
+Section 4 (section_4): What to ask when you call a clinic.
+Body (body_content): Additional practical tips. Minimum 200 words.
 CTA: Framed around solving the specific problem.
 
 FORMAT 3 — STORY FIRST
-Opening: A brief, grounded observation or scene from this area's daily life that connects to dental care.
-Section 1: The broader dental landscape in this area.
-Section 2: Who uses dental care here and how.
-Section 3: What separates good choices from bad ones.
-Body: The unique section. Practical advice.
+Opening (hero_intro): A brief, grounded observation or scene from this area's daily life.
+Section 1 (section_1): The broader dental landscape in this area.
+Section 2 (section_2): Who uses dental care here and how.
+Section 3 (section_3): What separates good choices from bad ones.
+Section 4 (section_4): A specific local tip only a resident would know.
+Body (body_content): More details and examples. Minimum 200 words.
 CTA: Warm and specific.
 
 FORMAT 4 — DATA AND INSIGHT FIRST
-Opening: A specific, concrete observation (cost range, timing pattern, demographic fact).
-Section 1: Context for that observation.
-Section 2: What it means for someone choosing a dentist here.
-Section 3: The unique section — deeper analysis.
-Body: Practical guide. What to ask. What to look for.
+Opening (hero_intro): A specific, concrete observation (cost range, timing pattern, demographic fact).
+Section 1 (section_1): Context for that observation.
+Section 2 (section_2): What it means for someone choosing a dentist here.
+Section 3 (section_3): The unique section — deeper analysis.
+Section 4 (section_4): Common mistakes to avoid.
+Body (body_content): What to ask. What to look for. Minimum 200 words.
 CTA: Confident and direct.
+
+IMPORTANT: You MUST populate ALL 4 sections (section_1 through section_4) AND body_content. Each section must have at least 80 words.
 
 ================================================================
 WRITING QUALITY STANDARDS
 ================================================================
 
-- Minimum body_content length: 350 words
-- Minimum section content length: 80 words each
+- Minimum body_content length: 400 words
+- Minimum section content length: 100 words each (section_1 through section_4)
 - hero_intro: 60 to 100 words. Should be the most compelling, specific paragraph on the page.
 - Tone: Varies by angle and format, but always clear, direct, and respectful
 - No paragraph should begin with "In {location_name}" — vary your sentence openings
@@ -581,10 +736,16 @@ FAIL CONDITIONS — CONTENT WILL BE REJECTED IF:
 - The unique section could plausibly appear on another area's page
 - Any clinical or factual claim is clearly false or fabricated
 - Generic phrases like "comprehensive care," "world-class," appear
+- Generic section headings used (see list in HEADING UNIQUENESS section above)
+- Primary keyword appears more than 4 times total on the page
+- Secondary keywords used more than once each
+- Any keyword appears in section titles or headings
 - The meta title exceeds 60 characters
 - The meta description exceeds 155 characters
 - Fewer than 10 FAQs are returned
 - Any FAQ is generic enough to appear on any dental city page
+- section_4_title or section_4_content is empty (MUST have 4 sections minimum)
+- section_1, section_2, or section_3 content is less than 80 words each
 
 ================================================================
 OUTPUT
@@ -597,7 +758,7 @@ Return ONLY this JSON structure with all fields populated. No extra keys. No mar
   "page_slug": "/{emirate_slug}/{city_slug}",
   "meta_title": "",
   "meta_description": "",
-  "keywords": [],
+  "keywords": ["primary keyword", "supporting keyword 1", "supporting keyword 2"],
   "noindex": false,
   "h1": "",
   "hero_subtitle": "",
@@ -609,6 +770,8 @@ Return ONLY this JSON structure with all fields populated. No extra keys. No mar
   "section_2_content": "",
   "section_3_title": "",
   "section_3_content": "",
+  "section_4_title": "",
+  "section_4_content": "",
   "body_content": "",
   "cta_text": "",
   "cta_button_text": "",
@@ -836,9 +999,43 @@ SERVICE CONTEXT:
 * Clinical notes: ${serviceData.clinical_notes}
 * Insurance coverage: ${serviceData.insurance_note}
 
-================================================================
+===============================================================
+STRICT CONTENT REQUIREMENTS — MANDATORY
+===============================================================
+
+1. UNIQUE & HUMAN: Write like a human expert, not an AI. Every sentence must feel natural and original. NEVER use generic templates.
+
+2. GOOGLE CORE UPDATE COMPLIANT: 
+   - Content must demonstrate Experience (E-E-A-T first hand)
+   - Show Expertise with accurate clinical information
+   - Build Trust through honest, verifiable claims
+   - Be Authoritative by citing real UAE dental standards
+
+3. INFO + COMMERCIAL HYBRID:
+   - 70% informational: explain, educate, answer questions
+   - 30% commercial: subtle clinic comparison, AppointPanda value
+
+4. GRAMMAR & STYLE:
+   - NO EM-DASHES (—) anywhere
+   - Grammatically perfect sentences
+   - No false information - every claim must be verifiable
+   - No invented statistics - use "most patients" or "in straightforward cases"
+
+5. STRICT JSON RULES:
+   - Arrays: NO trailing commas - ["a", "b", "c"] is correct, ["a", "b", "c",] is WRONG
+   - Objects: NO trailing commas - {"key": "value"} is correct, {"key": "value",} is WRONG
+   - Boolean: use lowercase "true" or "false" (NOT "True" or "False")
+   - Numbers: use plain integers (NOT "AED 500" - use 500)
+   - Every array must have proper comma separation
+
+6. VALIDATION BEFORE OUTPUT:
+   - Count all brackets: { must have }, [ must have ]
+   - Check no trailing commas anywhere in the JSON
+   - Ensure all strings are properly quoted
+
+===============================================================
 PAGE PURPOSE — READ THIS CAREFULLY
-================================================================
+===============================================================
 
 This is an informational-commercial hybrid page. That means:
 
@@ -956,7 +1153,7 @@ Return ONLY this JSON. No markdown. No preamble. No explanation.
   "page_slug": "/services/${serviceSlug}",
   "meta_title": "",
   "meta_description": "",
-  "keywords": [],
+  "keywords": ["primary keyword", "supporting keyword 1", "supporting keyword 2"],
   "noindex": false,
   "h1": "",
   "hero_subtitle": "",
@@ -988,8 +1185,13 @@ Return ONLY this JSON. No markdown. No preamble. No explanation.
 
     const content = String(aiResponse);
     
+    // Clean up common JSON issues first
+    const cleanedContent = content
+      .replace(/,\s*}/g, '}')
+      .replace(/,\s*]/g, ']');
+    
     // More robust JSON extraction
-    let jsonMatch = content.match(/\{[\s\S]*\}/);
+    let jsonMatch = cleanedContent.match(/\{[\s\S]*\}/);
     
     if (jsonMatch) {
       try {
@@ -1211,7 +1413,7 @@ Return ONLY this JSON. No markdown. No preamble. No explanation.
   "page_slug": "/${stateSlug}/${citySlug}/${serviceSlug}",
   "meta_title": "",
   "meta_description": "",
-  "keywords": [],
+  "keywords": ["primary keyword", "supporting keyword 1", "supporting keyword 2"],
   "noindex": false,
   "h1": "",
   "hero_subtitle": "",
@@ -1454,7 +1656,7 @@ async function callAIWithRetry(messages: { role: string; content: string }[], ai
         body: JSON.stringify({
           model: "gpt-4o-mini",
           messages,
-          max_tokens: 4000,
+          max_tokens: 2500,
           temperature: 0.7,
         }),
       });
@@ -1486,11 +1688,20 @@ function extractJson(text: string): any {
     // Remove thinking/reasoning blocks that MiniMax outputs
     let cleanedText = text.replace(/<think>[\s\S]*?/g, '').trim();
     
+    // Clean up common JSON issues (trailing commas, etc)
+    cleanedText = cleanedText
+      .replace(/,\s*}/g, '}')  // Remove trailing comma in objects
+      .replace(/,\s*]/g, ']')   // Remove trailing comma in arrays
+      .replace(/\n/g, ' ')      // Replace newlines with spaces in strings
+    
     // Try to find JSON in code blocks first
     let jsonMatch = cleanedText.match(/```json\n([\s\S]*?)\n```/);
     if (jsonMatch) {
       try {
-        return JSON.parse(jsonMatch[1]);
+        let blockContent = jsonMatch[1]
+          .replace(/,\s*}/g, '}')
+          .replace(/,\s*]/g, ']');
+        return JSON.parse(blockContent);
       } catch {
         // Continue
       }
@@ -1499,12 +1710,35 @@ function extractJson(text: string): any {
     // Try to find JSON object directly - look for opening { and try to parse
     const jsonStart = cleanedText.indexOf('{');
     if (jsonStart !== -1) {
-      // Try to find the closing brace by counting brackets
+      // Try to find the closing brace by counting brackets (with string handling)
       let depth = 0;
+      let inString = false;
+      let escape = false;
       let endPos = -1;
+      
       for (let i = jsonStart; i < cleanedText.length; i++) {
-        if (cleanedText[i] === '{') depth++;
-        else if (cleanedText[i] === '}') depth--;
+        const char = cleanedText[i];
+        
+        if (escape) {
+          escape = false;
+          continue;
+        }
+        
+        if (char === '\\') {
+          escape = true;
+          continue;
+        }
+        
+        if (char === '"') {
+          inString = !inString;
+          continue;
+        }
+        
+        if (inString) continue;
+        
+        if (char === '{') depth++;
+        else if (char === '}') depth--;
+        
         if (depth === 0) {
           endPos = i + 1;
           break;
@@ -1512,7 +1746,9 @@ function extractJson(text: string): any {
       }
       
       if (endPos !== -1) {
-        const jsonStr = cleanedText.substring(jsonStart, endPos);
+        let jsonStr = cleanedText.substring(jsonStart, endPos)
+          .replace(/,\s*}/g, '}')
+          .replace(/,\s*]/g, ']');
         try {
           return JSON.parse(jsonStr);
         } catch {
@@ -1521,11 +1757,14 @@ function extractJson(text: string): any {
       }
     }
     
-    // Last resort: try matching any {...} pattern
+    // Last resort: try matching any {...} pattern with cleanup
     const anyMatch = cleanedText.match(/\{[\s\S]*\}/);
     if (anyMatch) {
+      let cleaned = anyMatch[0]
+        .replace(/,\s*}/g, '}')
+        .replace(/,\s*]/g, ']');
       try {
-        return JSON.parse(anyMatch[0]);
+        return JSON.parse(cleaned);
       } catch {
         return null;
       }
@@ -1551,6 +1790,48 @@ async function generateContentForPage(
   const areaData = getAreaData(emirateSlug, citySlug);
   const contentAngle = getRandomItem(CONTENT_ANGLES);
 
+  // Perform keyword research using SerpApi
+  let primaryKeyword = `dentist in ${locationName}`;
+  let secondaryKeywords: string[] = [`dental clinic ${locationName}`, `dental care ${emirateName}`];
+  
+  const serpApiKey = Deno.env.get("SERPAPI_KEY");
+  
+  if (serpApiKey) {
+    try {
+      console.log(`page-content-generator: Researching keywords for ${locationName}...`);
+      const keywordResearch = await researchKeywordsForLocation(
+        locationName,
+        emirateName,
+        emirateSlug,
+        citySlug,
+        serpApiKey
+      );
+      
+      if (keywordResearch.primaryKeyword) {
+        primaryKeyword = keywordResearch.primaryKeyword;
+      }
+      if (keywordResearch.secondaryKeywords.length >= 2) {
+        secondaryKeywords = keywordResearch.secondaryKeywords;
+      }
+      
+      console.log(`page-content-generator: Keywords - Primary: "${primaryKeyword}", Secondary: ${secondaryKeywords.join(", ")}`);
+    } catch (kwError) {
+      console.warn(`page-content-generator: Keyword research failed, using defaults:`, kwError);
+    }
+  } else {
+    // Use location-specific fallback keywords when SERPAPI is not available
+    const fallbackKeywords = [
+      `dentist in ${locationName}`,
+      `dental clinic ${locationName}`,
+      `best dentist ${emirateSlug}`,
+      `dental services ${locationName}`,
+      `emergency dentist ${locationName}`,
+    ];
+    const shuffled = fallbackKeywords.sort(() => Math.random() - 0.5);
+    primaryKeyword = shuffled[0] || `dentist in ${locationName}`;
+    secondaryKeywords = [shuffled[1], shuffled[2]].filter(Boolean);
+  }
+
   const userPrompt = USER_PROMPT_TEMPLATE
     .replace(/{location_name}/g, locationName)
     .replace(/{emirate_name}/g, emirateName)
@@ -1560,7 +1841,12 @@ async function generateContentForPage(
     .replace(/{demographics}/g, areaData.demographics)
     .replace(/{landmarks}/g, areaData.landmarks)
     .replace(/{narrative}/g, areaData.narrative)
-    .replace(/{content_angle}/g, contentAngle);
+    .replace(/{content_angle}/g, contentAngle)
+    .replace(/{primary_keyword}/g, primaryKeyword)
+    .replace(/{secondary_keyword_1}/g, secondaryKeywords[0] || "")
+    .replace(/{secondary_keyword_2}/g, secondaryKeywords[1] || "");
+
+  console.log(`page-content-generator: Calling AI for ${locationName} with prompt length: ${userPrompt.length}`);
 
   try {
     const aiResponse = await callAIWithRetry(
@@ -1611,14 +1897,13 @@ async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
   // Determine page_type - use what AI returns, or derive from slug if missing
   let pageType = pageData.page_type;
   if (!pageType) {
-    if (pageData.page_slug?.includes("services/") && pageData.page_slug?.split("/").length === 2) {
-      pageType = "service";
-    } else if (pageData.page_slug?.includes("/services/")) {
+    // Pattern: /emirate/city/service -> service-location (check first as it's most specific)
+    if (pageData.page_slug?.match(/^\/[a-z]+\/[a-z-]+\/[a-z-]+\/$/)) {
       pageType = "service-location";
+    } else if (pageData.page_slug?.includes("services/") && pageData.page_slug?.split("/").length === 2) {
+      pageType = "service";
     } else if (pageData.page_slug?.match(/^\/[a-z]+\/[a-z-]+\/$/)) {
       pageType = "state";
-    } else if (pageData.page_slug?.match(/^\/[a-z]+\/[a-z-]+\/[a-z-]+\/$/)) {
-      pageType = "city";
     }
   }
   
@@ -1650,6 +1935,9 @@ async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
   if (pageData.section_3_title && pageData.section_3_content) {
     contentParts.push(`## ${pageData.section_3_title}\n\n${pageData.section_3_content}`);
   }
+  if (pageData.section_4_title && pageData.section_4_content) {
+    contentParts.push(`## ${pageData.section_4_title}\n\n${pageData.section_4_content}`);
+  }
   if (pageData.body_content) {
     contentParts.push(pageData.body_content);
   }
@@ -1659,12 +1947,13 @@ async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
   }
 
   // Only add h2_sections if there's actual content
-  if (pageData.section_1_title || pageData.section_2_title || pageData.section_3_title) {
-    saveData.h2_sections = JSON.stringify([
-      { title: pageData.section_1_title || "", content: pageData.section_1_content || "" },
-      { title: pageData.section_2_title || "", content: pageData.section_2_content || "" },
-      { title: pageData.section_3_title || "", content: pageData.section_3_content || "" },
-    ]);
+  if (pageData.section_1_title || pageData.section_2_title || pageData.section_3_title || pageData.section_4_title) {
+    const sections = [];
+    if (pageData.section_1_title) sections.push({ title: pageData.section_1_title, content: pageData.section_1_content || "" });
+    if (pageData.section_2_title) sections.push({ title: pageData.section_2_title, content: pageData.section_2_content || "" });
+    if (pageData.section_3_title) sections.push({ title: pageData.section_3_title, content: pageData.section_3_content || "" });
+    if (pageData.section_4_title) sections.push({ title: pageData.section_4_title, content: pageData.section_4_content || "" });
+    saveData.h2_sections = JSON.stringify(sections);
   }
 
   // Only add faqs if there are actual FAQs
@@ -1765,34 +2054,52 @@ async function saveSeoPage(supabase: any, pageData: any): Promise<void> {
 
   console.log(`page-content-generator: Save data keys: ${Object.keys(saveData).join(", ")}`);
   
-  // Save to seo_pages
-  const { error } = await supabase.from("seo_pages").upsert(saveData, { onConflict: "slug" });
-
-  if (error) {
-    console.error(`page-content-generator: Save error details:`, JSON.stringify(error));
-    throw error;
-  }
-
-  // Also save to page_content for service pages (non-blocking)
-  if (pageType === "service" && pageData.page_slug) {
+// For state and city pages, ONLY save to page_content (NOT seo_pages)
+  if (pageType === "state" || pageType === "city") {
+    // Save ONLY to page_content
     try {
       const pageContentData = {
         page_slug: pageData.page_slug,
-        page_type: "service",
+        page_type: pageType,
         meta_title: pageData.meta_title || null,
         meta_description: pageData.meta_description || null,
+        keywords: pageData.keywords || null,
         h1: pageData.h1 || null,
-        hero_intro: pageData.hero_intro || pageData.intro_text || null,
+        hero_subtitle: pageData.hero_subtitle || null,
+        hero_intro: pageData.hero_intro || null,
+        section_1_title: pageData.section_1_title || null,
+        section_1_content: pageData.section_1_content || null,
+        section_2_title: pageData.section_2_title || null,
+        section_2_content: pageData.section_2_content || null,
+        section_3_title: pageData.section_3_title || null,
+        section_3_content: pageData.section_3_content || null,
         body_content: pageData.body_content || null,
+        cta_text: pageData.cta_text || null,
+        cta_button_text: pageData.cta_button_text || null,
+        cta_button_url: pageData.cta_button_url || null,
         faqs: pageData.faqs || [],
         is_published: true,
       };
       
-      await supabase.from("page_content").upsert(pageContentData, { onConflict: "page_slug" });
+      const { error: pcError } = await supabase.from("page_content").upsert(pageContentData, { onConflict: "page_slug" });
+      if (pcError) {
+        console.error(`page-content-generator: page_content save error:`, JSON.stringify(pcError));
+        throw pcError;
+      }
       console.log(`page-content-generator: Saved to page_content ${pageData.page_slug}`);
     } catch (pcError) {
-      console.warn(`page-content-generator: page_content save failed (non-blocking):`, pcError);
+      console.error(`page-content-generator: page_content save failed:`, pcError);
+      throw pcError;
     }
+  } else {
+    // For service and service-location pages, save ONLY to seo_pages (NOT page_content)
+    const { error } = await supabase.from("seo_pages").upsert(saveData, { onConflict: "slug" });
+
+    if (error) {
+      console.error(`page-content-generator: Save error details:`, JSON.stringify(error));
+      throw error;
+    }
+    console.log(`page-content-generator: Saved to seo_pages ${pageData.page_slug}`);
   }
 
   console.log(`page-content-generator: Successfully saved ${pageData.page_slug}`);
@@ -1850,10 +2157,15 @@ serve(async (req) => {
 
     if (action === "generate_batch") {
       const cursor = body.cursor || null; // Last processed slug to resume from
-      const batchLimit = body.batch_limit || 3; // How many pages to process in this call
+      const batchLimit = body.batch_limit || 2; // How many pages to process in this call
 
       const states = await fetchAllRows(supabase, "states", "id, slug, name", { is_active: true });
       const cities = await fetchAllRows(supabase, "cities", "id, slug, name, state_id, states(slug, name)", { is_active: true });
+
+      console.log(`page-content-generator: Fetched ${states.length} states, ${cities.length} cities`);
+      if (cities.length > 0) {
+        console.log(`page-content-generator: Sample city data:`, JSON.stringify(cities[0]));
+      }
 
       // Build complete list of pages
       let allPages: any[] = [];
@@ -1898,24 +2210,26 @@ serve(async (req) => {
         }
       }
 
-      // Get already generated pages from seo_pages to skip them
-      const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
-      const existingSlugs = new Set(existingPages.map(p => p.slug));
+      // Get already generated pages from page_content to skip them (state/city pages saved there now)
+      const existingPageContent = await fetchAllRows(supabase, "page_content", "page_slug", {});
+      const existingContentSlugs = new Set(existingPageContent.map(p => p.page_slug));
+      console.log(`page-content-generator: Existing page_content count: ${existingPageContent.length}, sample slugs:`, existingPageContent.slice(0, 5).map(p => p.page_slug));
       
       // Filter out already generated pages (unless force_regenerate)
       let pagesToGenerate = allPages;
       if (!force_regenerate) {
         const beforeCount = allPages.length;
-        pagesToGenerate = allPages.filter(p => !existingSlugs.has(p.slug));
+        pagesToGenerate = allPages.filter(p => !existingContentSlugs.has(p.page_slug));
         console.log(`page-content-generator: Skipping ${beforeCount - pagesToGenerate.length} already generated pages`);
       }
 
       console.log(`page-content-generator: Total pages to generate: ${pagesToGenerate.length}`);
+      console.log(`page-content-generator: allPages count: ${allPages.length}, existingContentSlugs count: ${existingContentSlugs.size}`);
 
       // Find start index based on cursor
       let startIndex = 0;
       if (cursor) {
-        startIndex = pagesToGenerate.findIndex(p => p.slug === cursor);
+        startIndex = pagesToGenerate.findIndex(p => p.page_slug === cursor);
         if (startIndex === -1) startIndex = 0;
         else startIndex += 1; // Start after the cursor
       }
@@ -1931,9 +2245,9 @@ serve(async (req) => {
       const errors: string[] = [];
       let lastProcessedSlug = null;
 
-      for (const page of pagesToProcess) {
+for (const page of pagesToProcess) {
         const locationName = page.type === "state" ? page.state_name : page.city_name;
-        console.log(`page-content-generator: Generating ${page.slug}...`);
+        console.log(`page-content-generator: Generating ${page.page_slug}...`);
 
         try {
           const result = await generateContentForPage(page, aimlapiKey, force_regenerate);
@@ -1942,7 +2256,7 @@ serve(async (req) => {
             try {
               await saveSeoPage(supabase, result.data);
               processed++;
-              lastProcessedSlug = page.slug;
+              lastProcessedSlug = page.page_slug;
             } catch (saveErr) {
               failed++;
               errors.push(`Save error for ${locationName}: ${saveErr instanceof Error ? saveErr.message : String(saveErr)}`);
@@ -1951,14 +2265,15 @@ serve(async (req) => {
             skipped++;
           } else {
             failed++;
-            errors.push(`Generation error for ${locationName}: ${result.error}`);
+            errors.push(`Error for ${locationName}: ${result.error}`);
           }
         } catch (pageErr) {
           failed++;
           errors.push(`Error for ${locationName}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
         }
 
-        await delay(500);
+        // Delay between pages to reduce memory pressure
+        await delay(1000);
       }
 
       const remaining = pagesToGenerate.length - (startIndex + pagesToProcess.length);
@@ -2016,20 +2331,20 @@ serve(async (req) => {
       }));
 
       console.log("page-content-generator: All treatments:", treatments.map(t => `${t.name} (${t.slug})`).join(", "));
-      console.log("page-content-generator: All service pages slugs:", servicePages.map(p => p.slug).join(", "));
+      console.log("page-content-generator: All service pages slugs:", servicePages.map(p => p.page_slug).join(", "));
 
       // Get existing pages
       console.log("page-content-generator: Fetching existing seo_pages...");
       const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
       console.log(`page-content-generator: Found ${existingPages.length} existing seo_pages`);
-      const existingSlugs = new Set(existingPages.map(p => p.slug));
+      const existingSlugs = new Set(existingPages.map(p => p.page_slug));
 
       let pagesToGenerate = servicePages;
       if (!force_regenerate) {
-        pagesToGenerate = servicePages.filter(p => !existingSlugs.has(p.slug));
+        pagesToGenerate = servicePages.filter(p => !existingSlugs.has(p.page_slug));
       }
 
-      let startIndex = cursor ? pagesToGenerate.findIndex(p => p.slug === cursor) : 0;
+      let startIndex = cursor ? pagesToGenerate.findIndex(p => p.page_slug === cursor) : 0;
       if (startIndex === -1) startIndex = 0;
       else startIndex += 1;
 
@@ -2051,7 +2366,7 @@ serve(async (req) => {
           if (result.success) {
             await saveSeoPage(supabase, result.data);
             processed++;
-            lastProcessedSlug = page.slug;
+            lastProcessedSlug = page.page_slug;
           } else if (result.skipped) {
             skipped++;
           } else {
@@ -2120,7 +2435,7 @@ serve(async (req) => {
       // Check if already exists
       if (!force_regenerate) {
         const existing = await fetchAllRows(supabase, "seo_pages", "slug", {});
-        if (existing.some(p => p.slug === pageData.slug)) {
+        if (existing.some(p => p.page_slug === pageData.slug)) {
           return new Response(JSON.stringify({ success: false, error: "Page already exists. Use force_regenerate to overwrite." }), {
             status: 400,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -2162,8 +2477,8 @@ serve(async (req) => {
 
         for (const treatment of treatments) {
           slPages.push({
-            slug: `/${stateData.slug}/${city.slug}/${treatment.slug}`,
-            type: "service-location",
+            page_slug: `/${stateData.slug}/${city.slug}/${treatment.slug}`,
+            page_type: "service-location",
             state_slug: stateData.slug,
             state_name: stateData.name,
             city_slug: city.slug,
@@ -2176,14 +2491,14 @@ serve(async (req) => {
 
       // Get existing pages
       const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
-      const existingSlugs = new Set(existingPages.map(p => p.slug));
+      const existingSlugs = new Set(existingPages.map(p => p.page_slug));
 
       let pagesToGenerate = slPages;
       if (!force_regenerate) {
-        pagesToGenerate = slPages.filter(p => !existingSlugs.has(p.slug));
+        pagesToGenerate = slPages.filter(p => !existingSlugs.has(p.page_slug));
       }
 
-      let startIndex = cursor ? pagesToGenerate.findIndex(p => p.slug === cursor) : 0;
+      let startIndex = cursor ? pagesToGenerate.findIndex(p => p.page_slug === cursor) : 0;
       if (startIndex === -1) startIndex = 0;
       else startIndex += 1;
 
@@ -2196,7 +2511,7 @@ serve(async (req) => {
       let lastProcessedSlug = null;
 
       for (const page of pagesToProcess) {
-        console.log(`page-content-generator: Generating ${page.slug}...`);
+        console.log(`page-content-generator: Generating ${page.page_slug}...`);
 
         try {
           const result = await generateServiceLocationContent(page, aimlapiKey, force_regenerate);
@@ -2204,16 +2519,16 @@ serve(async (req) => {
           if (result.success) {
             await saveSeoPage(supabase, result.data);
             processed++;
-            lastProcessedSlug = page.slug;
+            lastProcessedSlug = page.page_slug;
           } else if (result.skipped) {
             skipped++;
           } else {
             failed++;
-            errors.push(`SL ${page.slug}: ${result.error}`);
+            errors.push(`SL ${page.page_slug}: ${result.error}`);
           }
         } catch (pageErr) {
           failed++;
-          errors.push(`Error for ${page.slug}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
+          errors.push(`Error for ${page.page_slug}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
         }
 
         await delay(500);
@@ -2271,8 +2586,8 @@ serve(async (req) => {
       for (const city of cities) {
         for (const treatment of treatments) {
           slPages.push({
-            slug: `/${emirateSlug}/${city.slug}/${treatment.slug}`,
-            type: "service-location",
+            page_slug: `/${emirateSlug}/${city.slug}/${treatment.slug}`,
+            page_type: "service-location",
             state_slug: emirateSlug,
             state_name: state.name,
             city_slug: city.slug,
@@ -2285,17 +2600,17 @@ serve(async (req) => {
 
       // Get existing pages
       const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
-      const existingSlugs = new Set(existingPages.map(p => p.slug));
+      const existingSlugs = new Set(existingPages.map(p => p.page_slug));
 
       let pagesToGenerate = slPages;
       if (!force_regenerate) {
-        pagesToGenerate = slPages.filter(p => !existingSlugs.has(p.slug));
+        pagesToGenerate = slPages.filter(p => !existingSlugs.has(p.page_slug));
       }
 
       // Find start index based on cursor
       let startIndex = 0;
       if (cursor) {
-        startIndex = pagesToGenerate.findIndex(p => p.slug === cursor);
+        startIndex = pagesToGenerate.findIndex(p => p.page_slug === cursor);
         if (startIndex === -1) startIndex = 0;
         else startIndex += 1;
       }
@@ -2309,20 +2624,20 @@ serve(async (req) => {
       let lastProcessedSlug = null;
 
       for (const page of pagesToProcess) {
-        console.log(`page-content-generator: Generating ${page.slug}...`);
+        console.log(`page-content-generator: Generating ${page.page_slug}...`);
         try {
           const result = await generateServiceLocationContent(page, aimlapiKey, force_regenerate);
           if (result.success) {
             await saveSeoPage(supabase, result.data);
             processed++;
-            lastProcessedSlug = page.slug;
+            lastProcessedSlug = page.page_slug;
           } else {
             failed++;
-            errors.push(`SL ${page.slug}: ${result.error}`);
+            errors.push(`SL ${page.page_slug}: ${result.error}`);
           }
         } catch (pageErr) {
           failed++;
-          errors.push(`Error for ${page.slug}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
+          errors.push(`Error for ${page.page_slug}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
         }
         await delay(500);
       }
@@ -2391,8 +2706,8 @@ serve(async (req) => {
       
       for (const treatment of treatments) {
         slPages.push({
-          slug: `/${emirateSlug}/${citySlug}/${treatment.slug}`,
-          type: "service-location",
+          page_slug: `/${emirateSlug}/${citySlug}/${treatment.slug}`,
+          page_type: "service-location",
           state_slug: emirateSlug,
           state_name: state.name,
           city_slug: citySlug,
@@ -2404,17 +2719,17 @@ serve(async (req) => {
 
       // Get existing pages
       const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
-      const existingSlugs = new Set(existingPages.map(p => p.slug));
+      const existingSlugs = new Set(existingPages.map(p => p.page_slug));
 
       let pagesToGenerate = slPages;
       if (!force_regenerate) {
-        pagesToGenerate = slPages.filter(p => !existingSlugs.has(p.slug));
+        pagesToGenerate = slPages.filter(p => !existingSlugs.has(p.page_slug));
       }
 
       // Find start index based on cursor
       let startIndex = 0;
       if (cursor) {
-        startIndex = pagesToGenerate.findIndex(p => p.slug === cursor);
+        startIndex = pagesToGenerate.findIndex(p => p.page_slug === cursor);
         if (startIndex === -1) startIndex = 0;
         else startIndex += 1; // Start after the cursor
       }
@@ -2428,20 +2743,20 @@ serve(async (req) => {
       let lastProcessedSlug = null;
 
       for (const page of pagesToProcess) {
-        console.log(`page-content-generator: Generating ${page.slug}...`);
+        console.log(`page-content-generator: Generating ${page.page_slug}...`);
         try {
           const result = await generateServiceLocationContent(page, aimlapiKey, force_regenerate);
           if (result.success) {
             await saveSeoPage(supabase, result.data);
             processed++;
-            lastProcessedSlug = page.slug;
+            lastProcessedSlug = page.page_slug;
           } else {
             failed++;
-            errors.push(`SL ${page.slug}: ${result.error}`);
+            errors.push(`SL ${page.page_slug}: ${result.error}`);
           }
         } catch (pageErr) {
           failed++;
-          errors.push(`Error for ${page.slug}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
+          errors.push(`Error for ${page.page_slug}: ${pageErr instanceof Error ? pageErr.message : String(pageErr)}`);
         }
         await delay(500);
       }
@@ -2537,7 +2852,7 @@ serve(async (req) => {
       // Check if already exists
       if (!force_regenerate) {
         const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
-        if (existingPages.some(p => p.slug === pageData.slug)) {
+        if (existingPages.some(p => p.page_slug === pageData.slug)) {
           return new Response(JSON.stringify({ success: false, skipped: true, error: "Page already exists. Use force_regenerate to overwrite." }), {
             status: 400,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -2749,14 +3064,14 @@ serve(async (req) => {
       // Filter existing if not force regenerating
       if (!forceRegenerate) {
         const existingPages = await fetchAllRows(supabase, "seo_pages", "slug", {});
-        const existingSlugs = new Set(existingPages.map(p => p.slug));
-        slPages = slPages.filter(p => !existingSlugs.has(p.slug));
+        const existingSlugs = new Set(existingPages.map(p => p.page_slug));
+        slPages = slPages.filter(p => !existingSlugs.has(p.page_slug));
       }
 
       // Find start position for cursor
       let startIndex = 0;
       if (cursor) {
-        startIndex = slPages.findIndex(p => p.slug === cursor);
+        startIndex = slPages.findIndex(p => p.page_slug === cursor);
         if (startIndex === -1) startIndex = 0;
         else startIndex += 1;
       }
@@ -2773,7 +3088,7 @@ serve(async (req) => {
 
       for (let i = 0; i < pagesToProcess.length; i++) {
         const page = pagesToProcess[i];
-        console.log(`page-content-generator: [${i + 1}/${pagesToProcess.length}] Processing ${page.slug}...`);
+        console.log(`page-content-generator: [${i + 1}/${pagesToProcess.length}] Processing ${page.page_slug}...`);
         
         try {
           // Perform competitor analysis (with rate limiting)
@@ -2813,14 +3128,14 @@ serve(async (req) => {
           if (result.success) {
             await saveSeoPageWithCompetitorAnalysis(supabase, result.data, analysis);
             processed++;
-            lastProcessedSlug = page.slug;
+            lastProcessedSlug = page.page_slug;
           } else {
             failed++;
-            errors.push(`${page.slug}: ${result.error}`);
+            errors.push(`${page.page_slug}: ${result.error}`);
           }
         } catch (pageError) {
           failed++;
-          errors.push(`${page.slug}: ${pageError instanceof Error ? pageError.message : String(pageError)}`);
+          errors.push(`${page.page_slug}: ${pageError instanceof Error ? pageError.message : String(pageError)}`);
         }
         
         // Small delay between pages

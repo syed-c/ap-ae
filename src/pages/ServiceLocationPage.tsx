@@ -48,13 +48,23 @@ interface ServiceLocationPageProps {
   seoH1Prop?: string | null;
   heroIntroProp?: string | null;
   contentProp?: string | null;
-  // Additional section props for server-side rendering
-  section1TitleProp?: string | null;
-  section1ContentProp?: string | null;
-  section2TitleProp?: string | null;
-  section2ContentProp?: string | null;
-  section3TitleProp?: string | null;
-  section3ContentProp?: string | null;
+  // Price & clinical data from DB
+  priceMinProp?: number | null;
+  priceMaxProp?: number | null;
+  priceNoteProp?: string | null;
+  quickAnswerProp?: string | null;
+  lastReviewedByProp?: string | null;
+  expertCredentialProp?: string | null;
+  medicalAccuracyVerifiedProp?: boolean;
+  // Process & options
+  processStepsProp?: any[] | null;
+  treatmentOptionsProp?: any[] | null;
+  benefitsProp?: any[] | null;
+  candidatesProp?: any[] | null;
+  alternativesProp?: any[] | null;
+  relatedQuestionsProp?: any[] | null;
+  processTimeMonthsProp?: string | null;
+  processTimeNoteProp?: string | null;
   allSeoDataProp?: any;
 }
 
@@ -64,12 +74,21 @@ const ServiceLocationPage = ({
   seoDataProp, allSeoDataProp,
   heroIntroProp,
   contentProp,
-  section1TitleProp,
-  section1ContentProp,
-  section2TitleProp,
-  section2ContentProp,
-  section3TitleProp,
-  section3ContentProp,
+  priceMinProp,
+  priceMaxProp,
+  priceNoteProp,
+  quickAnswerProp,
+  lastReviewedByProp,
+  expertCredentialProp,
+  medicalAccuracyVerifiedProp,
+  processStepsProp,
+  treatmentOptionsProp,
+  benefitsProp,
+  candidatesProp,
+  alternativesProp,
+  relatedQuestionsProp,
+  processTimeMonthsProp,
+  processTimeNoteProp,
 }: ServiceLocationPageProps) => {
   const routerQuery = useRouter().query;
   const stateSlug = stateSlugProp || routerQuery.stateSlug as string || '';
@@ -125,16 +144,8 @@ const ServiceLocationPage = ({
   // Client-side only is fallback
   const seoDataFromProps = allSeoDataProp || seoContent;
   
-  // Build comprehensive content from server-side sections first
-  const section1Title = section1TitleProp || seoDataFromProps?.section_1_title || null;
-  const section1Content = section1ContentProp || seoDataFromProps?.section_1_content || null;
-  const section2Title = section2TitleProp || seoDataFromProps?.section_2_title || null;
-  const section2Content = section2ContentProp || seoDataFromProps?.section_2_content || null;
-  const section3Title = section3TitleProp || seoDataFromProps?.section_3_title || null;
-  const section3Content = section3ContentProp || seoDataFromProps?.section_3_content || null;
-  
   // H1 from DB
-  const displayH1 = seoDataFromProps?.h1 || `Best ${treatmentName} in ${locationName}`;
+  const displayH1 = seoDataFromProps?.h1 || seoDataFromProps?.title || `Best ${treatmentName} in ${locationName}`;
   
   // Page intro from DB (for hero) - use server-side prop first
   const pageIntro = heroIntroProp || seoDataFromProps?.page_intro || null;
@@ -154,31 +165,43 @@ const ServiceLocationPage = ({
     { q: `How do I book an appointment?`, a: `Click "Book Now" on any profile to book.` },
   ];
 
-  // Pricing from DB
-  const priceMin = seoDataFromProps?.price_min;
-  const priceMax = seoDataFromProps?.price_max;
+  // Pricing from DB - prioritize server-side props
+  const priceMin = priceMinProp ?? seoDataFromProps?.price_min ?? null;
+  const priceMax = priceMaxProp ?? seoDataFromProps?.price_max ?? null;
+  const priceNote = priceNoteProp ?? seoDataFromProps?.price_note ?? null;
   
-  // Treatment options from DB for pricing cards
-  const treatmentOptions = seoDataFromProps?.treatment_options || [];
+  // Quick answer & credentials
+  const quickAnswer = quickAnswerProp ?? seoDataFromProps?.quick_answer ?? null;
+  const lastReviewedBy = lastReviewedByProp ?? seoDataFromProps?.last_reviewed_by ?? null;
+  const expertCredential = expertCredentialProp ?? seoDataFromProps?.expert_credential ?? null;
+  const medicalAccuracyVerified = medicalAccuracyVerifiedProp ?? seoDataFromProps?.medical_accuracy_verified ?? false;
   
-  // Process steps from DB
-  const processSteps = seoDataFromProps?.process_steps || [];
+  // Process & clinical data
+  const processSteps = processStepsProp ?? seoDataFromProps?.process_steps ?? null;
+  const treatmentOptions = treatmentOptionsProp ?? seoDataFromProps?.treatment_options ?? null;
+  const benefits = benefitsProp ?? seoDataFromProps?.benefits ?? null;
+  const candidates = candidatesProp ?? seoDataFromProps?.candidates ?? null;
+  const alternatives = alternativesProp ?? seoDataFromProps?.alternatives ?? null;
+  const relatedQuestions = relatedQuestionsProp ?? seoDataFromProps?.related_questions ?? null;
+  const processTimeMonths = processTimeMonthsProp ?? seoDataFromProps?.process_time_months ?? null;
+  const processTimeNote = processTimeNoteProp ?? seoDataFromProps?.process_time_note ?? null;
+  
+  // Treatment options from DB for pricing cards (use existing data)
+  const treatmentOptionsData = treatmentOptions || [];
   
   // Benefits from DB
-  const benefits = seoDataFromProps?.benefits || [];
+  const benefitsData = benefits || [];
   
   // Candidates (Recommended For) from DB - extract descriptions
-  const dbCandidates = seoDataFromProps?.candidates || [];
+  const dbCandidates = candidates || [];
   const candidateItems = dbCandidates.map((item: any) => item.description || item).filter(Boolean);
   
   // Alternatives (May Not Be Suitable) from DB - extract reasons
-  const dbAlternatives = seoDataFromProps?.alternatives || [];
+  const dbAlternatives = alternatives || [];
   const alternativeItems = dbAlternatives.map((item: any) => item.reason || item.name || item).filter(Boolean);
   
   // Medical verification info from DB
-  const expertCredential = seoDataFromProps?.expert_credential || null;
-  const medicalVerified = seoDataFromProps?.medical_accuracy_verified || false;
-  const lastReviewedBy = seoDataFromProps?.last_reviewed_by || null;
+  const medicalVerified = medicalAccuracyVerified || false;
 
   const cities = allCitiesInEmirate || [];
   const hasProfiles = (profiles || []).length > 0;
@@ -195,8 +218,8 @@ const ServiceLocationPage = ({
   }));
 
   // Dynamic cost cards from DB treatment_options or fallback to price_min/max
-  const costCards = treatmentOptions.length > 0 
-    ? treatmentOptions.slice(0, 4).map((opt: any) => ({
+  const costCards = treatmentOptionsData && treatmentOptionsData.length > 0 
+    ? treatmentOptionsData.slice(0, 4).map((opt: any) => ({
       name: opt.name || opt.type || "Treatment",
       price: opt.price_max ? `AED ${opt.price_max}+` : opt.price_min ? `AED ${opt.price_min}+` : "AED 500+",
       icon: opt.icon || "medical_services"
@@ -361,7 +384,7 @@ const ServiceLocationPage = ({
           </div>
           <div className="relative grid md:grid-cols-3 gap-8">
             <div className="hidden md:block absolute top-12 left-0 w-full h-[2px] bg-[#dedcdb] z-0" />
-            {(processSteps.length > 0 ? processSteps : [
+            {(processSteps && processSteps.length > 0 ? processSteps : [
               { step: "01", title: "Find", desc: `Select your preferred specialist in ${locationName}.` },
               { step: "02", title: "Choose", desc: "Pick a time that fits your urban lifestyle." },
               { step: "03", title: "Register", desc: "Simple digital onboarding. No paperwork." },
@@ -431,7 +454,7 @@ const ServiceLocationPage = ({
               <h3 className="text-lg font-bold text-[#2f2f2e]">Recommended For</h3>
             </div>
             <ul className="space-y-2 text-sm">
-              {candidateItems.length > 0 ? candidateItems.slice(0, 3).map((item: string, i: number) => (
+              {candidateItems && candidateItems.length > 0 ? candidateItems.slice(0, 3).map((item: string, i: number) => (
                 <li key={i} className="flex items-start gap-2 text-[#5c5b5b]">
                   <CheckCircle className="text-[#2eb2a5] text-base mt-0.5 flex-shrink-0" />{item}
                 </li>
@@ -452,7 +475,7 @@ const ServiceLocationPage = ({
               <h3 className="text-lg font-bold text-[#2f2f2e]">May Not Be Suitable</h3>
             </div>
             <ul className="space-y-2 text-sm">
-              {alternativeItems.length > 0 ? alternativeItems.slice(0, 3).map((item: string, i: number) => (
+              {alternativeItems && alternativeItems.length > 0 ? alternativeItems.slice(0, 3).map((item: string, i: number) => (
                 <li key={i} className="flex items-start gap-2 text-[#5c5b5b]">
                   <XCircle className="text-red-500/40 text-base mt-0.5 flex-shrink-0" />{item}
                 </li>
@@ -632,7 +655,7 @@ const ServiceLocationPage = ({
         <h3 className="text-2xl font-bold tracking-tight mb-8">Concierge Journey</h3>
         <div className="space-y-12 relative">
           <div className="absolute left-6 top-4 bottom-4 w-px bg-[#00675f]/20" />
-          {processSteps.length > 0 ? processSteps.slice(0, 4).map((step: any, i: number) => (
+          {processSteps && processSteps.length > 0 ? processSteps.slice(0, 4).map((step: any, i: number) => (
             <div key={i} className="relative flex items-start gap-6">
               <div className="w-12 h-12 rounded-full bg-[#00675f] flex items-center justify-center text-white z-10 shrink-0">
                 {i === 0 && <Search className="text-xl" />}

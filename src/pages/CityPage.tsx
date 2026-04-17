@@ -352,8 +352,16 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     { label: cityName },
   ];
 
-  // Parse SEO content
+  const section1Title = pageContentDataProp?.section_1_title || null;
+  const section1Content = pageContentDataProp?.section_1_content || null;
+  const section2Title = pageContentDataProp?.section_2_title || null;
+  const section2Content = pageContentDataProp?.section_2_content || null;
+  const section3Title = pageContentDataProp?.section_3_title || null;
+  const section3Content = pageContentDataProp?.section_3_content || null;
+  
+  // Parse seo_pages content for PageIntroSection
   const parsedContent = seoContent?.content ? parseMarkdownContent(seoContent.content) : null;
+  
   // Use dedicated faqs column first (has question/answer format), fallback to parsing from content (now returns q/a format)
   const rawSeoFaqs = seoContent?.faqs && Array.isArray(seoContent.faqs) && seoContent.faqs.length > 0
     ? seoContent.faqs
@@ -364,9 +372,9 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
   // SSR FAQ data takes priority, then use client-fetched SEO content, then defaults
   const serverFaqs = faqsProp && faqsProp.length > 0 ? faqsProp : [];
 
-  const pageTitle = seoContent?.meta_title || seoDataProp?.title || null;
-  const pageDescription = seoContent?.meta_description || seoDataProp?.description || null;
-  const pageH1 = seoContent?.h1 || seoH1Prop || null;
+  const pageTitle = pageContentDataProp?.meta_title || seoContent?.meta_title || seoDataProp?.title || null;
+  const pageDescription = pageContentDataProp?.meta_description || seoContent?.meta_description || seoDataProp?.description || null;
+  const pageH1 = pageContentDataProp?.h1 || seoContent?.h1 || seoH1Prop || null;
 
   // Note: parseFaqFromContent now returns { q, a }[] format (same as seoContent.faqs after parseFaqs validation)
   const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs : [];
@@ -401,10 +409,10 @@ const shouldNoIndex = false;
              containedInPlace: stateName,
            },
          ]}
-         id="city-page-schema"
-       />
+          id="city-page-schema"
+        />
 
-      {/* Hero Section — Full viewport with Luminous Atelier design */}
+      {/* Hero Section — Full viewport banner */}
       <section className="relative h-[85vh] flex items-center overflow-hidden bg-[#0e0e0e] mx-4 mb-4 rounded-[3rem]">
         <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
           <div className="absolute top-0 right-0 w-full h-full border-r border-b border-white/10 [mask-image:radial-gradient(ellipse_at_center,black,transparent)]" />
@@ -499,14 +507,16 @@ const shouldNoIndex = false;
         </div>
       </section>
 
-      {/* Page Intro Section - CMS Content */}
-      <PageIntroSection
-        title={parsedContent?.sections?.[0]?.heading || null}
-        content={(seoContent as any)?.page_intro || parsedContent?.intro || parsedContent?.sections?.[0]?.content || null}
-        isLoading={isSeoContentPending}
-      />
+      {/* Hero Intro Section - CMS Content Only (no heading) */}
+      {pageContentDataProp?.hero_intro && (
+        <section className="py-8 px-4">
+          <div className="container max-w-4xl mx-auto">
+            <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: pageContentDataProp.hero_intro }} />
+          </div>
+        </section>
+      )}
 
-      {/* Main Content: Dentists + SEO Content */}
+      {/* Main Content: Dentists */}
       <Section size="lg">
         <div className="container px-4">
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
@@ -570,20 +580,31 @@ const shouldNoIndex = false;
                 initialCount={10}
               />
 
-              {/* SEO Content Block */}
-              <SEOContentBlock
-                variant="city"
-                locationName={cityName}
-                stateName={stateName}
-                stateAbbr={stateAbbr}
-                stateSlug={stateSlug}
-                citySlug={citySlug}
-                clinicCount={totalClinicCount || profiles?.length || 0}
-                parsedContent={parsedContent}
-                popularTreatments={popularTreatments}
-                nearbyLocations={nearbyLocations}
-                isLoading={isSeoContentPending}
-              />
+              {/* Content Sections from page_content - section_1 to section_3 */}
+              {(section1Title && section1Content) || (section2Title && section2Content) || (section3Title && section3Content) ? (
+                <Section size="md">
+                  <div className="container px-4 max-w-4xl mx-auto space-y-8">
+                    {section1Title && section1Content && (
+                      <div>
+                        <h2 className="text-2xl font-bold mb-4">{section1Title}</h2>
+                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: section1Content.replace(/\n/g, '<br/>') }} />
+                      </div>
+                    )}
+                    {section2Title && section2Content && (
+                      <div>
+                        <h2 className="text-2xl font-bold mb-4">{section2Title}</h2>
+                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: section2Content.replace(/\n/g, '<br/>') }} />
+                      </div>
+                    )}
+                    {section3Title && section3Content && (
+                      <div>
+                        <h2 className="text-2xl font-bold mb-4">{section3Title}</h2>
+                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: section3Content.replace(/\n/g, '<br/>') }} />
+                      </div>
+                    )}
+                  </div>
+                </Section>
+              ) : null}
 
               {/* NEW: All Service-Location Pages - Premium Dark Design */}
               {(serviceLocationPages?.length || 0) > 0 ? (

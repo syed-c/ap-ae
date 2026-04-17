@@ -6,7 +6,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs, seoH1, heroIntro, content, section1Title, section1Content, section2Title, section2Content, section3Title, section3Content, allSeoData }: {
+const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs, seoH1, heroIntro, content, priceMin, priceMax, priceNote, quickAnswer, lastReviewedBy, expertCredential, medicalAccuracyVerified, processSteps, treatmentOptions, benefits, candidates, alternatives, relatedQuestions, processTimeMonths, processTimeNote, allSeoData }: {
     stateSlug: string;
     citySlug: string;
     serviceSlug: string;
@@ -18,12 +18,21 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
     seoH1: string | null;
     heroIntro?: string | null;
     content?: string | null;
-    section1Title?: string | null;
-    section1Content?: string | null;
-    section2Title?: string | null;
-    section2Content?: string | null;
-    section3Title?: string | null;
-    section3Content?: string | null;
+    priceMin?: number | null;
+    priceMax?: number | null;
+    priceNote?: string | null;
+    quickAnswer?: string | null;
+    lastReviewedBy?: string | null;
+    expertCredential?: string | null;
+    medicalAccuracyVerified?: boolean;
+    processSteps?: any[] | null;
+    treatmentOptions?: any[] | null;
+    benefits?: any[] | null;
+    candidates?: any[] | null;
+    alternatives?: any[] | null;
+    relatedQuestions?: any[] | null;
+    processTimeMonths?: string | null;
+    processTimeNote?: string | null;
     allSeoData?: any;
 }) => {
     const treatmentName = treatmentData?.name || serviceSlug;
@@ -90,12 +99,21 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
                 seoH1Prop={seoH1}
                 heroIntroProp={heroIntro}
                 contentProp={content}
-                section1TitleProp={section1Title}
-                section1ContentProp={section1Content}
-                section2TitleProp={section2Title}
-                section2ContentProp={section2Content}
-                section3TitleProp={section3Title}
-                section3ContentProp={section3Content}
+                priceMinProp={priceMin}
+                priceMaxProp={priceMax}
+                priceNoteProp={priceNote}
+                quickAnswerProp={quickAnswer}
+                lastReviewedByProp={lastReviewedBy}
+                expertCredentialProp={expertCredential}
+                medicalAccuracyVerifiedProp={medicalAccuracyVerified}
+                processStepsProp={processSteps}
+                treatmentOptionsProp={treatmentOptions}
+                benefitsProp={benefits}
+                candidatesProp={candidates}
+                alternativesProp={alternatives}
+                relatedQuestionsProp={relatedQuestions}
+                processTimeMonthsProp={processTimeMonths}
+                processTimeNoteProp={processTimeNote}
                 allSeoDataProp={allSeoData}
             />
         </>
@@ -208,20 +226,29 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const treatmentName = treatmentData?.name || serviceSlug;
     
     // Extract ALL SEO content fields for server-side rendering
-    const metaTitle = seoContent?.meta_title || `${treatmentName} in ${cityName}, ${stateName} (2026) — Book Now | AppointPanda`;
-    const metaDescription = seoContent?.meta_description || `Get ${treatmentName.toLowerCase()} treatment in ${cityName}, ${stateName}. Compare top clinics, check AED prices, read verified reviews. Book your appointment today.`;
-    const seoH1 = seoContent?.h1 || `Best ${treatmentName} in ${cityName}`;
-    const heroIntro = seoContent?.page_intro || seoContent?.content?.substring(0, 200) || null;
-    const content = seoContent?.content || null;
+    const seoDataFromDb = seoContent as any;
+    const metaTitle = seoDataFromDb?.meta_title || `${treatmentName} in ${cityName}, ${stateName} (2026) — Book Now | AppointPanda`;
+    const metaDescription = seoDataFromDb?.meta_description || `Get ${treatmentName.toLowerCase()} treatment in ${cityName}, ${stateName}. Compare top clinics, check AED prices, read verified reviews. Book your appointment today.`;
+    const seoH1 = seoDataFromDb?.h1 || seoDataFromDb?.title || `Best ${treatmentName} in ${cityName}`;
+    const heroIntro = seoDataFromDb?.page_intro || null;
+    const content = seoDataFromDb?.content || null;
     
-    // Extract additional sections - cast to any for flexibility
-    const seoContentAny = seoContent as any;
-    const section1Title = seoContentAny?.section_1_title || null;
-    const section1Content = seoContentAny?.section_1_content || null;
-    const section2Title = seoContentAny?.section_2_title || null;
-    const section2Content = seoContentAny?.section_2_content || null;
-    const section3Title = seoContentAny?.section_3_title || null;
-    const section3Content = seoContentAny?.section_3_content || null;
+    // Extract all additional fields from DB
+    const priceMin = seoDataFromDb?.price_min || null;
+    const priceMax = seoDataFromDb?.price_max || null;
+    const priceNote = seoDataFromDb?.price_note || null;
+    const quickAnswer = seoDataFromDb?.quick_answer || null;
+    const lastReviewedBy = seoDataFromDb?.last_reviewed_by || null;
+    const expertCredential = seoDataFromDb?.expert_credential || null;
+    const medicalAccuracyVerified = seoDataFromDb?.medical_accuracy_verified || false;
+    const processSteps = seoDataFromDb?.process_steps || null;
+    const treatmentOptions = seoDataFromDb?.treatment_options || null;
+    const benefits = seoDataFromDb?.benefits || null;
+    const candidates = seoDataFromDb?.candidates || null;
+    const alternatives = seoDataFromDb?.alternatives || null;
+    const relatedQuestions = seoDataFromDb?.related_questions || null;
+    const processTimeMonths = seoDataFromDb?.process_time_months || null;
+    const processTimeNote = seoDataFromDb?.process_time_note || null;
 
     let ssrFaqs: { question: string; answer: string }[] = [];
     
@@ -249,13 +276,23 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             seoH1: seoH1,
             heroIntro,
             content,
-            // Additional sections for SEO
-            section1Title,
-            section1Content,
-            section2Title,
-            section2Content,
-            section3Title,
-            section3Content,
+            // Price & clinical data
+            priceMin,
+            priceMax,
+            priceNote,
+            quickAnswer,
+            lastReviewedBy,
+            expertCredential,
+            medicalAccuracyVerified,
+            // Process & options
+            processSteps,
+            treatmentOptions,
+            benefits,
+            candidates,
+            alternatives,
+            relatedQuestions,
+            processTimeMonths,
+            processTimeNote,
             allSeoData: seoContent,
         },
         revalidate: 600,
