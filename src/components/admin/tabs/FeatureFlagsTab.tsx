@@ -141,7 +141,7 @@ export default function FeatureFlagsTab() {
           value: { enabled },
           description: FEATURE_FLAGS.find(f => f.key === key)?.description,
           updated_at: new Date().toISOString(),
-        }, {
+        } as any, {
           onConflict: 'key',
         });
 

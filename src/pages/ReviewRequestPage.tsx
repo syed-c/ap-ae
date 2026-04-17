@@ -218,7 +218,7 @@ export default function ReviewRequestPage() {
       event_type: 'thumbs_down',
       rating,
       comment: comment.trim() || null,
-    });
+    } as any);
 
     submitInternalReview.mutate();
   };

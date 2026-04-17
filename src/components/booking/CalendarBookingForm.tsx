@@ -211,7 +211,7 @@ export function CalendarBookingForm({
 
       const { data: insertedAppointment, error } = await supabase
         .from("appointments")
-        .insert(appointmentData)
+        .insert(appointmentData as any)
         .select('id')
         .single();
 

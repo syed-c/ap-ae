@@ -149,7 +149,7 @@ export default function ReviewFunnelPage() {
         event_type: event.event_type,
         rating: event.rating,
         comment: event.comment,
-      });
+      } as any);
       if (error) throw error;
 
       if (event.event_type === 'thumbs_down' && event.rating) {

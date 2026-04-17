@@ -57,7 +57,7 @@ export function useUpdateLead() {
       const updateData: Record<string, unknown> = { ...updates };
       if (updates.status === 'contacted') updateData.contacted_at = new Date().toISOString();
 
-      const { error } = await supabase.from('leads').update(updateData).eq('id', id);
+      const { error } = await supabase.from('leads').update(updateData as any).eq('id', id);
       if (error) throw error;
       await createAuditLog({ action: 'UPDATE', entityType: 'lead', entityId: id, oldValues: old, newValues: updates });
     },

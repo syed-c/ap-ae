@@ -134,7 +134,7 @@ export function SmartCitySearch({
           auto_created: true,
           seo_status: "inactive",
           page_exists: false,
-        })
+        } as any)
         .select(`
           id, name, slug,
           state:states!inner(id, name, abbreviation, slug)

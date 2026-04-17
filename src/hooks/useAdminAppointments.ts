@@ -68,7 +68,7 @@ export function useUpdateAppointment() {
   return useMutation({
     mutationFn: async ({ id, updates, sendNotification = true }: { id: string; updates: Partial<AdminAppointment>; sendNotification?: boolean }) => {
       const { data: old } = await supabase.from('appointments').select('*').eq('id', id).single();
-      const { error } = await supabase.from('appointments').update(updates).eq('id', id);
+      const { error } = await supabase.from('appointments').update(updates as any).eq('id', id);
       if (error) throw error;
       await createAuditLog({ action: 'UPDATE', entityType: 'appointment', entityId: id, oldValues: old, newValues: updates });
       

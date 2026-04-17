@@ -326,7 +326,7 @@ const ClaimProfilePage = () => {
           requester_address: manualForm.address,
           admin_notes: manualForm.notes ? `User notes: ${manualForm.notes}` : null,
           verification_method: "manual",
-        }, {
+        } as any, {
           onConflict: 'clinic_id,user_id'
         });
 

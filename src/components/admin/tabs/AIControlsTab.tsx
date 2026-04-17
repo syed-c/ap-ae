@@ -156,17 +156,17 @@ export default function AIControlsTab() {
   // Save AI settings
   const saveSettings = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from('global_settings')
-        .upsert({
-          key: 'ai_config',
-          value: {
-            modules: moduleStates,
-            thresholds,
-            updated_at: new Date().toISOString(),
-          },
-          description: 'AI module configuration and thresholds',
-        }, { onConflict: 'key' });
+const { error } = await supabase
+          .from('global_settings')
+          .upsert({
+            key: 'ai_config',
+            value: {
+              modules: moduleStates,
+              thresholds,
+              updated_at: new Date().toISOString(),
+            },
+            description: 'AI module configuration and thresholds',
+          } as any);
       if (error) throw error;
     },
     onSuccess: () => {

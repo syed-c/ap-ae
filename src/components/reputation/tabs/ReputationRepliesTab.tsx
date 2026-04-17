@@ -77,7 +77,7 @@ export default function ReputationRepliesTab({ clinicId, isAdmin }: Props) {
           ai_suggested_reply: replyText,
           reply_status: 'ready_to_post',
           updated_at: new Date().toISOString(),
-        })
+        } as any)
         .eq('id', selectedReview.id);
       if (error) throw error;
       await createAuditLog({
@@ -105,7 +105,7 @@ export default function ReputationRepliesTab({ clinicId, isAdmin }: Props) {
           reply_status: 'posted',
           reply_time: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        })
+        } as any)
         .eq('id', reviewId);
       if (error) throw error;
       await createAuditLog({

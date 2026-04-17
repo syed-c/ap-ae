@@ -191,7 +191,7 @@ export default function MessagesTab() {
         status: crmNumber ? 'queued' : 'pending',
         template_type: selectedTemplate || null,
         crm_number_id: crmNumber?.id || null,
-      });
+      } as any);
 
       if (error) throw error;
     },

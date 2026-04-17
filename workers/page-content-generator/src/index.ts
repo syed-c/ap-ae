@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface Env {
-  DB: D1Database;
+  DB: any;
   SUPABASE_SERVICE_KEY: string;
   AIMLAPI_KEY: string;
   SUPABASE_URL: string;

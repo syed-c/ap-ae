@@ -130,7 +130,7 @@ export default function ContactDetailsTab() {
       } else {
         await supabase
           .from('global_settings')
-          .insert({ key: 'contact_details', value: contactDetails as any, description: 'Platform contact information' });
+          .insert({ key: 'contact_details', value: contactDetails as any, description: 'Platform contact information' } as any);
       }
 
       // Save social links
@@ -143,7 +143,7 @@ export default function ContactDetailsTab() {
       } else {
         await supabase
           .from('global_settings')
-          .insert({ key: 'social_links', value: socialLinks as any, description: 'Social media links' });
+          .insert({ key: 'social_links', value: socialLinks as any, description: 'Social media links' } as any);
       }
 
       await createAuditLog({

@@ -149,7 +149,7 @@ export default function SupportTicketsTab() {
         ai_suggested_category: suggestCategory(formData.description) || null,
         status: 'open',
         priority: 'medium',
-      });
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {

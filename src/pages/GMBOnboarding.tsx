@@ -231,7 +231,7 @@ export default function GMBOnboarding() {
           onboarding_status: 'complete',
           completed_at: now,
           updated_at: now,
-        },
+        } as any,
         { onConflict: 'user_id' }
       );
     queryClient.invalidateQueries({ queryKey: ['user-onboarding'] });

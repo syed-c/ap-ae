@@ -99,7 +99,7 @@ export default function TeamManagementTab() {
           years_experience: data.years_experience || null,
           image_url: data.image_url || null,
           is_active: true,
-        });
+        } as any);
 
       if (error) throw error;
 
@@ -137,7 +137,7 @@ export default function TeamManagementTab() {
           years_experience: data.years_experience || null,
           image_url: data.image_url || null,
           updated_at: new Date().toISOString(),
-        })
+        } as any)
         .eq('id', id);
 
       if (error) throw error;

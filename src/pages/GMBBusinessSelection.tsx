@@ -227,7 +227,7 @@ export default function GMBBusinessSelection() {
               gmb_connected: true,
               gmb_last_sync_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
-            })
+            } as any)
             .eq('id', existingClinic.id);
 
           if (updateError) throw updateError;

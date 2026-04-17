@@ -308,7 +308,7 @@ export default function PlansTab() {
             key: 'pricing_plans', 
             value: updatedPlans as any,
             description: 'Platform subscription pricing plans configuration'
-          });
+          } as any);
         if (error) throw error;
       }
 

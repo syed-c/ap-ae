@@ -543,7 +543,7 @@ export default function GmbScraperBotTab() {
     // Insert in batches
     for (let i = 0; i < records.length; i += 500) {
       const batch = records.slice(i, i + 500);
-      await supabase.from('gmb_scraper_results').upsert(batch, { 
+      await supabase.from('gmb_scraper_results').upsert(batch as any, { 
         onConflict: 'session_id,place_id',
         ignoreDuplicates: true 
       });
@@ -560,7 +560,7 @@ export default function GmbScraperBotTab() {
     
     await supabase
       .from('gmb_scraper_sessions')
-      .update(updates)
+      .update(updates as any)
       .eq('id', sessionId);
   };
   
@@ -782,7 +782,7 @@ export default function GmbScraperBotTab() {
         duplicate_count: totalDuplicates,
         error_count: totalErrors,
         updated_at: new Date().toISOString(),
-      })
+      } as any)
       .eq('id', session.id);
     
     queryClient.invalidateQueries({ queryKey: ['gmb-scraper-sessions'] });

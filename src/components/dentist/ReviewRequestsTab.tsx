@@ -110,7 +110,7 @@ export default function ReviewRequestsTab() {
       
       const { error } = await supabase
         .from('review_requests')
-        .insert(requests);
+        .insert(requests as any);
       
       if (error) throw error;
       

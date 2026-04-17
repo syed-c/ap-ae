@@ -177,7 +177,7 @@ export default function TabVisibilityTab() {
           value: visibility as any,
           description: 'Tab visibility settings for admin and dentist dashboards',
           updated_at: new Date().toISOString(),
-        }, { onConflict: 'key' });
+        } as any, { onConflict: 'key' });
 
       if (error) throw error;
 

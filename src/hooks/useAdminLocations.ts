@@ -109,7 +109,7 @@ export function useUpdateState() {
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<State> }) => {
       const { data: old } = await supabase.from('states').select('*').eq('id', id).single();
-      const { error } = await supabase.from('states').update(updates).eq('id', id);
+      const { error } = await supabase.from('states').update(updates as any).eq('id', id);
       if (error) throw error;
       await createAuditLog({ action: 'UPDATE', entityType: 'state', entityId: id, oldValues: old, newValues: updates });
     },
@@ -276,7 +276,7 @@ export function useUpdateCity() {
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<City> }) => {
       const { data: old } = await supabase.from('cities').select('*').eq('id', id).single();
-      const { error } = await supabase.from('cities').update(updates).eq('id', id);
+      const { error } = await supabase.from('cities').update(updates as any).eq('id', id);
       if (error) throw error;
       await createAuditLog({ action: 'UPDATE', entityType: 'city', entityId: id, oldValues: old, newValues: updates });
     },
@@ -310,7 +310,7 @@ export function useUpdateArea() {
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Area> }) => {
       const { data: old } = await supabase.from('areas').select('*').eq('id', id).single();
-      const { error } = await supabase.from('areas').update(updates).eq('id', id);
+      const { error } = await supabase.from('areas').update(updates as any).eq('id', id);
       if (error) throw error;
       await createAuditLog({ action: 'UPDATE', entityType: 'area', entityId: id, oldValues: old, newValues: updates });
     },

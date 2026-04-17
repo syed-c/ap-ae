@@ -132,7 +132,7 @@ export default function UnassignedQueriesTab() {
           is_assigned: true,
           assigned_at: new Date().toISOString(),
           routing_notes: notes,
-        })
+        } as any)
         .eq('id', appointmentId);
 
       if (error) throw error;

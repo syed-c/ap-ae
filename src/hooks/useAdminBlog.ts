@@ -87,7 +87,7 @@ export function useUpdateBlogPost() {
       if (updates.status === 'published' && !old?.published_at) {
         updateData.published_at = new Date().toISOString();
       }
-      const { error } = await supabase.from('blog_posts').update(updateData).eq('id', id);
+      const { error } = await supabase.from('blog_posts').update(updateData as any).eq('id', id);
       if (error) throw error;
       await createAuditLog({ action: 'UPDATE', entityType: 'blog_post', entityId: id, oldValues: old, newValues: updates });
     },

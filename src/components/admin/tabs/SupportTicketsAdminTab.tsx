@@ -134,7 +134,7 @@ export default function SupportTicketsAdminTab() {
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<SupportTicket> }) => {
       const { error } = await supabase
         .from('support_tickets')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...updates, updated_at: new Date().toISOString() } as any)
         .eq('id', id);
 
       if (error) throw error;

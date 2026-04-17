@@ -76,7 +76,7 @@ export function useUpdateSubscription() {
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Subscription> }) => {
       const { error } = await supabase
         .from('clinic_subscriptions')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...updates, updated_at: new Date().toISOString() } as any)
         .eq('id', id);
       
       if (error) throw error;
