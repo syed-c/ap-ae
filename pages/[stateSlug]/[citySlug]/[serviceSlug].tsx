@@ -6,7 +6,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs, seoH1, heroIntro, content, priceMin, priceMax, priceNote, quickAnswer, lastReviewedBy, expertCredential, medicalAccuracyVerified, processSteps, treatmentOptions, benefits, candidates, alternatives, relatedQuestions, processTimeMonths, processTimeNote, allSeoData }: {
+const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs, seoH1, heroIntro, content, priceMin, priceMax, priceNote, quickAnswer, lastReviewedBy, expertCredential, medicalAccuracyVerified, processSteps, treatmentOptions, benefits, candidates, alternatives, relatedQuestions, processTimeMonths, processTimeNote, allSeoData, clinicProfilesProp }: {
     stateSlug: string;
     citySlug: string;
     serviceSlug: string;
@@ -34,6 +34,7 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
     processTimeMonths?: string | null;
     processTimeNote?: string | null;
     allSeoData?: any;
+    clinicProfilesProp?: any[];
 }) => {
     const treatmentName = treatmentData?.name || serviceSlug;
     const cityName = cityData?.name || citySlug;
@@ -115,6 +116,7 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
                 processTimeMonthsProp={processTimeMonths}
                 processTimeNoteProp={processTimeNote}
                 allSeoDataProp={allSeoData}
+                clinicProfilesProp={clinicProfilesProp}
             />
         </>
     );
@@ -122,8 +124,8 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
 
 export default ServiceLocationPageWithSEO;
 
-// Generate static paths - LIMITED to top cities only for build speed
-// Service-location pages for other cities will be ISR
+// Generate static paths - ONLY for city/treatment combinations with actual clinics
+// This prevents 404s from soft-404 pages with 0 results
 export const getStaticPaths: GetStaticPaths = async () => {
     try {
         const supabase = createServerSupabaseAdmin();
@@ -132,33 +134,61 @@ export const getStaticPaths: GetStaticPaths = async () => {
             return { paths: [], fallback: 'blocking' };
         }
         
-        // Get top 100 cities with most clinics
+        // Get all active cities with their state relationship
         const { data: cities } = await supabase
             .from('cities')
-            .select('slug, state:states(slug)')
-            .eq('is_active', true)
-            .limit(100);
-        
-        // Get all treatments for top cities
-        const { data: treatments } = await supabase
-            .from('treatments')
-            .select('slug')
+            .select('id, slug, state:states(id, slug)')
             .eq('is_active', true);
         
-        const paths: { params: { stateSlug: string; citySlug: string; serviceSlug: string } }[] = [];
+        // Get all active treatments
+        const { data: treatments } = await supabase
+            .from('treatments')
+            .select('id, slug')
+            .eq('is_active', true);
         
-        for (const city of cities || []) {
-            if (!city.state?.slug) continue;
-            for (const treatment of treatments || []) {
-                paths.push({
-                    params: {
-                        stateSlug: city.state.slug,
-                        citySlug: city.slug,
-                        serviceSlug: treatment.slug
-                    }
-                });
+        if (!cities || !treatments) {
+            return { paths: [], fallback: 'blocking' };
+        }
+        
+        // Get all city/treatment combinations that have at least one clinic
+        const { data: clinicCombinations } = await supabase
+            .from('clinic_treatments')
+            .select('clinic:clinics!inner(city_id, is_active), treatment_id')
+            .eq('clinic.is_active', true);
+        
+        // Build a set of valid city_id + treatment_id pairs
+        const validCombos = new Set<string>();
+        for (const combo of clinicCombinations || []) {
+            if (combo.clinic?.city_id && combo.treatment_id) {
+                validCombos.add(`${combo.clinic.city_id}-${combo.treatment_id}`);
             }
         }
+        
+        // Only create paths for combinations that have clinics
+        const paths: { params: { stateSlug: string; citySlug: string; serviceSlug: string } }[] = [];
+        
+        for (const city of cities) {
+            if (!city.state?.slug || !city.slug) continue;
+            
+            const stateSlug = city.state.slug;
+            const citySlug = city.slug;
+            const cityId = city.id;
+            
+            for (const treatment of treatments) {
+                // Only add path if this combination has at least one clinic
+                if (validCombos.has(`${cityId}-${treatment.id}`)) {
+                    paths.push({
+                        params: {
+                            stateSlug,
+                            citySlug,
+                            serviceSlug: treatment.slug
+                        }
+                    });
+                }
+            }
+        }
+        
+        console.log(`Service-location paths: ${paths.length} (from ${cities.length} cities × ${treatments.length} treatments, filtered by clinic existence)`);
         
         return { paths, fallback: 'blocking' };
     } catch (error) {
@@ -181,6 +211,31 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     if (!normalizedStateSlug || !citySlug || !serviceSlug) {
         return { notFound: true };
+    }
+
+    if (!supabase) {
+        return {
+            props: {
+                stateSlug: normalizedStateSlug,
+                citySlug,
+                serviceSlug: serviceSlug,
+                stateData: null,
+                cityData: null,
+                treatmentData: null,
+                seoData: {
+                    title: `${serviceSlug} in ${citySlug}`,
+                    description: 'Find and book dental appointments in UAE',
+                    canonical: `/${normalizedStateSlug}/${citySlug}/${serviceSlug}/`,
+                },
+                faqs: [],
+                seoH1: null,
+                treatmentRatings: null,
+                allSeoData: null,
+                pageContentDataProp: null,
+                clinicProfilesProp: [],
+            },
+            revalidate: 60,
+        };
     }
 
     const seoSlug = `/${normalizedStateSlug}/${citySlug}/${serviceSlug}`;
@@ -220,6 +275,40 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     if (!stateData) {
         return { notFound: true };
     }
+
+    // Return 404 if city or treatment doesn't exist
+    if (!cityData || !treatmentData) {
+        return { notFound: true };
+    }
+
+    // Return 404 if no clinics offer this treatment in this city
+    // This handles edge cases and prevents soft-404 pages
+    const { data: clinicCount } = await supabase
+        .from('clinic_treatments')
+        .select('id', { count: 'exact', head: true })
+        .eq('treatment_id', treatmentData.id)
+        .eq('clinic.is_active', true)
+        .eq('clinic.city_id', cityData.id);
+
+    if (!clinicCount || (clinicCount as any) === 0) {
+        return { notFound: true };
+    }
+
+    // Pre-fetch clinic profiles for SSR - this data will be passed to client
+    // and eliminates the need for client-side API call on first render
+    const { data: clinicProfiles } = await (supabase
+        .from('clinics') as any)
+        .select(`
+            id, name, slug, type, rating, review_count, image_url, is_verified, is_claimed, is_pinned,
+            location, address, phone, website, languages, area_id, city_id,
+            state:states(name, slug),
+            treatments(treatment_id, treatment:treatments(id, name, slug))
+        `)
+        .eq('city_id', cityData.id)
+        .eq('is_active', true)
+        .order('rating', { ascending: false })
+        .order('review_count', { ascending: false })
+        .limit(50);
 
     const stateName = stateData.name;
     const cityName = cityData?.name || citySlug;
@@ -294,6 +383,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             processTimeMonths,
             processTimeNote,
             allSeoData: seoContent,
+            clinicProfilesProp: clinicProfiles || [],
         },
         revalidate: 600,
     };

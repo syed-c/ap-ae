@@ -28,7 +28,7 @@ const ensureTrailingSlash = (url: string): string => {
 
 export const BreadcrumbSchema = ({
   items,
-  baseUrl = "https://www.AppointPanda.ae"
+  baseUrl = "https://www.appointpanda.ae"
 }: BreadcrumbSchemaProps) => {
   const schemaItems = items.map((item, index) => {
     const url = item.url.startsWith("http")

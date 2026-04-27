@@ -26,6 +26,7 @@ interface ProfileFilters {
   areaId?: string;
   treatmentId?: string;
   limit?: number;
+  initialData?: Profile[];
 }
 
 export function useProfiles(filters: ProfileFilters = {}) {
@@ -231,6 +232,8 @@ export function useProfiles(filters: ProfileFilters = {}) {
     },
     staleTime: 5 * 60 * 1000, // 5 min cache - profiles don't change frequently
     gcTime: 30 * 60 * 1000,
+    enabled: !filters.initialData,
+    initialData: filters.initialData,
   });
 }
 

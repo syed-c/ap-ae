@@ -1,5 +1,5 @@
 'use client';
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
@@ -55,9 +55,10 @@ interface StatePageProps {
   topClinicsProp?: { name: string; slug: string; rating: number; review_count: number }[];
   allSeoDataProp?: any;
   pageContentDataProp?: any;
+  clinicProfilesProp?: any[];
 }
 
-const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, faqsProp, seoH1Prop, stateRatingsProp, topClinicsProp, allSeoDataProp, pageContentDataProp }: StatePageProps = {}) => {
+const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, faqsProp, seoH1Prop, stateRatingsProp, topClinicsProp, allSeoDataProp, pageContentDataProp, clinicProfilesProp }: StatePageProps = {}) => {
   const router = useRouter();
   const isServerRender = typeof window === 'undefined';
   const stateSlug = isServerRender
@@ -127,15 +128,12 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
   });
 
   // Fetch profiles for this state - includes pinned clinics explicitly
+  const hasServerProfiles = !!(clinicProfilesProp && clinicProfilesProp.length > 0 && state);
   const { data: rawProfiles, isLoading: profilesLoading } = useQuery({
     queryKey: ['state-profiles', stateSlug, pinnedProfiles?.map(p => p.id).join(',')],
     queryFn: async () => {
-      if (!state) return [];
-
-      // Get IDs of pinned clinics
       const pinnedIds = (pinnedProfiles || []).map(p => p.id);
 
-      // Get city IDs for this state
       const { data: stateCities } = await supabaseAdmin
         .from('cities')
         .select('id')
@@ -145,7 +143,6 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
 
       const stateCityIds = stateCities.map(c => c.id);
 
-      // Get clinics in these cities
       const { data: clinics } = await supabaseAdmin
         .from('clinics')
         .select(`
@@ -158,7 +155,6 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
         .order('rating', { ascending: false })
         .limit(50);
 
-      // If there are pinned IDs not in the result, fetch them separately
       const resultIds = new Set((clinics || []).map(c => c.id));
       const missingPinnedIds = pinnedIds.filter(id => !resultIds.has(id));
 
@@ -176,7 +172,6 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
         pinnedClinics = extraPinned || [];
       }
 
-      // Combine and dedupe
       const seenIds = new Set<string>();
       const allClinics = [...(clinics || []), ...pinnedClinics].filter(c => {
         if (seenIds.has(c.id)) return false;
@@ -199,17 +194,38 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
         isPinned: false,
       }));
     },
-    enabled: !!state,
+    enabled: !!state && !hasServerProfiles,
   });
+
+  // Server-side profiles for SSR (Googlebot sees this immediately)
+  const [serverProfiles] = useState(() =>
+    hasServerProfiles
+      ? clinicProfilesProp.map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          slug: c.slug,
+          type: 'clinic' as const,
+          specialty: 'Dental Clinic',
+          location: c.city ? `${c.city.name}, ${c.city.state?.name || c.city.state?.abbreviation || ''}` : '',
+          rating: c.rating || 0,
+          reviewCount: c.review_count || 0,
+          image: c.cover_image_url,
+          isVerified: c.is_verified,
+          isClaimed: c.is_claimed,
+          isPinned: c.is_pinned,
+        }))
+      : undefined
+  );
 
   // Sort profiles with pinned ones first
   const profiles = useMemo(() => {
-    if (!rawProfiles) return [];
-    const sorted = sortWithPinnedFirst(rawProfiles, pinnedProfiles || []);
+    const source = hasServerProfiles && serverProfiles ? serverProfiles : rawProfiles;
+    if (!source) return [];
+    const sorted = sortWithPinnedFirst(source as any[], (pinnedProfiles || []) as any[]) as any[];
     // Mark pinned profiles
     const pinnedIds = new Set((pinnedProfiles || []).map(p => p.id));
     return sorted.map(p => ({ ...p, isPinned: pinnedIds.has(p.id) }));
-  }, [rawProfiles, pinnedProfiles]);
+  }, [rawProfiles, serverProfiles, hasServerProfiles, pinnedProfiles]);
 
   // Filters for state page (same as city page)
   const { filters: stateFilters, setFilters: setStateFilters } = useBudgetFilters();

@@ -209,6 +209,40 @@ export async function generateServiceLocationsByCity(
   return data as GenerateServiceLocationsResult;
 }
 
+export async function generateServiceLocationsByEmirate(
+  emirateSlug: string,
+  params: { force_regenerate?: boolean; batch_limit?: number; cursor?: string | null } = {}
+): Promise<GenerateServiceLocationsResult> {
+  const { data, error } = await supabase.functions.invoke(
+    "page-content-generator",
+    {
+      body: {
+        action: "generate_service_locations_by_emirate",
+        emirate_slug: emirateSlug,
+        batch_limit: params.batch_limit || 3,
+        force_regenerate: params.force_regenerate || false,
+        cursor: params.cursor || null,
+      },
+    }
+  );
+
+  if (error) {
+    return {
+      processed: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [error.message],
+      remaining: 0,
+      total_count: 0,
+      cursor: null,
+      has_more: false,
+      page_type: "service-location",
+    };
+  }
+
+  return data as GenerateServiceLocationsResult;
+}
+
 export async function generateSingleServiceLocation(
   slug: string,
   force_regenerate: boolean = false

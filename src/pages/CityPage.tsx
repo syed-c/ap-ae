@@ -1,5 +1,5 @@
 'use client';
-import { useState as useReactState, useMemo } from "react";
+import { useState as useReactState, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
@@ -82,9 +82,10 @@ interface CityPageProps {
   topClinicsProp?: { name: string; slug: string; rating: number; review_count: number }[];
   allSeoDataProp?: any;
   pageContentDataProp?: any;
+  clinicProfilesProp?: any[];
 }
 
-const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp, faqsProp, seoH1Prop, cityRatingsProp, topClinicsProp, allSeoDataProp, pageContentDataProp }: CityPageProps = {}) => {
+const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp, faqsProp, seoH1Prop, cityRatingsProp, topClinicsProp, allSeoDataProp, pageContentDataProp, clinicProfilesProp }: CityPageProps = {}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isServerRender = typeof window === 'undefined';
@@ -132,11 +133,10 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
   });
 
   // Fetch profiles for this city (limited for display)
+  const hasServerProfiles = !!(clinicProfilesProp && clinicProfilesProp.length > 0 && city);
   const { data: rawProfiles, isLoading: profilesLoading } = useQuery({
     queryKey: ['city-profiles', citySlug, pinnedProfiles?.map(p => p.id).join(',')],
     queryFn: async () => {
-      if (!city) return [];
-
       const pinnedIds = (pinnedProfiles || []).map(p => p.id);
 
       const { data: clinics } = await supabaseAdmin
@@ -190,13 +190,34 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
         isPinned: false,
       }));
     },
-    enabled: !!city,
+    enabled: !!city && !hasServerProfiles,
   });
+
+  // Server-side profiles for SSR (Googlebot sees this immediately)
+  const [serverProfiles] = useState(() =>
+    hasServerProfiles
+      ? clinicProfilesProp.map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          slug: c.slug,
+          type: 'clinic' as const,
+          specialty: 'Dental Clinic',
+          location: c.state ? `${c.state.name || ''}, ${c.state.slug?.substring(0, 2).toUpperCase() || ''}` : '',
+          rating: c.rating || 0,
+          reviewCount: c.review_count || 0,
+          image: c.cover_image_url || c.image_url,
+          isVerified: c.is_verified,
+          isClaimed: c.is_claimed,
+          isPinned: c.is_pinned,
+        }))
+      : undefined
+  );
 
   // Sort profiles with pinned ones first and apply filters
   const filteredProfiles = useMemo(() => {
-    if (!rawProfiles) return [];
-    const sorted = sortWithPinnedFirst(rawProfiles, pinnedProfiles || []);
+    if (!rawProfiles && !serverProfiles) return [];
+    const source = hasServerProfiles ? serverProfiles : rawProfiles;
+    const sorted = sortWithPinnedFirst(source as any[], (pinnedProfiles || []) as any[]) as any[];
     const pinnedIds = new Set((pinnedProfiles || []).map(p => p.id));
     let result = sorted.map(p => ({ ...p, isPinned: pinnedIds.has(p.id) }));
 
@@ -208,7 +229,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     }
 
     return result;
-  }, [rawProfiles, pinnedProfiles, filters]);
+  }, [rawProfiles, serverProfiles, hasServerProfiles, pinnedProfiles, filters]);
 
   const profiles = filteredProfiles;
 

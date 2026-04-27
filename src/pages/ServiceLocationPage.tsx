@@ -66,6 +66,7 @@ interface ServiceLocationPageProps {
   processTimeMonthsProp?: string | null;
   processTimeNoteProp?: string | null;
   allSeoDataProp?: any;
+  clinicProfilesProp?: any[];
 }
 
 const ServiceLocationPage = ({ 
@@ -89,6 +90,7 @@ const ServiceLocationPage = ({
   relatedQuestionsProp,
   processTimeMonthsProp,
   processTimeNoteProp,
+  clinicProfilesProp,
 }: ServiceLocationPageProps) => {
   const routerQuery = useRouter().query;
   const stateSlug = stateSlugProp || routerQuery.stateSlug as string || '';
@@ -117,7 +119,27 @@ const ServiceLocationPage = ({
     initialData: treatmentDataProp || undefined,
   });
 
-  const { data: profiles } = useProfiles({ cityId: city?.id, treatmentId: treatment?.id, limit: 50 });
+  const [profilesData] = useState(() =>
+    clinicProfilesProp
+      ? clinicProfilesProp.map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          slug: c.slug,
+          type: c.type,
+          specialty: 'Dental Clinic',
+          rating: c.rating,
+          reviewCount: c.review_count,
+          image: c.image_url,
+          isVerified: c.is_verified,
+          isClaimed: c.is_claimed,
+          isPinned: c.is_pinned,
+          location: c.location,
+          cityId: c.city_id,
+          languages: c.languages,
+        }))
+      : []
+  );
+  const profiles = profilesData;
 
   const { data: allCitiesInEmirate } = useQuery({
     queryKey: ['cities-by-emirate', normalizedStateSlug],

@@ -6,7 +6,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1, stateRatings, topClinics, pageContentData, allSeoData }: {
+const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1, stateRatings, topClinics, pageContentData, allSeoData, clinicProfilesProp }: {
     stateSlug: string;
     stateData: any;
     citiesData: any[];
@@ -17,6 +17,7 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
     topClinics?: { name: string; slug: string; rating: number; review_count: number }[];
     pageContentData?: any;
     allSeoData?: any;
+    clinicProfilesProp?: any[];
 }) => {
     const stateName = stateData?.name || stateSlug;
     const clinicCount = stateRatings?.clinicCount || 0;
@@ -108,6 +109,7 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
                 topClinicsProp={topClinics}
                 allSeoDataProp={allSeoData}
                 pageContentDataProp={pageContentData}
+                clinicProfilesProp={clinicProfilesProp}
             />
         </>
     );
@@ -157,6 +159,29 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 destination: `/${normalizedStateSlug}/`,
                 permanent: true,
             },
+        };
+    }
+
+    if (!supabase) {
+        return {
+            props: {
+                stateSlug: normalizedStateSlug,
+                stateData: null,
+                citiesData: [],
+                seoData: {
+                    title: `Best Dentists in ${normalizedStateSlug}, UAE`,
+                    description: 'Find and book dental appointments in UAE',
+                    canonical: `/${normalizedStateSlug}/`,
+                },
+                faqs: [],
+                seoH1: null,
+                stateRatings: null,
+                topClinics: [],
+                allSeoData: null,
+                pageContentData: null,
+                clinicProfilesProp: [],
+            },
+            revalidate: 60,
         };
     }
 
@@ -230,6 +255,26 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         .order('review_count', { ascending: false })
         .limit(5);
 
+    // Pre-fetch clinic profiles for SSR
+    let clinicProfilesProp: any[] = [];
+    const allStateClinics = await (supabase as any)
+        .from('clinics')
+        .select(`
+            id, name, slug, type, rating, review_count, image_url, is_verified, is_claimed, is_pinned,
+            location, address, phone, website, languages, area_id, city_id, state_id,
+            state:states(id, name, slug),
+            treatments(treatment_id, treatment:treatments(id, name, slug))
+        `)
+        .eq('state_id', stateData.id)
+        .eq('is_active', true)
+        .order('rating', { ascending: false })
+        .order('review_count', { ascending: false })
+        .limit(50);
+    
+    if (allStateClinics.data) {
+        clinicProfilesProp = allStateClinics.data;
+    }
+
     // Always generate meta - either from page_content, seo_pages, or auto-generated
     const metaTitle = pageContent?.meta_title || seoContent?.meta_title || `Best Dentists in ${stateData?.name || normalizedStateSlug}, UAE (2026) — Compare & Book | AppointPanda`;
     const metaDescription = pageContent?.meta_description || seoContent?.meta_description || `Find verified dental clinics in ${stateData?.name || normalizedStateSlug}. Compare ratings, read reviews, check AED prices for implants, braces, whitening. Book your appointment online.`;
@@ -274,6 +319,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             allSeoData: seoContent,
             // Pass page_content for state pages
             pageContentData: pageContent,
+            clinicProfilesProp: clinicProfilesProp,
         },
         revalidate: 600,
     };

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { generateSingle, generateBatch, generateServices, generateServiceLocations, generateSingleService, generateServiceLocationsByEmirate, generateServiceLocationsByCity, generateSingleServiceLocation } from "@/hooks/usePageContentGenerator";
+import { generateSingle, generateBatch, generateServices, generateServiceLocations, generateServiceLocationsByEmirate, generateServiceLocationsByCity, generateSingleService, generateSingleServiceLocation } from "@/hooks/usePageContentGenerator";
 import BulkMetaUpdateSection from "./BulkMetaUpdateSection";
 import { FileText, Play, Square, Loader2, Check, X, AlertCircle, Layers, RefreshCw, Settings } from "lucide-react";
 import { toast } from "sonner";
@@ -537,8 +537,8 @@ export default function PageContentGeneratorTab() {
                       `[${new Date().toLocaleTimeString()}] Batch: ${result.processed} processed, ${result.failed} failed, ${result.remaining} remaining`
                     ]);
 
-if (!result.has_more) {
-                      setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Done! Total: ${totalProcessed} processed, ${totalSkipped} skipped, ${totalFailed} failed`]);
+                    if (!result.has_more) {
+                      setServiceLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Done! Total: ${totalProcessed} processed, ${totalFailed} failed`]);
                       break;
                     }
                     if (result.failed > 0 && result.remaining > 0) break;

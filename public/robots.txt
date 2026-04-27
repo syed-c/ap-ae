@@ -14,8 +14,8 @@ Disallow: /appointment/
 Disallow: /review/
 Disallow: /rq/
 # Block utility pages (not SEO valuable)
-Disallow: /claim-profile/
-Disallow: /list-your-practice/
+Disallow: /claim-profile
+Disallow: /list-your-practice
 # Block tracking params
 Disallow: /*?p=*
 Disallow: /*?utm_*
@@ -38,11 +38,9 @@ Disallow: /form/
 Disallow: /appointment/
 Disallow: /review/
 Disallow: /rq/
-Disallow: /claim-profile/
-Disallow: /list-your-practice/
+Disallow: /claim-profile
+Disallow: /list-your-practice
 Disallow: /*?p=*
-Disallow: /*?utm_*
-Disallow: /*?ref=*
 
 User-agent: *
 Allow: /
@@ -58,8 +56,8 @@ Disallow: /form/
 Disallow: /appointment/
 Disallow: /review/
 Disallow: /rq/
-Disallow: /claim-profile/
-Disallow: /list-your-practice/
+Disallow: /claim-profile
+Disallow: /list-your-practice
 Disallow: /*?p=*
 Disallow: /*?utm_*
 Disallow: /*?ref=*

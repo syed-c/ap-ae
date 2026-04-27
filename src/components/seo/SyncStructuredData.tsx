@@ -12,7 +12,7 @@
 import { useSchemaSettings } from '@/hooks/useSchemaSettings';
 import { withTrailingSlash } from '@/lib/url/withTrailingSlash';
 
-const BASE_URL = 'https://www.AppointPanda.ae';
+const BASE_URL = 'https://www.appointpanda.ae';
 
 // ========================== SCHEMA GENERATORS ==========================
 
@@ -199,7 +199,7 @@ const generateLocalBusinessSchema = (data: LocalBusinessSchemaData) => ({
       ratingValue: data.rating,
       reviewCount: data.reviewCount,
       bestRating: 5,
-      worstRating: 1,
+      worstRating: 0,
     },
   }),
   ...(data.openingHours?.length && {
@@ -288,9 +288,10 @@ const generateArticleSchema = (data: ArticleSchemaData) => ({
 const generateFAQSchema = (data: FAQSchemaData) => ({
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: data.questions.map((q) => ({
+  mainEntity: data.questions.map((q, i) => ({
     '@type': 'Question',
     name: q.question,
+    url: `${BASE_URL}/#faq-${i + 1}`,
     acceptedAnswer: {
       '@type': 'Answer',
       text: q.answer,

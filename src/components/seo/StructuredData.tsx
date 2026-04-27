@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useSchemaSettings } from '@/hooks/useSchemaSettings';
 import { withTrailingSlash } from '@/lib/url/withTrailingSlash';
 
-const BASE_URL = 'https://www.AppointPanda.ae';
+const BASE_URL = 'https://www.appointpanda.ae';
 
 // Organization Schema
 export interface OrganizationSchemaProps {
@@ -206,7 +206,7 @@ const generateLocalBusinessSchema = (props: LocalBusinessSchemaProps) => {
       ratingValue: props.rating,
       reviewCount: props.reviewCount,
       bestRating: 5,
-      worstRating: 1,
+      worstRating: 0,
     };
   }
 
@@ -273,9 +273,10 @@ const generateArticleSchema = (props: ArticleSchemaProps) => ({
 const generateFAQSchema = (props: FAQSchemaProps) => ({
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: props.questions.map((q) => ({
+  mainEntity: props.questions.map((q, i) => ({
     '@type': 'Question',
     name: q.question,
+    url: `${BASE_URL}/#faq-${i + 1}`,
     acceptedAnswer: {
       '@type': 'Answer',
       text: q.answer,

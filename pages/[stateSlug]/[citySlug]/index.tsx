@@ -7,7 +7,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 // Wrapper component to render SEO meta tags server-side with FAQ data for SSR
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, faqs, seoH1, cityRatings, topClinics, allSeoData, pageContentDataProp }: {
+const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, faqs, seoH1, cityRatings, topClinics, allSeoData, pageContentDataProp, clinicProfilesProp }: {
     citySlug: string;
     stateSlug: string;
     stateData: any;
@@ -19,6 +19,7 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
     topClinics?: { name: string; slug: string; rating: number; review_count: number }[];
     allSeoData?: any;
     pageContentDataProp?: any;
+    clinicProfilesProp?: any[];
 }) => {
     const cityName = cityData?.name || citySlug;
     const stateName = stateData?.name || stateSlug;
@@ -113,6 +114,7 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
                 topClinicsProp={topClinics}
                 allSeoDataProp={allSeoData}
                 pageContentDataProp={pageContentDataProp}
+                clinicProfilesProp={clinicProfilesProp}
             />
         </>
     );
@@ -217,6 +219,30 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
+    if (!supabase) {
+        return {
+            props: {
+                citySlug,
+                stateSlug: normalizedStateSlug,
+                stateData: null,
+                cityData: null,
+                seoData: {
+                    title: `Best Dentists in ${citySlug}, UAE`,
+                    description: 'Find and book dental appointments in UAE',
+                    canonical: `/${normalizedStateSlug}/${citySlug}/`,
+                },
+                faqs: [],
+                seoH1: null,
+                cityRatings: null,
+                topClinics: [],
+                allSeoData: null,
+                pageContentDataProp: null,
+                clinicProfilesProp: [],
+            },
+            revalidate: 60,
+        };
+    }
+
     const seoSlug = `${normalizedStateSlug}/${citySlug}`;
 
     // Direct queries instead of React Query for faster build
@@ -274,6 +300,7 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
     // Fetch aggregate rating data for this city
     let cityRatings = { avgRating: 0, totalReviews: 0, clinicCount: 0 };
     let topClinics: any[] = [];
+    let clinicProfilesProp: any[] = [];
     if (finalCityData?.id) {
         const ratingsData = await supabase
             .from('clinics')
@@ -304,6 +331,25 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
             .order('review_count', { ascending: false })
             .limit(5);
         topClinics = topClinicsData?.data || [];
+
+        // Pre-fetch clinic profiles for SSR (already fetched in query above)
+        const allCityClinics = await (supabase
+            .from('clinics') as any)
+            .select(`
+                id, name, slug, type, rating, review_count, image_url, is_verified, is_claimed, is_pinned,
+                location, address, phone, website, languages, area_id, city_id,
+                state:states(name, slug),
+                treatments(treatment_id, treatment:treatments(id, name, slug))
+            `)
+            .eq('city_id', finalCityData.id)
+            .eq('is_active', true)
+            .order('rating', { ascending: false })
+            .order('review_count', { ascending: false })
+            .limit(50);
+        
+        if (allCityClinics.data) {
+            clinicProfilesProp = allCityClinics.data;
+        }
     }
     
     const cityName = finalCityData?.name || citySlug;
@@ -340,6 +386,7 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
             topClinics: topClinics,
             allSeoData: seoContent,
             pageContentDataProp: pageContent,
+            clinicProfilesProp: clinicProfilesProp,
         },
         revalidate: 600,
     };

@@ -135,6 +135,21 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
+    if (!supabase) {
+        return {
+            props: {
+                postSlug,
+                postData: null,
+                seoData: {
+                    title: 'Blog Post',
+                    description: 'Read dental health articles from AppointPanda',
+                    canonical: `/blog/${postSlug}/`,
+                },
+            },
+            revalidate: 60,
+        };
+    }
+
     // Direct query instead of React Query for faster build
     const postData = await supabase
         .from("blog_posts")

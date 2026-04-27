@@ -109,6 +109,26 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
+    if (!supabase) {
+        return {
+            props: {
+                serviceSlug,
+                seoData: {
+                    title: 'Dental Service',
+                    description: 'Find and book dental appointments in UAE',
+                    canonical: `/services/${serviceSlug}/`,
+                },
+                faqs: [],
+                seoH1: null,
+                h1Prop: null,
+                heroIntroProp: null,
+                contentProp: null,
+                allSeoData: null,
+            },
+            revalidate: 60,
+        };
+    }
+
     const seoSlug = `services/${serviceSlug}`;
     const seoSlugWithSlash = `/${seoSlug}`;
 

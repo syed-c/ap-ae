@@ -53,7 +53,7 @@ export function ClaimProfileCTA({
           className="w-full rounded-xl font-bold animate-pulse-soft"
           asChild
         >
-          <Link href={`/claim-profile?clinic=${encodeURIComponent(clinicName)}`}>
+          <Link href={`/claim-profile?clinic=${encodeURIComponent(clinicName)}`} rel="noopener noreferrer">
             Claim This Profile
             <ArrowRight className="h-4 w-4 ml-2" />
           </Link>
@@ -84,7 +84,7 @@ export function ClaimProfileCTA({
             size="lg"
             asChild
           >
-            <Link href={`/claim-profile?clinic=${encodeURIComponent(clinicName)}`}>
+            <Link href={`/claim-profile?clinic=${encodeURIComponent(clinicName)}`} rel="noopener noreferrer">
               Claim This Profile
               <ArrowRight className="h-4 w-4 ml-2" />
             </Link>
@@ -112,7 +112,7 @@ export function ClaimProfileCTA({
             className="rounded-lg border-amber-300 hover:bg-amber-100 dark:border-amber-700"
             asChild
           >
-            <Link href={`/claim-profile?clinic=${encodeURIComponent(clinicName)}`}>
+            <Link href={`/claim-profile?clinic=${encodeURIComponent(clinicName)}`} rel="noopener noreferrer">
               Claim Profile
               <ArrowRight className="h-3 w-3 ml-1" />
             </Link>

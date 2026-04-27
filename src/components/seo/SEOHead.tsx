@@ -38,6 +38,10 @@ export const SEOHead = ({
   const router = useRouter();
   const currentPath = currentPathProp ?? router.asPath ?? '/';
 
+  // CRITICAL: Strip query params from path for canonical — otherwise pagination/filter URLs
+  // create duplicate content issues (Google sees ?page=2 as a different canonical page)
+  const pathWithoutQuery = currentPath.split('?')[0].split('#')[0];
+
   // Ensure we have at least some title
   const safeTitle = title || 'Dental Clinics in UAE';
   // Avoid double branding: if title already contains the site name, use it as-is
@@ -51,7 +55,7 @@ export const SEOHead = ({
   // This prevents 301 redirect loops and duplicate content issues
   const canonicalUrl = canonical
     ? `${BASE_URL}${canonical.startsWith('/') ? canonical : `/${canonical}`}`
-    : `${BASE_URL}${currentPath}`;
+    : `${BASE_URL}${pathWithoutQuery}`;
 
   // Normalize canonical: just remove duplicate slashes, don't add trailing slash
   const normalizedCanonical = canonicalUrl.replace(/\/+/g, '/');

@@ -11,7 +11,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const BASE_URL = "https://www.AppointPanda.ae";
+const BASE_URL = "https://www.appointpanda.ae";
 
 // IMPORTANT:
 // When we call Prerender.io, we must NOT use a bot User-Agent.

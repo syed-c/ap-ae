@@ -98,6 +98,22 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
+    if (!supabase) {
+        return {
+            props: {
+                insuranceSlug,
+                emirateSlug,
+                citySlug,
+                seoData: {
+                    title: 'Dental Insurance',
+                    description: 'Find dentists that accept your insurance in UAE',
+                    canonical: `/insurance/${insuranceSlug}/`,
+                },
+            },
+            revalidate: 60,
+        };
+    }
+
     // Direct queries instead of React Query for faster build
     const [insuranceData, seoContent] = await Promise.all([
         supabase

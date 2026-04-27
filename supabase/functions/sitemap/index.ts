@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const BASE_URL = "https://www.AppointPanda.ae";
+const BASE_URL = "https://www.appointpanda.ae";
 const CHUNK_SIZE = 2500; // Max URLs per sitemap chunk
 
 interface SitemapUrl {
@@ -339,27 +339,44 @@ serve(async (req) => {
       return xmlResponse(generateSitemapXml(urls), corsHeaders);
     }
 
-    // SERVICE-LOCATION COMBINATIONS SITEMAP (CHUNKED)
-    // Include ALL emirate/area/service combinations for comprehensive coverage
-    if (sitemapType === "service-locations") {
+// SERVICE-LOCATION COMBINATIONS SITEMAP (CHUNKED)
+// Only include city/treatment combinations that have at least one active clinic
+if (sitemapType === "service-locations") {
       const allUrls: SitemapUrl[] = [];
 
       // Get all active areas (cities) with their emirate (state) relationship
       const cities = await fetchAllRows(supabase, "cities", "id, slug, states(slug)", { is_active: true });
-      const treatments = await fetchAllRows(supabase, "treatments", "slug", { is_active: true });
+      const treatments = await fetchAllRows(supabase, "treatments", "id, slug", { is_active: true });
+
+      // Get all city/treatment combinations that have at least one active clinic
+      const clinicCombinations = await fetchAllRows(
+        supabase, 
+        "clinic_treatments", 
+        "treatment_id, clinic:clinics!inner(city_id)"
+      );
+
+      // Build set of valid city_id + treatment_id combinations
+      const validCombos = new Set<string>();
+      for (const combo of clinicCombinations || []) {
+        if (combo.clinic?.city_id && combo.treatment_id) {
+          validCombos.add(`${combo.clinic.city_id}-${combo.treatment_id}`);
+        }
+      }
 
       for (const city of cities) {
         if (!city.slug || city.slug.trim() === '') continue;
 
         const stateData = Array.isArray(city.states) ? city.states[0] : city.states;
-        if (stateData?.slug) {
+        if (stateData?.slug && city.id) {
           for (const treatment of treatments) {
-            if (!treatment.slug || treatment.slug.trim() === '') continue;
-            allUrls.push({
-              loc: normalizeUrl(`/${stateData.slug}/${city.slug}/${treatment.slug}`),
-              priority: 0.7,
-              changefreq: "weekly",
-            });
+            // Only include if this combination has at least one clinic
+            if (treatment.slug && treatment.slug.trim() !== '' && validCombos.has(`${city.id}-${treatment.id}`)) {
+              allUrls.push({
+                loc: normalizeUrl(`/${stateData.slug}/${city.slug}/${treatment.slug}`),
+                priority: 0.7,
+                changefreq: "weekly",
+              });
+            }
           }
         }
       }
