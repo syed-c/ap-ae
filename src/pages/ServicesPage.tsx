@@ -5,13 +5,13 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { SEOHead } from "@/components/seo/SEOHead";
-import { ArrowRight, Sparkles, Shield, Clock, Building2 } from "lucide-react";
+import { ArrowRight, Shield, Clock, Building2, CheckCircle, Star } from "lucide-react";
 import { useRealCounts } from "@/hooks/useRealCounts";
 import { useSeoPageContent } from "@/hooks/useSeoPageContent";
+import { motion } from "framer-motion";
 
 const ServicesPage = () => {
   const { data: treatments, isLoading } = useQuery({
@@ -58,35 +58,75 @@ const ServicesPage = () => {
       />
       
       {/* Hero Section — Dark theme matching homepage */}
-      <section className="relative overflow-hidden min-h-[45vh] flex items-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <section className="relative overflow-hidden min-h-[70vh] flex items-start bg-slate-950 pt-4 md:pt-6 lg:pt-8">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-primary/15 rounded-full blur-[120px]" />
-          <div className="absolute -bottom-40 -left-40 w-[400px] h-[400px] bg-teal/10 rounded-full blur-[100px]" />
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }} />
+          <motion.div
+            animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-0 left-[30%] -translate-x-1/2 w-[1200px] h-[800px] bg-gradient-to-b from-primary/30 via-primary/15 to-transparent rounded-b-[100%] blur-[180px]"
+          />
+          <motion.div
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            className="absolute top-1/4 left-[30%] -translate-x-1/2 w-[800px] h-[600px] bg-primary/10 rounded-full blur-[150px]"
+          />
+          <motion.div
+            animate={{ opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+            className="absolute bottom-0 left-[30%] -translate-x-1/2 w-[1000px] h-[300px] bg-slate-900 rounded-t-[100%] blur-[100px]"
+          />
         </div>
         
-        <div className="container relative z-10 py-16 md:py-20 px-5 md:px-8">
+        <div className="container relative z-10 w-full py-8 md:py-12 lg:py-16 px-4 md:px-6">
           <Breadcrumbs items={breadcrumbs} className="mb-6 [&_a]:text-white/60 [&_span]:text-white/40 [&_svg]:text-white/30" />
           
           <div className="max-w-4xl mx-auto text-center">
-            <Badge variant="secondary" className="rounded-full px-4 py-2 text-sm font-bold mb-6 bg-primary/15 text-primary border-primary/30 backdrop-blur-md">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Verified Specialists
-            </Badge>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-wrap gap-2.5 mb-6 justify-center"
+            >
+              <span className="inline-flex items-center gap-2 bg-primary/15 backdrop-blur-md border border-primary/30 rounded-full px-4 py-2 shadow-lg">
+                <CheckCircle className="h-5 w-5 text-primary" />
+                <span className="text-xs md:text-sm font-bold text-primary">DHA & DOH Verified</span>
+              </span>
+              <span className="inline-flex items-center gap-2 bg-primary/15 backdrop-blur-md border border-primary/30 rounded-full px-4 py-2 shadow-lg">
+                <Star className="h-4 w-4 text-primary" />
+                <span className="text-xs md:text-sm font-bold text-primary">4.9★ Rated Platform</span>
+              </span>
+            </motion.div>
             
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4" style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif" }}>
-              <span className="text-white">Dental</span>
-              <span className="block text-primary">Services</span>
-            </h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="leading-[1.05] mb-5"
+              style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif" }}
+            >
+              <span className="block text-4xl sm:text-6xl md:text-7xl lg:text-[5rem] font-black text-white tracking-tight">
+                Dental
+              </span>
+              <span className="block text-4xl sm:text-6xl md:text-7xl lg:text-[5rem] font-black text-primary tracking-tight mt-1">
+                Services
+              </span>
+            </motion.h1>
             
-            <p className="text-lg md:text-xl text-white/40 max-w-2xl mx-auto mb-8">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-8"
+            >
               Explore our comprehensive range of dental treatments. Find the right service for your needs and connect with verified specialists across the UAE.
-            </p>
+            </motion.p>
 
-            <div className="flex flex-wrap justify-center gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="flex flex-wrap justify-center gap-3"
+            >
               <div className="flex items-center gap-2 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-2xl px-5 py-3">
                 <span className="font-bold text-white">{allTreatments.length}+ Treatments</span>
               </div>
@@ -102,7 +142,7 @@ const ServicesPage = () => {
                 <Clock className="h-5 w-5 text-primary" />
                 <span className="font-bold text-white">Book in 60s</span>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
 
@@ -113,52 +153,77 @@ const ServicesPage = () => {
         </div>
       </section>
 
-      {/* Popular Services */}
-      <Section size="lg">
-        <SectionHeader
-          label="Most Searched"
-          title="Popular Dental"
-          highlight="Treatments"
-        />
+      {/* Most Searched - Dark Cards like Why AppointPanda */}
+      <section className="bg-slate-950 py-16 md:py-20 lg:py-24 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-10 right-[10%] w-48 h-48 bg-primary/10 rounded-full blur-[100px]" />
+          <div className="absolute bottom-10 left-[5%] w-40 h-40 bg-teal/10 rounded-full blur-[80px]" />
+        </div>
+        
+        <div className="container px-4 md:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-8 md:mb-10"
+          >
+            <span className="inline-flex items-center gap-2 bg-primary/20 rounded-full px-4 py-2 mb-4 border border-primary/30">
+              <CheckCircle className="h-4 w-4 text-primary" />
+              <span className="text-sm font-bold text-primary">Most Searched</span>
+            </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white" style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif" }}>
+              Popular Dental{" "}
+              <span className="text-primary">Treatments</span>
+            </h2>
+            <p className="text-white/50 mt-2 md:mt-3 max-w-xl mx-auto text-sm md:text-base">
+              Browse our most popular dental services across all 7 Emirates.
+            </p>
+          </motion.div>
 
-        {isLoading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
-              <Skeleton key={i} className="h-32 rounded-2xl" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {popularTreatments.map((treatment, i) => (
-              <Link
-                key={treatment.id}
-                href={`/services/${treatment.slug}/`}
-                className="group bg-card border border-border rounded-2xl p-6 hover:border-primary hover:shadow-xl transition-all animate-fade-in-up"
-                style={{ animationDelay: `${i * 0.05}s` }}
-              >
-                <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors mb-2">
-                  {treatment.name}
-                </h3>
-                {treatment.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                    {treatment.description}
-                  </p>
-                )}
-                <span className="text-sm font-bold text-primary flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  Learn More <ArrowRight className="h-3 w-3" />
-                </span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </Section>
+          {isLoading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[...Array(8)].map((_, i) => (
+                <Skeleton key={i} className="h-32 rounded-2xl bg-white/5" />
+              ))}
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+            >
+              {popularTreatments.map((treatment, i) => (
+                <motion.div key={treatment.id} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+                  <Link
+                    href={`/services/${treatment.slug}/`}
+                    className="group bg-white/[0.04] backdrop-blur-sm rounded-2xl p-6 text-center border border-white/10 hover:border-primary/40 hover:bg-white/[0.08] transition-all duration-300 block h-full"
+                  >
+                    <h3 className="font-bold text-lg text-white group-hover:text-primary transition-colors mb-2">
+                      {treatment.name}
+                    </h3>
+                    {treatment.description && (
+                      <p className="text-sm text-white/45 line-clamp-2 mb-3">
+                        {treatment.description}
+                      </p>
+                    )}
+                    <span className="text-sm font-bold text-primary flex items-center gap-1 justify-center">
+                      Learn More <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </div>
+      </section>
 
-      {/* All Services - Dark Section */}
-      <section className="section-dark py-20">
+      {/* Full Directory - Light Section */}
+      <section className="py-16 md:py-20 lg:py-24">
         <div className="container">
           <div className="text-center mb-10">
-            <p className="text-micro text-primary mb-2">Full Directory</p>
-            <h2 className="text-section text-3xl md:text-4xl text-white">
+            <p className="text-sm font-bold text-primary mb-3">Full Directory</p>
+            <h2 className="text-3xl md:text-4xl font-black text-foreground">
               All Dental <span className="text-primary">Services</span>
             </h2>
           </div>
@@ -168,7 +233,7 @@ const ServicesPage = () => {
               <Link
                 key={treatment.id}
                 href={`/services/${treatment.slug}/`}
-                className="bg-white/5 border border-white/10 rounded-2xl px-5 py-3 font-bold text-white hover:border-primary hover:text-primary hover:bg-white/10 transition-all animate-fade-in-up"
+                className="bg-card border border-border rounded-2xl px-5 py-3 font-bold text-foreground hover:border-primary hover:shadow-lg hover:text-primary transition-all animate-fade-in-up"
                 style={{ animationDelay: `${i * 0.03}s` }}
               >
                 {treatment.name}

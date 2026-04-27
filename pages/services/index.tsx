@@ -1,3 +1,4 @@
+import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import ServicesPageComponent from '@/pages/ServicesPage';
 
@@ -16,6 +17,7 @@ export default function ServicesIndexPage() {
         <meta property="og:description" content="Browse all dental services available across the UAE." />
         <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
         <meta property="og:site_name" content="AppointPanda" />
+        <meta property="og:locale" content="en_AE" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:url" content={`${BASE_URL}/services/`} />
         <meta name="twitter:title" content="Dental Services in UAE - Find Treatments & Procedures | AppointPanda" />
@@ -26,3 +28,7 @@ export default function ServicesIndexPage() {
     </>
   );
 }
+
+export const getStaticProps: GetStaticProps = async () => {
+  return { props: {}, revalidate: 600 };
+};

@@ -537,11 +537,11 @@ export default function PageContentGeneratorTab() {
                       `[${new Date().toLocaleTimeString()}] Batch: ${result.processed} processed, ${result.failed} failed, ${result.remaining} remaining`
                     ]);
 
-                    if (!result.has_more) {
-                      setServiceLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Done! Total: ${totalProcessed} processed, ${totalFailed} failed`]);
+if (!result.has_more) {
+                      setSlLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Done! Total: ${totalProcessed} processed, ${totalSkipped} skipped, ${totalFailed} failed`]);
                       break;
                     }
-
+                    if (result.failed > 0 && result.remaining > 0) break;
                     cursor = result.cursor;
                     if (result.processed === 0) break;
                   }

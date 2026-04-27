@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Menu, X, ChevronDown, Search, User, Phone, Shield, ChevronRight } from "lucide-react";
+import { Menu, X, ChevronDown, Search, User, Phone, Shield, ChevronRight, MapPin, Stethoscope, CalendarCheck, Star, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,6 +15,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase, supabaseAdmin } from "@/integrations/supabase/client";
 import { useStates, useCities } from "@/hooks/useLocations";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { RiHospitalFill, RiShieldCheckFill, RiStarSmileFill } from "react-icons/ri";
+import { FaTooth, FaStar } from "react-icons/fa";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -81,7 +83,7 @@ export function Navbar() {
       {/* Main Navigation */}
       <nav className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled
         ? 'bg-white/95 backdrop-blur-xl border-b border-gray-200/80 shadow-md shadow-black/[0.06]'
-        : 'bg-white/80 backdrop-blur-md border-b border-gray-200/60'
+        : 'bg-white/90 backdrop-blur-md border-b border-gray-200/60'
         }`}>
         <div className="container">
           <div className="flex items-center justify-between h-14 lg:h-16">
@@ -91,100 +93,94 @@ export function Navbar() {
                 <img
                   src={logoUrl}
                   alt={siteSettings?.siteName || 'AppointPanda'}
-                  className="h-8 w-auto max-w-[160px] object-contain"
+                  className="h-7 w-auto max-w-[140px] object-contain"
                 />
               ) : (
                 <div className="flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                    <span className="text-xs font-bold">AP</span>
+                    <FaTooth className="h-4 w-4" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold tracking-tight text-foreground leading-none">
                       Appoint<span className="text-primary">Panda</span>
                     </span>
                     <span className="text-[9px] text-muted-foreground font-medium">
-                      {siteSettings?.siteTagline || 'Dental Directory'}
+                      {siteSettings?.siteTagline || 'UAE Dental Directory'}
                     </span>
                   </div>
                 </div>
               )}
             </Link>
 
-            {/* Center: Search trigger (desktop) */}
-            <button
-              onClick={() => router.push("/search/")}
-              className="hidden lg:flex items-center gap-2 bg-muted/60 hover:bg-muted border border-border/60 rounded-lg px-4 py-2 text-sm text-muted-foreground transition-colors min-w-[280px] xl:min-w-[360px]"
-            >
-              <Search className="h-4 w-4 text-muted-foreground/60" />
-              <span>Search dentists, services, locations...</span>
-            </button>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-1">
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
-                  Services
-                  <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-52 rounded-lg p-1.5 bg-card border border-border shadow-lg z-50">
-                  <DropdownMenuItem asChild className="rounded-md font-semibold text-foreground cursor-pointer">
-                    <Link href="/services/">All Services</Link>
-                  </DropdownMenuItem>
-                  <div className="h-px bg-border my-1" />
-                  {(treatments || []).map((item) => (
-                    <DropdownMenuItem key={item.slug} asChild className="rounded-md font-medium text-foreground/80 cursor-pointer">
-                      <Link href={`/services/${item.slug}/`}>{item.name}</Link>
+            {/* Desktop Right Section */}
+            <div className="hidden lg:flex items-center gap-3">
+              {/* Desktop Navigation */}
+              <div className="flex items-center gap-0.5">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted/50 rounded-md transition-colors">
+                    Services
+                    <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52 rounded-lg p-1.5 bg-card border border-border shadow-lg z-50">
+                    <DropdownMenuItem asChild className="rounded-md font-semibold text-foreground cursor-pointer">
+                      <Link href="/services/">All Services</Link>
                     </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
-                  Locations
-                  <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-52 rounded-lg p-1.5 bg-card border border-border shadow-lg z-50">
-                  {states?.map((state) => (
-                    <DropdownMenuItem key={state.slug} asChild className="rounded-md font-semibold text-foreground cursor-pointer">
-                      <Link href={`/${state.slug}/`}>{state.name}</Link>
-                    </DropdownMenuItem>
-                  ))}
-                  {states && states.length > 0 && topAreas.length > 0 && (
                     <div className="h-px bg-border my-1" />
-                  )}
-                  <p className="px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 mt-1">Popular Areas</p>
-                  {topAreas.map((area) => (
-                    <DropdownMenuItem key={area.slug} asChild className="rounded-md font-medium text-foreground/80 cursor-pointer">
-                      <Link href={`/${area.stateSlug}/${area.slug}/`}>{area.name}</Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    {(treatments || []).map((item) => (
+                      <DropdownMenuItem key={item.slug} asChild className="rounded-md font-medium text-foreground/80 cursor-pointer">
+                        <Link href={`/services/${item.slug}/`}>{item.name}</Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-              <Link
-                href="/pricing/"
-                className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
-              >
-                Pricing
-              </Link>
-            </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted/50 rounded-md transition-colors">
+                    Locations
+                    <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52 rounded-lg p-1.5 bg-card border border-border shadow-lg z-50">
+                    {states?.map((state) => (
+                      <DropdownMenuItem key={state.slug} asChild className="rounded-md font-semibold text-foreground cursor-pointer">
+                        <Link href={`/${state.slug}/`}>{state.name}</Link>
+                      </DropdownMenuItem>
+                    ))}
+                    {states && states.length > 0 && topAreas.length > 0 && (
+                      <div className="h-px bg-border my-1" />
+                    )}
+                    <p className="px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 mt-1">Popular Areas</p>
+                    {topAreas.map((area) => (
+                      <DropdownMenuItem key={area.slug} asChild className="rounded-md font-medium text-foreground/80 cursor-pointer">
+                        <Link href={`/${area.stateSlug}/${area.slug}/`}>{area.name}</Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-            {/* Desktop Actions */}
-            <div className="hidden lg:flex items-center gap-2">
-              <Button variant="ghost" size="sm" className="text-sm font-medium text-foreground/70 hover:text-foreground" asChild>
-                <Link href="/list-your-practice/">For Dentists</Link>
-              </Button>
-              <Button variant="ghost" size="icon" className="rounded-lg text-foreground/60 hover:text-foreground h-9 w-9" asChild>
-                <Link href="/auth/"><User className="h-4 w-4" /></Link>
-              </Button>
-              <Button
-                size="sm"
-                className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-9 px-4"
-                onClick={() => router.push("/search/")}
-              >
-                Find Dentist
-              </Button>
+                <Link
+                  href="/pricing/"
+                  className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted/50 rounded-md transition-colors"
+                >
+                  Pricing
+                </Link>
+              </div>
+
+              {/* Desktop Actions */}
+              <div className="flex items-center gap-2 border-l border-border/60 pl-3">
+                <Button variant="ghost" size="sm" className="text-sm font-medium text-foreground/70 hover:text-foreground" asChild>
+                  <Link href="/list-your-practice/">For Dentists</Link>
+                </Button>
+                <Button variant="ghost" size="icon" className="rounded-lg text-foreground/60 hover:text-foreground h-9 w-9" asChild>
+                  <Link href="/auth/"><User className="h-4 w-4" /></Link>
+                </Button>
+                <Button
+                  size="sm"
+                  className="rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-9 px-4"
+                  onClick={() => router.push("/search/")}
+                >
+                  Find Dentist
+                </Button>
+              </div>
             </div>
 
             {/* Mobile Menu Button */}
@@ -196,49 +192,111 @@ export function Navbar() {
             </button>
           </div>
 
-          {/* Mobile Menu */}
+{/* Mobile Menu - Modern & Organized (Light Theme) */}
           {mobileMenuOpen && (
-            <div className="lg:hidden py-4 border-t border-border animate-fade-in bg-card">
-              {/* Mobile Search */}
-              <button
-                onClick={() => { setMobileMenuOpen(false); router.push("/search/"); }}
-                className="flex items-center gap-2 w-full bg-muted/60 border border-border/60 rounded-lg px-4 py-3 text-sm text-muted-foreground mb-3"
-              >
-                <Search className="h-4 w-4" />
-                Search dentists, services...
-              </button>
-
-              <div className="space-y-0.5">
-                <Link href="/services/" className="flex items-center justify-between px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>
-                  Services <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </Link>
-                <p className="px-3 pt-3 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Locations</p>
-                {states?.map((state) => (
-                  <Link
-                    key={state.slug}
-                    href={`/${state.slug}/`}
-                    className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg"
-                    onClick={() => setMobileMenuOpen(false)}
+            <div className="lg:hidden border-t border-border bg-white">
+              <div className="px-4 py-4 space-y-4 max-h-[70vh] overflow-y-auto">
+                {/* Quick Actions - Modern Cards */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); router.push("/search/"); }}
+                    className="flex flex-col items-center gap-2 p-3 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors"
                   >
-                    {state.name}
+                    <RiStarSmileFill className="h-5 w-5 text-primary" />
+                    <span className="text-xs font-semibold text-primary">Find Dentist</span>
+                  </button>
+                  <Link
+                    href="/emergency-dentist/"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex flex-col items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-colors"
+                  >
+                    <AlertCircle className="h-5 w-5 text-red-500" />
+                    <span className="text-xs font-semibold text-red-500">Emergency</span>
                   </Link>
-                ))}
-                <div className="h-px bg-border my-2" />
-                <Link href="/insurance/" className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Insurance</Link>
-                <Link href="/pricing/" className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Pricing</Link>
-                <Link href="/emergency-dentist/" className="block px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Emergency Dentist</Link>
-                <div className="h-px bg-border my-2" />
-                <Link href="/blog/" className="block px-3 py-2.5 text-sm text-foreground/70 hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
-                <Link href="/faq/" className="block px-3 py-2.5 text-sm text-foreground/70 hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
-                <Link href="/contact/" className="block px-3 py-2.5 text-sm text-foreground/70 hover:bg-muted rounded-lg" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
-              </div>
-              <div className="mt-4 space-y-2">
-                <Button variant="outline" className="w-full rounded-lg font-semibold border-border text-foreground" asChild>
-                  <Link href="/auth/" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-                </Button>
-                <Button className="w-full rounded-lg bg-primary text-primary-foreground font-semibold" onClick={() => { setMobileMenuOpen(false); router.push("/search/"); }}>
-                  Find Dentist
-                </Button>
+                </div>
+
+                {/* Services */}
+                <div>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 px-1">Services</p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <Link href="/services/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/50 text-xs font-medium text-foreground hover:bg-muted transition-colors">
+                      <Stethoscope className="h-3.5 w-3.5 text-primary" />
+                      All Services
+                    </Link>
+                    {(treatments || []).slice(0, 3).map((item) => (
+                      <Link
+                        key={item.slug}
+                        href={`/services/${item.slug}/`}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/50 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      >
+                        <FaTooth className="h-3.5 w-3.5 text-primary" />
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Locations */}
+                <div>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 px-1">Locations</p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <Link href="/search/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/50 text-xs font-medium text-foreground hover:bg-muted transition-colors">
+                      <MapPin className="h-3.5 w-3.5 text-primary" />
+                      All Emirates
+                    </Link>
+                    {(states || []).slice(0, 3).map((state) => (
+                      <Link
+                        key={state.slug}
+                        href={`/${state.slug}/`}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/50 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      >
+                        <MapPin className="h-3.5 w-3.5 text-primary" />
+                        {state.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Quick Links */}
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 px-1">Quick Links</p>
+                  <Link href="/insurance/" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/50 text-xs font-medium text-foreground hover:bg-muted transition-colors">
+                    Insurance Guide <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                  <Link href="/pricing/" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/50 text-xs font-medium text-foreground hover:bg-muted transition-colors">
+                    Pricing <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                  <Link href="/about/" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/50 text-xs font-medium text-foreground hover:bg-muted transition-colors">
+                    About Us <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+
+                {/* Support Links */}
+                <div className="space-y-1 pt-2 border-t border-border">
+                  <Link href="/faq/" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-3 py-2.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                    FAQ <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                  <Link href="/contact/" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-3 py-2.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                    Contact <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                  <Link href="/blog/" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-3 py-2.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                    Blog <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+
+                {/* CTA Buttons */}
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  <Button variant="outline" size="sm" className="rounded-lg font-semibold border-border text-foreground bg-white hover:bg-muted h-10" asChild>
+                    <Link href="/list-your-practice/" onClick={() => setMobileMenuOpen(false)}>
+                      <RiHospitalFill className="h-4 w-4 mr-1.5" /> List Practice
+                    </Link>
+                  </Button>
+                  <Button size="sm" className="rounded-lg bg-primary text-primary-foreground font-semibold h-10" onClick={() => { setMobileMenuOpen(false); router.push("/search/"); }}>
+                    <Search className="h-4 w-4 mr-1.5" /> Find Now
+                  </Button>
+                </div>
               </div>
             </div>
           )}

@@ -183,7 +183,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
-    const seoSlug = `${normalizedStateSlug}/${citySlug}/${serviceSlug}`;
+    const seoSlug = `/${normalizedStateSlug}/${citySlug}/${serviceSlug}`;
 
     // Direct queries instead of React Query for faster build
     const [stateData, cityData, treatmentData, seoContent] = await Promise.all([

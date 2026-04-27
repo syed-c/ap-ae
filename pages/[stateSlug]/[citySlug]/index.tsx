@@ -255,7 +255,6 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
 
     // Also check cityData - return 404 if state is missing (but allow inactive cities)
     if (!stateData) {
-        console.log(`404: state=${normalizedStateSlug}, city=${citySlug}, stateData=${!!stateData}, cityData=${!!cityData}`);
         return { notFound: true };
     }
     

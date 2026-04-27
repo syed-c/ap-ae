@@ -147,14 +147,6 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     // Use page_content if available, otherwise seo_pages
     const content = pageContent || seoContent;
     
-    console.log('[SSR] serviceSlug:', serviceSlug);
-    console.log('[SSR] pageContent found:', !!pageContent);
-    console.log('[SSR] seoContent found:', !!seoContent);
-    console.log('[SSR] pageContent slug:', pageContent?.page_slug);
-    console.log('[SSR] seoContent slug:', seoContent?.slug);
-    console.log('[SSR] pageContent content:', pageContent?.body_content?.substring(0, 50));
-    console.log('[SSR] seoContent content:', seoContent?.content?.substring(0, 50));
-    
     const totalClinics = allClinics?.count || 0;
     const metaTitle = content?.meta_title || (content as any)?.title || `${treatment.name} in UAE (2026) — Find Top Dentists & Specialists | AppointPanda`;
     const metaDescription = content?.meta_description || `Get ${treatment.name.toLowerCase()} treatment in UAE. Compare ${totalClinics.toLocaleString()}+ verified specialists across Dubai, Abu Dhabi, Sharjah. Read patient reviews, see transparent AED pricing, check dentist credentials (BDS, MDS, DHA-licensed). Book your appointment instantly. Most clinics offer free consultation.`;

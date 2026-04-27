@@ -77,12 +77,6 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
   const serverAiCostRange = aiCostRangeProp || null;
   const serverAiChecklist = aiChecklistProp || null;
 
-  console.log('[Client] serverTitle:', serverTitle?.substring(0, 40));
-  console.log('[Client] serverH1:', serverH1?.substring(0, 40));
-  console.log('[Client] serverHeroIntro:', serverHeroIntro?.substring(0, 50));
-  console.log('[Client] serverContent:', serverContent?.substring(0, 50));
-  console.log('[Client] serverFaqs count:', serverFaqs.length);
-
   // Fetch treatment data
   const { data: treatment } = useQuery({
     queryKey: ["treatment", serviceSlug],
@@ -120,10 +114,6 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
   const displayH1 = serverH1 || `Best ${treatmentName} in UAE — Verified Specialists`;
   const displayIntro = serverHeroIntro || treatment?.description || null;
   const displayContent = serverContent || null;
-  
-  console.log('[ServicePage] displayH1:', displayH1?.substring(0, 40));
-  console.log('[ServicePage] displayIntro length:', displayIntro?.length);
-  console.log('[ServicePage] displayContent length:', displayContent?.length);
   
   const parsedContent = displayContent ? parseMarkdownContent(displayContent) : null;
 
