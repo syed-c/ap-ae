@@ -3,9 +3,8 @@ import Link from "next/link";
 import {
   Facebook, Instagram, Twitter, Linkedin, Youtube,
   Mail, Phone, MapPin, Heart, ChevronRight,
+  ShieldCheck, Shield, Lock, Star, Stethoscope
 } from "lucide-react";
-import { FaShieldAlt, FaCheckCircle, FaLock, FaStar } from "react-icons/fa";
-import { RiShieldCheckFill, RiHospitalFill } from "react-icons/ri";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { ACTIVE_STATES } from "@/lib/constants/activeStates";
 
@@ -79,15 +78,15 @@ export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
           <div className="container px-4 md:px-6">
             <div className="flex flex-wrap justify-center md:justify-between gap-4 md:gap-8 py-3 md:py-4">
               <div className="flex items-center gap-2">
-                <RiShieldCheckFill className="h-4 w-4 text-primary" />
+                <ShieldCheck className="h-4 w-4 text-primary" />
                 <span className="text-xs font-medium">Verified Clinics</span>
               </div>
               <div className="flex items-center gap-2">
-                <FaShieldAlt className="h-3.5 w-3.5 text-primary" />
+                <Shield className="h-3.5 w-3.5 text-primary" />
                 <span className="text-xs font-medium">Licensed Professionals</span>
               </div>
               <div className="flex items-center gap-2">
-                <FaLock className="h-3.5 w-3.5 text-primary" />
+                <Lock className="h-3.5 w-3.5 text-primary" />
                 <span className="text-xs font-medium">Data Privacy</span>
               </div>
               <div className="flex items-center gap-2">
@@ -244,7 +243,7 @@ export const Footer = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>
                 href="/list-your-practice/"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs font-semibold hover:bg-primary/20 transition-all"
               >
-                <RiHospitalFill className="h-3 w-3" />
+                <Stethoscope className="h-3 w-3" />
                 List Your Practice
                 <ChevronRight className="h-3 w-3" />
               </Link>

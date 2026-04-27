@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Menu, X, ChevronDown, Search, User, Phone, Shield, ChevronRight, MapPin, Stethoscope, CalendarCheck, Star, AlertCircle } from "lucide-react";
+import { Menu, X, ChevronDown, Search, User, Phone, Shield, ChevronRight, MapPin, Stethoscope, CalendarCheck, Star, AlertCircle, Building2, Heart, GraduationCap, PlusSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,8 +15,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase, supabaseAdmin } from "@/integrations/supabase/client";
 import { useStates, useCities } from "@/hooks/useLocations";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import { RiHospitalFill, RiShieldCheckFill, RiStarSmileFill } from "react-icons/ri";
-import { FaTooth, FaStar } from "react-icons/fa";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -98,7 +96,7 @@ export function Navbar() {
               ) : (
                 <div className="flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                    <FaTooth className="h-4 w-4" />
+                    <Heart className="h-4 w-4" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold tracking-tight text-foreground leading-none">
@@ -202,7 +200,7 @@ export function Navbar() {
                     onClick={() => { setMobileMenuOpen(false); router.push("/search/"); }}
                     className="flex flex-col items-center gap-2 p-3 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors"
                   >
-                    <RiStarSmileFill className="h-5 w-5 text-primary" />
+                    <Star className="h-5 w-5 text-primary" />
                     <span className="text-xs font-semibold text-primary">Find Dentist</span>
                   </button>
                   <Link
@@ -230,7 +228,7 @@ export function Navbar() {
                         onClick={() => setMobileMenuOpen(false)}
                         className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/50 text-xs font-medium text-foreground hover:bg-muted transition-colors"
                       >
-                        <FaTooth className="h-3.5 w-3.5 text-primary" />
+                        <GraduationCap className="h-3.5 w-3.5 text-primary" />
                         {item.name}
                       </Link>
                     ))}
@@ -290,7 +288,7 @@ export function Navbar() {
                 <div className="grid grid-cols-2 gap-2 pt-2">
                   <Button variant="outline" size="sm" className="rounded-lg font-semibold border-border text-foreground bg-white hover:bg-muted h-10" asChild>
                     <Link href="/list-your-practice/" onClick={() => setMobileMenuOpen(false)}>
-                      <RiHospitalFill className="h-4 w-4 mr-1.5" /> List Practice
+                      <PlusSquare className="h-4 w-4 mr-1.5" /> List Practice
                     </Link>
                   </Button>
                   <Button size="sm" className="rounded-lg bg-primary text-primary-foreground font-semibold h-10" onClick={() => { setMobileMenuOpen(false); router.push("/search/"); }}>

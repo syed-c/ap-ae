@@ -1,5 +1,6 @@
 'use client';
 import { useState } from "react";
+import Image from "next/image";
 import {
   ArrowRight, Shield, Star, MapPin,
   Heart, Search, Building2, Stethoscope, Calendar,
@@ -118,11 +119,14 @@ const HomeV2 = () => {
       <section className="relative min-h-[520px] md:min-h-[580px] flex items-center justify-center overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0">
-          <img
-            src={heroDentalFamily.src}
+          <Image
+            src={heroDentalFamily}
             alt="Happy family at dental clinic"
-            className="w-full h-full object-cover"
-            loading="eager"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+            quality={85}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-foreground/70 via-foreground/55 to-foreground/75" />
         </div>
