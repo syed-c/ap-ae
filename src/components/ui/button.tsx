@@ -1,27 +1,26 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[8px] text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2D9C84] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
-        outline: "border border-border/50 bg-background hover:bg-muted/50 hover:border-border",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border/30",
-        ghost: "hover:bg-muted/50 hover:text-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        hero: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl hover:-translate-y-0.5",
+        default: "bg-[#2D9C84] text-white hover:bg-[#3AB89E] shadow-[0_4px_16px_rgba(0,0,0,0.3)] inset-shadow-[0_1px_0_rgba(255,255,255,0.1)] hover:-translate-y-[1px]",
+        destructive: "bg-[#EF4444] text-white hover:bg-[#DC2626]",
+        outline: "border border-[#2D9C84] bg-transparent text-white hover:bg-[rgba(45,156,132,0.08)] hover:border-[#3AB89E]",
+        secondary: "bg-[#FACC15] text-[#0A0A0A] hover:bg-[#FCD34D] font-extrabold shadow-[0_4px_12px_rgba(250,204,21,0.2)]",
+        ghost: "text-white hover:bg-[rgba(45,156,132,0.08)]",
+        link: "text-[#2D9C84] underline-offset-4 hover:underline",
+        gold: "bg-gradient-to-b from-[#FACC15] to-[#D4A810] text-[#0A0A0A] font-extrabold shadow-[0_4px_12px_rgba(250,204,21,0.2)] inset-shadow-[0_1px_0_rgba(255,255,255,0.25)] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(250,204,21,0.3)]",
       },
       size: {
-        default: "h-10 px-5 py-2",
-        sm: "h-9 rounded-xl px-4 text-xs",
-        lg: "h-12 rounded-xl px-8 text-base",
-        icon: "h-10 w-10 rounded-xl",
+        default: "h-10 px-4 py-2",
+        sm: "h-9 px-3 text-xs",
+        lg: "h-12 px-6 text-[15px]",
+        icon: "h-10 w-10 rounded-full",
       },
     },
     defaultVariants: {

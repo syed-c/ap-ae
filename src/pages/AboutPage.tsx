@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Head from "next/head";
+import { MarketplaceHero } from "@/components/marketplace/MarketplaceHero";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { SectionHeader } from "@/components/layout/SectionHeader";
@@ -93,59 +94,20 @@ const AboutPage = () => {
         />
       </Head>
 
-      {/* Dark Hero Section */}
-      <section className="relative bg-dark-section text-dark-section-foreground overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.1),transparent_50%)]" />
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple/10 rounded-full blur-3xl" />
-
-        <div className="container relative py-20 md:py-28">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-bold text-primary">About Us</span>
-            </div>
-
-            <h1 className="font-display text-4xl md:text-6xl font-bold mb-6">
-              Making Quality Dental Care{" "}
-              <span className="text-gradient">Accessible</span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-dark-section-foreground/70 max-w-2xl mx-auto mb-8">
-              The UAE's trusted platform connecting patients with verified dental professionals. Your smile, our mission.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button asChild size="lg" className="rounded-2xl font-bold shadow-glow">
-                <Link href="/search/">
-                  Find a Dentist
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="rounded-2xl font-bold border-white/40 text-white bg-white/10 hover:bg-white/20">
-                <Link href="/list-your-practice/">List Your Practice</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Bar */}
-      <Section variant="primary" size="sm" className="-mt-1">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, i) => (
-            <div key={i} className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary-foreground/10 mb-3">
-                <stat.icon className="h-6 w-6" />
-              </div>
-              <p className="font-display text-3xl md:text-4xl font-bold">{stat.value}</p>
-              <p className="text-primary-foreground/80 font-medium mt-1">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
+      <MarketplaceHero
+        badge="Marketplace Story"
+        title="A completely reimagined dental marketplace for the UAE"
+        description="AppointPanda is being rebuilt as a trust-first healthcare marketplace that helps patients discover, compare, and book dental care with more confidence and less friction."
+        actions={[
+          { href: '/search/', label: 'Find a Dentist' },
+          { href: '/list-your-practice/', label: 'List Your Practice', variant: 'outline' },
+        ]}
+        stats={stats.map((stat) => ({
+          label: stat.label,
+          value: stat.value,
+          icon: <stat.icon className="h-5 w-5" />,
+        }))}
+      />
 
       {/* Mission Section */}
       <Section size="lg">
@@ -203,8 +165,7 @@ const AboutPage = () => {
       <Section variant="muted" size="lg">
         <SectionHeader
           label="What We Stand For"
-          title="Our Core"
-          highlight="Values"
+          title="Our Core Values"
         />
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {values.map((value, i) => (

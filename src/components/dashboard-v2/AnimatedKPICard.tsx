@@ -85,14 +85,14 @@ export function AnimatedKPICard({
     return (
       <div
         className={cn(
-          'relative group p-5 rounded-2xl border bg-card shadow-sm hover:shadow-md transition-all duration-300',
+          'relative group rounded-[12px] border border-border bg-card p-5 shadow-[0_2px_8px_rgba(17,27,33,0.08)] transition-all duration-300',
           'hover:-translate-y-0.5 cursor-pointer overflow-hidden',
           className
         )}
         onClick={onClick}
       >
         {/* Background glow */}
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-primary/8 blur-2xl opacity-0 transition-opacity group-hover:opacity-100" />
         
         <div className="flex items-center gap-4">
           {/* Circular Progress */}
@@ -158,7 +158,7 @@ export function AnimatedKPICard({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 px-2 mt-2 text-xs text-primary hover:text-primary hover:bg-primary/10"
+                className="mt-2 h-7 px-2 text-xs text-secondary hover:bg-accent hover:text-secondary"
                 onClick={(e) => {
                   e.stopPropagation();
                   action.onClick();
@@ -178,11 +178,11 @@ export function AnimatedKPICard({
     return (
       <div
         className={cn(
-          'relative group p-5 rounded-2xl overflow-hidden transition-all duration-300',
+          'relative group overflow-hidden rounded-[12px] border border-border p-5 transition-all duration-300',
           'hover:-translate-y-0.5 cursor-pointer',
           variant === 'dark' 
-            ? 'bg-gradient-to-br from-slate-800 to-slate-900 text-white shadow-lg' 
-            : 'bg-gradient-to-br from-primary/90 to-teal text-white shadow-lg shadow-primary/20',
+            ? 'bg-secondary text-white shadow-[0_4px_16px_rgba(7,94,84,0.18)]' 
+            : 'bg-primary/10 text-foreground shadow-[0_0_30px_-8px_oklch(0.72_0.19_28/0.25)]',
           className
         )}
         onClick={onClick}
@@ -196,15 +196,15 @@ export function AnimatedKPICard({
         <div className="relative">
           <div className="flex items-center justify-between mb-3">
             <div className={cn(
-              'h-10 w-10 rounded-xl flex items-center justify-center',
-              variant === 'dark' ? 'bg-white/10' : 'bg-white/20'
+              'flex h-10 w-10 items-center justify-center rounded-full',
+              variant === 'dark' ? 'bg-white/10' : 'bg-white/50'
             )}>
-              <Icon className="h-5 w-5 text-white" />
+              <Icon className={cn('h-5 w-5', variant === 'dark' ? 'text-white' : 'text-secondary')} />
             </div>
             {trend && (
               <div className={cn(
                 'flex items-center gap-1 px-2 py-1 rounded-full text-xs',
-                'bg-white/20 backdrop-blur-sm'
+                variant === 'dark' ? 'bg-white/20 backdrop-blur-sm' : 'bg-white/60'
               )}>
                 {trend === 'up' ? (
                   <TrendingUp className="h-3 w-3" />
@@ -223,13 +223,13 @@ export function AnimatedKPICard({
             {typeof value === 'string' ? value : displayValue}
             {suffix}
           </p>
-          <p className="text-sm text-white/70 mt-1">{label}</p>
+          <p className={cn('mt-1 text-sm', variant === 'dark' ? 'text-foreground/70' : 'text-muted-foreground')}>{label}</p>
 
           {action && (
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 px-0 mt-3 text-xs text-white/80 hover:text-white hover:bg-transparent"
+              className={cn('mt-3 h-7 px-0 text-xs hover:bg-transparent', variant === 'dark' ? 'text-white/80 hover:text-white' : 'text-secondary hover:text-secondary')}
               onClick={(e) => {
                 e.stopPropagation();
                 action.onClick();
@@ -246,16 +246,16 @@ export function AnimatedKPICard({
 
   // Default variant
   return (
-    <div
-      className={cn(
-        'relative group p-4 rounded-xl border bg-card shadow-sm hover:shadow-md transition-all duration-300',
-        'hover:-translate-y-0.5 cursor-pointer',
-        className
-      )}
+      <div
+        className={cn(
+          'relative group rounded-[12px] border border-border bg-card p-4 shadow-[0_2px_8px_rgba(17,27,33,0.08)] transition-all duration-300',
+          'hover:-translate-y-0.5 cursor-pointer',
+          className
+        )}
       onClick={onClick}
     >
       <div className="flex items-center gap-3">
-        <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0', iconBg)}>
+        <div className={cn('flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full', iconBg)}>
           <Icon className={cn('h-5 w-5', iconColor)} />
         </div>
         <div className="flex-1 min-w-0">

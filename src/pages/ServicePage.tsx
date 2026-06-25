@@ -3,7 +3,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { supabaseAdmin } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
+import { MarketplaceHero } from "@/components/marketplace/MarketplaceHero";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { DentistListFrame } from "@/components/location";
@@ -81,7 +82,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
   const { data: treatment } = useQuery({
     queryKey: ["treatment", serviceSlug],
     queryFn: async () => {
-      const { data } = await supabaseAdmin.from("treatments").select("*").eq("slug", serviceSlug).maybeSingle();
+      const { data } = await supabase.from("treatments").select("*").eq("slug", serviceSlug).maybeSingle();
       return data;
     },
   });
@@ -90,7 +91,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
   const { data: relatedTreatments } = useQuery({
     queryKey: ["related-treatments", serviceSlug],
     queryFn: async () => {
-      const { data } = await supabaseAdmin.from("treatments").select("*").eq("is_active", true).neq("slug", serviceSlug).order("display_order").limit(6);
+      const { data } = await supabase.from("treatments").select("*").eq("is_active", true).neq("slug", serviceSlug).order("display_order").limit(6);
       return data || [];
     },
   });
@@ -161,148 +162,94 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
       />
       
       <StructuredData
-        type="service"
-        name={`${treatmentName} in UAE`}
-        description={treatment?.description || `Professional ${treatmentName} services across the UAE`}
-        url={serverCanonical}
-        provider="AppointPanda Partner Clinics"
-        areaServed="United Arab Emirates"
+        data={{
+          type: 'service',
+          name: `${treatmentName} in UAE`,
+          description: treatment?.description || `Professional ${treatmentName} services across the UAE`,
+          url: serverCanonical,
+          provider: "AppointPanda Partner Clinics",
+          areaServed: "United Arab Emirates",
+        }}
       />
       <StructuredData
-        type="breadcrumb"
-        items={[
-          { name: 'Home', url: '/' },
-          { name: 'Services', url: '/services/' },
-          { name: treatmentName, url: serverCanonical },
-        ]}
+        data={{
+          type: 'breadcrumb',
+          items: [
+            { name: 'Home', url: '/' },
+            { name: 'Services', url: '/services/' },
+            { name: treatmentName, url: serverCanonical },
+          ],
+        }}
       />
       <StructuredData
-        type="medicalProcedure"
-        name={treatmentName}
-        description={treatment?.description || `Professional ${treatmentName} services across the UAE`}
-        url={serverCanonical}
-        procedureType="Dental Procedure"
-        bodyLocation="Oral cavity"
-        followup="Regular dental checkups recommended every 6 months"
-        preparation="Initial consultation and dental examination required"
-        recognizingAuthority={[
-          { name: "Dubai Health Authority (DHA)", url: "https://www.dha.gov.ae" },
-          { name: "Department of Health - Abu Dhabi (DOH)", url: "https://www.doh.gov.ae" },
-          { name: "Ministry of Health and Prevention (MOHAP)", url: "https://www.mohap.gov.ae" },
-        ]}
+        data={{
+          type: 'medicalProcedure',
+          name: treatmentName,
+          description: treatment?.description || `Professional ${treatmentName} services across the UAE`,
+          url: serverCanonical,
+          procedureType: "Dental Procedure",
+          bodyLocation: "Oral cavity",
+          followup: "Regular dental checkups recommended every 6 months",
+          preparation: "Initial consultation and dental examination required",
+          recognizingAuthority: [
+            { name: "Dubai Health Authority (DHA)", url: "https://www.dha.gov.ae" },
+            { name: "Department of Health - Abu Dhabi (DOH)", url: "https://www.doh.gov.ae" },
+            { name: "Ministry of Health and Prevention (MOHAP)", url: "https://www.mohap.gov.ae" },
+          ],
+        }}
       />
       <StructuredData
-        type="breadcrumb"
-        items={[
-          { name: 'Home', url: '/' },
-          { name: 'Services', url: '/services/' },
-          { name: treatmentName, url: serverCanonical },
-        ]}
+        data={{
+          type: 'breadcrumb',
+          items: [
+            { name: 'Home', url: '/' },
+            { name: 'Services', url: '/services/' },
+            { name: treatmentName, url: serverCanonical },
+          ],
+        }}
       />
       <StructuredData 
-        type="faq" 
-        questions={faqs.map(f => ({ question: f.question, answer: f.answer })).filter(f => f.question && f.answer)}
-        includeSpeakable={true}
+        data={{
+          type: 'faq',
+          questions: faqs.map(f => ({ question: f.question, answer: f.answer })).filter(f => f.question && f.answer),
+        }}
       />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-emerald-50/50 to-background pt-8 pb-12">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl"
-            animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.3, 0.2] }}
-            transition={{ duration: 8, repeat: Infinity }}
-          />
-          <motion.div
-            className="absolute bottom-0 right-1/4 w-80 h-80 bg-teal-200/20 rounded-full blur-3xl"
-            animate={{ scale: [1, 1.15, 1], opacity: [0.15, 0.25, 0.15] }}
-            transition={{ duration: 10, repeat: Infinity, delay: 2 }}
-          />
-        </div>
-
-        <div className="container relative z-10 px-4">
-          <div className="flex justify-center mb-6">
-            <Breadcrumbs items={breadcrumbs} />
+      <MarketplaceHero
+        breadcrumbs={breadcrumbs}
+        badge="Treatment Marketplace"
+        title={displayH1}
+        description={metaDescription}
+        actions={[
+          { href: '/search/', label: 'Find a Specialist' },
+          { href: '/services/', label: 'All Treatments', variant: 'outline' },
+        ]}
+        stats={[
+          { label: 'Verified specialists', value: `${profiles?.length || 0}`, icon: <CheckCircle2 className="h-5 w-5" /> },
+          { label: 'Average rating', value: '4.8+', icon: <Star className="h-5 w-5" /> },
+          { label: 'Coverage', value: '7 Emirates', icon: <MapPin className="h-5 w-5" /> },
+          { label: 'Price range', value: minPrice > 0 ? `AED ${minPrice.toLocaleString()}+` : 'Consult', icon: <BarChart3 className="h-5 w-5" /> },
+        ]}
+      >
+        {sortedByPrice.length > 0 && (
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {sortedByPrice.slice(0, 6).map((range) => (
+              <div key={range.id} className="marketplace-panel p-4">
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  <Link href={`/${range.state?.slug}/`} className="hover:text-primary">
+                    {range.state?.name}
+                  </Link>
+                </div>
+                <div className="mt-3 text-2xl font-black text-foreground">
+                  AED {range.price_min.toLocaleString()} - {range.price_max.toLocaleString()}
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">Estimated marketplace range</p>
+              </div>
+            ))}
           </div>
-
-          <div className="max-w-4xl mx-auto text-center">
-            {/* Price Cards */}
-            {sortedByPrice.length > 0 && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
-              >
-                {sortedByPrice.slice(0, 6).map((range, i) => (
-                  <motion.div
-                    key={range.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-2xl p-4 hover:border-emerald-300 hover:shadow-lg transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <MapPin className="h-4 w-4 text-emerald-600" />
-                      <Link href={`/${range.state?.slug}/`} className="font-semibold text-gray-800 hover:text-emerald-700 transition-colors">
-                        {range.state?.name}
-                      </Link>
-                    </div>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-bold text-emerald-700">
-                        AED {range.price_min.toLocaleString()}
-                      </span>
-                      <span className="text-gray-400">-</span>
-                      <span className="text-2xl font-bold text-emerald-700">
-                        {range.price_max.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" style={{ width: '100%' }} />
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-
-            {/* Price CTA */}
-            {/*
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link
-                href={`/services/${serviceSlug}/`}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-full hover:bg-emerald-700 transition-colors shadow-lg hover:shadow-xl"
-              >
-                <BarChart3 className="h-5 w-5" />
-                View Full Price Guide
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-            </div>
-            */}
-
-            {/* Stats */}
-            {profiles && profiles.length > 0 && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="flex flex-wrap items-center justify-center gap-6 mt-8"
-              >
-                <div className="flex items-center gap-2 text-gray-600">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                  <span><strong className="text-gray-900">{profiles.length}</strong> verified specialists</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Star className="h-5 w-5 text-amber-400 fill-amber-400" />
-                  <span><strong className="text-gray-900">4.8+</strong> average rating</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <MapPin className="h-5 w-5 text-emerald-500" />
-                  <span>All <strong className="text-gray-900">7 emirates</strong></span>
-                </div>
-              </motion.div>
-            )}
-          </div>
-        </div>
-      </section>
+        )}
+      </MarketplaceHero>
 
       {/* Page Intro - H1 + hero intro paragraph */}
       <PageIntroSection

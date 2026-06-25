@@ -189,11 +189,13 @@ const AISearchPage = () => {
         keywords={["budget dental search", "affordable dentist", "find dentist near me", "dental care finder"]}
       />
       <StructuredData
-        type="breadcrumb"
-        items={[
-          { name: "Home", url: "/" },
-          { name: "Find Dentist", url: "/search/" },
-        ]}
+        data={{
+          type: 'breadcrumb',
+          items: [
+            { name: "Home", url: "/" },
+            { name: "Find Dentist", url: "/search/" },
+          ],
+        }}
       />
       <Navbar />
 
@@ -251,9 +253,9 @@ const AISearchPage = () => {
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {[
-                    "Cleaning under $80 in Boston",
-                    "Implants under $1500 near me",
-                    "Affordable whitening in LA",
+                    "Teeth cleaning under 200 AED in Dubai",
+                    "Dental implants under 8000 AED",
+                    "Affordable whitening in Abu Dhabi",
                   ].map((example, i) => (
                     <button
                       key={i}

@@ -1,192 +1,142 @@
 'use client';
-import { Star, MapPin, CheckCircle, Clock, Building2, ChevronRight, Calendar, Pin } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Profile } from "@/hooks/useProfiles";
-import { useState } from "react";
-import { MultiStepBookingModal } from "./MultiStepBookingModal";
-import { Badge } from "@/components/ui/badge";
-import { proxyImageUrl } from "@/lib/proxyImageUrl";
+
+import { useState } from 'react';
+import Link from 'next/link';
+import {
+  Building2,
+  CalendarCheck,
+  ChevronRight,
+  Languages,
+  MapPin,
+  Pin,
+  ShieldCheck,
+  Sparkles,
+  Star,
+} from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { MultiStepBookingModal } from './MultiStepBookingModal';
+import { Profile } from '@/hooks/useProfiles';
+import { proxyImageUrl } from '@/lib/proxyImageUrl';
 
 interface ProfileCardProps {
   profile: Profile;
-  variant?: "list" | "compact" | "elite";
+  variant?: 'list' | 'compact' | 'elite';
 }
 
-// Generate letter avatar with first letter of clinic/dentist name
 function getLetterAvatar(name: string): string {
   const initials = name
     .split(' ')
-    .map(word => word[0])
+    .map((word) => word[0])
     .join('')
     .toUpperCase()
     .slice(0, 2);
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=0f766e&color=fff&size=200&font-size=0.4&bold=true`;
+
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    initials
+  )}&background=0f5f73&color=fff&size=200&font-size=0.42&bold=true`;
 }
 
-export function ProfileCard({ profile, variant = "list" }: ProfileCardProps) {
+function formatReviewCount(reviewCount: number | undefined): string {
+  if (!reviewCount) {
+    return 'New listing';
+  }
+
+  return `${reviewCount} review${reviewCount === 1 ? '' : 's'}`;
+}
+
+function ProfileMeta({ icon: Icon, children }: { icon: typeof MapPin; children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+      <Icon className="h-4 w-4 text-primary/70" />
+      <span className="truncate">{children}</span>
+    </span>
+  );
+}
+
+export function ProfileCard({ profile, variant = 'list' }: ProfileCardProps) {
   const [bookingOpen, setBookingOpen] = useState(false);
 
-  const profileLink = profile.type === 'clinic'
-    ? `/clinic/${profile.slug}`
-    : `/dentist/${profile.slug}`;
+  const profileLink = profile.type === 'clinic' ? `/clinic/${profile.slug}` : `/dentist/${profile.slug}`;
+  const proxiedImage = proxyImageUrl(profile.image);
+  const displayImage = proxiedImage || getLetterAvatar(profile.name);
+  const profileLocation = profile.location || 'UAE';
+  const languageList = profile.languages?.slice(0, 3).join(', ');
+  const specialty = profile.specialty || (profile.type === 'clinic' ? 'Dental Clinic' : 'Dental Professional');
 
-  // Use letter avatar if no image available - shows first letter of name
-  const displayImage = proxyImageUrl(profile.image) || getLetterAvatar(profile.name);
-  const hasRealImage = !!proxyImageUrl(profile.image);
-
-  // List variant - horizontal card for search results (mobile-optimized)
-  if (variant === "list") {
+  if (variant === 'list') {
     return (
       <>
-        {/* Mobile: Compact stacked card */}
-        <div className="doctor-list-card group md:hidden">
-          <div className="flex items-start gap-3">
-            {/* Photo - smaller on mobile */}
-            <div className="relative shrink-0">
-              <img
-                src={displayImage}
-                alt={profile.name}
-                className="h-16 w-16 rounded-xl object-cover border-2 border-card shadow-md bg-muted"
-              />
-              {profile.isVerified && (
-                <div className="absolute -bottom-1 -right-1 bg-card text-primary p-1 rounded-full shadow-md border border-border">
-                  <CheckCircle className="h-3.5 w-3.5 fill-primary/20" />
-                </div>
-              )}
-            </div>
-
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                {profile.isPinned && (
-                  <Badge variant="outline" className="text-[10px] py-0 px-1.5 bg-primary/10 text-primary border-primary/30">
-                    <Pin className="h-2.5 w-2.5 mr-0.5" />
-                    Featured
-                  </Badge>
-                )}
-                <span className="text-xs font-bold text-primary uppercase tracking-wide">{profile.specialty}</span>
-                <div className="flex items-center gap-0.5 text-gold">
-                  <Star className="h-3 w-3 fill-current" />
-                  <span className="text-xs font-bold">{profile.rating.toFixed(1)}</span>
-                </div>
-              </div>
-
-              <h3 className="font-bold text-foreground text-base leading-tight mb-1 line-clamp-1">{profile.name}</h3>
-
-              <div className="flex items-center gap-1 text-muted-foreground text-xs">
-                <MapPin className="h-3 w-3 text-primary/50" />
-                <span className="truncate">{profile.location}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile action buttons - full width */}
-          <div className="flex gap-2 mt-3 pt-3 border-t border-border">
-            <Button variant="outline" size="sm" className="flex-1 rounded-xl font-bold text-xs h-9" asChild>
-              <Link href={profileLink}>
-                View Profile
-              </Link>
-            </Button>
-            <Button
-              size="sm"
-              className="flex-1 rounded-xl font-bold text-xs h-9 bg-foreground text-background hover:bg-primary"
-              onClick={() => setBookingOpen(true)}
-            >
-              <Calendar className="h-3.5 w-3.5 mr-1" />
-              Book
-            </Button>
-          </div>
-        </div>
-
-        {/* Desktop: Full horizontal card */}
-        <div className="doctor-list-card group hidden md:flex">
-          {/* Photo */}
+        <article className="doctor-list-card group">
           <div className="relative shrink-0">
             <img
               src={displayImage}
               alt={profile.name}
-              className="h-24 w-24 md:h-28 md:w-28 rounded-[1.5rem] object-cover border-4 border-card shadow-lg bg-muted"
+              className="h-24 w-24 rounded-[1.5rem] border border-border/60 object-cover shadow-md md:h-28 md:w-28"
+              loading="lazy"
             />
             {profile.isVerified && (
-              <div className="absolute -bottom-1 -right-1 bg-card text-primary p-1.5 rounded-full shadow-lg border border-border">
-                <CheckCircle className="h-5 w-5 fill-primary/20" />
+              <div className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full border border-white bg-card text-primary shadow-md">
+                <ShieldCheck className="h-4 w-4" />
               </div>
             )}
           </div>
 
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-3 mb-2">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
               {profile.isPinned && (
-                <Badge variant="outline" className="text-xs py-0.5 px-2 bg-primary/10 text-primary border-primary/30">
-                  <Pin className="h-3 w-3 mr-1" />
+                <Badge variant="outline" className="rounded-full border-primary/20 bg-primary/8 text-primary">
+                  <Pin className="mr-1 h-3 w-3" />
                   Featured
                 </Badge>
               )}
-              <span className="badge-brand">{profile.specialty}</span>
-              <div className="badge-amber">
+              <span className="badge-brand">{specialty}</span>
+              <span className="badge-amber">
                 <Star className="h-3.5 w-3.5 fill-current" />
-                <span className="text-data">{profile.rating.toFixed(1)}</span>
-                {profile.reviewCount > 0 && (
-                  <span className="font-medium">({profile.reviewCount} reviews)</span>
-                )}
-              </div>
-            </div>
-
-            <h3 className="text-data text-xl md:text-2xl text-foreground mb-2 tracking-tight">{profile.name}</h3>
-
-            <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
-              {profile.clinicName && profile.type === 'dentist' && (
-                <span className="flex items-center gap-1.5 text-sm font-medium">
-                  <Building2 className="h-4 w-4 text-primary/50" />
-                  {profile.clinicName}
-                </span>
-              )}
-              <span className="flex items-center gap-1.5 text-sm font-medium">
-                <MapPin className="h-4 w-4 text-primary/50" />
-                {profile.location}
+                {profile.rating > 0 ? profile.rating.toFixed(1) : 'Unrated'}
               </span>
             </div>
-          </div>
 
-          {/* Stats & Actions */}
-          <div className="flex flex-col items-end gap-4 shrink-0 border-l border-border pl-6 ml-2">
-            <div className="grid grid-cols-2 gap-4 text-right">
-              <div>
-                <p className="text-micro mb-1">Next Available</p>
-                <p className="text-data text-foreground">Today</p>
+            <div className="mt-4 flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+              <div className="min-w-0">
+                <h3 className="truncate text-xl font-black text-foreground md:text-2xl">{profile.name}</h3>
+                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
+                  {profile.clinicName && profile.type === 'dentist' && (
+                    <ProfileMeta icon={Building2}>{profile.clinicName}</ProfileMeta>
+                  )}
+                  <ProfileMeta icon={MapPin}>{profileLocation}</ProfileMeta>
+                  {languageList && <ProfileMeta icon={Languages}>{languageList}</ProfileMeta>}
+                </div>
               </div>
-              <div>
-                <p className="text-micro mb-1">Type</p>
-                <p className="text-data text-primary capitalize">{profile.type}</p>
+
+              <div className="rounded-2xl border border-border/60 bg-muted/30 px-4 py-3 xl:min-w-[170px]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Marketplace Signal
+                </p>
+                <p className="mt-2 text-base font-bold text-foreground">
+                  {formatReviewCount(profile.reviewCount)}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground capitalize">
+                  {profile.type} listing
+                </p>
               </div>
             </div>
 
-            {profile.languages && profile.languages.length > 0 && (
-              <div>
-                <p className="text-micro mb-1">Languages</p>
-                <p className="text-sm font-bold text-foreground">{profile.languages.slice(0, 3).join(', ')}</p>
-              </div>
-            )}
-
-            <div className="flex items-center gap-2 mt-2">
-              <Button variant="outline" size="sm" className="rounded-xl font-bold" asChild>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Button variant="outline" asChild>
                 <Link href={profileLink}>
-                  Profile <ChevronRight className="h-4 w-4 ml-1" />
+                  View Profile
+                  <ChevronRight className="h-4 w-4" />
                 </Link>
               </Button>
-              <Button
-                size="sm"
-                className="rounded-xl font-bold bg-foreground text-background hover:bg-primary"
-                onClick={() => setBookingOpen(true)}
-              >
-                <Calendar className="h-4 w-4 mr-1" />
-                Book Now
+              <Button onClick={() => setBookingOpen(true)}>
+                <CalendarCheck className="h-4 w-4" />
+                Book Appointment
               </Button>
             </div>
           </div>
-        </div>
+        </article>
 
         <MultiStepBookingModal
           open={bookingOpen}
@@ -200,61 +150,57 @@ export function ProfileCard({ profile, variant = "list" }: ProfileCardProps) {
     );
   }
 
-  // Elite variant - for dark background carousel
-  if (variant === "elite") {
+  if (variant === 'elite') {
     return (
       <>
-        <div className="relative bg-card rounded-[2rem] overflow-hidden min-w-[260px] max-w-[260px] card-hover group border border-border/50">
-          {/* Image */}
-          <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+        <article className="group flex min-w-[288px] max-w-[288px] flex-col overflow-hidden rounded-[1.75rem] border border-border/60 bg-card shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+          <div className="relative aspect-[4/5] overflow-hidden bg-muted">
             <img
               src={displayImage}
               alt={profile.name}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
             />
-            {/* Top badges */}
-            <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-              <div className="badge-amber">
+            <div className="absolute inset-x-0 top-0 flex items-start justify-between p-4">
+              <span className="badge-amber">
                 <Star className="h-3.5 w-3.5 fill-current" />
-                <span className="text-data text-sm">{profile.rating.toFixed(1)}</span>
-              </div>
-              {profile.isVerified && (
-                <div className="badge-verified">
-                  <CheckCircle className="h-3 w-3" />
-                  Verified
-                </div>
-              )}
-            </div>
-            {/* Specialty badge */}
-            <div className="absolute bottom-3 left-3">
-              <span className="badge-brand">
-                {profile.specialty}
+                {profile.rating > 0 ? profile.rating.toFixed(1) : 'New'}
               </span>
+              {profile.isVerified && <span className="badge-verified">Verified</span>}
+            </div>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 to-transparent p-4 text-white">
+              <span className="badge-brand bg-white/12 text-white border-white/10">{specialty}</span>
+              <h3 className="mt-3 text-lg font-black">{profile.name}</h3>
+              <div className="mt-2 flex items-center gap-1.5 text-sm text-white/74">
+                <MapPin className="h-4 w-4 text-primary" />
+                <span className="truncate">{profileLocation}</span>
+              </div>
             </div>
           </div>
-          {/* Content */}
-          <div className="p-5">
-            <h3 className="text-data text-lg text-foreground mb-1 truncate">{profile.name}</h3>
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
-              <MapPin className="h-4 w-4 text-primary/50" />
-              <span className="font-medium">{profile.location}</span>
+
+          <div className="flex flex-1 flex-col p-5">
+            <div className="flex flex-wrap gap-2">
+              {profile.isPinned && (
+                <Badge variant="outline" className="rounded-full border-primary/20 bg-primary/8 text-primary">
+                  <Sparkles className="mr-1 h-3 w-3" />
+                  Premium
+                </Badge>
+              )}
+              <Badge variant="outline" className="rounded-full text-muted-foreground">
+                {formatReviewCount(profile.reviewCount)}
+              </Badge>
             </div>
-            <div className="flex gap-2">
-              <Link href={profileLink} className="flex-1">
-                <Button variant="outline" size="sm" className="w-full rounded-xl font-bold">
-                  View Profile
-                </Button>
-              </Link>
-              <Button
-                size="sm"
-                className="rounded-xl font-bold"
-                onClick={() => setBookingOpen(true)}
-              >
+
+            <div className="mt-5 flex gap-2">
+              <Button variant="outline" className="flex-1" asChild>
+                <Link href={profileLink}>Profile</Link>
+              </Button>
+              <Button className="flex-1" onClick={() => setBookingOpen(true)}>
                 Book
               </Button>
             </div>
           </div>
-        </div>
+        </article>
 
         <MultiStepBookingModal
           open={bookingOpen}
@@ -268,56 +214,61 @@ export function ProfileCard({ profile, variant = "list" }: ProfileCardProps) {
     );
   }
 
-  // Compact variant (default) - for grid displays
   return (
     <>
-      <div className="group bg-card rounded-[2rem] border border-border overflow-hidden card-hover">
-        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <article className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border/60 bg-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/25 hover:shadow-lg">
+        <div className="relative aspect-[5/4] overflow-hidden bg-muted">
           <img
             src={displayImage}
             alt={profile.name}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
           />
-          <div className="absolute top-3 left-3 flex items-center gap-2">
-            <div className="badge-amber">
+          <div className="absolute inset-x-0 top-0 flex items-start justify-between p-4">
+            <span className="badge-amber">
               <Star className="h-3.5 w-3.5 fill-current" />
-              <span className="text-data text-sm">{profile.rating.toFixed(1)}</span>
-            </div>
-            {profile.isVerified && (
-              <div className="badge-verified">
-                <CheckCircle className="h-3 w-3" />
-                Verified
-              </div>
-            )}
-          </div>
-          <div className="absolute top-3 right-3">
-            <span className="badge-brand">
-              {profile.specialty}
+              {profile.rating > 0 ? profile.rating.toFixed(1) : 'New'}
             </span>
+            {profile.isVerified && <span className="badge-verified">Verified</span>}
           </div>
         </div>
-        <div className="p-5">
-          <h3 className="text-data text-lg text-foreground mb-1">{profile.name}</h3>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
-            <MapPin className="h-4 w-4 text-primary/50" />
-            <span className="font-medium">{profile.location}</span>
+
+        <div className="flex flex-1 flex-col p-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="badge-brand">{specialty}</span>
+            {profile.isPinned && (
+              <Badge variant="outline" className="rounded-full border-primary/20 bg-primary/8 text-primary">
+                Featured
+              </Badge>
+            )}
           </div>
-          <div className="flex gap-2">
-            <Link href={profileLink} className="flex-1">
-              <Button variant="outline" size="sm" className="w-full rounded-xl font-bold">
-                View Profile
-              </Button>
-            </Link>
-            <Button
-              size="sm"
-              className="rounded-xl font-bold"
-              onClick={() => setBookingOpen(true)}
-            >
+
+          <h3 className="mt-4 line-clamp-2 text-xl font-black text-foreground">{profile.name}</h3>
+
+          <div className="mt-3 space-y-2">
+            <ProfileMeta icon={MapPin}>{profileLocation}</ProfileMeta>
+            {profile.clinicName && profile.type === 'dentist' && (
+              <ProfileMeta icon={Building2}>{profile.clinicName}</ProfileMeta>
+            )}
+            {languageList && <ProfileMeta icon={Languages}>{languageList}</ProfileMeta>}
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-border/60 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">{formatReviewCount(profile.reviewCount)}</span>
+            <span className="mx-2 text-border">•</span>
+            <span className="capitalize">{profile.type}</span>
+          </div>
+
+          <div className="mt-5 flex gap-2">
+            <Button variant="outline" className="flex-1" asChild>
+              <Link href={profileLink}>View</Link>
+            </Button>
+            <Button className="flex-1" onClick={() => setBookingOpen(true)}>
               Book
             </Button>
           </div>
         </div>
-      </div>
+      </article>
 
       <MultiStepBookingModal
         open={bookingOpen}

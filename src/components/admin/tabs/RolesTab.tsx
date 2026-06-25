@@ -112,7 +112,7 @@ const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
 // All available roles
 const ALL_ROLES = [
   { value: 'super_admin', label: 'Super Admin', color: 'purple' },
-  { value: 'district_manager', label: 'District Manager', color: 'blue-custom' },
+  { value: 'platform_admin', label: 'District Manager', color: 'blue-custom' },
   { value: 'dentist', label: 'Dentist', color: 'primary' },
   { value: 'seo_team', label: 'SEO Team', color: 'teal' },
   { value: 'content_team', label: 'Content Team', color: 'gold' },
@@ -275,13 +275,13 @@ export default function RolesTab() {
   };
 
   // Get users by role
-  const adminUsers = users?.filter(u => u.roles?.includes('super_admin') || u.roles?.includes('district_manager')) || [];
-  const districtManagers = users?.filter(u => u.roles?.includes('district_manager')) || [];
+  const adminUsers = users?.filter(u => u.roles?.includes('super_admin') || u.roles?.includes('platform_admin')) || [];
+  const districtManagers = users?.filter(u => u.roles?.includes('platform_admin')) || [];
 
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'super_admin': return <Badge className="bg-purple text-purple-foreground">Super Admin</Badge>;
-      case 'district_manager': return <Badge className="bg-blue-custom text-blue-custom-foreground">District Manager</Badge>;
+      case 'platform_admin': return <Badge className="bg-blue-custom text-blue-custom-foreground">District Manager</Badge>;
       case 'dentist': return <Badge className="bg-primary text-primary-foreground">Dentist</Badge>;
       default: return <Badge variant="secondary">Patient</Badge>;
     }
@@ -415,7 +415,7 @@ export default function RolesTab() {
                                     <CheckCircle className="h-4 w-4 text-teal" />
                                   </div>
                                 </TableCell>
-                                {['district_manager', 'dentist', 'seo_team', 'content_team', 'marketing_team', 'support_team', 'patient'].map((role) => (
+                                {['platform_admin', 'dentist', 'seo_team', 'content_team', 'marketing_team', 'support_team', 'patient'].map((role) => (
                                   <TableCell key={role} className="text-center">
                                     <div className="flex justify-center">
                                       <Switch
@@ -444,7 +444,7 @@ export default function RolesTab() {
         {/* Role Presets Tab */}
         <TabsContent value="presets" className="mt-4">
           <div className="grid grid-cols-2 gap-4">
-            {['super_admin', 'district_manager', 'dentist', 'patient'].map((role) => {
+            {['super_admin', 'platform_admin', 'dentist', 'patient'].map((role) => {
               const rolePerms = rolePermissions?.[role] || DEFAULT_ROLE_PERMISSIONS[role] || [];
               const hasAllPerms = rolePerms.includes('*');
               const activeCount = hasAllPerms ? ALL_PERMISSIONS.length : rolePerms.length;
@@ -455,7 +455,7 @@ export default function RolesTab() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg capitalize flex items-center gap-2">
                         {role === 'super_admin' && <Shield className="h-5 w-5 text-purple" />}
-                        {role === 'district_manager' && <UserCheck className="h-5 w-5 text-blue-custom" />}
+                        {role === 'platform_admin' && <UserCheck className="h-5 w-5 text-blue-custom" />}
                         {role === 'dentist' && <Building2 className="h-5 w-5 text-teal" />}
                         {role === 'patient' && <Users className="h-5 w-5 text-muted-foreground" />}
                         {role.replace('_', ' ')}
@@ -464,7 +464,7 @@ export default function RolesTab() {
                     </div>
                     <CardDescription className="text-xs">
                       {role === 'super_admin' && 'Full platform control'}
-                      {role === 'district_manager' && 'Regional operations'}
+                      {role === 'platform_admin' && 'Regional operations'}
                       {role === 'dentist' && 'Practice management'}
                       {role === 'patient' && 'Public access only'}
                     </CardDescription>

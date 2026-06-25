@@ -48,7 +48,7 @@ import {
 // Team roles configuration
 const TEAM_ROLES = [
   { value: 'super_admin', label: 'Super Admin', color: 'purple', icon: Shield },
-  { value: 'district_manager', label: 'District Manager', color: 'blue-custom', icon: UserCheck },
+  { value: 'platform_admin', label: 'District Manager', color: 'blue-custom', icon: UserCheck },
   { value: 'dentist', label: 'Dentist', color: 'primary', icon: Users },
   { value: 'seo_team', label: 'SEO Team', color: 'teal', icon: Search },
   { value: 'content_team', label: 'Content Team', color: 'gold', icon: FileEdit },
@@ -270,7 +270,7 @@ export default function UsersTab() {
 
   const roleBreakdown = {
     super_admin: users?.filter(u => u.roles?.includes('super_admin')).length || 0,
-    district_manager: users?.filter(u => u.roles?.includes('district_manager')).length || 0,
+    district_manager: users?.filter(u => u.roles?.includes('platform_admin')).length || 0,
     dentist: users?.filter(u => u.roles?.includes('dentist')).length || 0,
     team: users?.filter(u => 
       u.roles?.some(r => ['seo_team', 'content_team', 'marketing_team', 'support_team'].includes(r))
@@ -442,7 +442,7 @@ export default function UsersTab() {
             </div>
           </CardContent>
         </Card>
-        <Card className={`card-modern cursor-pointer transition-colors ${roleFilter === 'district_manager' ? 'border-blue-custom' : 'hover:border-blue-custom/50'}`} onClick={() => setRoleFilter('district_manager')}>
+        <Card className={`card-modern cursor-pointer transition-colors ${roleFilter === 'platform_admin' ? 'border-blue-custom' : 'hover:border-blue-custom/50'}`} onClick={() => setRoleFilter('platform_admin')}>
           <CardContent className="p-4 flex items-center gap-4">
             <div className="h-12 w-12 rounded-xl bg-blue-light flex items-center justify-center">
               <UserCheck className="h-6 w-6 text-blue-custom" />

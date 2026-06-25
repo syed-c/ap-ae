@@ -6,14 +6,14 @@ import { useAuth } from '@/hooks/useAuth';
  * Hook to determine which admin tabs a user can access based on their role
  * and explicitly assigned tab permissions in user_tab_permissions table.
  * 
- * - super_admin and district_manager: Access ALL tabs (no restrictions)
+ * - super_admin and platform_admin: Access ALL tabs (no restrictions)
  * - Other roles (content_team, seo_team, etc.): Only access tabs explicitly granted
  */
 export function useUserTabAccess() {
   const { user, roles } = useAuth();
   
   // Super admins and district managers have full access
-  const hasFullAccess = roles.includes('super_admin') || roles.includes('district_manager');
+  const hasFullAccess = roles.includes('super_admin') || roles.includes('platform_admin');
   
   // Fetch user-specific tab permissions for non-super-admin users
   const { data: userTabPermissions, isLoading } = useQuery({

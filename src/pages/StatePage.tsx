@@ -3,8 +3,9 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { supabase, supabaseAdmin } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
+import { MarketplaceHero } from "@/components/marketplace/MarketplaceHero";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
 import { DentistListFrame } from "@/components/location";
@@ -108,7 +109,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
     queryFn: async () => {
       if (!cityIds.length) return {} as Record<string, number>;
 
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await supabase
         .from("clinics")
         .select("city_id")
         .in("city_id", cityIds)
@@ -134,7 +135,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
     queryFn: async () => {
       const pinnedIds = (pinnedProfiles || []).map(p => p.id);
 
-      const { data: stateCities } = await supabaseAdmin
+      const { data: stateCities } = await supabase
         .from('cities')
         .select('id')
         .eq('state_id', state.id);
@@ -143,7 +144,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
 
       const stateCityIds = stateCities.map(c => c.id);
 
-      const { data: clinics } = await supabaseAdmin
+      const { data: clinics } = await supabase
         .from('clinics')
         .select(`
           id, name, slug, description, cover_image_url, rating, review_count,
@@ -160,7 +161,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
 
       let pinnedClinics: any[] = [];
       if (missingPinnedIds.length > 0) {
-        const { data: extraPinned } = await supabaseAdmin
+        const { data: extraPinned } = await supabase
           .from('clinics')
           .select(`
             id, name, slug, description, cover_image_url, rating, review_count,
@@ -360,91 +361,37 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
         keywords={[`dentists ${stateName}`, `dental clinics ${stateName}`, `find dentist ${stateName}`, 'book dental appointment']}
       />
       <StructuredData
-        type="breadcrumb"
-        items={[
-          { name: 'Home', url: '/' },
-          { name: stateName, url: `/${normalizedStateSlug}/` },
-        ]}
+        data={{
+          type: 'breadcrumb',
+          items: [
+            { name: 'Home', url: '/' },
+            { name: stateName, url: `/${normalizedStateSlug}/` },
+          ],
+        }}
       />
       <StructuredData
-        type="faq"
-        questions={faqs.map(f => ({ question: f.q || f.question, answer: f.a || f.answer }))}
-        includeSpeakable={true}
+        data={{
+          type: 'faq',
+          questions: faqs.map(f => ({ question: f.q || f.question, answer: f.a || f.answer })),
+        }}
       />
 
-      {/* SECTION 1: Hero — Dark theme matching homepage */}
-      <section className="relative overflow-hidden min-h-[50vh] flex items-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-primary/15 rounded-full blur-[120px]" />
-          <div className="absolute -bottom-40 -left-40 w-[400px] h-[400px] bg-teal/10 rounded-full blur-[100px]" />
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }} />
-        </div>
-
-        <div className="container relative z-10 py-16 md:py-20 px-5 md:px-8">
-          <div className="flex justify-center mb-6">
-            <Breadcrumbs items={breadcrumbs} className="[&_a]:text-white/60 [&_span]:text-white/40 [&_svg]:text-white/30" />
-          </div>
-
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/15 backdrop-blur-md border border-primary/30 rounded-full px-4 py-2 mb-6">
-              <Shield className="h-4 w-4 text-primary" />
-              <span className="text-sm font-bold text-primary">Licensed Dental Professionals</span>
-            </div>
-
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 px-2" style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif" }}>
-              {pageH1 && pageH1.includes(stateName) ? (
-                <>
-                  <span className="text-white">{pageH1.split(stateName)[0]}</span>
-                  <span className="text-primary">{stateName}</span>
-                </>
-              ) : (
-                <span className="text-white">{pageH1}</span>
-              )}
-            </h1>
-
-            <p className="text-lg md:text-xl text-white/40 mb-8 max-w-2xl mx-auto">
-              Discover top-rated dental professionals across {stateName}. Browse by city, compare reviews, and book your appointment online.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
-              <Link href="/search/">
-                <Button size="lg" className="h-12 px-6 font-bold rounded-2xl">
-                  Find a Dentist <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-2 md:flex md:flex-wrap md:justify-center md:gap-4 px-2">
-              <div className="flex flex-col md:flex-row items-center gap-1 md:gap-2 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl md:rounded-2xl px-3 py-2 md:px-5 md:py-3">
-                <Building2 className="h-4 w-4 md:h-5 md:w-5 text-primary" />
-                <span className="font-bold text-sm md:text-base text-white">{cities?.length || 0}</span>
-                <span className="text-[10px] md:text-sm text-white/50 hidden md:inline">Areas</span>
-              </div>
-              <div className="flex flex-col md:flex-row items-center gap-1 md:gap-2 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl md:rounded-2xl px-3 py-2 md:px-5 md:py-3">
-                <Star className="h-4 w-4 md:h-5 md:w-5 text-gold fill-gold" />
-                <span className="font-bold text-sm md:text-base text-white">4.8</span>
-                <span className="text-[10px] md:text-sm text-white/50 hidden md:inline">Avg. Rating</span>
-              </div>
-              <div className="flex flex-col md:flex-row items-center gap-1 md:gap-2 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-xl md:rounded-2xl px-3 py-2 md:px-5 md:py-3">
-                <Clock className="h-4 w-4 md:h-5 md:w-5 text-primary" />
-                <span className="font-bold text-sm md:text-base text-white">60s</span>
-                <span className="text-[10px] md:text-sm text-white/50 hidden md:inline">Book</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom wave */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 80" fill="none" className="w-full h-12 md:h-16" preserveAspectRatio="none">
-            <path d="M0 80V40C240 10 480 0 720 20C960 40 1200 50 1440 30V80H0Z" className="fill-background" />
-          </svg>
-        </div>
-      </section>
+      <MarketplaceHero
+        breadcrumbs={breadcrumbs}
+        badge="Emirate Marketplace"
+        title={pageH1 || `Find dentists across ${stateName}`}
+        description={`Browse clinics and dentists across ${stateName}, compare trust signals, and move from discovery to booking through a more structured marketplace experience.`}
+        actions={[
+          { href: '/search/', label: 'Search the Directory' },
+          { href: '/services/', label: 'Browse Services', variant: 'outline' },
+        ]}
+        stats={[
+          { label: 'Areas in this emirate', value: `${cities?.length || 0}`, icon: <Building2 className="h-5 w-5" /> },
+          { label: 'Marketplace rating signal', value: '4.8', icon: <Star className="h-5 w-5" /> },
+          { label: 'Booking speed', value: '60s', icon: <Clock className="h-5 w-5" /> },
+          { label: 'Trust layer', value: 'Licensed', icon: <Shield className="h-5 w-5" /> },
+        ]}
+      />
 
       {/* Page Intro Section - CMS Content from page_content table - ONLY hero_intro, no heading */}
       <PageIntroSection

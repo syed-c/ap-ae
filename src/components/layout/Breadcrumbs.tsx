@@ -1,9 +1,10 @@
-import Link from "next/link";
-import { ChevronRight, Home } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { withTrailingSlash } from "@/lib/url/withTrailingSlash";
+'use client';
 
-interface BreadcrumbItem {
+import Link from 'next/link';
+import { ChevronRight, Home } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export interface BreadcrumbItem {
   label: string;
   href?: string;
 }
@@ -11,39 +12,45 @@ interface BreadcrumbItem {
 interface BreadcrumbsProps {
   items: BreadcrumbItem[];
   className?: string;
+  showHome?: boolean;
 }
 
-export const Breadcrumbs = ({ items, className }: BreadcrumbsProps) => {
-  return (
-    <nav
-      aria-label="Breadcrumb"
-      className={cn("flex items-center gap-2 text-sm text-muted-foreground", className)}
-    >
-      <Link href="/"
-        className="hover:text-primary transition-colors flex items-center gap-1"
-      >
-        <Home className="h-4 w-4" />
-        <span className="sr-only">Home</span>
-      </Link>
+export function Breadcrumbs({ items, className, showHome = true }: BreadcrumbsProps) {
+  const allItems = showHome ? [{ label: 'Home', href: '/' }, ...items] : items;
 
-      {items.map((item, index) => {
-        const href = item.href ? withTrailingSlash(item.href) : undefined;
+  return (
+    <nav aria-label="Breadcrumb" className={cn('flex items-center gap-1 text-sm', className)}>
+      {allItems.map((item, index) => {
+        const isLast = index === allItems.length - 1;
+
         return (
-          <div key={index} className="flex items-center gap-2">
-            <ChevronRight className="h-4 w-4 text-border" />
-            {href && index !== items.length - 1 ? (
-              <Link
-                href={href}
-                className="hover:text-primary transition-colors font-medium"
+          <div key={item.href || item.label} className="flex items-center gap-1">
+            {index > 0 && (
+              <ChevronRight className="h-3.5 w-3.5 text-[#62626B]" />
+            )}
+            {isLast || !item.href ? (
+              <span
+                className={cn(
+                  'text-sm',
+                  isLast ? 'text-white font-medium' : 'text-[#62626B]'
+                )}
               >
                 {item.label}
-              </Link>
+              </span>
             ) : (
-              <span className="font-semibold text-foreground">{item.label}</span>
+              <Link
+                href={item.href}
+                className="text-[#62626B] hover:text-[#2D9C84] transition-all duration-300 text-sm"
+              >
+                {index === 0 && showHome ? (
+                  <Home className="h-3.5 w-3.5 inline-block mr-1" />
+                ) : null}
+                {item.label}
+              </Link>
             )}
           </div>
         );
       })}
     </nav>
   );
-};
+}

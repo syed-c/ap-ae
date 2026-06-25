@@ -78,7 +78,6 @@ export default function DentistDashboardLayoutV2({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sidebar */}
       <DentistSidebar
         activeTab={activeTab}
         onTabChange={onTabChange}
@@ -86,22 +85,19 @@ export default function DentistDashboardLayoutV2({
         onCollapsedChange={setSidebarCollapsed}
       />
 
-      {/* Main content area */}
       <div
         className={cn(
           'min-h-screen transition-all duration-300 ease-out',
-          sidebarCollapsed ? 'ml-[72px]' : 'ml-64'
+          sidebarCollapsed ? 'ml-[84px]' : 'ml-[340px]'
         )}
       >
-        {/* Top Bar */}
         <DentistTopBar
           pageTitle={pageInfo.title}
           pageDescription={pageInfo.description}
           breadcrumbs={getBreadcrumbs()}
         />
 
-        {/* Content */}
-        <main className="p-6">
+        <main className="min-h-[calc(100vh-72px)] p-4 md:p-6">
           {children}
         </main>
       </div>

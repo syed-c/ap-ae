@@ -16,7 +16,7 @@ npm run start  # Start production server
 - **Data layer**: `src/lib/supabaseServer.ts` - Server-side Supabase clients
   - `createServerSupabase()` - Uses anon key (RLS applies)
   - `createServerSupabaseAdmin()` - Uses service role key (bypasses RLS)
-- **Client hooks**: `src/hooks/*.ts` - Client-side React Query hooks use `supabaseAdmin` from `@/integrations/supabase/client`
+- **Client hooks**: `src/hooks/*.ts` - Client-side React Query hooks use `supabase` (anon key) from `@/integrations/supabase/client` — do NOT use service role key client-side
 
 ## Critical Pattern: Props Must Flow to Components
 
@@ -40,7 +40,7 @@ All server-side data fetching for SSG build (especially SSG/ISR pages) MUST use 
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` or `NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY` (server-only, for admin queries)
+- `SUPABASE_SERVICE_ROLE_KEY` (server-only, for admin queries — do NOT use NEXT_PUBLIC_ prefix)
 
 ## Testing Changes
 

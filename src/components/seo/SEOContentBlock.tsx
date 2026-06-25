@@ -74,7 +74,7 @@ export const SEOContentBlock = ({
         itemScope 
         itemType="https://schema.org/Article"
       >
-        <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm animate-pulse">
+        <div className="marketplace-panel overflow-hidden animate-pulse">
           <div className="p-4 md:p-6 border-b border-border bg-gradient-to-r from-primary/5 to-transparent">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-muted" />
@@ -136,7 +136,7 @@ export const SEOContentBlock = ({
          <motion.div
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
-           className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm"
+           className="marketplace-panel overflow-hidden"
          >
            {/* Header */}
            <div className="p-4 md:p-6 border-b border-border bg-gradient-to-r from-primary/5 to-transparent">
@@ -363,7 +363,7 @@ const OptimizedContentLayout = ({
           {/* Main Sections - Rendered as semantic HTML for SEO */}
           <div className="space-y-6">
             {displaySections.slice(0, 4).map((section, idx) => (
-              <section key={idx} className="border-l-2 border-primary/20 pl-4 md:pl-6">
+              <section key={idx} className="rounded-[1.25rem] border border-border/60 bg-muted/25 p-5 md:p-6">
                 {section.heading ? (
                   section.level === 2 ? (
                     <h2 
@@ -396,7 +396,7 @@ const OptimizedContentLayout = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-card border border-border rounded-2xl p-6"
+           className="marketplace-panel p-6"
         >
           <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
             <Stethoscope className="h-4 w-4 text-primary" />
@@ -407,7 +407,7 @@ const OptimizedContentLayout = ({
               <Link
                 key={t.slug}
                 href={stateSlug && citySlug ? buildUrl(stateSlug, citySlug, t.slug) : buildUrl('services', t.slug)}
-                className="bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium hover:bg-primary/20 transition-colors"
+                className="rounded-full border border-primary/15 bg-primary/8 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/15"
               >
                 {t.name}
               </Link>
@@ -422,7 +422,7 @@ const OptimizedContentLayout = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="bg-card border border-border rounded-2xl p-6"
+          className="marketplace-panel p-6"
         >
           <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
             <MapPin className="h-4 w-4 text-primary" />
@@ -433,7 +433,7 @@ const OptimizedContentLayout = ({
               <Link
                 key={loc.slug}
                 href={withTrailingSlash(`/${stateSlug}/${loc.slug}`)}
-                className="flex items-center gap-1 bg-muted hover:bg-muted/80 rounded-full px-4 py-2 text-sm font-medium transition-colors"
+                className="flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-4 py-2 text-sm font-medium transition-colors hover:bg-muted/70"
               >
                 <MapPin className="h-3 w-3" />
                 {loc.name}

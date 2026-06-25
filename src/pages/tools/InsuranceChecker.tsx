@@ -292,7 +292,7 @@ export default function InsuranceChecker() {
                       {treatmentId && (
                         <TableCell className="text-right">
                           {clinic.pricing ? (
-                            <span>${clinic.pricing.price_from}{clinic.pricing.price_to ? ` – $${clinic.pricing.price_to}` : ''}</span>
+                            <span>AED {clinic.pricing.price_from?.toLocaleString()}{clinic.pricing.price_to ? ` – AED ${clinic.pricing.price_to.toLocaleString()}` : ''}</span>
                           ) : '—'}
                         </TableCell>
                       )}

@@ -232,7 +232,7 @@ export default function SystemAuditTab() {
   // User roles detected
   const userRoles = [
     { role: 'super_admin', description: 'Full platform access, all admin controls', count: '~2' },
-    { role: 'district_manager', description: 'Regional management (limited use)', count: '~1' },
+    { role: 'platform_admin', description: 'Regional management (limited use)', count: '~1' },
     { role: 'dentist', description: 'Claimed clinic owners, dashboard access', count: '~10' },
     { role: 'patient', description: 'Implicit role (no user_roles entry needed)', count: 'N/A' },
   ];

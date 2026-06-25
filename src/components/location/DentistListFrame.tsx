@@ -1,22 +1,11 @@
 'use client';
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ProfileCard } from "@/components/ProfileCard";
-import { MobileDentistSlider } from "@/components/lists/MobileDentistSlider";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  ChevronDown,
-  ChevronUp,
-  Users,
-  MapPin,
-  X,
-  Search,
-  Phone,
-  ArrowRight
-} from "lucide-react";
-import Link from "next/link";
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { ArrowRight, MapPin, Search, ShieldCheck, Users, X } from 'lucide-react';
+
+import { ProfileCard } from '@/components/ProfileCard';
+import { Button } from '@/components/ui/button';
 
 interface DentistListFrameProps {
   profiles: any[];
@@ -32,291 +21,144 @@ interface DentistListFrameProps {
   initialCount?: number;
 }
 
-/**
- * DentistListFrame - A scrollable container for dentist profiles
- * with a proper frame, expand/collapse functionality, and SEO-friendly rendering.
- * Content is rendered as real HTML for Google bots.
- */
 export const DentistListFrame = ({
   profiles,
   isLoading,
   locationName,
-  stateSlug = "",
+  stateSlug = '',
   nearbyLocations = [],
   emptyMessage,
-  showFilters = false,
   hasActiveFilters = false,
   onClearFilters,
-  maxHeight = 600,
   initialCount = 6,
 }: DentistListFrameProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const displayProfiles = isExpanded ? profiles : profiles.slice(0, initialCount);
+  const visibleProfiles = isExpanded ? profiles : profiles.slice(0, initialCount);
   const hasMoreProfiles = profiles.length > initialCount;
   const remainingCount = profiles.length - initialCount;
 
   if (isLoading) {
     return (
-      <div
-        className="bg-card border border-border rounded-3xl overflow-hidden"
-        itemScope
-        itemType="https://schema.org/ItemList"
-        aria-busy="true"
-      >
-        <div className="p-6 border-b border-border">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              <h3 className="font-bold text-lg" itemProp="name">
-                Dentists in {locationName}
-              </h3>
-            </div>
-            <span className="text-sm text-muted-foreground">Loading results...</span>
+      <section className="marketplace-panel overflow-hidden" aria-busy="true">
+        <div className="border-b border-border/60 bg-muted/35 px-5 py-4 md:px-6">
+          <div className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-black text-foreground">Dental providers in {locationName}</h2>
           </div>
         </div>
-        {/* SEO: Always render semantic content structure for bots */}
-        <p className="sr-only" itemProp="description">
-          Browse verified dental professionals in {locationName}. Find ratings, reviews, and book appointments online.
-        </p>
-        <div className="p-6 space-y-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-muted/50 border border-border rounded-2xl p-4 animate-pulse">
+        <div className="grid gap-4 p-5 md:p-6">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="rounded-[1.5rem] border border-border/60 bg-card p-5 shadow-sm">
               <div className="flex gap-4">
-                <div className="h-16 w-16 rounded-xl bg-muted" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 w-24 bg-muted rounded" />
-                  <div className="h-5 w-48 bg-muted rounded" />
-                  <div className="h-3 w-32 bg-muted rounded" />
+                <div className="h-24 w-24 rounded-[1.25rem] bg-muted animate-pulse" />
+                <div className="flex-1 space-y-3">
+                  <div className="h-4 w-28 rounded-full bg-muted animate-pulse" />
+                  <div className="h-7 w-3/5 rounded-full bg-muted animate-pulse" />
+                  <div className="h-4 w-2/5 rounded-full bg-muted animate-pulse" />
+                  <div className="h-10 w-40 rounded-2xl bg-muted animate-pulse" />
                 </div>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
     );
   }
 
   if (!profiles || profiles.length === 0) {
     return (
-      <div className="bg-card border border-border rounded-3xl overflow-hidden">
-        <div className="p-6 border-b border-border">
+      <section className="marketplace-panel overflow-hidden">
+        <div className="border-b border-border/60 bg-muted/35 px-5 py-4 md:px-6">
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
-            <h3 className="font-bold text-lg">Dentists & Clinics</h3>
+            <Search className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-black text-foreground">Marketplace results</h2>
           </div>
         </div>
-        <div className="p-8">
-          {/* Primary message */}
-          <div className="text-center mb-6">
-            <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-foreground mb-2">No dentists found</h3>
-            <p className="text-muted-foreground mb-4">
-              {emptyMessage || (hasActiveFilters
-                ? "Try adjusting your filters to see more results."
-                : `We're still adding dentists in ${locationName}. Check back soon!`
-              )}
+
+        <div className="p-6 md:p-8">
+          <div className="mx-auto max-w-2xl rounded-[1.75rem] border border-dashed border-border bg-muted/25 p-8 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <MapPin className="h-7 w-7" />
+            </div>
+            <h3 className="mt-5 text-2xl font-black text-foreground">No providers match this view yet</h3>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              {emptyMessage ||
+                (hasActiveFilters
+                  ? 'Try relaxing your filters to discover more clinics and dentists.'
+                  : `We are still expanding coverage in ${locationName}.`)}
             </p>
-          </div>
-          
-          {/* SEO-rich fallback content for empty states */}
-          <div className="bg-muted/30 rounded-2xl p-6 space-y-4">
-            <h4 className="font-semibold text-foreground flex items-center gap-2">
-              <Search className="h-4 w-4 text-primary" />
-              Find Dental Care Near {locationName}
-            </h4>
-            <p className="text-sm text-muted-foreground">
-              While we're adding dental clinics to {locationName}, here are some ways to find quality dental care:
-            </p>
-            <ul className="text-sm text-muted-foreground space-y-2">
-              <li className="flex items-start gap-2">
-                <ArrowRight className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                <span>Check nearby areas in {stateSlug || "this emirate"} for available dental clinics</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Phone className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                <span>Contact local hospitals or health centers for dental service referrals</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                <span>Visit government health authority websites for licensed practitioners</span>
-              </li>
-            </ul>
-            
-            {/* Links to nearby locations */}
-            {nearbyLocations && nearbyLocations.length > 0 && (
-              <div className="pt-4 border-t border-border">
-                <h5 className="font-medium text-foreground mb-3">Nearby Areas with Dental Care:</h5>
-                <div className="flex flex-wrap gap-2">
-                  {nearbyLocations.slice(0, 6).map((loc) => (
+
+            {nearbyLocations.length > 0 && (
+              <div className="mt-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Nearby Areas
+                </p>
+                <div className="mt-3 flex flex-wrap justify-center gap-2">
+                  {nearbyLocations.slice(0, 6).map((location) => (
                     <Link
-                      key={loc.slug}
-                      href={stateSlug ? `/${stateSlug}/${loc.slug}/` : `/${loc.slug}/`}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium hover:bg-primary/20 transition-colors"
+                      key={location.slug}
+                      href={stateSlug ? `/${stateSlug}/${location.slug}/` : `/${location.slug}/`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card px-3.5 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:text-primary"
                     >
-                      <MapPin className="h-3 w-3" />
-                      {loc.name}
+                      <MapPin className="h-3.5 w-3.5 text-primary" />
+                      {location.name}
                     </Link>
                   ))}
                 </div>
               </div>
             )}
-          </div>
-          
-          {hasActiveFilters && onClearFilters && (
-            <div className="mt-4 text-center">
-              <Button
-                variant="outline"
-                className="rounded-xl"
-                onClick={onClearFilters}
-              >
-                <X className="h-4 w-4 mr-2" />
-                Clear All Filters
+
+            {hasActiveFilters && onClearFilters && (
+              <Button variant="outline" className="mt-6" onClick={onClearFilters}>
+                <X className="h-4 w-4" />
+                Clear Filters
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
-      {/* Header */}
-      <div className="p-4 md:p-6 border-b border-border bg-gradient-to-r from-primary/5 to-transparent">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
-            <h3 className="font-bold text-lg">Dentists in {locationName}</h3>
+    <section className="marketplace-panel overflow-hidden">
+      <div className="border-b border-border/60 bg-muted/35 px-5 py-4 md:px-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="flex items-center gap-2 text-primary">
+              <ShieldCheck className="h-4 w-4" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">Marketplace Listings</span>
+            </div>
+            <h2 className="mt-2 text-xl font-black text-foreground md:text-2xl">
+              Dentists and clinics in {locationName}
+            </h2>
           </div>
-          <span className="text-sm text-muted-foreground">
-            {profiles.length} {profiles.length === 1 ? 'result' : 'results'}
-          </span>
+          <div className="rounded-full border border-border/70 bg-card px-4 py-2 text-sm font-medium text-muted-foreground">
+            {profiles.length} result{profiles.length === 1 ? '' : 's'}
+          </div>
         </div>
       </div>
 
-      {/* SEO: Semantic HTML list always in DOM for bots/crawlers */}
-      <noscript>
-        <div itemScope itemType="https://schema.org/ItemList">
-          <meta itemProp="name" content={`Dentists in ${locationName}`} />
-          <meta itemProp="numberOfItems" content={String(profiles.length)} />
-          {profiles.map((profile, index) => (
-            <div key={profile.id} itemScope itemType="https://schema.org/Dentist" itemProp="itemListElement">
-              <meta itemProp="position" content={String(index + 1)} />
-              <h4 itemProp="name">{profile.name}</h4>
-              {profile.location && <p itemProp="address">{profile.location}</p>}
-              {profile.specialty && <p itemProp="medicalSpecialty">{profile.specialty}</p>}
-              {profile.rating && profile.review_count && profile.review_count > 0 && <span itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
-                <meta itemProp="ratingValue" content={String(profile.rating)} />
-                <meta itemProp="reviewCount" content={String(profile.review_count)} />
-                <meta itemProp="bestRating" content="5" />
-                <meta itemProp="worstRating" content="1" />
-              </span>}
-              {profile.slug && <a itemProp="url" href={`https://www.AppointPanda.ae/clinic/${profile.slug}/`}>View Profile</a>}
-            </div>
-          ))}
-        </div>
-      </noscript>
-
-      {/* Screen-reader / bot-accessible semantic list (visually hidden but in DOM) */}
-      <div className="sr-only" role="list" aria-label={`${profiles.length} dentists in ${locationName}`}
-        itemScope itemType="https://schema.org/ItemList">
-        <meta itemProp="name" content={`Dentists in ${locationName}`} />
-        <meta itemProp="numberOfItems" content={String(profiles.length)} />
-        {profiles.map((profile, index) => (
-          <div key={profile.id} role="listitem" itemScope itemType="https://schema.org/Dentist" itemProp="itemListElement">
-            <meta itemProp="position" content={String(index + 1)} />
-            <span itemProp="name">{profile.name}</span>
-            {profile.location && <span itemProp="address">{profile.location}</span>}
-            {profile.specialty && <span itemProp="medicalSpecialty">{profile.specialty}</span>}
-            {profile.rating && profile.review_count && profile.review_count > 0 && <span itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
-              <meta itemProp="ratingValue" content={String(profile.rating)} />
-              <meta itemProp="reviewCount" content={String(profile.review_count)} />
-              <meta itemProp="bestRating" content="5" />
-              <meta itemProp="worstRating" content="1" />
-            </span>}
-            {profile.slug && <a itemProp="url" href={`https://www.AppointPanda.ae/clinic/${profile.slug}/`}>{profile.name}</a>}
-          </div>
+      <div className="space-y-4 p-5 md:p-6">
+        {visibleProfiles.map((profile) => (
+          <article key={profile.id} itemScope itemType="https://schema.org/Dentist" className="contents">
+            <ProfileCard profile={profile} variant="list" />
+            <meta itemProp="name" content={profile.name} />
+            {profile.location && <meta itemProp="address" content={profile.location} />}
+          </article>
         ))}
       </div>
 
-      {/* Scrollable Content Frame */}
-      <div className="relative">
-        {/* Mobile: Horizontal slider */}
-        <div className="md:hidden p-4">
-          <MobileDentistSlider profiles={displayProfiles} />
-        </div>
-
-        {/* Desktop: Scrollable list */}
-        <div className="hidden md:block">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={isExpanded ? 'expanded' : 'collapsed'}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <ScrollArea
-                className="w-full"
-                style={{ maxHeight: isExpanded ? 'none' : `${maxHeight}px` }}
-              >
-                <div className="p-4 md:p-6 space-y-4">
-                  {displayProfiles.map((profile, index) => (
-                    <motion.div
-                      key={profile.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.03 }}
-                    >
-                      <article
-                        itemScope
-                        itemType="https://schema.org/Dentist"
-                        className="contents"
-                      >
-                        <ProfileCard profile={profile} variant="list" />
-                        <meta itemProp="name" content={profile.name} />
-                        {profile.location && (
-                          <meta itemProp="address" content={profile.location} />
-                        )}
-                      </article>
-                    </motion.div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Gradient fade at bottom when collapsed */}
-          {!isExpanded && hasMoreProfiles && (
-            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-card to-transparent pointer-events-none" />
-          )}
-        </div>
-      </div>
-
-      {/* Expand/Collapse Footer */}
       {hasMoreProfiles && (
-        <div className="p-4 border-t border-border bg-muted/30">
-          <Button
-            variant="ghost"
-            className="w-full rounded-xl font-bold hover:bg-primary/10 transition-colors group"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? (
-              <>
-                <ChevronUp className="h-4 w-4 mr-2 group-hover:animate-bounce" />
-                Show Less
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-4 w-4 mr-2 group-hover:animate-bounce" />
-                View All {remainingCount} More Dentists
-              </>
-            )}
+        <div className="border-t border-border/60 bg-muted/20 px-5 py-4 md:px-6">
+          <Button variant="outline" className="w-full" onClick={() => setIsExpanded((expanded) => !expanded)}>
+            {isExpanded ? 'Show Less' : `View ${remainingCount} More Providers`}
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

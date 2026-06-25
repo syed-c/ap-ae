@@ -24,10 +24,13 @@ interface AuthContextType {
   isAdmin: boolean;
   isSuperAdmin: boolean;
   isDentist: boolean;
+  isClinicStaff: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshRoles: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: Error | null }>;
+  updatePassword: (password: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -217,9 +220,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRoles([]);
   };
 
-  const isAdmin = roles.includes('super_admin') || roles.includes('district_manager');
+  const resetPassword = async (email: string) => {
+    const redirectUrl = `${window.location.origin}/auth?reset=true`;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
+    });
+    return { error: error as Error | null };
+  };
+
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    return { error: error as Error | null };
+  };
+
   const isSuperAdmin = roles.includes('super_admin');
+  const isAdmin = isSuperAdmin || roles.includes('platform_admin') || roles.includes('content_moderator');
   const isDentist = roles.includes('dentist');
+  const isClinicStaff = roles.includes('clinic_owner') || roles.includes('clinic_manager') || roles.includes('receptionist');
 
   return (
     <AuthContext.Provider
@@ -232,10 +249,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin,
         isSuperAdmin,
         isDentist,
+        isClinicStaff,
         signIn,
         signUp,
         signOut,
         refreshRoles,
+        resetPassword,
+        updatePassword,
       }}
     >
       {children}

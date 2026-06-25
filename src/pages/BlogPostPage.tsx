@@ -442,18 +442,22 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp, dehydratedState
         keywords={post.tags || ['dental health', 'oral care']}
       />
       <StructuredData
-        type="article"
-        headline={post.title}
-        description={post.excerpt || post.seo_description || ''}
-        image={post.featured_image_url || ''}
-        url={`/blog/${post.slug}/`}
-        datePublished={post.published_at || ''}
-        dateModified={post.updated_at || post.published_at || ''}
-        author={post.author_name || 'AppointPanda Team'}
+        data={{
+          type: 'article',
+          headline: post.title,
+          description: post.excerpt || post.seo_description || '',
+          image: post.featured_image_url || '',
+          url: `/blog/${post.slug}/`,
+          datePublished: post.published_at || '',
+          dateModified: post.updated_at || post.published_at || '',
+          author: post.author_name || 'AppointPanda Team',
+        }}
       />
       <StructuredData
-        type="breadcrumb"
-        items={breadcrumbs.map(b => ({ name: b.label, url: b.href }))}
+        data={{
+          type: 'breadcrumb',
+          items: breadcrumbs.map(b => ({ name: b.label, url: b.href })),
+        }}
       />
 
       {/* Breadcrumb Section - Clean Header */}

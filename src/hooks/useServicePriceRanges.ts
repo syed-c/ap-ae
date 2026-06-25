@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabaseAdmin } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface ServicePriceRange {
   id: string;
@@ -18,7 +18,7 @@ export function useServicePriceRanges(treatmentSlug?: string) {
   return useQuery({
     queryKey: ['service-price-ranges', treatmentSlug],
     queryFn: async () => {
-      let query = supabaseAdmin
+      let query = supabase
         .from('service_price_ranges')
         .select(`
           *,
@@ -29,7 +29,7 @@ export function useServicePriceRanges(treatmentSlug?: string) {
         .order('price_min');
 
       if (treatmentSlug) {
-        const { data: treatment } = await supabaseAdmin
+        const { data: treatment } = await supabase
           .from('treatments')
           .select('id')
           .eq('slug', treatmentSlug)
@@ -51,7 +51,7 @@ export function useAllServicePrices() {
   return useQuery({
     queryKey: ['all-service-prices'],
     queryFn: async () => {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await supabase
         .from('service_price_ranges')
         .select(`
           *,
@@ -70,7 +70,7 @@ export function useBudgetRanges() {
   return useQuery({
     queryKey: ['budget-ranges'],
     queryFn: async () => {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await supabase
         .from('budget_ranges')
         .select('id, name, slug, min_value, max_value, display_order, is_active')
         .eq('is_active', true)

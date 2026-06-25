@@ -124,12 +124,12 @@ export const GeographicLinkBlock = ({
       <motion.section
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-card border border-border rounded-2xl p-6"
+        className="marketplace-panel p-6 md:p-7"
         aria-label="Explore more locations"
       >
-        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+        <h3 className="mb-4 flex items-center gap-2 text-lg font-black text-foreground">
           <Navigation className="h-5 w-5 text-primary" />
-          Explore Dental Care in {stateName}
+          Explore the {stateName} marketplace
         </h3>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -143,7 +143,7 @@ export const GeographicLinkBlock = ({
                 <Link
                   key={city.slug}
                   href={buildUrl(stateSlug, city.slug)}
-                  className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted/50 hover:text-primary"
                 >
                   Dentists in {city.name} →
                 </Link>
@@ -161,7 +161,7 @@ export const GeographicLinkBlock = ({
                 <Link
                   key={service.slug}
                   href={`/services/${service.slug}/`}
-                  className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted/50 hover:text-primary"
                 >
                   {service.name} →
                 </Link>
@@ -180,7 +180,7 @@ export const GeographicLinkBlock = ({
                   <Link
                     key={state.slug}
                     href={`/${state.slug}/`}
-                    className="block text-sm text-foreground hover:text-primary transition-colors"
+                    className="block rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted/50 hover:text-primary"
                   >
                     Dentists in {state.name} →
                   </Link>
@@ -201,24 +201,24 @@ export const GeographicLinkBlock = ({
         <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card border border-border rounded-2xl p-6"
+          className="marketplace-panel p-6 md:p-7"
           aria-label="Back to emirate"
         >
-          <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+          <h3 className="mb-4 flex items-center gap-2 text-lg font-black text-foreground">
             <Building2 className="h-5 w-5 text-primary" />
             Explore More in {stateName}
           </h3>
           <div className="grid md:grid-cols-2 gap-4">
             <Link
               href={buildUrl(stateSlug)}
-              className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+              className="flex items-center justify-between rounded-xl border border-border/70 bg-muted/30 p-3 transition-colors hover:bg-muted/60"
             >
               <span className="font-medium">All of {stateName}</span>
               <ArrowRight className="h-4 w-4 text-muted-foreground" />
             </Link>
             <Link
               href="/services/"
-              className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+              className="flex items-center justify-between rounded-xl border border-border/70 bg-muted/30 p-3 transition-colors hover:bg-muted/60"
             >
               <span className="font-medium">All Dental Services</span>
               <ArrowRight className="h-4 w-4 text-muted-foreground" />
@@ -232,12 +232,12 @@ export const GeographicLinkBlock = ({
       <motion.section
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-card border border-border rounded-2xl p-6"
+        className="marketplace-panel p-6 md:p-7"
         aria-label="Explore dental services"
       >
-        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+        <h3 className="mb-4 flex items-center gap-2 text-lg font-black text-foreground">
           <Navigation className="h-5 w-5 text-primary" />
-          Dental Services in {cityName}
+          Browse the {cityName} marketplace
         </h3>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -251,7 +251,7 @@ export const GeographicLinkBlock = ({
                 <Link
                   key={service.slug}
                   href={buildUrl(stateSlug, citySlug, service.slug)}
-                  className="block text-sm text-foreground hover:text-primary transition-colors"
+                  className="block rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted/50 hover:text-primary"
                 >
                   {service.name} →
                 </Link>
@@ -269,7 +269,7 @@ export const GeographicLinkBlock = ({
                 <Link
                   key={city.slug}
                   href={buildUrl(stateSlug, city.slug)}
-                  className="block text-sm text-foreground hover:text-primary transition-colors"
+                  className="block rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted/50 hover:text-primary"
                 >
                   Dentists in {city.name} →
                 </Link>
@@ -285,7 +285,7 @@ export const GeographicLinkBlock = ({
             <nav className="space-y-1.5">
               <Link
                 href={buildUrl(stateSlug)}
-                className="block text-sm text-foreground hover:text-primary transition-colors"
+                className="block rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted/50 hover:text-primary"
               >
                 All cities in {stateName} →
               </Link>
@@ -293,7 +293,7 @@ export const GeographicLinkBlock = ({
                 <Link
                   key={state.slug}
                   href={`/${state.slug}/`}
-                  className="block text-sm text-muted-foreground hover:text-primary transition-colors"
+                  className="block rounded-xl px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-primary"
                 >
                   Dentists in {state.name} →
                 </Link>
@@ -311,12 +311,12 @@ export const GeographicLinkBlock = ({
       <motion.section
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-card border border-border rounded-2xl p-6"
+        className="marketplace-panel p-6 md:p-7"
         aria-label="Related dental services"
       >
-        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+        <h3 className="mb-4 flex items-center gap-2 text-lg font-black text-foreground">
           <Navigation className="h-5 w-5 text-primary" />
-          More {serviceName} Options
+          More {serviceName} options
         </h3>
 
         <div className="grid md:grid-cols-3 gap-6">

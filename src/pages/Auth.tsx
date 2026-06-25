@@ -50,25 +50,23 @@ export default function Auth() {
     // Redirect authenticated users away from auth page
     setHasRedirected(true);
 
-    const isSuperAdmin = roles.includes('super_admin') || roles.includes('district_manager');
-    const isAdmin = isSuperAdmin || roles.some(r => ['seo_team', 'content_team', 'marketing_team', 'support_team'].includes(r));
-    const isDentist = roles.includes('dentist');
+    const isSuperAdmin = roles.includes('super_admin');
+    const isAdmin = isSuperAdmin || roles.includes('platform_admin') || roles.includes('content_moderator');
+    const isClinicStaff = roles.includes('clinic_owner') || roles.includes('clinic_manager') || roles.includes('receptionist');
 
-    // SuperAdmins go directly to /admin - no delays, no onboarding
-    if (isSuperAdmin || isAdmin) {
+    if (isSuperAdmin) {
       router.replace('/admin');
-    } else if (isDentist) {
-      // Dentists go to their dashboard
+    } else if (isAdmin) {
+      router.replace('/admin');
+    } else if (isClinicStaff) {
+      router.replace('/dashboard?tab=my-dashboard');
+    } else if (roles.includes('dentist')) {
       router.replace('/dashboard?tab=my-dashboard');
     } else if (roles.length === 0) {
-      // User has no roles - might still be loading, or is a new user
-      // Send to onboarding
       router.replace('/onboarding?new=true');
-    } else if (roles.includes('super_admin') || roles.includes('district_manager')) {
-      // Admin users go directly to admin dashboard
-      router.replace('/admin');
+    } else if (roles.includes('patient')) {
+      router.replace('/patient-dashboard');
     } else {
-      // Has some other role, default to onboarding
       router.replace('/onboarding?new=true');
     }
   }, [user, roles, isLoading, router, hasRedirected]);

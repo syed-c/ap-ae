@@ -1,4 +1,14 @@
-import { GetStaticProps } from 'next';
-import DentistDashboardV2 from '@/components/dashboard-v2/DentistDashboardV2';
-export default DentistDashboardV2;
-export const getServerSideProps: GetStaticProps = async () => ({ props: {} });
+import { GetServerSideProps } from 'next';
+
+export default function DashboardV2Redirect() {
+    return null;
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+    return {
+        redirect: {
+            destination: '/dashboard',
+            permanent: true,
+        },
+    };
+};

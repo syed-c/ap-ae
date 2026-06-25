@@ -151,36 +151,38 @@ export default function DentistSidebar({
       <button
         onClick={() => onTabChange(item.id)}
         className={cn(
-          'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200',
-          'text-[13px] font-medium relative group',
+          'group relative flex w-full items-center gap-3 rounded-[8px] px-3 py-3 transition-all duration-200',
+          'text-[13px] font-medium',
           isActive
-            ? 'bg-gradient-to-r from-primary to-primary/90 text-white shadow-md shadow-primary/25'
-            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
-          collapsed && 'justify-center px-2'
+            ? 'bg-muted text-foreground'
+            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+          collapsed && 'justify-center px-2.5'
         )}
       >
         <Icon className={cn(
           'h-4 w-4 flex-shrink-0 transition-colors',
-          isActive ? 'text-white' : 'text-slate-500 group-hover:text-primary'
+          isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'
         )} />
+
+        {isActive && <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-primary" />}
 
         {!collapsed && (
           <>
             <span className="flex-1 text-left truncate">{item.label}</span>
 
             {showBadgeCount && (
-              <Badge className="h-5 min-w-5 px-1 text-[10px] font-bold bg-coral text-white border-0">
+              <Badge className="h-5 min-w-5 justify-center px-1 text-[10px] font-bold">
                 {pendingCount > 9 ? '9+' : pendingCount}
               </Badge>
             )}
 
             {item.badge === 'AI' && (
-              <Badge className="h-4 px-1 text-[9px] font-bold bg-gradient-to-r from-purple-500 to-indigo-500 text-white border-0">
+              <Badge variant="outline" className="h-4 px-1 text-[9px] font-bold">
                 AI
               </Badge>
             )}
             {item.badge === 'PRO' && (
-              <Badge className="h-4 px-1 text-[9px] font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0">
+              <Badge variant="warning" className="h-4 px-1 text-[9px] font-bold">
                 PRO
               </Badge>
             )}
@@ -194,10 +196,10 @@ export default function DentistSidebar({
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>{content}</TooltipTrigger>
-            <TooltipContent side="right" className="flex items-center gap-2 bg-slate-900 text-white border-slate-700">
+            <TooltipContent side="right" className="flex items-center gap-2">
               {item.label}
               {showBadgeCount && (
-                <Badge className="h-4 min-w-4 px-1 text-[9px] bg-coral text-white border-0">
+                <Badge className="h-4 min-w-4 px-1 text-[9px]">
                   {pendingCount}
                 </Badge>
               )}
@@ -214,44 +216,45 @@ export default function DentistSidebar({
     <aside
       className={cn(
         'fixed inset-y-0 left-0 z-50 flex flex-col',
-        'bg-white border-r border-slate-200 shadow-sm',
+        'border-r border-border bg-card shadow-[0_2px_8px_rgba(17,27,33,0.08)]',
         'transition-all duration-300 ease-out',
-        collapsed ? 'w-[60px]' : 'w-56'
+        collapsed ? 'w-[84px]' : 'w-[340px]'
       )}
     >
-      {/* Logo & Brand */}
       <div className={cn(
-        'h-14 flex items-center gap-2 px-3 border-b border-slate-100',
+        'flex h-[72px] items-center gap-3 border-b border-primary/20 bg-primary px-4 text-primary-foreground',
         collapsed && 'justify-center'
       )}>
-        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-teal flex items-center justify-center shadow-sm flex-shrink-0">
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white/20 text-white shadow-[0_0_20px_-4px_oklch(0.61_0.12_190/0.4)]">
           <Sparkles className="h-4 w-4 text-white" />
         </div>
         {!collapsed && (
-          <span className="font-bold text-sm text-slate-800">AppointPanda</span>
+          <div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">Dashboard</div>
+            <span className="text-sm font-medium text-primary-foreground">AppointPanda</span>
+          </div>
         )}
       </div>
 
-      {/* Clinic Card - Compact */}
       {!collapsed && clinic && (
-        <div className="p-3 border-b border-slate-100">
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-slate-50 to-slate-100">
-            <Avatar className="h-8 w-8 rounded-lg border border-slate-200">
+        <div className="border-b border-border p-4">
+          <div className="flex items-center gap-3 rounded-[10px] bg-muted p-3">
+            <Avatar className="h-10 w-10 rounded-full border border-border">
               <AvatarImage src={clinic.cover_image_url || undefined} />
-              <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-bold text-xs">
+              <AvatarFallback className="rounded-full bg-accent text-secondary font-semibold text-xs">
                 {clinic.name.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-slate-800 truncate">{clinic.name}</p>
+              <p className="text-sm font-medium text-secondary truncate">{clinic.name}</p>
               <div className="flex items-center gap-1">
                 {clinic.verification_status === 'verified' && (
-                  <Badge variant="outline" className="h-3 px-1 text-[8px] bg-emerald-50 text-emerald-600 border-emerald-200">
+                  <Badge variant="success" className="h-4 px-1.5 text-[8px]">
                     ✓
                   </Badge>
                 )}
                 {(clinic.rating || 0) > 0 && (
-                  <span className="flex items-center gap-0.5 text-[9px] text-slate-500">
+                  <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
                     <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
                     {Number(clinic.rating).toFixed(1)}
                   </span>
@@ -262,13 +265,12 @@ export default function DentistSidebar({
         </div>
       )}
 
-      {/* Navigation */}
       <ScrollArea className="flex-1 px-2">
         <nav className="space-y-4 py-3">
           {NAV_SECTIONS.map((section) => (
             <div key={section.title}>
               {!collapsed && (
-                <p className="px-3 mb-1 text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                   {section.title}
                 </p>
               )}
@@ -282,13 +284,11 @@ export default function DentistSidebar({
         </nav>
       </ScrollArea>
 
-      {/* Footer - Collapse + User */}
-      <div className="border-t border-slate-100">
-        {/* Collapse Toggle - Compact */}
+      <div className="border-t border-border bg-card">
         <button
           onClick={() => onCollapsedChange(!collapsed)}
           className={cn(
-            'w-full flex items-center gap-2 px-3 py-2 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors text-xs',
+            'flex w-full items-center gap-2 px-4 py-3 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-secondary',
             collapsed && 'justify-center'
           )}
         >
@@ -302,17 +302,16 @@ export default function DentistSidebar({
           )}
         </button>
 
-        {/* User + Sign Out - Compact */}
-        <div className={cn('p-2 border-t border-slate-100', collapsed && 'flex flex-col items-center')}>
+        <div className={cn('border-t border-border p-3', collapsed && 'flex flex-col items-center')}>
           <div className={cn('flex items-center gap-2', collapsed && 'flex-col')}>
-            <Avatar className={cn('h-7 w-7 border border-slate-200')}>
-              <AvatarFallback className="bg-slate-100 text-slate-600 font-medium text-xs">
+            <Avatar className={cn('h-9 w-9 border border-border')}>
+              <AvatarFallback className="bg-muted text-secondary font-medium text-xs">
                 {user?.email?.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-slate-700 truncate">
+                <p className="text-sm font-medium text-secondary truncate">
                   {user?.email?.split('@')[0]}
                 </p>
               </div>
@@ -324,7 +323,7 @@ export default function DentistSidebar({
             size="sm"
             onClick={signOut}
             className={cn(
-              'mt-1 text-coral hover:text-coral hover:bg-coral/10 h-7 text-xs',
+              'mt-2 h-8 text-xs text-secondary hover:bg-accent hover:text-secondary',
               collapsed ? 'w-7 p-0' : 'w-full justify-start gap-1.5'
             )}
           >

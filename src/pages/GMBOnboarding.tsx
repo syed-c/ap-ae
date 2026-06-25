@@ -105,7 +105,7 @@ export default function GMBOnboarding() {
   });
 
   const isNewSignup = isNewSignupParam && onboarding?.onboarding_status !== 'complete';
-  const isAdmin = roles.includes('super_admin') || roles.includes('district_manager');
+  const isAdmin = roles.includes('super_admin') || roles.includes('platform_admin');
 
   // Set noindex for onboarding pages
   useEffect(() => {

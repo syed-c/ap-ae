@@ -201,26 +201,26 @@ export default function DashboardOverviewV2({ onNavigate }: DashboardOverviewV2P
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-foreground tracking-tight">
-            Welcome back! 👋
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground lg:text-3xl">
+            Your practice conversation hub
           </h1>
           <p className="text-muted-foreground mt-1">
-            Here's what's happening at <span className="font-medium text-foreground">{clinic.name}</span> today
+            Track appointments, patients, reviews, and follow-ups for <span className="font-medium text-foreground">{clinic.name}</span> in one calm workspace.
           </p>
         </div>
         <div className="flex gap-3">
           <Button
             variant="outline"
-            className="gap-2 rounded-xl"
+            className="gap-2"
             onClick={() => onNavigate('my-reputation')}
           >
             <QrCode className="h-4 w-4" />
             QR Code
           </Button>
           <Button
-            className="gap-2 rounded-xl shadow-lg shadow-primary/20"
+            className="gap-2"
             onClick={() => onNavigate('my-patients')}
           >
             <Send className="h-4 w-4" />
@@ -287,8 +287,7 @@ export default function DashboardOverviewV2({ onNavigate }: DashboardOverviewV2P
         <div className="lg:col-span-2 space-y-6">
           {/* Today's Schedule */}
           <PremiumCard padding="none" className="overflow-hidden">
-            {/* Gradient top accent */}
-            <div className="h-1 bg-gradient-to-r from-primary via-teal to-emerald-500" />
+            <div className="h-1 bg-primary" />
             
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">

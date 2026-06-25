@@ -1,49 +1,67 @@
-import { cn } from "@/lib/utils";
+'use client';
+
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface SectionHeaderProps {
   label?: string;
   title: string;
-  highlight?: string;
   description?: string;
-  align?: "left" | "center";
+  highlight?: string;
+  action?: {
+    label: string;
+    href: string;
+  };
+  align?: 'center' | 'left';
   className?: string;
-  dark?: boolean;
 }
 
-export const SectionHeader = ({
+export function SectionHeader({
   label,
   title,
-  highlight,
   description,
-  align = "center",
+  highlight,
+  action,
+  align = 'left',
   className,
-  dark = false
-}: SectionHeaderProps) => {
+}: SectionHeaderProps) {
   return (
     <div className={cn(
-      "mb-12",
-      align === "center" && "text-center",
-      className
+      'flex flex-col',
+      align === 'center' ? 'items-center text-center' : 'items-start',
+      className,
     )}>
       {label && (
-        <span className="text-primary text-sm font-bold uppercase tracking-wider">
+        <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#2D9C84] mb-3">
           {label}
         </span>
       )}
-      <h2 className={cn(
-        "font-display text-3xl md:text-4xl lg:text-5xl font-black mt-2",
-        dark && "text-dark-section-foreground"
-      )} style={{ fontFamily: "'Nunito', 'Plus Jakarta Sans', sans-serif" }}>
-        {title} {highlight && <span className="text-primary">{highlight}</span>}
-      </h2>
-      {description && (
-        <p className={cn(
-          "mt-4 max-w-2xl text-muted-foreground",
-          align === "center" && "mx-auto"
-        )}>
-          {description}
-        </p>
-      )}
+      <div className={cn(
+        'flex flex-col',
+        align === 'center' ? 'items-center' : 'items-start',
+        action ? 'lg:flex-row lg:items-end lg:justify-between w-full' : '',
+      )}>
+        <div>
+          <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
+            {title}{highlight ? <span className="text-[#2D9C84]"> {highlight}</span> : null}
+          </h2>
+          {description && (
+            <p className="mt-3 text-[#62626B] text-base md:text-lg max-w-2xl leading-relaxed">
+              {description}
+            </p>
+          )}
+        </div>
+        {action && (
+          <Link
+            href={action.href}
+            className="hidden lg:inline-flex items-center gap-2 text-sm text-[#2D9C84] hover:text-[#3AB89E] font-medium transition-all duration-300 mt-4 lg:mt-0 shrink-0"
+          >
+            {action.label}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        )}
+      </div>
     </div>
   );
-};
+}

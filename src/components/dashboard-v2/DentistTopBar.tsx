@@ -89,15 +89,14 @@ export default function DentistTopBar({
   // Notification type configs
   const notificationIcons = {
     appointment: { icon: Calendar, color: 'text-primary bg-primary/10' },
-    review: { icon: Star, color: 'text-amber-500 bg-amber-50' },
-    message: { icon: MessageSquare, color: 'text-blue-500 bg-blue-50' },
-    alert: { icon: AlertCircle, color: 'text-red-500 bg-red-50' },
+    review: { icon: Star, color: 'text-gold bg-gold/10' },
+    message: { icon: MessageSquare, color: 'text-primary bg-primary/10' },
+    alert: { icon: AlertCircle, color: 'text-destructive bg-destructive/10' },
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="flex items-center justify-between h-16 px-6">
-        {/* Left side - Breadcrumbs & Title */}
+    <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur-sm">
+      <div className="flex h-[72px] items-center justify-between px-4 md:px-6">
         <div className="flex-1 min-w-0">
           {breadcrumbs && breadcrumbs.length > 0 && (
             <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-0.5">
@@ -119,9 +118,11 @@ export default function DentistTopBar({
             </nav>
           )}
           <div className="flex items-center gap-3">
-            <div className="h-6 w-1 rounded-full bg-gradient-to-b from-primary to-teal" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-primary">
+              <Check className="h-4 w-4" />
+            </div>
             <div>
-              <h1 className="text-lg font-bold text-foreground">{pageTitle}</h1>
+              <h1 className="text-lg font-semibold text-foreground">{pageTitle}</h1>
               {pageDescription && (
                 <p className="text-xs text-muted-foreground">{pageDescription}</p>
               )}
@@ -129,7 +130,6 @@ export default function DentistTopBar({
           </div>
         </div>
 
-        {/* Center - Search */}
         <div className="hidden lg:flex items-center max-w-md flex-1 mx-8">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -137,26 +137,23 @@ export default function DentistTopBar({
               placeholder="Search patients, appointments..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary rounded-xl"
+              className="pl-10 bg-muted border-transparent focus-visible:ring-1 focus-visible:ring-primary"
             />
           </div>
         </div>
 
-        {/* Right side - Actions */}
         <div className="flex items-center gap-3">
-          {/* Date Display */}
-          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted/50 text-sm">
+          <div className="hidden md:flex items-center gap-2 rounded-full bg-accent px-3 py-1.5 text-sm text-secondary">
             <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium text-foreground">{format(new Date(), 'EEE, MMM d')}</span>
+            <span className="font-medium text-secondary">{format(new Date(), 'EEE, MMM d')}</span>
           </div>
 
-          {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative h-10 w-10 rounded-xl hover:bg-muted"
+                className="relative h-10 w-10 rounded-full hover:bg-accent"
               >
                 <Bell className="h-5 w-5" />
                 {notifications.length > 0 && (
@@ -164,7 +161,7 @@ export default function DentistTopBar({
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 rounded-xl p-0">
+            <DropdownMenuContent align="end" className="w-80 p-0">
               <DropdownMenuLabel className="flex items-center justify-between px-4 py-3 border-b">
                 <span className="font-semibold">Notifications</span>
                 {notifications.length > 0 && (
@@ -189,10 +186,10 @@ export default function DentistTopBar({
                     return (
                       <DropdownMenuItem
                         key={notification.id}
-                        className="flex items-start gap-3 p-4 cursor-pointer focus:bg-muted"
+                        className="flex cursor-pointer items-start gap-3 p-4 focus:bg-muted"
                         onClick={() => markAsRead(notification.id)}
                       >
-                        <div className={cn('h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0', config.color)}>
+                        <div className={cn('flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full', config.color)}>
                           <Icon className="h-4 w-4" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -221,11 +218,10 @@ export default function DentistTopBar({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Help */}
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 rounded-xl hover:bg-muted"
+            className="h-10 w-10 rounded-full hover:bg-accent"
           >
             <HelpCircle className="h-5 w-5" />
           </Button>

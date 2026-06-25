@@ -9,51 +9,52 @@ export const PageIntroSection = ({
   title,
   content,
   isLoading = false,
-  className = "",
+  className = '',
 }: PageIntroSectionProps) => {
   if (isLoading) {
     return (
-      <div style={{ padding: '48px 16px', backgroundColor: '#f9fafb', borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>
-        <div style={{ maxWidth: '896px', margin: '0 auto' }}>
-          <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '32px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <div style={{ height: '28px', width: '66%', backgroundColor: '#e5e7eb', borderRadius: '8px', marginBottom: '16px' }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ height: '16px', width: '100%', backgroundColor: '#e5e7eb', borderRadius: '4px' }} />
-              <div style={{ height: '16px', width: '83%', backgroundColor: '#e5e7eb', borderRadius: '4px' }} />
-              <div style={{ height: '16px', width: '80%', backgroundColor: '#e5e7eb', borderRadius: '4px' }} />
+      <section className={`border-y border-border/60 bg-muted/35 py-12 md:py-14 ${className}`}>
+        <div className="container max-w-5xl px-4 md:px-6">
+          <div className="marketplace-panel p-8 md:p-10">
+            <div className="h-3 w-28 rounded-full bg-muted animate-pulse" />
+            <div className="mt-4 h-10 w-2/3 rounded-2xl bg-muted animate-pulse" />
+            <div className="mt-6 space-y-3">
+              <div className="h-4 w-full rounded-full bg-muted animate-pulse" />
+              <div className="h-4 w-5/6 rounded-full bg-muted animate-pulse" />
+              <div className="h-4 w-4/5 rounded-full bg-muted animate-pulse" />
             </div>
           </div>
         </div>
-      </div>
+      </section>
     );
   }
 
-  const hasContent = !!(title || content);
-
-  if (!hasContent) {
-    console.log('[PageIntroSection] No title or content, returning null');
+  if (!title && !content) {
     return null;
   }
 
-  console.log('[PageIntroSection] Rendering with title:', !!title, 'content:', !!content);
-
   return (
-    <div style={{ padding: '48px 16px', backgroundColor: '#ffffff', borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>
-      <div style={{ maxWidth: '896px', margin: '0 auto' }}>
-        <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '32px 40px' }}>
+    <section className={`border-y border-border/60 bg-muted/35 py-12 md:py-14 ${className}`}>
+      <div className="container max-w-5xl px-4 md:px-6">
+        <div className="marketplace-panel p-8 md:p-10 lg:p-12">
+          <div className="inline-flex items-center rounded-full border border-primary/15 bg-primary/6 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+            Marketplace Overview
+          </div>
+
           {title && (
-            <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#111827', marginBottom: '20px', lineHeight: '1.3' }}>
+            <h1 className="mt-5 font-display text-3xl font-black tracking-tight text-foreground md:text-4xl lg:text-5xl">
               {title}
             </h1>
           )}
+
           {content && (
-            <div className="hero-intro" style={{ color: '#4b5563', lineHeight: '1.75' }}>
-              <p style={{ fontSize: '18px', margin: 0 }}>{content}</p>
+            <div className="hero-intro mt-5 max-w-3xl text-base leading-8 text-muted-foreground md:text-lg">
+              <p>{content}</p>
             </div>
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

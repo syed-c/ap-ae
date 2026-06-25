@@ -17,6 +17,7 @@ import {
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { PageHero } from '@/components/layout/PageHero';
 import { Section } from '@/components/layout/Section';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
@@ -143,42 +144,15 @@ export default function EmergencyDentistFinder() {
         canonical="/emergency-dentist/"
       />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-destructive/5 via-background to-background pt-6 pb-12">
-        <div className="container relative z-10 px-4">
-          <div className="flex justify-center mb-4">
-            <Breadcrumbs items={breadcrumbs} />
-          </div>
-
-          <div className="max-w-3xl mx-auto text-center">
-            <motion.div {...fadeUp} className="inline-flex items-center gap-2 bg-destructive/10 border border-destructive/20 rounded-full px-4 py-2 mb-4">
-              <Zap className="h-4 w-4 text-destructive" />
-              <span className="text-xs font-semibold text-destructive">Urgent Dental Care</span>
-            </motion.div>
-
-            <motion.h1 {...fadeUp} transition={{ delay: 0.1 }} className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Emergency <span className="text-destructive">Dentist</span> Finder
-            </motion.h1>
-
-            <motion.p {...fadeUp} transition={{ delay: 0.2 }} className="text-base md:text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Find dentists open now for urgent dental care across the UAE. Select your location to see available clinics immediately.
-            </motion.p>
-
-            <motion.div {...fadeUp} transition={{ delay: 0.25 }} className="flex items-center justify-center gap-4">
-              <Badge variant="outline" className="text-sm rounded-full px-4 py-1.5">
-                <Clock className="h-3 w-3 mr-1" />
-                {format(currentTime, 'EEEE, h:mm a')}
-              </Badge>
-              {(isWeekend || isAfterHours) && (
-                <Badge className="bg-gold/20 text-gold border-gold/30 rounded-full px-4 py-1.5">
-                  <AlertTriangle className="h-3 w-3 mr-1" />
-                  {isWeekend ? 'Weekend Hours' : 'After Hours'}
-                </Badge>
-              )}
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        breadcrumbs={breadcrumbs}
+        badge="Emergency Care"
+        title="Need a dentist"
+        highlight="right now?"
+        description="Find emergency dental clinics open near you across the UAE. Same-day appointments available."
+      >
+        {/* Keep any breadcrumbs that were shown before the hero */}
+      </PageHero>
 
       {/* Search Section */}
       <Section size="sm">

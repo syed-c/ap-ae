@@ -7,6 +7,7 @@ import { SectionHeader } from "@/components/layout/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageHero } from "@/components/layout/PageHero";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { useRealCounts } from "@/hooks/useRealCounts";
@@ -85,50 +86,18 @@ const BlogPage = () => {
         keywords={['dental health blog', 'oral hygiene tips', 'dental advice', 'dentist blog', 'dental care tips']}
       />
       <StructuredData
-        type="breadcrumb"
-        items={breadcrumbs.map(b => ({ name: b.label, url: b.href }))}
+        data={{
+          type: 'breadcrumb',
+          items: breadcrumbs.map(b => ({ name: b.label, url: b.href })),
+        }}
       />
 
-      {/* Dark Hero Section */}
-      <section className="relative bg-dark-section text-dark-section-foreground overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(234,179,8,0.1),transparent_50%)]" />
-        <div className="absolute top-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-gold/10 rounded-full blur-3xl" />
-
-        <div className="container relative py-16 md:py-24">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <BookOpen className="h-4 w-4 text-primary" />
-              <span className="text-sm font-bold text-primary">Dental Insights</span>
-            </div>
-
-            <h1 className="font-display text-4xl md:text-5xl font-bold mb-6">
-              Dental Health{" "}
-              <span className="text-gradient">Blog</span>
-            </h1>
-
-            <p className="text-lg text-dark-section-foreground/70 max-w-xl mx-auto mb-8">
-              Expert advice, dental tips, and the latest news from top dental professionals across the UAE.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-4 text-sm">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                <span>{posts?.length || 0} Articles</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-                <Star className="h-4 w-4 text-gold" />
-                <span>Expert Authors</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-                <Clock className="h-4 w-4 text-coral" />
-                <span>Updated Weekly</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        badge="Blog"
+        title="Dental Health"
+        highlight="Insights & Guides"
+        description="Expert articles on dental care, treatments, oral hygiene tips, and finding the right dentist across the UAE."
+      />
 
       {/* Featured Posts */}
       {featuredPosts && featuredPosts.length > 0 && (

@@ -3,7 +3,7 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/seo/SEOHead";
-import { useRealCounts } from "@/hooks/useRealCounts";
+import { PageHero } from "@/components/layout/PageHero";
 import {
   Search,
   UserCheck,
@@ -11,19 +11,14 @@ import {
   Star,
   ArrowRight,
   CheckCircle,
-  Sparkles,
   Building2,
   TrendingUp,
-  Zap,
   Shield,
   Phone,
-  Users,
-  Award
+  Users
 } from "lucide-react";
 
 const HowItWorksPage = () => {
-  const { data: counts } = useRealCounts();
-
   const patientSteps = [
     {
       step: 1,
@@ -109,54 +104,12 @@ const HowItWorksPage = () => {
         keywords={['how to find dentist', 'book dental appointment', 'list dental practice', 'dental directory']}
       />
 
-      {/* Dark Hero Section */}
-      <section className="relative bg-dark-section text-dark-section-foreground overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.1),transparent_50%)]" />
-        <div className="absolute top-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-gold/10 rounded-full blur-3xl" />
-
-        <div className="container relative py-20 md:py-28">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-bold text-primary">Simple & Easy</span>
-            </div>
-
-            <h1 className="font-display text-4xl md:text-6xl font-bold mb-6">
-              How{" "}
-              <span className="text-gradient">AppointPanda</span>{" "}
-              Works
-            </h1>
-
-            <p className="text-xl md:text-2xl text-dark-section-foreground/70 max-w-2xl mx-auto mb-8">
-              Whether you're a patient looking for dental care or a dentist wanting to grow your practice, we make it easy.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                  <Users className="h-4 w-4 text-primary" />
-                </div>
-                <span>{counts?.clinics?.toLocaleString() || "6,600+"}+ Practices</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center">
-                  <Award className="h-4 w-4 text-gold" />
-                </div>
-                <span>Verified Professionals</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-coral/20 flex items-center justify-center">
-                  <Zap className="h-4 w-4 text-coral" />
-                </div>
-                <span>60s Booking</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        badge="How It Works"
+        title="Finding dental care made"
+        highlight="simple"
+        description="From search to booking, here's how AppointPanda helps you find the right dentist in just a few steps."
+      />
 
       {/* For Patients */}
       <Section size="lg">

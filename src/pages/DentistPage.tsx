@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { MarketplaceHero } from "@/components/marketplace/MarketplaceHero";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Section } from "@/components/layout/Section";
@@ -312,135 +313,108 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp, treatments
         ogType="profile"
       />
       <StructuredData
-        type="person"
-        name={dentist.name}
-        jobTitle={dentist.title || 'Dental Professional'}
-        description={dentist.bio || `${dentist.name} is a verified dental professional in ${locationDisplay}.`}
-        image={proxyImageUrl(dentist.image_url) || undefined}
-        url={`/dentist/${dentist.slug}/`}
-        worksFor={dentist.clinic ? { name: dentist.clinic.name, url: `/clinic/${dentist.clinic.slug}/` } : undefined}
+        data={{
+          type: 'person',
+          name: dentist.name,
+          jobTitle: dentist.title || 'Dental Professional',
+          description: dentist.bio || `${dentist.name} is a verified dental professional in ${locationDisplay}.`,
+          image: proxyImageUrl(dentist.image_url) || undefined,
+          url: `/dentist/${dentist.slug}/`,
+          worksFor: dentist.clinic ? { name: dentist.clinic.name, url: `/clinic/${dentist.clinic.slug}/` } : undefined,
+        }}
       />
-      {/* Hero Section */}
-      <section className="gradient-hero py-12 md:py-16">
-        <div className="container">
-          <Breadcrumbs items={breadcrumbs} className="mb-8" />
-
-          <div className="card-modern p-6 md:p-8">
-            <div className="flex flex-col md:flex-row gap-6">
-              {/* Photo */}
-              <div className="flex-shrink-0">
-                <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-4 border-background shadow-elevated">
-                  {dentist.image_url ? (
-                    <img
-                      src={proxyImageUrl(dentist.image_url) || dentist.image_url}
-                      alt={dentist.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-purple/20 flex items-center justify-center">
-                      <span className="text-4xl font-display font-bold text-primary/50">
-                        {dentist.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Info */}
-              <div className="flex-1">
-                <div className="flex flex-wrap items-start gap-3 mb-2">
-                  {dentist.is_active && (
-                    <Badge className="bg-gold/10 text-gold border border-gold/20 rounded-full px-3 py-1 font-bold">
-                      <Award className="h-4 w-4 mr-1" />
-                      Active
-                    </Badge>
-                  )}
-                </div>
-
-                <h1 className="font-display text-3xl md:text-4xl font-bold mb-1">
-                  {dentist.name}
-                </h1>
-
-                {dentist.title && (
-                  <p className="text-lg text-muted-foreground font-medium mb-4">
-                    {dentist.title}
-                  </p>
+      <MarketplaceHero
+        breadcrumbs={breadcrumbs}
+        badge="Dentist Profile"
+        title={dentist.name}
+        description={seoDataProp?.description || dentist.bio || `${dentist.name} is a verified dental professional in ${locationDisplay}.`}
+        actions={[
+          { href: '#book', label: 'Book Appointment', icon: <Calendar className="h-4 w-4" /> },
+          { href: dentist.clinic ? `/clinic/${dentist.clinic.slug}/` : '/search/', label: 'View Clinic', variant: 'outline' },
+        ]}
+        stats={[
+          { label: 'Rating', value: (Number(dentist.rating) || 0) > 0 ? Number(dentist.rating).toFixed(1) : 'New', icon: <Star className="h-5 w-5" /> },
+          { label: 'Reviews', value: `${dentist.review_count || 0}`, icon: <Award className="h-5 w-5" /> },
+          { label: 'Experience', value: dentist.years_experience ? `${dentist.years_experience}+ yrs` : 'Verified', icon: <Clock className="h-5 w-5" /> },
+          { label: 'Location', value: stateAbbr || cityName, icon: <Briefcase className="h-5 w-5" /> },
+        ]}
+      >
+        <div className="marketplace-panel max-w-4xl p-5 md:p-6">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center">
+            <div className="shrink-0">
+              <div className="h-28 w-28 overflow-hidden rounded-[1.5rem] border border-border/60 shadow-md md:h-36 md:w-36">
+                {dentist.image_url ? (
+                  <img
+                    src={proxyImageUrl(dentist.image_url) || dentist.image_url}
+                    alt={dentist.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 to-purple/20">
+                    <span className="text-4xl font-display font-bold text-primary/50">
+                      {dentist.name.split(' ').map((namePart) => namePart[0]).join('')}
+                    </span>
+                  </div>
                 )}
+              </div>
+            </div>
 
-                {/* Rating */}
-                <div className="flex items-center gap-4 mb-4">
-                  {(Number(dentist.rating) || 0) > 0 && (
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1 text-gold">
-                        <Star className="h-5 w-5 fill-current" />
-                        <span className="font-bold text-lg">{Number(dentist.rating).toFixed(1)}</span>
-                      </div>
-                      <span className="text-muted-foreground">
-                        ({dentist.review_count || 0} reviews)
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Quick Info */}
-                <div className="flex flex-wrap gap-4">
-                  {dentist.years_experience && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="h-4 w-4 text-primary" />
-                      <span className="font-medium">{dentist.years_experience}+ Years Experience</span>
-                    </div>
-                  )}
-                  {dentist.clinic && (
-                    <Link
-                      href={`/clinic/${dentist.clinic.slug}/`}
-                      className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
-                    >
-                      <Briefcase className="h-4 w-4 text-primary" />
-                      <span className="font-medium">{dentist.clinic.name}</span>
-                    </Link>
-                  )}
-                </div>
-
-                {/* Trust Signals */}
-                <TrustSignalStrip
-                  isVerified={dentist.is_active}
-                  isClaimed={true}
-                  reviewCount={dentist.review_count || 0}
-                  rating={Number(dentist.rating) || 0}
-                  yearsExperience={dentist.years_experience || undefined}
-                  className="mt-3"
-                />
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                {dentist.is_active && (
+                  <Badge className="rounded-full border border-gold/20 bg-gold/10 px-3 py-1 font-bold text-gold">
+                    <Award className="mr-1 h-4 w-4" />
+                    Active
+                  </Badge>
+                )}
+                {dentist.title && <span className="badge-brand">{dentist.title}</span>}
               </div>
 
-              {/* Actions */}
-              <div className="flex md:flex-col gap-3">
-                <Button size="lg" className="rounded-xl font-bold flex-1 md:flex-none" onClick={() => setBookingOpen(true)}>
-                  <Calendar className="h-4 w-4 mr-2" />
+              <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
+                {dentist.years_experience && (
+                  <span className="inline-flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    {dentist.years_experience}+ years experience
+                  </span>
+                )}
+                {dentist.clinic && (
+                  <Link href={`/clinic/${dentist.clinic.slug}/`} className="inline-flex items-center gap-2 hover:text-primary">
+                    <Briefcase className="h-4 w-4 text-primary" />
+                    {dentist.clinic.name}
+                  </Link>
+                )}
+              </div>
+
+              <TrustSignalStrip
+                isVerified={dentist.is_active}
+                isClaimed={true}
+                reviewCount={dentist.review_count || 0}
+                rating={Number(dentist.rating) || 0}
+                yearsExperience={dentist.years_experience || undefined}
+                className="mt-4"
+              />
+
+              <div className="mt-5 flex gap-2">
+                <Button id="book" onClick={() => setBookingOpen(true)}>
+                  <Calendar className="mr-2 h-4 w-4" />
                   Book Appointment
                 </Button>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-xl"
-                    onClick={handleShare}
-                  >
-                    {shareSuccess ? <Check className="h-4 w-4 text-teal" /> : <Share2 className="h-4 w-4" />}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className={`rounded-xl ${isLiked ? 'bg-coral/10 border-coral/30' : ''}`}
-                    onClick={handleLike}
-                  >
-                    <Heart className={`h-4 w-4 ${isLiked ? 'fill-coral text-coral' : ''}`} />
-                  </Button>
-                </div>
+                <Button variant="outline" size="icon" className="rounded-xl" onClick={handleShare}>
+                  {shareSuccess ? <Check className="h-4 w-4 text-teal" /> : <Share2 className="h-4 w-4" />}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className={`rounded-xl ${isLiked ? 'bg-coral/10 border-coral/30' : ''}`}
+                  onClick={handleLike}
+                >
+                  <Heart className={`h-4 w-4 ${isLiked ? 'fill-coral text-coral' : ''}`} />
+                </Button>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </MarketplaceHero>
 
       {/* Content */}
       <Section size="md">

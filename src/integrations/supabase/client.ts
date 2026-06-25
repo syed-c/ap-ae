@@ -32,13 +32,4 @@ export const supabase: SupabaseClient<Database> = createClient<Database>(supabas
   },
 });
 
-export const supabaseAdmin: SupabaseClient<Database> = createClient<Database>(
-  supabaseUrl,
-  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || supabaseKey,
-  {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  }
-);
+

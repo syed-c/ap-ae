@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabaseAdmin } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
 
 export interface SeoPageContent {
@@ -141,7 +141,7 @@ export function useSeoPageContent(slug: string | undefined) {
 
       // PRIORITY 1: Check page_content table first (admin CMS editable content)
       console.log('[SEO] PRIORITY 1: Checking page_content...');
-      const { data: pageContentData, error: pageContentError } = await supabaseAdmin
+      const { data: pageContentData, error: pageContentError } = await supabase
         .from("page_content")
         .select("*")
         .in("page_slug", candidates)
@@ -197,7 +197,7 @@ export function useSeoPageContent(slug: string | undefined) {
 
       // PRIORITY 2: Fall back to seo_pages table (legacy/generated content)
       // First try to get optimized content with actual content
-      const { data: optimizedData, error: optimizedError } = await supabaseAdmin
+      const { data: optimizedData, error: optimizedError } = await supabase
         .from("seo_pages")
         .select("*")
         .in("slug", candidates)
@@ -226,7 +226,7 @@ export function useSeoPageContent(slug: string | undefined) {
       // Also check if there's content even if is_optimized is false
       // This handles cases where content exists but is_optimized is not set
       if (optimizedData && !optimizedData.content) {
-        const { data: anyData } = await supabaseAdmin
+        const { data: anyData } = await supabase
           .from("seo_pages")
           .select("*")
           .in("slug", candidates)
@@ -246,7 +246,7 @@ export function useSeoPageContent(slug: string | undefined) {
 
       // Fallback: Get any page with content (even if not marked optimized)
       console.log('[SEO] Trying fallback query...');
-      const { data: anyData, error: anyError } = await supabaseAdmin
+      const { data: anyData, error: anyError } = await supabase
         .from("seo_pages")
         .select("*")
         .in("slug", candidates)
@@ -275,7 +275,7 @@ export function useSeoPageContent(slug: string | undefined) {
       // CRITICAL: Third fallback - get page with meta_title/meta_description
       // even if it has no body content. This ensures meta tags from the
       // Meta Optimizer tab are always used on the live site.
-      const { data: metaOnlyData, error: metaOnlyError } = await supabaseAdmin
+      const { data: metaOnlyData, error: metaOnlyError } = await supabase
         .from("seo_pages")
         .select("*")
         .in("slug", candidates)

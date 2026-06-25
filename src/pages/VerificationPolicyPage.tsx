@@ -46,7 +46,7 @@ const VerificationPolicyPage = () => {
         description="Learn how AppointPanda verifies dental clinics and dentists in the UAE. Our multi-step process ensures patients connect with legitimate, licensed professionals."
         canonical="/verification-policy/"
       />
-      <StructuredData type="faq" questions={faqs} />
+      <StructuredData data={{ type: 'faq', questions: faqs }} />
 
       <section className="bg-gradient-to-b from-background via-primary/5 to-background pt-6 pb-12">
         <div className="container">

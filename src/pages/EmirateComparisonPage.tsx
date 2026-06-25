@@ -85,7 +85,7 @@ const EmirateComparisonPage = ({ faqsProp }: EmirateComparisonPageProps) => {
         canonical={`/compare/${slug}/${emirate1}-vs-${emirate2}/`}
         keywords={[`${treatmentName} ${emirate1Name}`, `${treatmentName} ${emirate2Name}`, `dental prices comparison UAE`]}
       />
-      <StructuredData type="faq" questions={finalFaqs.map((f) => ({ question: f.q, answer: f.a }))} />
+      <StructuredData data={{ type: 'faq', questions: finalFaqs.map((f) => ({ question: f.q, answer: f.a })) }} />
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-8 pb-14">

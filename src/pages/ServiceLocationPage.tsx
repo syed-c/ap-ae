@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabaseAdmin } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
 
 import { useProfiles } from "@/hooks/useProfiles";
@@ -112,7 +112,7 @@ const ServiceLocationPage = ({
   const { data: treatment } = useQuery({
     queryKey: ["treatment", service],
     queryFn: async () => {
-      const { data } = await supabaseAdmin.from("treatments").select("*").eq("slug", service).maybeSingle();
+      const { data } = await supabase.from("treatments").select("*").eq("slug", service).maybeSingle();
       return data;
     },
     enabled: !!service,
@@ -144,9 +144,9 @@ const ServiceLocationPage = ({
   const { data: allCitiesInEmirate } = useQuery({
     queryKey: ['cities-by-emirate', normalizedStateSlug],
     queryFn: async () => {
-      const { data: stateData } = await supabaseAdmin.from('states').select('id').eq('slug', normalizedStateSlug).eq('is_active', true).maybeSingle();
+      const { data: stateData } = await supabase.from('states').select('id').eq('slug', normalizedStateSlug).eq('is_active', true).maybeSingle();
       if (!stateData) return [];
-      const { data: citiesData } = await supabaseAdmin.from('cities').select('id, name, slug, image_url').eq('state_id', stateData.id).eq('is_active', true).order('population', { ascending: false });
+      const { data: citiesData } = await supabase.from('cities').select('id, name, slug, image_url').eq('state_id', stateData.id).eq('is_active', true).order('population', { ascending: false });
       return citiesData || [];
     },
     enabled: !!normalizedStateSlug,

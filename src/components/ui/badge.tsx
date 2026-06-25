@@ -1,19 +1,18 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex min-h-5 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2D9C84] focus:ring-offset-2",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/90",
-        secondary: "border-border/50 bg-muted/50 text-muted-foreground hover:bg-muted",
-        destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border-border/50 text-foreground hover:bg-muted/50",
-        success: "border-transparent bg-teal-light text-teal-dark",
-        warning: "border-transparent bg-gold-light text-gold-dark",
+        default: "border-transparent bg-[#2D9C84] text-white",
+        secondary: "border-[#1E1E1E] bg-[#161616] text-[#62626B]",
+        destructive: "border-transparent bg-[#EF4444] text-white",
+        outline: "border-[#2D9C84] bg-transparent text-white",
+        success: "border-transparent bg-[rgba(34,197,94,0.1)] text-[#22C55E]",
+        warning: "border-transparent bg-[rgba(250,204,21,0.1)] text-[#FACC15]",
       },
     },
     defaultVariants: {

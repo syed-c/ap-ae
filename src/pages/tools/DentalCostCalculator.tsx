@@ -317,7 +317,7 @@ export default function DentalCostCalculator() {
                   <div className="text-center p-6 bg-primary/5 rounded-lg">
                     <p className="text-sm text-muted-foreground mb-1">Estimated Price Range</p>
                     <p className="text-3xl font-bold text-primary">
-                      ${Math.min(...budgetRanges.map((b: any) => b.price_min)).toLocaleString()} – ${Math.max(...budgetRanges.map((b: any) => b.price_max)).toLocaleString()}
+                      AED {Math.min(...budgetRanges.map((b: any) => b.price_min)).toLocaleString()} – AED {Math.max(...budgetRanges.map((b: any) => b.price_max)).toLocaleString()}
                     </p>
                     <p className="text-xs text-muted-foreground mt-2">
                       Based on platform budget ranges
@@ -327,7 +327,7 @@ export default function DentalCostCalculator() {
                     {budgetRanges.map((br: any) => (
                       <div key={br.id} className="flex justify-between items-center py-2 px-3 bg-muted/30 rounded-lg text-sm">
                         <span className="font-medium">{br.label}</span>
-                        <span className="text-muted-foreground">${br.price_min} – ${br.price_max}</span>
+                        <span className="text-muted-foreground">AED {br.price_min?.toLocaleString()} – AED {br.price_max?.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>

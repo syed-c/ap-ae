@@ -3,12 +3,10 @@ import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 import { withTrailingSlash } from "@/lib/url/withTrailingSlash";
 
-interface NavLinkCompatProps {
-  className?: string;
+interface NavLinkCompatProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   activeClassName?: string;
   pendingClassName?: string;
   to: string;
-  href?: string;
 }
 
 const NavLink = forwardRef<HTMLAnchorElement, NavLinkCompatProps>(

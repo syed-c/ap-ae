@@ -26,6 +26,7 @@ interface HomePageProps {
     cityId: string;
   }[];
   statesWithClinics: { id: string; name: string; slug: string; abbreviation: string }[];
+  featuredTreatments: { id: string; name: string; slug: string }[];
 }
 
 export default function IndexPageWithSEO({
@@ -33,6 +34,7 @@ export default function IndexPageWithSEO({
   realCounts,
   topProfiles,
   statesWithClinics,
+  featuredTreatments,
 }: HomePageProps) {
   const websiteSchema = {
     "@context": "https://schema.org",
@@ -84,6 +86,7 @@ export default function IndexPageWithSEO({
         realCountsProp={realCounts}
         topProfilesProp={topProfiles}
         statesWithClinicsProp={statesWithClinics}
+        featuredTreatmentsProp={featuredTreatments}
       />
     </>
   );
@@ -102,6 +105,7 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
         realCounts: null,
         topProfiles: [],
         statesWithClinics: [],
+        featuredTreatments: [],
       },
       revalidate: 300,
     };
@@ -117,11 +121,12 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
       .order('display_order');
 
     // Fetch counts using Promise.all for parallel execution
-    const [clinicsRes, dentistsRes, citiesRes, treatmentsRes] = await Promise.all([
+    const [clinicsRes, dentistsRes, citiesRes, treatmentsRes, featuredTreatmentsRes] = await Promise.all([
       supabase.from('clinics').select('id', { count: 'exact', head: true }).eq('is_active', true),
       supabase.from('dentists').select('id', { count: 'exact', head: true }).eq('is_active', true),
       supabase.from('cities').select('id', { count: 'exact', head: true }).eq('is_active', true).not('state_id', 'is', null),
       supabase.from('treatments').select('id', { count: 'exact', head: true }).eq('is_active', true),
+      supabase.from('treatments').select('id, name, slug').eq('is_active', true).order('display_order').limit(8),
     ]);
 
     const realCountsData = {
@@ -187,6 +192,7 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
         realCounts: realCountsData,
         topProfiles: profiles,
         statesWithClinics: statesWithClinicsData,
+        featuredTreatments: featuredTreatmentsRes.data || [],
       },
       revalidate: 300,
     };
@@ -201,6 +207,7 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
         realCounts: null,
         topProfiles: [],
         statesWithClinics: [],
+        featuredTreatments: [],
       },
       revalidate: 300,
     };

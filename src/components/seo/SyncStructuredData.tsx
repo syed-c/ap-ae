@@ -119,6 +119,16 @@ export interface WebSiteSchemaData {
   searchUrl?: string;
 }
 
+export interface PersonSchemaData {
+  type: 'person';
+  name: string;
+  jobTitle?: string;
+  description?: string;
+  image?: string;
+  url: string;
+  worksFor?: { name: string; url: string };
+}
+
 export interface PlaceSchemaData {
   type: 'place';
   name: string;
@@ -139,6 +149,7 @@ export type SyncSchemaData =
   | ItemListSchemaData
   | MedicalProcedureSchemaData
   | WebSiteSchemaData
+  | PersonSchemaData
   | PlaceSchemaData;
 
 // Schema generation functions
@@ -383,6 +394,23 @@ const generateWebSiteSchema = (data: WebSiteSchemaData) => ({
   },
 });
 
+const generatePersonSchema = (data: PersonSchemaData) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: data.name,
+  jobTitle: data.jobTitle,
+  description: data.description,
+  image: data.image,
+  url: `${BASE_URL}${withTrailingSlash(data.url)}`,
+  ...(data.worksFor && {
+    worksFor: {
+      '@type': 'Organization',
+      name: data.worksFor.name,
+      url: `${BASE_URL}${withTrailingSlash(data.worksFor.url)}`,
+    },
+  }),
+});
+
 const generatePlaceSchema = (data: PlaceSchemaData) => ({
   '@context': 'https://schema.org',
   '@type': 'Place',
@@ -432,6 +460,8 @@ function generateSchema(data: SyncSchemaData, organizationSettings?: any): objec
       return generateMedicalProcedureSchema(data);
     case 'webSite':
       return generateWebSiteSchema(data);
+    case 'person':
+      return generatePersonSchema(data);
     case 'place':
       return generatePlaceSchema(data);
     default:
@@ -475,3 +505,6 @@ export const SyncStructuredData = ({ data, id }: SyncStructuredDataProps) => {
 };
 
 export default SyncStructuredData;
+
+// Alias for backward compatibility - both names point to the same component
+export const StructuredData = SyncStructuredData;

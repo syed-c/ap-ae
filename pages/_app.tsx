@@ -3,27 +3,39 @@ import type { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider, HydrationBoundary } from '@tanstack/react-query';
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Nunito } from 'next/font/google';
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Inter, JetBrains_Mono, Noto_Sans_Arabic } from 'next/font/google';
 import { AuthProvider } from '@/hooks/useAuth';
-import { TooltipProvider } from '@/components/ui/tooltip';
 
 const Toaster = dynamic(() => import('@/components/ui/toaster').then(m => m.Toaster));
 const Sonner = dynamic(() => import('@/components/ui/sonner').then(m => m.Toaster));
 const MetaTagInjector = dynamic(() => import('@/components/analytics/MetaTagInjector').then(m => m.MetaTagInjector));
 
-const nunito = Nunito({
+const displayFont = Inter({
   subsets: ['latin'],
-  variable: '--font-nunito',
+  variable: '--font-display',
   display: 'swap',
-  weight: ['400', '500', '600', '700', '800', '900'],
+  weight: ['500', '600', '700', '800'],
 });
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const bodyFont = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600'],
+});
+
+const monoFont = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+  weight: ['400', '500', '600'],
+});
+
+const arabicFont = Noto_Sans_Arabic({
+  subsets: ['arabic'],
+  variable: '--font-arabic',
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
 });
 
 // Lazy-load non-critical components — keeps initial JS bundle lean
@@ -49,7 +61,7 @@ const VisitorTracker = dynamic(
 );
 
 export default function App({ Component, pageProps }: AppProps) {
-  const fontClass = `${nunito.variable} ${plusJakartaSans.variable}`;
+  const fontClass = `${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} ${arabicFont.variable}`;
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -63,10 +75,10 @@ export default function App({ Component, pageProps }: AppProps) {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <HydrationBoundary state={pageProps.dehydratedState}>
-        <AuthProvider>
-          <TooltipProvider>
+    <div className={fontClass}>
+      <QueryClientProvider client={queryClient}>
+        <HydrationBoundary state={pageProps.dehydratedState}>
+          <AuthProvider>
             <AnalyticsProvider>
               <MetaTagInjector />
               <Toaster />
@@ -77,9 +89,9 @@ export default function App({ Component, pageProps }: AppProps) {
               <PandaBot />
               <Component {...pageProps} />
             </AnalyticsProvider>
-          </TooltipProvider>
-        </AuthProvider>
-      </HydrationBoundary>
-    </QueryClientProvider>
+          </AuthProvider>
+        </HydrationBoundary>
+      </QueryClientProvider>
+    </div>
   );
 }

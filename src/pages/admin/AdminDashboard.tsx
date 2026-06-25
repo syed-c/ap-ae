@@ -351,9 +351,10 @@ export default function AdminDashboard() {
   const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
 
   // Define roles that can access admin dashboard
-  const ADMIN_ROLES = ['super_admin', 'district_manager', 'seo_team', 'content_team', 'marketing_team', 'support_team'];
-  const isAdmin = roles.some(role => ADMIN_ROLES.includes(role));
-  const isSuperAdmin = roles.includes('super_admin') || roles.includes('district_manager');
+  const ADMIN_ROLES = ['super_admin', 'platform_admin', 'content_moderator'];
+
+  const isSuperAdmin = roles.includes('super_admin') || roles.includes('platform_admin');
+  const isAdmin = isSuperAdmin || roles.includes('content_moderator');
   const isDentist = roles.includes('dentist');
   const primaryRole = roles[0] || 'patient';
 
@@ -546,7 +547,7 @@ export default function AdminDashboard() {
   if (isDentistRoute) {
     return (
       <Suspense fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-primary/10">
+        <div className="min-h-screen flex items-center justify-center bg-background">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
             <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
@@ -662,52 +663,44 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa] flex">
-      {/* Sidebar - Dark Modern Design with Graphics */}
+    <div className="min-h-screen bg-background flex">
       <aside
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 overflow-hidden',
-          'bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900',
+          'bg-secondary',
           sidebarOpen ? 'w-64' : 'w-16'
         )}
       >
-        {/* Background Graphics */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 -left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl" />
-          <div className="absolute top-1/3 -right-10 w-24 h-24 bg-teal/20 rounded-full blur-2xl" />
-          <div className="absolute bottom-1/4 -left-5 w-20 h-20 bg-gold/15 rounded-full blur-2xl" />
-          <div className="absolute bottom-20 right-0 w-16 h-16 bg-primary/10 rounded-full blur-xl" />
-          {/* Grid pattern */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:20px_20px]" />
+          <div className="absolute bottom-20 right-0 w-16 h-16 bg-white/10 rounded-full blur-xl" />
         </div>
 
-        {/* Logo */}
         <div className="relative h-16 flex items-center justify-between px-4 border-b border-white/10">
           {sidebarOpen && (
             <div className="flex items-center gap-2">
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/30">
+              <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center shadow-[0_2px_8px_rgba(37,211,102,0.28)]">
                 <span className="text-white font-extrabold text-sm">AP</span>
               </div>
-              <span className="font-display font-bold text-lg text-white">AppointPanda</span>
+              <span className="font-display font-semibold text-lg text-white">AppointPanda</span>
             </div>
           )}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="shrink-0 text-white/60 hover:text-white hover:bg-white/10 rounded-xl"
+            className="shrink-0 text-white/70 hover:text-white hover:bg-white/10 rounded-full"
           >
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
 
-        {/* Navigation */}
         <ScrollArea className="flex-1 py-4 relative">
           <nav className="space-y-6 px-2">
             {tabGroups.map((group) => (
               <div key={group.label}>
                 {sidebarOpen && (
-                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-3 mb-2">
+                  <p className="text-[10px] font-semibold text-white/45 uppercase tracking-[0.18em] px-3 mb-2">
                     {group.label}
                   </p>
                 )}
@@ -720,11 +713,11 @@ export default function AdminDashboard() {
                         key={tab.id}
                         onClick={() => navigateToTab(tab.id)}
                         className={cn(
-                          'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group',
+                          'w-full flex items-center gap-3 px-3 py-2.5 rounded-[8px] text-sm font-medium transition-all duration-200 relative group',
                           isActive
-                            ? 'bg-white text-slate-900 font-semibold shadow-lg shadow-white/20'
+                            ? 'bg-white text-secondary font-semibold'
                             : tab.highlight
-                              ? 'text-primary bg-primary/10 hover:bg-primary/20'
+                              ? 'text-white bg-primary/12 hover:bg-primary/22'
                               : 'text-white/70 hover:bg-white/10 hover:text-white'
                         )}
                       >
@@ -735,13 +728,9 @@ export default function AdminDashboard() {
                         <Icon className={cn('h-4 w-4 shrink-0', isActive ? 'text-primary' : 'group-hover:text-primary')} />
                         {sidebarOpen && <span>{tab.label}</span>}
                         {tab.id === 'appointments' && unreadCount > 0 && sidebarOpen && (
-                          <Badge className="ml-auto bg-coral text-white text-xs h-5 min-w-5 flex items-center justify-center border-0 shadow-lg shadow-coral/30">
+                          <Badge className="ml-auto text-xs h-5 min-w-5 flex items-center justify-center">
                             {unreadCount}
                           </Badge>
-                        )}
-                        {/* Hover glow effect */}
-                        {!isActive && (
-                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity" />
                         )}
                       </button>
                     );
@@ -752,10 +741,9 @@ export default function AdminDashboard() {
           </nav>
         </ScrollArea>
 
-        {/* User info & Logout */}
-        <div className="relative p-4 border-t border-white/10 bg-black/20">
+        <div className="relative p-4 border-t border-white/10 bg-black/10">
           <div className={cn('flex items-center gap-3', !sidebarOpen && 'justify-center')}>
-            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-teal flex items-center justify-center shadow-lg">
+            <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center shadow-[0_2px_8px_rgba(37,211,102,0.28)]">
               <span className="text-sm font-bold text-white">
                 {user.email?.[0]?.toUpperCase() || 'A'}
               </span>
@@ -771,7 +759,7 @@ export default function AdminDashboard() {
             variant="ghost"
             size={sidebarOpen ? 'default' : 'icon'}
             onClick={signOut}
-            className={cn('mt-3 text-coral hover:text-white hover:bg-coral/20 border border-coral/30', sidebarOpen ? 'w-full' : 'w-9')}
+            className={cn('mt-3 text-white hover:text-white hover:bg-white/10 border border-white/15', sidebarOpen ? 'w-full' : 'w-9')}
           >
             <LogOut className="h-4 w-4" />
             {sidebarOpen && <span className="ml-2">Sign Out</span>}
@@ -779,33 +767,31 @@ export default function AdminDashboard() {
         </div>
       </aside>
 
-      {/* Main content */}
       <main
         className={cn(
           'flex-1 transition-all duration-300 min-h-screen',
           sidebarOpen ? 'ml-64' : 'ml-16'
         )}
       >
-        {/* Top bar - Enhanced */}
-        <div className="h-16 border-b border-border/30 bg-white flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm">
+        <div className="h-16 border-b border-border bg-card flex items-center justify-between px-6 sticky top-0 z-40 shadow-[0_2px_8px_rgba(17,27,33,0.08)]">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-1 rounded-full bg-gradient-to-b from-primary to-teal" />
-            <h2 className="font-bold text-foreground text-lg">
+            <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center text-primary">
+              <Sparkles className="h-4 w-4" />
+            </div>
+            <h2 className="font-semibold text-foreground text-lg">
               {tabGroups.flatMap(g => g.tabs).find(t => t.id === activeTab)?.label || 'Dashboard'}
             </h2>
           </div>
           <div className="flex items-center gap-3">
-            {/* Live indicator */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200">
-              <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-medium text-emerald-700">Live</span>
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent">
+              <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-xs font-medium text-secondary">Live</span>
             </div>
-            {/* Enhanced Notification Center */}
             <NotificationCenter />
           </div>
         </div>
 
-        <div className="p-6 bg-[#f5f7fa] min-h-[calc(100vh-4rem)]">
+        <div className="p-6 bg-background min-h-[calc(100vh-4rem)]">
           <Suspense fallback={
             <div className="flex items-center justify-center py-20">
               <div className="text-center">

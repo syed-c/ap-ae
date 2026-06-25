@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { MarketplaceHero } from "@/components/marketplace/MarketplaceHero";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
@@ -255,112 +256,69 @@ const InsuranceDetailPage = ({
         keywords={[`${insurance.name} dental`, `${insurance.name} dentist UAE`, `dental insurance ${locationSuffix}`]}
       />
 
-      {/* Hero */}
-      <div className="bg-gradient-to-b from-muted/50 to-background border-b border-border">
-        <div className="container py-8 md:py-12">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4 flex-wrap">
-            {breadcrumbs.map((crumb, i) => (
-              <span key={i} className="flex items-center gap-2">
-                {i > 0 && <span>/</span>}
-                {i === breadcrumbs.length - 1 ? (
-                  <span className="text-foreground font-medium">{crumb.label}</span>
-                ) : (
-                  <Link href={crumb.href} className="hover:text-primary transition-colors">{crumb.label}</Link>
-                )}
-              </span>
-            ))}
-          </nav>
-
-          <div className="flex flex-col md:flex-row md:items-center gap-6">
-            <div className="shrink-0 h-20 w-20 rounded-2xl bg-card border border-border flex items-center justify-center">
-              {insurance.logo_url ? (
-                <img src={insurance.logo_url} alt={insurance.name} className="h-14 w-14 object-contain" />
-              ) : (
-                <Shield className="h-10 w-10 text-primary" />
-              )}
-            </div>
-            <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
-                {insurance.name}{locationSuffix}
-              </h1>
-              <p className="text-muted-foreground mb-3">
-                {(insurance as any).description || `Find dental clinics that accept ${insurance.name} insurance with direct billing${locationSuffix}.`}
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2 text-sm">
-                  <Building2 className="h-4 w-4 text-primary" />
-                  <span className="font-bold">{totalCount}</span>
-                  <span className="text-muted-foreground">Clinics</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <BadgeCheck className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">Verified Providers</span>
-                </div>
-              </div>
-            </div>
+      <MarketplaceHero
+        breadcrumbs={breadcrumbs}
+        badge="Insurance Marketplace"
+        title={`${insurance.name}${locationSuffix}`}
+        description={(insurance as any).description || `Find dental clinics that accept ${insurance.name} insurance with direct billing${locationSuffix}.`}
+        actions={[
+          { href: '/search/', label: 'Search All Providers' },
+          { href: '/insurance/', label: 'All Insurance Networks', variant: 'outline' },
+        ]}
+        stats={[
+          { label: 'Clinics accepting this plan', value: `${totalCount}`, icon: <Building2 className="h-5 w-5" /> },
+          { label: 'Provider quality', value: 'Verified', icon: <BadgeCheck className="h-5 w-5" /> },
+          { label: 'Claims flow', value: 'Direct billing', icon: <FileCheck className="h-5 w-5" /> },
+          { label: 'Coverage focus', value: locationSuffix ? 'Local view' : 'UAE-wide', icon: <MapPin className="h-5 w-5" /> },
+        ]}
+      >
+        {(insurance as any).coverage_notes && (
+          <div className="marketplace-panel max-w-3xl p-4 md:p-5">
+            <h3 className="text-sm font-black text-foreground">Coverage Notes</h3>
+            <p className="mt-2 text-sm leading-7 text-muted-foreground">{(insurance as any).coverage_notes}</p>
           </div>
+        )}
 
-          {/* Coverage info if available */}
-          {(insurance as any).coverage_notes && (
-            <div className="mt-6 p-4 rounded-xl bg-card border border-border">
-              <h3 className="font-bold text-sm mb-1">Coverage Notes</h3>
-              <p className="text-sm text-muted-foreground">{(insurance as any).coverage_notes}</p>
-            </div>
-          )}
-
-          {/* Emirate Quick Links */}
-          {availableEmirates && availableEmirates.length > 0 && !urlCitySlug && (
-            <div className="mt-6">
-              <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-2">
-                Browse {insurance.name} by Emirate
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                <Link
-                  href={buildInsuranceUrl(insurance.slug)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${!emirateSlug
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted hover:bg-primary/10 hover:text-primary"
-                    }`}
-                >
-                  All Emirates
-                </Link>
-                {availableEmirates.map((em) => (
-                  <Link
-                    key={em.slug}
-                    href={buildInsuranceUrl(insurance.slug, em.slug)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${emirateSlug === em.slug
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted hover:bg-primary/10 hover:text-primary"
-                      }`}
-                  >
-                    {em.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Benefits */}
-          <div className="grid grid-cols-3 gap-3 mt-6">
-            {[
-              { icon: FileCheck, title: "Direct Billing", desc: "No upfront payment required" },
-              { icon: Sparkles, title: "Pre-Approval", desc: "Clinics handle paperwork" },
-              { icon: HeadphonesIcon, title: "Claims Help", desc: "Assistance with claims" },
-            ].map((b, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border">
-                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <b.icon className="h-4 w-4 text-primary" />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-bold text-sm truncate">{b.title}</p>
-                  <p className="text-xs text-muted-foreground truncate">{b.desc}</p>
-                </div>
-              </div>
+        {availableEmirates && availableEmirates.length > 0 && !urlCitySlug && (
+          <div className="mt-4 flex max-w-4xl flex-wrap gap-2">
+            <Link
+              href={buildInsuranceUrl(insurance.slug)}
+              className={`rounded-full border px-3.5 py-2 text-xs font-medium transition-all ${!emirateSlug ? 'border-primary bg-primary text-primary-foreground' : 'border-white/10 bg-white/5 text-white/75 hover:border-primary/35 hover:text-white'}`}
+            >
+              All Emirates
+            </Link>
+            {availableEmirates.map((em) => (
+              <Link
+                key={em.slug}
+                href={buildInsuranceUrl(insurance.slug, em.slug)}
+                className={`rounded-full border px-3.5 py-2 text-xs font-medium transition-all ${emirateSlug === em.slug ? 'border-primary bg-primary text-primary-foreground' : 'border-white/10 bg-white/5 text-white/75 hover:border-primary/35 hover:text-white'}`}
+              >
+                {em.name}
+              </Link>
             ))}
           </div>
+        )}
+
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {[
+            { icon: FileCheck, title: 'Direct Billing', desc: 'No upfront payment required' },
+            { icon: Sparkles, title: 'Pre-Approval', desc: 'Clinics handle paperwork' },
+            { icon: HeadphonesIcon, title: 'Claims Help', desc: 'Assistance with claims' },
+          ].map((benefit) => (
+            <div key={benefit.title} className="marketplace-panel max-w-sm p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <benefit.icon className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-black text-foreground">{benefit.title}</p>
+                  <p className="text-xs text-muted-foreground">{benefit.desc}</p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
+      </MarketplaceHero>
 
       {/* Main Content */}
       <Section size="md">

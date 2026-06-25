@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { PageHero } from "@/components/layout/PageHero";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { useSeoPageContent } from "@/hooks/useSeoPageContent";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
@@ -25,7 +26,6 @@ import {
   Headphones,
   CalendarCheck,
   ShoppingBag,
-  Sparkles,
   ArrowRight,
   CheckCircle,
   User,
@@ -231,42 +231,24 @@ const ContactPage = () => {
         keywords={['contact AppointPanda', 'dental help', 'dentist questions', 'dental support']}
       />
 
-      {/* Dark Hero Section */}
-      <section className="relative bg-dark-section text-dark-section-foreground overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.1),transparent_50%)]" />
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple/10 rounded-full blur-3xl" />
-
-        <div className="container relative py-20 md:py-28">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-bold text-primary">We're Here to Help</span>
-            </div>
-
-            <h1 className="font-display text-4xl md:text-6xl font-bold mb-6">
-              Get in{" "}
-              <span className="text-gradient">Touch</span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-dark-section-foreground/70 max-w-2xl mx-auto mb-8">
-              Have questions about finding a dentist or listing your practice? Our team is ready to assist you.
-            </p>
-
-            {/* Quick Contact Stats */}
-            <div className="flex flex-wrap justify-center gap-4">
-              {features.map((feature, i) => (
-                <div key={i} className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-full px-4 py-2 border border-white/10">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">{feature}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+      <PageHero
+        badge="We're Here to Help"
+        title="Get in"
+        highlight="Touch"
+        description="Have questions about finding a dentist or listing your practice? Our team is ready to assist you."
+      >
+        <div className="flex flex-wrap gap-3 mt-2">
+          {features.map((feature, i) => (
+            <span
+              key={i}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#62626B] bg-[rgba(22,22,22,0.85)] backdrop-blur-xl border border-[rgba(45,156,132,0.15)] rounded-full"
+            >
+              <CheckCircle className="h-3.5 w-3.5 text-[#2D9C84]" />
+              {feature}
+            </span>
+          ))}
         </div>
-      </section>
+      </PageHero>
 
       {/* Contact Departments - Elevated Cards */}
       <Section size="lg" className="-mt-10 relative z-20">

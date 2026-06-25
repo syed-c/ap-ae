@@ -6,8 +6,9 @@ import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import dynamic from 'next/dynamic';
-import { supabase, supabaseAdmin } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
+import { MarketplaceHero } from "@/components/marketplace/MarketplaceHero";
 import { generateCityQA } from "@/lib/ai-seo/generateQAContent";
 import { Section } from "@/components/layout/Section";
 import { SearchBox } from "@/components/SearchBox";
@@ -121,7 +122,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     queryKey: ['city-clinic-count', city?.id],
     queryFn: async () => {
       if (!city) return 0;
-      const { count, error } = await supabaseAdmin
+      const { count, error } = await supabase
         .from('clinics')
         .select('id', { count: 'exact', head: true })
         .eq('city_id', city.id)
@@ -139,7 +140,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     queryFn: async () => {
       const pinnedIds = (pinnedProfiles || []).map(p => p.id);
 
-      const { data: clinics } = await supabaseAdmin
+      const { data: clinics } = await supabase
         .from('clinics')
         .select(`
           id, name, slug, description, cover_image_url, rating, review_count,
@@ -156,7 +157,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
 
       let pinnedClinics: any[] = [];
       if (missingPinnedIds.length > 0) {
-        const { data: extraPinned } = await supabaseAdmin
+        const { data: extraPinned } = await supabase
           .from('clinics')
           .select(`
             id, name, slug, description, cover_image_url, rating, review_count,
@@ -241,7 +242,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     queryKey: ['cities-by-emirate', normalizedStateSlug],
     queryFn: async () => {
       // First get the state to get its ID
-      const { data: stateData, error: stateError } = await supabaseAdmin
+      const { data: stateData, error: stateError } = await supabase
         .from('states')
         .select('id')
         .eq('slug', normalizedStateSlug)
@@ -254,7 +255,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
       }
       
       // Then get cities by state_id
-      const { data: citiesData, error: citiesError } = await supabaseAdmin
+      const { data: citiesData, error: citiesError } = await supabase
         .from('cities')
         .select('id, name, slug')
         .eq('state_id', stateData.id)
@@ -277,7 +278,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     queryKey: ['service-locations', normalizedStateSlug, citySlug],
     queryFn: async () => {
       const slugPattern = `/${normalizedStateSlug}/${citySlug}/`;
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await supabase
         .from('seo_pages')
         .select('slug, title, h1, meta_title')
         .eq('page_type', 'service-location' as any)
@@ -433,100 +434,26 @@ const shouldNoIndex = false;
           id="city-page-schema"
         />
 
-      {/* Hero Section — Full viewport banner */}
-      <section className="relative h-[85vh] flex items-center overflow-hidden bg-[#0e0e0e] mx-4 mb-4 rounded-[3rem]">
-        <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 right-0 w-full h-full border-r border-b border-white/10 [mask-image:radial-gradient(ellipse_at_center,black,transparent)]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-white/5 rounded-full rotate-45" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/5 rounded-full -rotate-12" />
+      <MarketplaceHero
+        breadcrumbs={breadcrumbs}
+        badge="Local Marketplace"
+        title={pageH1 || `Find dentists in ${cityName}`}
+        description={pageDescription}
+        actions={[
+          { href: '/search/', label: 'Search All Providers' },
+          { href: `/${normalizedStateSlug}/`, label: `Browse ${stateName}`, variant: 'outline' },
+        ]}
+        stats={[
+          { label: 'Clinics discovered', value: `${profiles?.length || totalClinicCount || 0}+`, icon: <Shield className="h-5 w-5" /> },
+          { label: 'Specialists visible', value: `${(profiles?.length || 0) * 5 || 0}+`, icon: <Users className="h-5 w-5" /> },
+          { label: 'Average rating signal', value: '4.8', icon: <Star className="h-5 w-5" /> },
+          { label: 'Location context', value: stateAbbr, icon: <MapPin className="h-5 w-5" /> },
+        ]}
+      >
+        <div className="max-w-4xl">
+          <SearchBox variant="hero" stateSlug={stateSlug} defaultCity={`${citySlug}|${stateSlug}`} />
         </div>
-
-        <div className="relative z-10 max-w-5xl mx-auto w-full text-center space-y-12 p-8 md:p-12">
-          <div className="flex justify-center mb-4">
-            <Breadcrumbs items={breadcrumbs} className="[&_a]:text-white/60 [&_span]:text-white/40 [&_svg]:text-white/30" />
-          </div>
-
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[#73ebdc] mx-auto mb-6">
-            <Shield className="text-sm h-4 w-4" />
-            <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Verified Provider Directory</span>
-          </div>
-
-          <div className="space-y-6">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-4xl md:text-6xl font-extrabold text-white leading-tight tracking-tight max-w-4xl mx-auto"
-            >
-              {pageH1 && pageH1.includes(cityName) ? (
-                <>
-                  {pageH1.split(cityName)[0]}
-                  <span className="text-[#73ebdc]">{cityName}</span>
-                  {pageH1.split(cityName)[1] || ''}
-                </>
-              ) : (
-                pageH1 || 'Loading...'
-              )}
-            </motion.h1>
-          </div>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-sm md:text-base lg:text-lg text-white/50 mb-8 max-w-2xl mx-auto px-2"
-          >
-            {pageDescription}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="max-w-4xl mx-auto"
-          >
-            <SearchBox variant="hero" stateSlug={stateSlug} defaultCity={`${citySlug}|${stateSlug}`} />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-8 md:gap-16 pt-8"
-          >
-            {(totalClinicCount || profiles?.length || 0) > 0 ? (
-              <>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-black text-white">{profiles?.length || 0}+</span>
-                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Verified<br/>Clinics</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-black text-white">{(profiles?.length || 0) * 5}+</span>
-                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Active<br/>Specialists</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-black text-white">4.8</span>
-                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Average<br/>Rating</span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-black text-white">DHA</span>
-                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Licensed<br/>Dentists</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-black text-white">Verified</span>
-                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Clinic<br/>Profiles</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-black text-white">24/7</span>
-                  <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Patient<br/>Support</span>
-                </div>
-              </>
-            )}
-          </motion.div>
-        </div>
-      </section>
+      </MarketplaceHero>
 
       {/* Hero Intro Section - CMS Content Only (no heading) */}
       {pageContentDataProp?.hero_intro && (

@@ -185,7 +185,7 @@ We are committed to resolving your concerns within 30 days of receipt, as requir
 
       {/* Privacy Policy Schema */}
       <StructuredData 
-        type="organization"
+        data={{ type: 'organization' }}
       />
 
       {/* Dark Hero Section */}

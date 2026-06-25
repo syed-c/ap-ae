@@ -12,18 +12,18 @@ import { LucideIcon, ArrowRight, Loader2 } from 'lucide-react';
 // ============================================
 export const designTokens = {
   radius: {
-    sm: 'rounded-xl',
-    md: 'rounded-2xl',
-    lg: 'rounded-3xl',
-    xl: 'rounded-[2rem]',
+    sm: 'rounded-[8px]',
+    md: 'rounded-[10px]',
+    lg: 'rounded-[12px]',
+    xl: 'rounded-[16px]',
     full: 'rounded-full',
   },
   shadow: {
-    sm: 'shadow-sm',
-    md: 'shadow-md shadow-black/5',
-    lg: 'shadow-lg shadow-black/8',
-    xl: 'shadow-xl shadow-black/10',
-    glow: 'shadow-lg shadow-primary/20',
+    sm: 'shadow-[0_1px_3px_rgba(0,0,0,0.3)]',
+    md: 'shadow-[0_4px_12px_rgba(0,0,0,0.35)]',
+    lg: 'shadow-[0_8px_28px_rgba(0,0,0,0.4)]',
+    xl: 'shadow-[0_16px_40px_-24px_rgba(0,0,0,0.5)]',
+    glow: 'shadow-[0_0_30px_-8px_oklch(0.72_0.19_28/0.35)]',
   },
   transition: 'transition-all duration-200 ease-out',
 };
@@ -45,11 +45,11 @@ export const PremiumCard = forwardRef<HTMLDivElement, PremiumCardProps>(
     const baseStyles = 'relative overflow-hidden';
 
     const variantStyles = {
-      default: 'bg-card border border-border/50 shadow-sm',
-      glass: 'bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg',
-      gradient: 'bg-gradient-to-br from-card to-muted/30 border border-border/30',
-      elevated: 'bg-card shadow-xl shadow-black/5 border-0',
-      outlined: 'bg-transparent border-2 border-border',
+      default: 'bg-card border border-border shadow-[0_1px_3px_rgba(0,0,0,0.3)]',
+      glass: 'bg-card/80 backdrop-blur-xl border border-border shadow-[0_8px_32px_rgba(0,0,0,0.3)]',
+      gradient: 'bg-card/50 border border-border',
+      elevated: 'bg-card border border-border shadow-[0_4px_16px_rgba(17,27,33,0.12)]',
+      outlined: 'bg-transparent border border-border',
     };
 
     const paddingStyles = {
@@ -60,7 +60,7 @@ export const PremiumCard = forwardRef<HTMLDivElement, PremiumCardProps>(
     };
 
     const hoverStyles = hover
-      ? 'cursor-pointer hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 hover:border-primary/20'
+      ? 'cursor-pointer hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_4px_16px_rgba(17,27,33,0.12)]'
       : '';
 
     return (
@@ -69,7 +69,7 @@ export const PremiumCard = forwardRef<HTMLDivElement, PremiumCardProps>(
         onClick={onClick}
         className={cn(
           baseStyles,
-          'rounded-2xl',
+          'rounded-[12px]',
           variantStyles[variant],
           paddingStyles[padding],
           hoverStyles,
@@ -121,7 +121,7 @@ export const StatCard = ({
     >
       <div className="flex items-start justify-between">
         {Icon && (
-          <div className={cn('h-9 w-9 rounded-xl flex items-center justify-center', iconBg)}>
+          <div className={cn('flex h-9 w-9 items-center justify-center rounded-full', iconBg)}>
             <Icon className={cn('h-4 w-4', iconColor)} />
           </div>
         )}
@@ -187,15 +187,15 @@ export const PremiumButton = forwardRef<HTMLButtonElement, PremiumButtonProps>(
     disabled,
     ...props
   }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    const baseStyles = 'inline-flex items-center justify-center font-medium rounded-[8px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variantStyles = {
-      primary: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 focus:ring-primary',
-      secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-secondary',
-      outline: 'border-2 border-border bg-transparent hover:bg-muted text-foreground focus:ring-primary',
-      ghost: 'bg-transparent hover:bg-muted text-foreground focus:ring-primary',
-      danger: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-lg shadow-destructive/25 focus:ring-destructive',
-      success: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-600/25 focus:ring-emerald-600',
+      primary: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_30px_-8px_oklch(0.72_0.19_28/0.4)] focus:ring-primary',
+      secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90 focus:ring-secondary',
+      outline: 'border border-border bg-card/50 hover:bg-card text-foreground focus:ring-primary',
+      ghost: 'bg-transparent hover:bg-card text-foreground focus:ring-primary',
+      danger: 'bg-destructive text-destructive-foreground hover:bg-destructive/92 shadow-[0_0_20px_-8px_oklch(0.65_0.24_28/0.4)] focus:ring-destructive',
+      success: 'bg-primary/10 text-primary hover:bg-primary/20 focus:ring-primary',
     };
 
     const sizeStyles = {
@@ -250,15 +250,15 @@ export const SectionHeader = ({
   <div className="flex items-start justify-between mb-4">
     <div className="flex items-center gap-2">
       {Icon && (
-        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Icon className={cn('h-4 w-4', iconColor)} />
-        </div>
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent">
+            <Icon className={cn('h-4 w-4', iconColor)} />
+          </div>
       )}
       <div>
         <div className="flex items-center gap-2">
-          <h2 className="text-base font-bold text-foreground">{title}</h2>
+          <h2 className="text-base font-semibold text-foreground">{title}</h2>
           {badge && (
-            <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-primary/10 text-primary rounded-full">
+            <span className="rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-secondary">
               {badge}
             </span>
           )}
@@ -352,19 +352,19 @@ interface StatusBadgeProps {
 
 export const StatusBadge = ({ status, label, dot = true }: StatusBadgeProps) => {
   const styles = {
-    success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    warning: 'bg-amber-50 text-amber-700 border-amber-200',
-    error: 'bg-red-50 text-red-700 border-red-200',
-    info: 'bg-blue-50 text-blue-700 border-blue-200',
-    neutral: 'bg-slate-50 text-slate-700 border-slate-200',
+    success: 'bg-emerald/15 text-emerald border-emerald/30',
+    warning: 'bg-amber/15 text-amber border-amber/30',
+    error: 'bg-destructive/15 text-destructive border-destructive/30',
+    info: 'bg-blue/15 text-blue border-blue/30',
+    neutral: 'bg-card/50 text-foreground/70 border-border',
   };
 
   const dotStyles = {
-    success: 'bg-emerald-500',
-    warning: 'bg-amber-500',
-    error: 'bg-red-500',
-    info: 'bg-blue-500',
-    neutral: 'bg-slate-400',
+    success: 'bg-emerald',
+    warning: 'bg-amber',
+    error: 'bg-destructive',
+    info: 'bg-blue',
+    neutral: 'bg-muted-foreground',
   };
 
   return (
@@ -395,7 +395,7 @@ export const QuickAction = ({
   label,
   description,
   onClick,
-  color = 'from-primary to-teal',
+  color = 'bg-primary/20 text-primary',
   disabled = false,
 }: QuickActionProps) => (
   <button
@@ -408,8 +408,8 @@ export const QuickAction = ({
       disabled && 'opacity-50 cursor-not-allowed hover:shadow-none hover:translate-y-0'
     )}
   >
-    <div className={cn('h-10 w-10 rounded-xl bg-gradient-to-br flex items-center justify-center', color)}>
-      <Icon className="h-5 w-5 text-white" />
+    <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center', color)}>
+      <Icon className="h-5 w-5" />
     </div>
     <div>
       <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{label}</p>

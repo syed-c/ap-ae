@@ -62,11 +62,9 @@ export const SEOHead = ({
 
   const imageUrl = ogImage || DEFAULT_OG_IMAGE;
 
-  // CRITICAL SEO RULE: If the page is classified as indexable in the registry,
-  // we MUST NOT output noindex, regardless of what the component is told.
+  // Respect explicit noindex prop; only override if classification says non-indexable
   const classification = classifyPath(currentPath);
-  const isPageIndexable = classification.indexable;
-  const effectiveNoindex = isPageIndexable ? false : noindex;
+  const effectiveNoindex = noindex || !classification.indexable;
 
   return (
     <Head>
@@ -96,6 +94,11 @@ export const SEOHead = ({
       <meta property="og:description" content={safeDescription} />
       <meta property="og:image" content={imageUrl} />
       <meta property="og:site_name" content={SITE_NAME} />
+      <meta property="og:locale" content="en_AE" />
+
+      {/* Hreflang for UAE - primary English, alternate Arabic */}
+      <link rel="alternate" hrefLang="en-AE" href={normalizedCanonical} />
+      <link rel="alternate" hrefLang="x-default" href={normalizedCanonical} />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />

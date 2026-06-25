@@ -1,368 +1,279 @@
 'use client';
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { useRouter } from "next/router";
-import { MapPin, Search, Stethoscope, Shield, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useCitiesByStateSlug, useCities } from "@/hooks/useLocations";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
+import { Search, MapPin, Stethoscope, ShieldCheck, X, ArrowRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useTreatments } from '@/hooks/useTreatments';
+import { useStates, useCities } from '@/hooks/useLocations';
 
 interface SearchBoxProps {
-  variant?: "default" | "compact" | "hero";
+  variant?: 'hero' | 'compact';
+  className?: string;
+  onSearch?: (params: { location: string; treatment: string; insurance: string }) => void;
+  stateSlug?: string;
   defaultCity?: string;
   defaultTreatment?: string;
-  stateSlug?: string;
-  showInsurance?: boolean;
 }
 
-interface SearchOption {
-  value: string;
+interface FuzzyOption {
+  id: string;
   label: string;
-  slug?: string;
-  stateSlug?: string;
+  slug: string;
+  type: 'state' | 'city' | 'treatment' | 'insurance';
+  group: string;
 }
 
-function fuzzyScore(query: string, label: string): number {
-  const q = query.toLowerCase().trim();
-  const l = label.toLowerCase();
-  if (!q) return 1;
-  if (l === q) return 100;
-  if (l.startsWith(q)) return 90;
-  if (l.includes(q)) return 70;
-  const words = l.split(/[\s,]+/);
-  let bestWordScore = 0;
-  for (const word of words) {
-    const dist = levenshtein(q, word.slice(0, q.length + 2));
-    const maxLen = Math.max(q.length, word.length);
-    const similarity = maxLen > 0 ? (1 - dist / maxLen) * 60 : 0;
-    bestWordScore = Math.max(bestWordScore, similarity);
-  }
-  let qi = 0;
-  for (let li = 0; li < l.length && qi < q.length; li++) {
-    if (l[li] === q[qi]) qi++;
-  }
-  const subseqScore = qi === q.length ? 40 : (qi / q.length) * 20;
-  return Math.max(bestWordScore, subseqScore);
+function fuzzyMatch(text: string, query: string): boolean {
+  const q = query.toLowerCase();
+  const t = text.toLowerCase();
+  if (t.includes(q)) return true;
+  const qWords = q.split(/\s+/);
+  return qWords.every((word) => t.includes(word));
 }
 
-function levenshtein(a: string, b: string): number {
-  const m = a.length, n = b.length;
-  if (m === 0) return n;
-  if (n === 0) return m;
-  const dp: number[][] = Array.from({ length: m + 1 }, (_, i) =>
-    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
-  );
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      dp[i][j] = a[i - 1] === b[j - 1]
-        ? dp[i - 1][j - 1]
-        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+export function SearchBox({ variant = 'compact', className, onSearch }: SearchBoxProps) {
+  const router = useRouter();
+  const { data: treatments } = useTreatments();
+  const { data: states } = useStates();
+  const { data: cities } = useCities();
+
+  const [location, setLocation] = useState('');
+  const [treatment, setTreatment] = useState('');
+  const [insurance, setInsurance] = useState('');
+  const [focusedField, setFocusedField] = useState<'location' | 'treatment' | 'insurance' | null>(null);
+
+  const locationRef = useRef<HTMLDivElement>(null);
+  const treatmentRef = useRef<HTMLDivElement>(null);
+  const insuranceRef = useRef<HTMLDivElement>(null);
+
+  const { data: insurances } = useQuery({
+    queryKey: ['searchbox-insurances'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('insurances')
+        .select('id, name, slug')
+        .eq('is_active', true)
+        .order('display_order');
+      return data || [];
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const insuranceOptions = useMemo(() => (insurances || []).map(ins => ({
+    id: ins.id, label: ins.name, slug: ins.slug
+  })), [insurances]);
+
+  const allOptions = useMemo(() => {
+    const opts: FuzzyOption[] = [];
+
+    (states || []).forEach((s) => {
+      opts.push({ id: s.id, label: s.name, slug: s.slug, type: 'state', group: 'Emirates' });
+    });
+    (cities || []).forEach((c) => {
+      opts.push({ id: c.id, label: `${c.name}${c.state ? `, ${c.state.abbreviation}` : ''}`, slug: c.slug, type: 'city', group: 'Cities' });
+    });
+    (treatments || []).forEach((t) => {
+      opts.push({ id: t.id, label: t.name, slug: t.slug, type: 'treatment', group: 'Treatments' });
+    });
+    insuranceOptions.forEach((ins) => {
+      opts.push({ id: ins.id, label: ins.label, slug: ins.slug, type: 'insurance', group: 'Insurance' });
+    });
+
+    return opts;
+  }, [states, cities, treatments]);
+
+  const filteredLocation = useMemo(() => {
+    if (!location || !focusedField || focusedField !== 'location') return [];
+    return allOptions
+      .filter((o) => (o.type === 'state' || o.type === 'city') && fuzzyMatch(o.label, location))
+      .slice(0, 6);
+  }, [location, focusedField, allOptions]);
+
+  const filteredTreatment = useMemo(() => {
+    if (!treatment || !focusedField || focusedField !== 'treatment') return [];
+    return allOptions
+      .filter((o) => o.type === 'treatment' && fuzzyMatch(o.label, treatment))
+      .slice(0, 6);
+  }, [treatment, focusedField, allOptions]);
+
+  const filteredInsurance = useMemo(() => {
+    if (!insurance || !focusedField || focusedField !== 'insurance') return [];
+    return allOptions
+      .filter((o) => o.type === 'insurance' && fuzzyMatch(o.label, insurance))
+      .slice(0, 6);
+  }, [insurance, focusedField, allOptions]);
+
+  const handleSelect = useCallback((option: FuzzyOption, field: 'location' | 'treatment' | 'insurance') => {
+    if (field === 'location') setLocation(option.label);
+    else if (field === 'treatment') setTreatment(option.label);
+    else if (field === 'insurance') setInsurance(option.label);
+    setFocusedField(null);
+  }, []);
+
+  const handleSearch = useCallback(() => {
+    if (onSearch) {
+      onSearch({ location, treatment, insurance });
+      return;
     }
-  }
-  return dp[m][n];
-}
 
-const headingFont = "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif";
-
-function SmartSearchInput({
-  placeholder,
-  options,
-  value,
-  onChange,
-  icon: Icon,
-  className = "",
-}: {
-  placeholder: string;
-  options: SearchOption[];
-  value: string;
-  onChange: (value: string, label: string) => void;
-  icon?: React.ComponentType<{ className?: string }>;
-  className?: string;
-}) {
-  const [query, setQuery] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const [displayValue, setDisplayValue] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (value) {
-      const option = options.find(o => o.value === value);
-      setDisplayValue(option?.label || value);
-      setQuery(option?.label || value);
-    } else {
-      setDisplayValue("");
-      setQuery("");
-    }
-  }, [value, options]);
-
-  const filteredOptions = useMemo(() => {
-    if (!query.trim()) return options.slice(0, 15);
-    return options
-      .map(o => ({ ...o, score: fuzzyScore(query, o.label) }))
-      .filter(o => o.score > 15)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 15);
-  }, [query, options]);
+    const params = new URLSearchParams();
+    // Send free-text location query as 'q' for SearchPage
+    if (location) params.set('q', location);
+    // If a specific treatment was selected, pass its name as treatment text
+    if (treatment) params.set('treatment', treatment);
+    // If a specific insurance was selected, pass its name
+    if (insurance) params.set('insurance', insurance);
+    router.push(`/search/?${params.toString()}`);
+  }, [location, treatment, insurance, onSearch, router]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-        setQuery(displayValue);
+      if (
+        !locationRef.current?.contains(e.target as Node) &&
+        !treatmentRef.current?.contains(e.target as Node) &&
+        !insuranceRef.current?.contains(e.target as Node)
+      ) {
+        setFocusedField(null);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [displayValue]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  const handleSelect = (option: SearchOption) => {
-    onChange(option.value, option.label);
-    setQuery(option.label);
-    setDisplayValue(option.label);
-    setIsOpen(false);
-  };
-
-  const handleClear = () => {
-    onChange("", "");
-    setQuery("");
-    setDisplayValue("");
-    inputRef.current?.focus();
-  };
-
-  const highlightMatch = useCallback((label: string) => {
-    if (!query.trim()) return label;
-    const idx = label.toLowerCase().indexOf(query.toLowerCase());
-    if (idx === -1) return label;
-    return (
-      <>
-        {label.slice(0, idx)}
-        <span className="text-primary font-bold">{label.slice(idx, idx + query.length)}</span>
-        {label.slice(idx + query.length)}
-      </>
-    );
-  }, [query]);
-
-  return (
-    <div ref={containerRef} className={`relative ${className}`}>
-      <div className="relative flex items-center">
-        {Icon && <Icon className="absolute left-4 h-5 w-5 text-primary/60 pointer-events-none z-10" />}
-        <Input
-          ref={inputRef}
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
-          onFocus={() => setIsOpen(true)}
-          placeholder={placeholder}
-          className={`${Icon ? 'pl-12' : ''} pr-9 h-14 rounded-2xl border-border/50 bg-background text-base font-medium focus-visible:ring-2 focus-visible:ring-primary/40 placeholder:text-muted-foreground/50`}
-        />
-        {query && (
-          <button onClick={handleClear} className="absolute right-3.5 p-1.5 rounded-full hover:bg-muted transition-colors z-10">
-            <X className="h-4 w-4 text-muted-foreground" />
-          </button>
-        )}
-      </div>
-      {isOpen && filteredOptions.length > 0 && (
-        <div className="absolute z-50 w-full mt-2 bg-card border border-border rounded-2xl shadow-2xl max-h-[280px] overflow-auto">
-          {filteredOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => handleSelect(option)}
-              className="w-full text-left px-5 py-3 hover:bg-primary/5 transition-colors text-sm text-foreground flex items-center gap-2.5 first:rounded-t-2xl last:rounded-b-2xl"
-            >
-              {Icon && <Icon className="h-4 w-4 text-muted-foreground/50 shrink-0" />}
-              <span>{highlightMatch(option.label)}</span>
-            </button>
-          ))}
-        </div>
-      )}
-      {isOpen && query.trim().length >= 2 && filteredOptions.length === 0 && (
-        <div className="absolute z-50 w-full mt-2 bg-card border border-border rounded-2xl shadow-2xl p-5 text-center">
-          <p className="text-sm text-muted-foreground">No results for "{query}"</p>
-          <p className="text-xs text-muted-foreground/60 mt-1">Try a different spelling</p>
-        </div>
-      )}
-    </div>
+  const inputBase = cn(
+    'w-full h-11 bg-[#0A0A0A] border border-[#1E1E1E] rounded-lg text-sm text-white placeholder:text-[#62626B]',
+    'focus:outline-none focus:border-[#2D9C84] transition-all duration-300 pl-9 pr-3',
   );
-}
 
-export function SearchBox({
-  variant = "default",
-  defaultCity,
-  defaultTreatment,
-  stateSlug: propStateSlug,
-  showInsurance = true,
-}: SearchBoxProps) {
-  const router = useRouter();
-  const { stateSlug: routeStateSlug, citySlug: routeCitySlug } = useRouter().query as { stateSlug?: string; citySlug?: string };
-  const [city, setCity] = useState<string>(defaultCity ?? "");
-  const [_cityLabel, setCityLabel] = useState<string>("");
-  const [treatment, setTreatment] = useState<string>(defaultTreatment ?? "");
-  const [_treatmentLabel, setTreatmentLabel] = useState<string>("");
-  const [insurance, setInsurance] = useState<string>("");
-  const [_insuranceLabel, setInsuranceLabel] = useState<string>("");
-
-  const stateContext = propStateSlug || routeStateSlug;
-  const { data: stateCitiesData } = useCitiesByStateSlug(stateContext || '');
-  const { data: allCitiesData } = useCities();
-  const citiesData = stateContext && stateCitiesData?.length ? stateCitiesData : allCitiesData;
-
-  const { data: treatmentsData } = useQuery({
-    queryKey: ['search-treatments'],
-    queryFn: async () => {
-      const { data } = await supabase.from('treatments').select('id, name, slug').eq('is_active', true).order('display_order');
-      return data || [];
-    },
-  });
-
-  const { data: insurancesData } = useQuery({
-    queryKey: ['search-insurances'],
-    queryFn: async () => {
-      const { data } = await supabase.from('insurances').select('id, name, slug').eq('is_active', true).order('name');
-      return data || [];
-    },
-    enabled: showInsurance,
-  });
-
-  useEffect(() => {
-    if (routeCitySlug && stateContext && citiesData?.length && !city) {
-      const matchingCity = citiesData.find(c => c.slug === routeCitySlug);
-      if (matchingCity) {
-        const value = `${matchingCity.slug}|${stateContext}`;
-        setCity(value);
-        setCityLabel(`${matchingCity.name}${(matchingCity as any).state?.abbreviation ? `, ${(matchingCity as any).state?.abbreviation}` : ''}`);
-      }
-    }
-  }, [routeCitySlug, stateContext, citiesData, city]);
-
-  useEffect(() => { if (defaultCity && !city) setCity(defaultCity); }, [defaultCity, city]);
-  useEffect(() => { if (defaultTreatment && !treatment) setTreatment(defaultTreatment); }, [defaultTreatment, treatment]);
-
-  const cityOptions: SearchOption[] = useMemo(() =>
-    citiesData?.map(c => ({
-      value: `${c.slug}|${(c as any).state?.slug || ''}`,
-      label: `${c.name}${(c as any).state?.abbreviation ? `, ${(c as any).state?.abbreviation}` : ''}`,
-      slug: c.slug,
-      stateSlug: (c as any).state?.slug || '',
-    })) || [],
-    [citiesData]);
-
-  const treatmentOptions: SearchOption[] = useMemo(() =>
-    treatmentsData?.map(t => ({ value: t.slug, label: t.name, slug: t.slug })) || [],
-    [treatmentsData]);
-
-  const insuranceOptions: SearchOption[] = useMemo(() =>
-    insurancesData?.map(ins => ({ value: ins.slug || '', label: ins.name, slug: ins.slug || undefined })) || [],
-    [insurancesData]);
-
-  const handleSearch = () => {
-    if (city) {
-      const [citySlug, targetStateSlug] = city.split('|');
-      if (insurance) {
-        const params = new URLSearchParams();
-        params.set('city', citySlug);
-        params.set('state', targetStateSlug);
-        if (treatment) params.set('treatment', treatment);
-        router.push(`/insurance/${insurance}?${params.toString()}/`);
-        return;
-      }
-      if (targetStateSlug && citySlug) {
-        const path = treatment 
-          ? `/${targetStateSlug}/${citySlug}/${treatment}/`
-          : `/${targetStateSlug}/${citySlug}/`;
-        router.push(path);
-      } else if (stateContext) {
-        router.push(`/${stateContext}/`);
-      } else {
-        router.push('/search/');
-      }
-    } else if (insurance) {
-      router.push(`/insurance/${insurance}/`);
-    } else if (stateContext) {
-      router.push(`/${stateContext}/`);
-    } else {
-      router.push('/search/');
-    }
+  const dropdown = (filtered: FuzzyOption[], field: 'location' | 'treatment' | 'insurance') => {
+    if (filtered.length === 0) return null;
+    return (
+      <div className="absolute top-full left-0 right-0 mt-1 bg-[#161616] border border-[#1E1E1E] rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-xl z-50 overflow-hidden">
+        {filtered.map((opt) => (
+          <button
+            key={`${opt.type}-${opt.id}`}
+            type="button"
+            onClick={() => handleSelect(opt, field)}
+            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-[#62626B] hover:text-white hover:bg-[rgba(45,156,132,0.08)] transition-all duration-300 text-left"
+          >
+            {opt.label}
+            <span className="ml-auto text-[10px] uppercase tracking-wider text-[#2D9C84]">{opt.group}</span>
+          </button>
+        ))}
+      </div>
+    );
   };
 
-  if (variant === "hero") {
+  if (variant === 'hero') {
     return (
-      <div className="bg-card/90 backdrop-blur-xl border border-border/20 rounded-[1.75rem] p-5 md:p-7 shadow-2xl shadow-black/25">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2.5 block px-1" style={{ fontFamily: headingFont }}>
-              📍 Location
-            </label>
-            <SmartSearchInput
-              placeholder="Emirate, city, area..."
-              options={cityOptions}
-              value={city}
-              onChange={(val, label) => { setCity(val); setCityLabel(label); }}
-              icon={MapPin}
-            />
+      <div className={cn('card-glass bg-[rgba(22,22,22,0.8)] backdrop-blur-xl border border-[#1E1E1E] rounded-2xl p-4 md:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]', className)}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Location */}
+          <div ref={locationRef} className="relative">
+            <label className="block text-xs font-medium text-[#62626B] mb-1.5">Location</label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#62626B]" />
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                onFocus={() => setFocusedField('location')}
+                placeholder="Emirate or city..."
+                className={inputBase}
+              />
+              {location && (
+                <button onClick={() => { setLocation(''); setFocusedField(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#62626B] hover:text-white transition-all duration-300">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+            {dropdown(filteredLocation, 'location')}
           </div>
-          <div>
-            <label className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2.5 block px-1" style={{ fontFamily: headingFont }}>
-              🦷 Service
-            </label>
-            <SmartSearchInput
-              placeholder="Treatment type..."
-              options={treatmentOptions}
-              value={treatment}
-              onChange={(val, label) => { setTreatment(val); setTreatmentLabel(label); }}
-              icon={Stethoscope}
-            />
+
+          {/* Treatment */}
+          <div ref={treatmentRef} className="relative">
+            <label className="block text-xs font-medium text-[#62626B] mb-1.5">Treatment</label>
+            <div className="relative">
+              <Stethoscope className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#62626B]" />
+              <input
+                type="text"
+                value={treatment}
+                onChange={(e) => setTreatment(e.target.value)}
+                onFocus={() => setFocusedField('treatment')}
+                placeholder="Dental service..."
+                className={inputBase}
+              />
+              {treatment && (
+                <button onClick={() => { setTreatment(''); setFocusedField(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#62626B] hover:text-white transition-all duration-300">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+            {dropdown(filteredTreatment, 'treatment')}
           </div>
-          <div>
-            <label className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-2.5 block px-1" style={{ fontFamily: headingFont }}>
-              🛡️ Insurance
-            </label>
-            <SmartSearchInput
-              placeholder="Your insurance..."
-              options={insuranceOptions}
-              value={insurance}
-              onChange={(val, label) => { setInsurance(val); setInsuranceLabel(label); }}
-              icon={Shield}
-            />
+
+          {/* Insurance */}
+          <div ref={insuranceRef} className="relative">
+            <label className="block text-xs font-medium text-[#62626B] mb-1.5">Insurance</label>
+            <div className="relative">
+              <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#62626B]" />
+              <input
+                type="text"
+                value={insurance}
+                onChange={(e) => setInsurance(e.target.value)}
+                onFocus={() => setFocusedField('insurance')}
+                placeholder="Provider (optional)..."
+                className={inputBase}
+              />
+              {insurance && (
+                <button onClick={() => { setInsurance(''); setFocusedField(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#62626B] hover:text-white transition-all duration-300">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+            {dropdown(filteredInsurance, 'insurance')}
           </div>
         </div>
-        <Button
-          onClick={handleSearch}
-          size="lg"
-          className="w-full h-16 mt-5 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-lg gap-3 shadow-xl shadow-primary/30 transition-all hover:shadow-2xl hover:shadow-primary/40 hover:scale-[1.01] active:scale-[0.99]"
-          style={{ fontFamily: headingFont }}
-        >
-          <Search className="h-6 w-6" />
-          Find Dentists Now
-        </Button>
+
+        <div className="mt-3">
+          <Button
+            variant="gold"
+            size="lg"
+            className="w-full"
+            onClick={handleSearch}
+          >
+            <Search className="h-4 w-4" />
+            Find Dentist
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     );
   }
 
-  // Default/Compact variant
+  // Compact variant
   return (
-    <div className="bg-card border border-border rounded-2xl p-4 shadow-lg">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-        <div>
-          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block px-1">City</label>
-          <SmartSearchInput placeholder="Search any city..." options={cityOptions} value={city} onChange={(val, label) => { setCity(val); setCityLabel(label); }} icon={MapPin} />
-        </div>
-        <div>
-          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block px-1">Treatment</label>
-          <SmartSearchInput placeholder="Search treatment..." options={treatmentOptions} value={treatment} onChange={(val, label) => { setTreatment(val); setTreatmentLabel(label); }} icon={Stethoscope} />
-        </div>
-        {showInsurance && (
-          <div>
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block px-1">Insurance</label>
-            <SmartSearchInput placeholder="Search insurance..." options={insuranceOptions} value={insurance} onChange={(val, label) => { setInsurance(val); setInsuranceLabel(label); }} icon={Shield} />
-          </div>
-        )}
-        <div className="flex items-end">
-          <Button onClick={handleSearch} size="lg" className="h-14 w-full rounded-xl font-bold gap-2">
-            <Search className="h-4 w-4" /> Search
-          </Button>
-        </div>
+    <div className={cn('flex items-center gap-2', className)}>
+      <div className="relative flex-1">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#62626B]" />
+        <input
+          type="text"
+          value={treatment || location}
+          onChange={(e) => {
+            setTreatment(e.target.value);
+            setLocation(e.target.value);
+          }}
+          placeholder="Search treatments, locations..."
+          className="w-full h-10 pl-9 pr-3 bg-[#0A0A0A] border border-[#1E1E1E] rounded-lg text-sm text-white placeholder:text-[#62626B] focus:outline-none focus:border-[#2D9C84] transition-all duration-300"
+        />
       </div>
+      <Button variant="default" size="sm" onClick={handleSearch}>
+        <Search className="h-4 w-4" />
+      </Button>
     </div>
   );
 }

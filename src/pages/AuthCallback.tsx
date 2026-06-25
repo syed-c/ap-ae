@@ -365,8 +365,9 @@ export default function AuthCallback() {
 
         // Check onboarding status
         const onboardingStatus = await readOnboardingStatus(session.user.id);
-        const isSuperAdmin = roles.includes('super_admin') || roles.includes('district_manager');
-        const isAdmin = isSuperAdmin || roles.some(r => ['seo_team', 'content_team', 'marketing_team', 'support_team'].includes(r));
+        const isSuperAdmin = roles.includes('super_admin');
+        const isAdmin = isSuperAdmin || roles.includes('platform_admin') || roles.includes('content_moderator');
+        const isClinicStaff = roles.includes('clinic_owner') || roles.includes('clinic_manager') || roles.includes('receptionist');
         const isDentist = roles.includes('dentist');
 
         // Route decision
@@ -389,11 +390,11 @@ export default function AuthCallback() {
           return;
         }
 
-        // SuperAdmins and Admins go directly to /admin - no delays or onboarding
         if (isSuperAdmin || isAdmin) {
           router.replace('/admin');
+        } else if (isClinicStaff) {
+          router.replace('/dashboard?tab=my-dashboard');
         } else if (isDentist) {
-          // Dentists go directly to dashboard (no onboarding redirect)
           router.replace('/dashboard?tab=my-dashboard');
         } else {
           // No role yet - bootstrap dentist role if Google provider login

@@ -1,6 +1,6 @@
 // Database types for the Dental Directory Platform - US Edition
 
-export type AppRole = 'super_admin' | 'district_manager' | 'dentist' | 'patient';
+export type AppRole = 'super_admin' | 'platform_admin' | 'content_moderator' | 'clinic_owner' | 'clinic_manager' | 'dentist' | 'receptionist' | 'patient' | 'visitor';
 export type ClaimStatus = 'unclaimed' | 'pending' | 'claimed';
 export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'expired';
 export type ClinicSource = 'manual' | 'gmb' | 'import';

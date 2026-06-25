@@ -76,7 +76,6 @@ export const HeroBanner = ({
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[1.05] tracking-[-0.03em] mb-6 md:mb-8"
-            style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
           >
             {headline}
           </motion.h1>

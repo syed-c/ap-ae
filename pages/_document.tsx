@@ -13,8 +13,8 @@ class MyDocument extends Document {
           <link rel="icon" type="image/png" href="/favicon.png?v=5" />
           <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png?v=5" />
           <link rel="manifest" href="/site.webmanifest?v=5" />
-          <meta name="msapplication-TileColor" content="#0d9488" />
-          <meta name="theme-color" content="#3a8f95" />
+          <meta name="msapplication-TileColor" content="#0A0A0A" />
+          <meta name="theme-color" content="#0A0A0A" />
 
           {/* Geo targeting */}
           <meta name="geo.region" content="AE" />
@@ -56,7 +56,7 @@ class MyDocument extends Document {
             }}
           />
         </Head>
-        <body className="min-h-screen bg-background font-sans antialiased nunito plus-jakarta-sans">
+        <body className="min-h-screen bg-background font-sans antialiased">
           <Main />
           <NextScript />
         </body>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageLayout } from "@/components/layout/PageLayout";
+import { PageHero } from "@/components/layout/PageHero";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/seo/SEOHead";
@@ -127,51 +128,18 @@ const FAQPage = () => {
 
       {/* FAQ Schema for SEO */}
       <StructuredData 
-        type="faq" 
-        questions={allFaqs}
-        includeSpeakable={true}
+        data={{
+          type: 'faq',
+          questions: allFaqs,
+        }}
       />
 
-      {/* Dark Hero Section */}
-      <section className="relative bg-dark-section text-dark-section-foreground overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.1),transparent_50%)]" />
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-gold/10 rounded-full blur-3xl" />
-
-        <div className="container relative py-16 md:py-24">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <HelpCircle className="h-4 w-4 text-primary" />
-              <span className="text-sm font-bold text-primary">Help Center</span>
-            </div>
-
-            <h1 className="text-4xl md:text-5xl font-black mb-6" style={{ fontFamily: "'Varela Round', 'Quicksand', sans-serif" }}>
-              Frequently Asked{" "}
-              <span className="text-primary">Questions</span>
-            </h1>
-
-            <p className="text-lg text-dark-section-foreground/70 max-w-xl mx-auto mb-8">
-              Find answers about dental care in the UAE — from DHA licensing to AED costs and insurance coverage.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-4 text-sm">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-                <Building2 className="h-4 w-4 text-primary" />
-                <span>{counts?.clinics?.toLocaleString() || "6,600+"}+ Practices</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-                <Shield className="h-4 w-4 text-gold" />
-                <span>DHA & DOH Verified</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-                <Users className="h-4 w-4 text-coral" />
-                <span>Free for Patients</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        badge="FAQ"
+        title="Frequently Asked"
+        highlight="Questions"
+        description="Find answers to common questions about finding a dentist, insurance coverage, and using our platform."
+      />
 
       {/* FAQ Sections */}
       <Section size="lg">
@@ -182,7 +150,7 @@ const FAQPage = () => {
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${category.color} flex items-center justify-center`}>
                   <category.icon className="h-7 w-7 text-primary" />
                 </div>
-                <h2 className="text-2xl font-black" style={{ fontFamily: "'Varela Round', 'Quicksand', sans-serif" }}>{category.title}</h2>
+                <h2 className="text-2xl font-black font-display">{category.title}</h2>
               </div>
 
               <Accordion type="single" collapsible className="w-full">
@@ -208,7 +176,7 @@ const FAQPage = () => {
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
             <MessageSquare className="h-8 w-8 text-primary" />
           </div>
-          <h2 className="text-2xl md:text-3xl font-black mb-4" style={{ fontFamily: "'Varela Round', 'Quicksand', sans-serif" }}>
+          <h2 className="text-2xl md:text-3xl font-black mb-4 font-display">
             Still Have Questions?
           </h2>
           <p className="text-muted-foreground mb-8">
@@ -234,7 +202,7 @@ const FAQPage = () => {
       {/* CTA */}
       <Section variant="dark" size="md">
         <div className="text-center">
-          <h2 className="text-3xl md:text-4xl font-black mb-4 text-dark-section-foreground" style={{ fontFamily: "'Varela Round', 'Quicksand', sans-serif" }}>
+          <h2 className="text-3xl md:text-4xl font-black mb-4 text-dark-section-foreground font-display">
             Ready to find your dentist in UAE?
           </h2>
           <p className="text-dark-section-foreground/70 mb-8 max-w-xl mx-auto">

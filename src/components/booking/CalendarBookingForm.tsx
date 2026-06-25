@@ -7,6 +7,7 @@ import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
+import { useClinicTimeSlots } from "@/hooks/useClinicTimeSlots";
 import { format, addDays, isSameDay, startOfDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -86,25 +87,8 @@ interface CalendarBookingFormProps {
   onClose?: () => void;
 }
 
-// Format time range display (1-hour intervals)
-const formatTimeRange = (hour: number): string => {
-  const endHour = hour + 1;
-
-  const formatHour = (h: number) => {
-    if (h < 12) return `${h}:00 AM`;
-    if (h === 12) return `12:00 PM`;
-    return `${h - 12}:00 PM`;
-  };
-
-  return `${formatHour(hour)} - ${formatHour(endHour)}`;
-};
-
-// 1-hour intervals from 9 AM to 6 PM
-const timeSlots = Array.from({ length: 9 }, (_, i) => {
-  const hour = i + 9;
-  const time = `${hour.toString().padStart(2, "0")}:00`;
-  return { value: time, label: formatTimeRange(hour) };
-});
+// Dynamic time slots from DB (clinic_hours + dentist_settings)
+// Falls back to 9 AM - 6 PM, 30-min slots if no data
 
 export function CalendarBookingForm({
   profileId,
@@ -475,35 +459,7 @@ export function CalendarBookingForm({
               />
 
               {/* Time Slots Grid - Only shown after date is selected */}
-              {selectedDate && (
-                <FormField
-                  control={form.control}
-                  name="preferred_time"
-                  render={({ field }) => (
-                    <FormItem className="animate-fade-in-up">
-                      <FormLabel className="text-sm font-medium text-center block">Available Times</FormLabel>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-2">
-                        {timeSlots.map((slot) => (
-                          <button
-                            key={slot.value}
-                            type="button"
-                            onClick={() => field.onChange(slot.value)}
-                            className={cn(
-                              "py-2.5 px-2 rounded-xl text-xs sm:text-sm font-medium transition-all border",
-                              field.value === slot.value
-                                ? "bg-primary text-primary-foreground border-primary shadow-md"
-                                : "bg-muted/50 text-foreground border-border hover:border-primary/50 hover:bg-muted"
-                            )}
-                          >
-                            {slot.label}
-                          </button>
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
+              {selectedDate && <TimeSlotPicker clinicId={clinicId} selectedDate={selectedDate} form={form} />}
 
               {!selectedDate && (
                 <p className="text-center text-sm text-muted-foreground py-4">
@@ -601,5 +557,48 @@ export function CalendarBookingForm({
         </form>
       </Form>
     </div>
+  );
+}
+
+function TimeSlotPicker({ clinicId, selectedDate, form }: {
+  clinicId?: string | null;
+  selectedDate: Date;
+  form: any;
+}) {
+  const { data: timeSlots, isLoading } = useClinicTimeSlots(clinicId, selectedDate);
+
+  return (
+    <FormField
+      control={form.control}
+      name="preferred_time"
+      render={({ field }) => (
+        <div className="animate-fade-in-up">
+          <label className="text-sm font-medium text-center block mb-2">Available Times</label>
+          {isLoading ? (
+            <p className="text-center text-sm text-muted-foreground py-4">Loading available times...</p>
+          ) : timeSlots && timeSlots.length > 0 ? (
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+              {timeSlots.map((slot) => (
+                <button
+                  key={slot.value}
+                  type="button"
+                  onClick={() => field.onChange(slot.value)}
+                  className={cn(
+                    "py-2.5 px-2 rounded-xl text-xs sm:text-sm font-medium transition-all border",
+                    field.value === slot.value
+                      ? "bg-primary text-primary-foreground border-primary shadow-md"
+                      : "bg-muted/50 text-foreground border-border hover:border-primary/50 hover:bg-muted"
+                  )}
+                >
+                  {slot.label}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-sm text-muted-foreground py-4">No available time slots for this date.</p>
+          )}
+        </div>
+      )}
+    />
   );
 }
