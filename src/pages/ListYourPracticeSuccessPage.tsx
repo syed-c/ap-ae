@@ -1,6 +1,6 @@
 'use client';
-import { useEffect } from "react";
 import Link from "next/link";
+import Head from "next/head";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
@@ -10,23 +10,14 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 const ListYourPracticeSuccessPage = () => {
   const { data: siteSettings } = useSiteSettings();
   const supportEmail = siteSettings?.contactDetails?.support_email || 'support@AppointPanda.ae';
-  // Set noindex for success pages - they should not be indexed
-  useEffect(() => {
-    let meta = document.querySelector('meta[name="robots"]');
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.setAttribute('name', 'robots');
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute('content', 'noindex, nofollow');
-
-    return () => {
-      meta?.setAttribute('content', 'index, follow');
-    };
-  }, []);
 
   return (
     <PageLayout>
+      <Head>
+        <title>Submission Received | AppointPanda</title>
+        <meta name="description" content="Your practice listing request has been received. Our team will review and verify your details within 24-48 hours." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Head>
       <Section size="lg" className="pt-32">
         <div className="max-w-2xl mx-auto text-center">
           {/* Success Icon */}

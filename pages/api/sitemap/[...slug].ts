@@ -118,8 +118,14 @@ ${sitemaps.map(s => `  <sitemap>
     const urls: SitemapUrl[] = [
       { loc: normalizeUrl('/'), priority: 1.0, changefreq: 'daily' },
       { loc: normalizeUrl('/services'), priority: 0.9, changefreq: 'weekly' },
+      { loc: normalizeUrl('/specialties'), priority: 0.9, changefreq: 'weekly' },
+      { loc: normalizeUrl('/emirates'), priority: 0.9, changefreq: 'weekly' },
       { loc: normalizeUrl('/insurance'), priority: 0.8, changefreq: 'weekly' },
       { loc: normalizeUrl('/blog'), priority: 0.8, changefreq: 'daily' },
+      { loc: normalizeUrl('/find-clinics'), priority: 0.8, changefreq: 'weekly' },
+      { loc: normalizeUrl('/for-clinics'), priority: 0.7, changefreq: 'weekly' },
+      { loc: normalizeUrl('/reviews'), priority: 0.7, changefreq: 'weekly' },
+      { loc: normalizeUrl('/emergency'), priority: 0.7, changefreq: 'weekly' },
       { loc: normalizeUrl('/about'), priority: 0.5, changefreq: 'monthly' },
       { loc: normalizeUrl('/contact'), priority: 0.5, changefreq: 'monthly' },
       { loc: normalizeUrl('/faq'), priority: 0.6, changefreq: 'monthly' },
@@ -129,6 +135,9 @@ ${sitemaps.map(s => `  <sitemap>
       { loc: normalizeUrl('/emergency-dentist'), priority: 0.8, changefreq: 'weekly' },
       { loc: normalizeUrl('/terms'), priority: 0.3, changefreq: 'yearly' },
       { loc: normalizeUrl('/privacy'), priority: 0.3, changefreq: 'yearly' },
+      { loc: normalizeUrl('/verification-policy'), priority: 0.3, changefreq: 'yearly' },
+      { loc: normalizeUrl('/medical-review-policy'), priority: 0.3, changefreq: 'yearly' },
+      { loc: normalizeUrl('/editorial-policy'), priority: 0.3, changefreq: 'yearly' },
     ];
     return res.send(generateSitemapXml(urls));
   }

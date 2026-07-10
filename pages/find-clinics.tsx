@@ -1,68 +1,44 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
-import { Search, SlidersHorizontal, MapPin, Star, ChevronDown, Loader2 } from 'lucide-react';
+import { GetStaticProps } from 'next';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PageHero } from '@/components/layout/PageHero';
 import { ClinicCard } from '@/components/ClinicCard';
-import { emirates, specialties, insurers, SITE_NAME, SITE_DOMAIN } from '@/lib/site-data';
-import { supabase } from '@/integrations/supabase/client';
+import { emirates, clinics as staticClinics, SITE_NAME, SITE_DOMAIN } from '@/lib/site-data';
 
-interface RawClinic {
-  id: string;
-  name: string;
+interface StaticClinicProps {
   slug: string;
-  cover_image_url: string | null;
-  average_rating: number;
-  total_reviews: number;
-  city_id: string | null;
+  name: string;
+  location: string;
+  rating: number;
+  reviewCount: number;
+  emirate: string;
 }
 
-export default function FindClinicsPage() {
-  const [clinics, setClinics] = useState<RawClinic[]>([]);
-  const [loading, setLoading] = useState(true);
+interface PageProps {
+  initialClinics: StaticClinicProps[];
+}
+
+export const getStaticProps: GetStaticProps<PageProps> = async () => {
+  const initialClinics: StaticClinicProps[] = staticClinics.map(c => ({
+    slug: c.slug,
+    name: c.name,
+    location: `${c.area}, ${c.emirate}`,
+    rating: c.rating,
+    reviewCount: c.reviews,
+    emirate: c.emirate,
+  }));
+  return { props: { initialClinics }, revalidate: 3600 };
+};
+
+export default function FindClinicsPage({ initialClinics }: PageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedEmirates, setSelectedEmirates] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const perPage = 12;
-
-  useEffect(() => {
-    const fetchClinics = async () => {
-      setLoading(true);
-      const dentalKeywords = ['dental', 'dentist', 'dentistry', 'orthodont', 'smile', 'oral', 'endodont', 'periodont', 'veneers', 'invisalign', 'braces', 'teeth'];
-      const q = supabase
-        .from('clinics')
-        .select('id, name, slug, cover_image_url, average_rating, total_reviews, city_id')
-        .eq('is_active', true)
-        .or(dentalKeywords.map(k => 'name.ilike.%' + k + '%').join(','))
-        .order('total_reviews', { ascending: false });
-
-      const { data } = await q.limit(200);
-      setClinics(data || []);
-      setLoading(false);
-    };
-    fetchClinics();
-  }, []);
-
-  // Get cities for mapping
-  const [cityNames, setCityNames] = useState<Record<string, string>>({});
-  const [cityStates, setCityStates] = useState<Record<string, string>>({});
-  const [stateSlugs, setStateSlugs] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    supabase.from('cities').select('id, name, state_id').eq('is_active', true).then(({ data }) => {
-      const names: Record<string, string> = {};
-      const states: Record<string, string> = {};
-      (data || []).forEach(c => { names[c.id] = c.name; states[c.id] = c.state_id; });
-      setCityNames(names);
-      setCityStates(states);
-    });
-    supabase.from('states').select('id, name, slug').eq('is_active', true).then(({ data }) => {
-      const slugs: Record<string, string> = {};
-      (data || []).forEach(s => { slugs[s.id] = s.slug; });
-      setStateSlugs(slugs);
-    });
-  }, []);
+  const clinics = initialClinics;
 
   const filtered = useMemo(() => {
     let result = [...clinics];
@@ -71,15 +47,10 @@ export default function FindClinicsPage() {
       result = result.filter(c => c.name.toLowerCase().includes(q));
     }
     if (selectedEmirates.length > 0) {
-      result = result.filter(c => {
-        if (!c.city_id) return false;
-        const stateId = cityStates[c.city_id];
-        const slug = stateSlugs[stateId];
-        return slug && selectedEmirates.includes(slug);
-      });
+      result = result.filter(c => selectedEmirates.includes(c.emirate));
     }
     return result;
-  }, [clinics, searchQuery, selectedEmirates, cityStates, stateSlugs]);
+  }, [clinics, searchQuery, selectedEmirates]);
 
   const totalPages = Math.ceil(filtered.length / perPage);
   const paginated = filtered.slice((page - 1) * perPage, page * perPage);
@@ -151,19 +122,11 @@ export default function FindClinicsPage() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-6">
               <p className="text-sm text-zinc-500">
-                {loading ? (
-                  <span className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading...</span>
-                ) : (
-                  <><span className="font-semibold text-zinc-900">{filtered.length}</span> clinics found</>
-                )}
+                <><span className="font-semibold text-zinc-900">{filtered.length}</span> clinics found</>
               </p>
             </div>
 
-            {loading ? (
-              <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-zinc-300" />
-              </div>
-            ) : paginated.length === 0 ? (
+            {paginated.length === 0 ? (
               <div className="text-center py-16">
                 <Search className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
                 <h3 className="font-semibold text-zinc-900">No clinics match your filters</h3>
@@ -174,23 +137,16 @@ export default function FindClinicsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {paginated.map(clinic => {
-                  const cityName = clinic.city_id ? cityNames[clinic.city_id] : null;
-                  const stateId = clinic.city_id ? cityStates[clinic.city_id] : null;
-                  const stateName = stateId ? emirates.find(e => e.slug === stateSlugs[stateId])?.name : null;
-                  const location = [cityName, stateName].filter(Boolean).join(', ') || 'UAE';
-                  return (
-                    <ClinicCard
-                      key={clinic.id}
-                      slug={clinic.slug}
-                      name={clinic.name}
-                      location={location}
-                      rating={clinic.average_rating || 0}
-                      reviewCount={clinic.total_reviews || 0}
-                      coverImageUrl={clinic.cover_image_url}
-                    />
-                  );
-                })}
+                {paginated.map(clinic => (
+                  <ClinicCard
+                    key={clinic.slug}
+                    slug={clinic.slug}
+                    name={clinic.name}
+                    location={clinic.location}
+                    rating={clinic.rating}
+                    reviewCount={clinic.reviewCount}
+                  />
+                ))}
               </div>
             )}
 
