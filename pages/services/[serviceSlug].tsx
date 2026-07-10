@@ -1,5 +1,4 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
-import Head from 'next/head';
 import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import ServicePageComponent from '@/pages/ServicePage';
 
@@ -16,49 +15,6 @@ const ServicePageWithSEO = ({ serviceSlug, seoData, h1, heroIntro, content, faqs
 }) => {
     return (
         <>
-            <Head>
-                <title>{seoData.title}</title>
-                <meta name="description" content={seoData.description} />
-                <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
-                <meta property="og:type" content="website" />
-                <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />
-                <meta property="og:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
-                <meta property="og:description" content={seoData.description} />
-                <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
-                <meta property="og:site_name" content="AppointPanda" />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:url" content={`${BASE_URL}${seoData.canonical}`} />
-                <meta name="twitter:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
-                <meta name="twitter:description" content={seoData.description} />
-                <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "BreadcrumbList",
-                        itemListElement: [
-                            { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
-                            { "@type": "ListItem", position: 2, name: "Services", item: `${BASE_URL}/services/` },
-                            { "@type": "ListItem", position: 3, name: h1 || serviceSlug, item: `${BASE_URL}${seoData.canonical}` },
-                        ]
-                    }) }}
-                />
-                {/* FAQPage Schema */}
-                {faqs && faqs.length > 0 && (
-                    <script
-                        type="application/ld+json"
-                        dangerouslySetInnerHTML={{ __html: JSON.stringify({
-                            "@context": "https://schema.org",
-                            "@type": "FAQPage",
-                            mainEntity: faqs.map(f => ({
-                                "@type": "Question",
-                                name: f.question,
-                                acceptedAnswer: { "@type": "Answer", text: f.answer }
-                            }))
-                        }) }}
-                    />
-                )}
-            </Head>
             <ServicePageComponent 
                 serviceSlugProp={serviceSlug}
                 seoDataProp={seoData}

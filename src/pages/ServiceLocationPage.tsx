@@ -307,10 +307,10 @@ const ServiceLocationPage = ({
                 </div>
                 <ChevronDown className="text-white/20 ml-auto h-4 w-4" />
               </div>
-              <button className="w-full md:w-auto px-10 py-5 bg-[#73ebdc] text-[#004842] font-black rounded-[2rem] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 m-1">
+              <Link href={`/${stateSlug}/${citySlug}/`} className="w-full md:w-auto px-10 py-5 bg-[#73ebdc] text-[#004842] font-black rounded-[2rem] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 m-1">
                 <Search className="h-5 w-5" />
                 Find Specialist
-              </button>
+              </Link>
             </div>
           </div>
           
@@ -366,9 +366,9 @@ const ServiceLocationPage = ({
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-16">
             <h2 className="text-4xl font-bold tracking-tight">World-Class Specialists</h2>
-            <button className="flex items-center gap-2 text-[#00675f] font-bold hover:translate-x-2 transition-transform">
+            <Link href={`/${stateSlug}/${citySlug}/`} className="flex items-center gap-2 text-[#00675f] font-bold hover:translate-x-2 transition-transform">
               View All Dentists <ChevronRight className="h-4 w-4" />
-            </button>
+            </Link>
           </div>
           <div className="grid md:grid-cols-2 gap-8">
             {topDoctors.map((doctor: any, i: number) => (
@@ -459,7 +459,7 @@ const ServiceLocationPage = ({
             <div className="bg-[#00675f] p-6 rounded-[2rem] text-white">
               <h3 className="font-bold text-xl mb-4">Need a Quote?</h3>
               <p className="text-[#73ebdc] text-sm mb-8">Every smile is unique. Get a personalized estimate after your first consultation.</p>
-              <button className="w-full py-3 bg-white text-[#00675f] rounded-xl font-bold hover:bg-[#73ebdc] transition-colors">Book Consult</button>
+              <Link href={`/${stateSlug}/${citySlug}/`} className="block w-full py-3 bg-white text-[#00675f] rounded-xl font-bold hover:bg-[#73ebdc] transition-colors text-center">Book Consult</Link>
             </div>
           </div>
         </div>
@@ -547,9 +547,9 @@ const ServiceLocationPage = ({
               <h2 className="text-3xl font-bold tracking-tight text-[#2f2f2e]">Explore Other Locations</h2>
               <p className="text-[#5c5b5b] font-medium">Find our verified network of specialists across {stateName}.</p>
             </div>
-            <button className="text-[#2eb2a5] font-bold flex items-center gap-2 hover:translate-x-2 transition-transform">
+            <Link href="/find-clinics" className="text-[#2eb2a5] font-bold flex items-center gap-2 hover:translate-x-2 transition-transform">
               Global Directory <ChevronRight className="h-4 w-4" />
-            </button>
+            </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {cities.map((c: any, i: number) => (
@@ -593,9 +593,9 @@ const ServiceLocationPage = ({
                 <MapPin className="text-sm" />
               </div>
             </div>
-            <button className="w-full bg-gradient-to-r from-[#00675f] to-[#73ebdc] text-white py-4 rounded-full font-bold text-sm shadow-lg shadow-[#00675f]/20">
+            <Link href={`/${stateSlug}/${citySlug}/`} className="block w-full bg-gradient-to-r from-[#00675f] to-[#73ebdc] text-white py-4 rounded-full font-bold text-sm shadow-lg shadow-[#00675f]/20 text-center">
               Discover Practices
-            </button>
+            </Link>
           </div>
         </div>
       </section>

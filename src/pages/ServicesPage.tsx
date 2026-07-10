@@ -14,7 +14,7 @@ import { useRealCounts } from "@/hooks/useRealCounts";
 import { useSeoPageContent } from "@/hooks/useSeoPageContent";
 import { motion } from "framer-motion";
 
-const ServicesPage = () => {
+const ServicesPage = ({ treatmentsProp }: { treatmentsProp?: { slug: string; name: string; description: string | null }[] }) => {
   const { data: treatments, isLoading } = useQuery({
     queryKey: ["all-treatments"],
     queryFn: async () => {
@@ -25,6 +25,7 @@ const ServicesPage = () => {
         .order("display_order");
       return data || [];
     },
+    initialData: treatmentsProp as any,
   });
 
   // Fetch states for interlinking
