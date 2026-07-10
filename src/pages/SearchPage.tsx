@@ -659,7 +659,7 @@ export default function SearchPage({
       </div>
 
       {activeFilterCount > 0 && (
-        <Button variant="ghost" size="sm" onClick={clearFilters} className="w-full justify-start text-muted-foreground">
+        <Button variant="ghost" size="sm" onClick={clearFilters} className="w-full justify-start text-[#6B7280]">
           <X className="mr-2 h-4 w-4" />
           Clear all filters ({activeFilterCount})
         </Button>
@@ -685,35 +685,29 @@ export default function SearchPage({
         }}
       />
 
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-card/40 to-background pointer-events-none" />
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full blur-3xl" style={{ background: 'oklch(0.72 0.19 28 / 0.08)' }} />
-          <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full blur-3xl" style={{ background: 'oklch(0.75 0.13 200 / 0.06)' }} />
-        </div>
-
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#F9FAFB] to-white">
         <div className="container relative px-4 py-10 md:px-6 md:py-14">
           <div className="max-w-4xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-sm px-4 py-2 text-sm font-medium text-primary">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-light px-4 py-2 text-sm font-medium text-primary">
               <Sparkles className="h-4 w-4" />
               Find the right dentist for you
             </div>
-            <h1 className="mt-5 font-display text-3xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
+            <h1 className="mt-5 font-display text-3xl font-bold tracking-tight text-[#111827] md:text-5xl lg:text-6xl">
               Search dentists & clinics across the UAE
             </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground md:text-base lg:text-lg">
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-[#6B7280] md:text-base lg:text-lg">
               Compare provider types, treatment fit, insurance compatibility, trust signals, and location coverage in one focused interface.
             </p>
           </div>
 
           <div className="mt-8 flex gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280]" />
               <Input
                 value={filters.query}
                 onChange={(event) => updateFilter('query', event.target.value)}
                 placeholder="Search by dentist, clinic, service, or specialty..."
-                className="h-12 rounded-[8px] border-border bg-card/80 pl-11 text-foreground"
+                className="h-12 rounded-[8px] border-[#E5E7EB] bg-white text-[#111827]"
               />
             </div>
 
@@ -739,10 +733,10 @@ export default function SearchPage({
             </div>
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-2 text-sm text-muted-foreground">
-            <span className="rounded-full border border-border/50 bg-card/30 backdrop-blur-sm px-3 py-2">Verified providers</span>
-            <span className="rounded-full border border-border/50 bg-card/30 backdrop-blur-sm px-3 py-2">Insurance-aware search</span>
-            <span className="rounded-full border border-border/50 bg-card/30 backdrop-blur-sm px-3 py-2">Dentist and clinic listings</span>
+          <div className="mt-5 flex flex-wrap gap-2 text-sm text-[#6B7280]">
+            <span className="rounded-full border border-[#E5E7EB] bg-white px-3 py-2">Verified providers</span>
+            <span className="rounded-full border border-[#E5E7EB] bg-white px-3 py-2">Insurance-aware search</span>
+            <span className="rounded-full border border-[#E5E7EB] bg-white px-3 py-2">Dentist and clinic listings</span>
           </div>
         </div>
       </section>
@@ -751,12 +745,12 @@ export default function SearchPage({
         <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
           <aside className="hidden lg:block">
               <div className="marketplace-panel sticky top-28 p-5">
-                <div className="flex items-center gap-2 text-sm font-semibold text-secondary">
+                <div className="flex items-center gap-2 text-sm font-semibold text-[#111827]">
                   <Filter className="h-4 w-4 text-primary" />
                   Marketplace Filters
                   {activeFilterCount > 0 && <Badge variant="secondary" className="text-[10px]">{activeFilterCount}</Badge>}
               </div>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-2 text-sm text-[#6B7280]">
                 Refine provider type, location, treatment, insurance, and trust signals.
               </p>
               <div className="mt-6">{filterSidebar}</div>
@@ -771,11 +765,11 @@ export default function SearchPage({
                     <Search className="h-4 w-4" />
                     <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">Results</span>
                   </div>
-                  <h2 className="mt-2 text-2xl font-semibold text-foreground">Search results</h2>
+                  <h2 className="mt-2 text-2xl font-semibold text-[#111827]">Search results</h2>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-[#6B7280]">
                     {isLoading ? 'Searching...' : `${searchData?.total || 0} results found`}
                   </p>
                   <Select value={filters.sortBy} onValueChange={(value) => updateFilter('sortBy', value)}>
@@ -812,10 +806,10 @@ export default function SearchPage({
               )}
 
               {!isLoading && searchData?.results.length === 0 && (
-                <div className="rounded-[12px] border border-dashed border-border bg-muted/50 py-20 text-center">
-                  <Search className="mx-auto h-12 w-12 text-muted-foreground/30" />
-                  <h3 className="mt-5 text-xl font-semibold text-foreground">No results found</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">Try broadening your search or removing a few filters.</p>
+                <div className="rounded-[12px] border border-dashed border-[#E5E7EB] bg-[#F9FAFB] py-20 text-center">
+                  <Search className="mx-auto h-12 w-12 text-[#9CA3AF]/30" />
+                  <h3 className="mt-5 text-xl font-semibold text-[#111827]">No results found</h3>
+                  <p className="mt-2 text-sm text-[#6B7280]">Try broadening your search or removing a few filters.</p>
                   <Button variant="outline" className="mt-5" onClick={clearFilters}>
                     Clear All Filters
                   </Button>
@@ -835,7 +829,7 @@ export default function SearchPage({
                       <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((currentPage) => currentPage - 1)}>
                         Previous
                       </Button>
-                      <span className="px-3 text-sm text-muted-foreground">
+                      <span className="px-3 text-sm text-[#6B7280]">
                         Page {page} of {totalPages}
                       </span>
                       <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((currentPage) => currentPage + 1)}>
@@ -864,7 +858,7 @@ function FilterSection({
 }) {
   return (
     <div className="space-y-2.5">
-      <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+      <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#6B7280]">
         {icon}
         {title}
       </label>

@@ -20,8 +20,6 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
-        arabic: ['var(--font-arabic)', 'system-ui', 'sans-serif'],
       },
       fontWeight: {
         normal: "400",
@@ -40,10 +38,14 @@ const config: Config = {
         primary: {
           DEFAULT: "var(--primary)",
           foreground: "var(--primary-foreground)",
+          hover: "var(--primary-hover)",
+          light: "var(--primary-light)",
+          glow: "var(--primary-glow)",
         },
         secondary: {
           DEFAULT: "var(--secondary)",
           foreground: "var(--secondary-foreground)",
+          hover: "var(--secondary-hover)",
         },
         destructive: {
           DEFAULT: "var(--destructive)",
@@ -52,6 +54,7 @@ const config: Config = {
         muted: {
           DEFAULT: "var(--muted)",
           foreground: "var(--muted-foreground)",
+          hover: "var(--muted-hover)",
         },
         accent: {
           DEFAULT: "var(--accent)",
@@ -65,41 +68,17 @@ const config: Config = {
           DEFAULT: "var(--card)",
           foreground: "var(--card-foreground)",
         },
-        sidebar: {
-          DEFAULT: "var(--sidebar-background)",
-          foreground: "var(--sidebar-foreground)",
-          primary: "var(--sidebar-primary)",
-          "primary-foreground": "var(--sidebar-primary-foreground)",
-          accent: "var(--sidebar-accent)",
-          "accent-foreground": "var(--sidebar-accent-foreground)",
-          border: "var(--sidebar-border)",
-          ring: "var(--sidebar-ring)",
-        },
-        teal: {
-          DEFAULT: "var(--teal)",
-          light: "var(--teal-light)",
-          dark: "var(--teal-dark)",
-        },
-        gold: {
-          DEFAULT: "var(--gold)",
-          foreground: "var(--gold-foreground)",
-        },
-        emerald: {
-          DEFAULT: "var(--emerald)",
-          light: "var(--emerald-light)",
-        },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "var(--radius-lg)",
+        md: "var(--radius-md)",
+        sm: "var(--radius-sm)",
         "3xl": "1.5rem",
         "4xl": "2rem",
       },
       boxShadow: {
         card: "var(--shadow-sm)",
         elevated: "var(--shadow-md)",
-        glow: "var(--shadow-glow)",
       },
       keyframes: {
         "accordion-down": {
@@ -133,6 +112,9 @@ const config: Config = {
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
+        },
+        ping: {
+          "75%, 100%": { transform: "scale(2)", opacity: "0" },
         },
       },
       animation: {

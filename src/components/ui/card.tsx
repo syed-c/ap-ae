@@ -5,7 +5,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
   <div
     ref={ref}
     className={cn(
-      "rounded-[14px] border border-[#2D9C84] bg-[#0E0E0E] text-white shadow-[0_4px_16px_rgba(0,0,0,0.5),0_8px_32px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(45,156,132,0.1)] transition-all duration-300 hover:border-[#3AB89E] hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.5),0_12px_40px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(58,184,158,0.15)]",
+      "rounded-[14px] border border-[#E5E7EB] bg-[#FFFFFF] text-[#111827] shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_6px_rgba(0,0,0,0.04)] transition-all duration-300 hover:border-[#D1D5DB] hover:shadow-[0_4px_6px_rgba(0,0,0,0.04),0_10px_15px_rgba(0,0,0,0.06)]",
       className
     )}
     {...props}
@@ -22,14 +22,14 @@ CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn("text-lg font-semibold leading-none tracking-tight text-white", className)} {...props} />
+    <h3 ref={ref} className={cn("text-lg font-semibold leading-none tracking-tight text-[#111827]", className)} {...props} />
   ),
 );
 CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("text-sm text-[#62626B] leading-relaxed", className)} {...props} />
+    <p ref={ref} className={cn("text-sm text-[#6B7280] leading-relaxed", className)} {...props} />
   ),
 );
 CardDescription.displayName = "CardDescription";

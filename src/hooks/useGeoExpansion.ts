@@ -70,7 +70,8 @@ export function useGeoExpansionStats() {
       if (!data?.success) throw new Error(data?.error || "Failed to fetch stats");
       return data.data as GeoExpansionStats;
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
+    retry: 1,
+    refetchInterval: false, // Don't auto-refresh — let the user refresh manually
   });
 }
 

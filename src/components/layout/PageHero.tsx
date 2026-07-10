@@ -1,101 +1,68 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Breadcrumbs, BreadcrumbItem } from '@/components/layout/Breadcrumbs';
+import { Star, BadgeCheck, Users } from 'lucide-react';
 
 interface PageHeroProps {
-  breadcrumbs?: BreadcrumbItem[];
-  badge?: string;
+  kicker?: string;
   title: string;
+  subtitle?: string;
+  children?: ReactNode;
+  badge?: string;
   highlight?: string;
   description?: string;
-  children?: ReactNode;
-  className?: string;
-  size?: 'sm' | 'md' | 'lg';
+  breadcrumbs?: { label: string; href?: string }[];
+  size?: string;
+  showTrust?: boolean;
 }
 
 export function PageHero({
-  breadcrumbs,
-  badge,
-  title,
-  highlight,
-  description,
-  children,
-  className,
+  kicker, badge, title, subtitle, description, highlight,
+  children, showTrust = true,
 }: PageHeroProps) {
+  const displayKicker = kicker || badge;
+  const displaySubtitle = subtitle || description;
+  const displayTitle = highlight ? `${title} ${highlight}` : title;
+
   return (
-    <section className={cn('relative overflow-hidden', className)}>
-      {/* Mesh Gradient Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-48 -right-48 w-[600px] h-[600px] bg-[#2D9C84] opacity-[0.08] rounded-full blur-[120px]" />
-        <div className="absolute -bottom-48 -left-48 w-[500px] h-[500px] bg-[#FACC15] opacity-[0.05] rounded-full blur-[100px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#2D9C84] opacity-[0.04] rounded-full blur-[150px]" />
-      </div>
-
-      <div className="relative max-w-[1440px] mx-auto px-4 lg:px-6 py-16 lg:py-24 xl:py-32">
-        {breadcrumbs && breadcrumbs.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-          >
-            <Breadcrumbs items={breadcrumbs} />
-          </motion.div>
+    <section className="gradient-dark-hero overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10 py-14 lg:py-20">
+        {displayKicker && (
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-400 mb-3 text-center">
+            {displayKicker}
+          </p>
         )}
-
-        {badge && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="mt-4"
-          >
-            <span className="badge-teal inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#2D9C84] bg-[rgba(45,156,132,0.1)] border border-[rgba(45,156,132,0.2)] rounded-full">
-              {badge}
-            </span>
-          </motion.div>
-        )}
-
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-6 text-white text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight"
-        >
-          {highlight ? (
-            <>
-              {title}{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2D9C84] to-[#FACC15]">
-                {highlight}
-              </span>
-            </>
-          ) : (
-            title
+        <div className="text-center max-w-3xl mx-auto">
+          <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-white leading-[1.1]">
+            {displayTitle}
+          </h1>
+          {displaySubtitle && (
+            <p className="text-zinc-400 text-sm md:text-base mt-3 max-w-2xl mx-auto leading-relaxed">
+              {displaySubtitle}
+            </p>
           )}
-        </motion.h1>
-
-        {description && (
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-4 text-[#62626B] text-lg md:text-xl max-w-2xl leading-relaxed"
-          >
-            {description}
-          </motion.p>
-        )}
-
+        </div>
         {children && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="mt-8"
-          >
+          <div className="mt-8">
             {children}
-          </motion.div>
+          </div>
+        )}
+        {showTrust && (
+          <div className="mt-8 pt-6 border-t border-white/5 max-w-lg mx-auto">
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs">
+              <span className="flex items-center gap-1.5 text-amber-400 font-medium">
+                <Star className="h-3.5 w-3.5 fill-amber-400" /> 4.8 <span className="text-amber-300/50">★</span>
+              </span>
+              <span className="text-zinc-600">|</span>
+              <span className="flex items-center gap-1.5 text-zinc-400">
+                <BadgeCheck className="h-3.5 w-3.5 text-emerald-500" /> 1,286 clinics
+              </span>
+              <span className="text-zinc-600">|</span>
+              <span className="flex items-center gap-1.5 text-zinc-400">
+                <Users className="h-3.5 w-3.5" /> 200k+ patients
+              </span>
+            </div>
+          </div>
         )}
       </div>
     </section>

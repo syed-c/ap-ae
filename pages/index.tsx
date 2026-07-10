@@ -2,40 +2,30 @@ import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import IndexPage from '@/pages/Index';
 import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
-import { ACTIVE_STATE_SLUGS } from '@/lib/constants/activeStates';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-interface HomePageProps {
-  seoData: { title: string; description: string };
-  realCounts: { clinics: number; states: number; cities: number; dentists: number; treatments: number } | null;
-  topProfiles: {
+export interface HomePageData {
+  clinicCount: number;
+  reviewCount: number;
+  avgRating: number;
+  clinicsWithImages: number;
+  topDentalClinics: {
     id: string;
     name: string;
     slug: string;
-    type: 'dentist' | 'clinic';
-    specialty: string;
-    location: string;
+    coverImageUrl: string | null;
     rating: number;
     reviewCount: number;
-    image: string;
-    isVerified: boolean;
-    clinicName: string;
-    clinicId: string;
-    areaId: string | null;
-    cityId: string;
+    cityName: string | null;
+    stateName: string | null;
   }[];
-  statesWithClinics: { id: string; name: string; slug: string; abbreviation: string }[];
-  featuredTreatments: { id: string; name: string; slug: string }[];
+  statesData: { id: string; name: string; slug: string; clinicCount: number }[];
+  treatmentsData: { name: string; slug: string; count: number }[];
+  citiesData: { id: string; name: string; slug: string; stateId: string }[];
 }
 
-export default function IndexPageWithSEO({
-  seoData,
-  realCounts,
-  topProfiles,
-  statesWithClinics,
-  featuredTreatments,
-}: HomePageProps) {
+export default function IndexPageWithSEO({ pageData }: { pageData: HomePageData }) {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -49,167 +39,142 @@ export default function IndexPageWithSEO({
         "urlTemplate": `${BASE_URL}/search?q={search_term_string}`
       },
       "query-input": "required name=search_term_string"
-    },
-    "sameAs": [
-      "https://www.facebook.com/appointpanda/",
-      "https://www.instagram.com/appointpanda/",
-      "https://www.linkedin.com/company/appointpanda/",
-      // Add Google Business Profile URL when claimed
-      // "https://maps.google.com/?cid=XXXXXXXXXXXXXXXXX",
-    ],
+    }
   };
 
   return (
     <>
       <Head>
-        <title>{seoData.title}</title>
-        <meta name="description" content={seoData.description} />
-        <link rel="canonical" href={`${BASE_URL}/`} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={`${BASE_URL}/`} />
-        <meta property="og:title" content={seoData.title} />
-        <meta property="og:description" content={seoData.description} />
-        <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
-        <meta property="og:site_name" content="AppointPanda" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:url" content={`${BASE_URL}/`} />
-        <meta name="twitter:title" content={seoData.title} />
-        <meta name="twitter:description" content={seoData.description} />
-        <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
       </Head>
-      <IndexPage
-        seoDataProp={seoData}
-        realCountsProp={realCounts}
-        topProfilesProp={topProfiles}
-        statesWithClinicsProp={statesWithClinics}
-        featuredTreatmentsProp={featuredTreatments}
-      />
+      <IndexPage pageData={pageData} />
     </>
   );
 }
 
-export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
-  const supabase = createServerSupabaseAdmin();
-
-  if (!supabase) {
-    return {
-      props: {
-        seoData: {
-          title: 'AppointPanda - Find & Book Dental Appointments in UAE',
-          description: 'Find and book appointments with top-rated dental professionals across the UAE. Verified dentists, real reviews, easy booking.',
-        },
-        realCounts: null,
-        topProfiles: [],
-        statesWithClinics: [],
-        featuredTreatments: [],
-      },
-      revalidate: 300,
-    };
-  }
-  
+export const getStaticProps: GetStaticProps = async () => {
   try {
-    // Fetch states
-    const { data: statesData } = await supabase
-      .from('states')
-      .select('*')
-      .eq('is_active', true)
-      .in('slug', ACTIVE_STATE_SLUGS)
-      .order('display_order');
+    const supabase = createServerSupabaseAdmin();
+    if (!supabase) return { props: { pageData: null }, revalidate: 3600 };
 
-    // Fetch counts using Promise.all for parallel execution
-    const [clinicsRes, dentistsRes, citiesRes, treatmentsRes, featuredTreatmentsRes] = await Promise.all([
-      supabase.from('clinics').select('id', { count: 'exact', head: true }).eq('is_active', true),
-      supabase.from('dentists').select('id', { count: 'exact', head: true }).eq('is_active', true),
-      supabase.from('cities').select('id', { count: 'exact', head: true }).eq('is_active', true).not('state_id', 'is', null),
-      supabase.from('treatments').select('id', { count: 'exact', head: true }).eq('is_active', true),
-      supabase.from('treatments').select('id, name, slug').eq('is_active', true).order('display_order').limit(8),
+    const [
+      { count: totalClinics },
+      { count: totalReviews },
+      { data: ratingData },
+      { count: clinicsWithImages },
+      { data: states },
+      { data: treatments },
+      { data: cities },
+    ] = await Promise.all([
+      supabase.from('clinics').select('*', { count: 'exact', head: true }).eq('is_active', true),
+      supabase.from('google_reviews').select('*', { count: 'exact', head: true }),
+      supabase.from('clinics').select('average_rating').eq('is_active', true).gt('average_rating', 0),
+      supabase.from('clinics').select('*', { count: 'exact', head: true }).eq('is_active', true).not('cover_image_url', 'is', null),
+      supabase.from('states').select('id, name, slug').eq('is_active', true).order('display_order'),
+      supabase.from('treatments').select('id, name, slug').eq('is_active', true).order('display_order'),
+      supabase.from('cities').select('id, name, slug, state_id').eq('is_active', true),
     ]);
 
-    const realCountsData = {
-      clinics: clinicsRes.count || 0,
-      states: (statesData || []).length,
-      cities: citiesRes.count || 0,
-      dentists: dentistsRes.count || 0,
-      treatments: treatmentsRes.count || 0,
-    };
-
-    // Fetch top clinics with related data
-    const { data: clinicsData } = await supabase
+    // Get dental clinics with best data for featured section
+    const dentalKeywords = ['dental', 'dentist', 'dentistry', 'orthodont', 'smile', 'oral', 'endodont', 'periodont', 'veneers', 'invisalign', 'braces'];
+    const { data: topClinics } = await supabase
       .from('clinics')
-      .select('id, name, slug, cover_image_url, rating, review_count, verification_status, claim_status, city_id, area:areas(id, name, slug), city:cities(id, name, slug, state_id)')
+      .select('id, name, slug, cover_image_url, average_rating, total_reviews, city_id')
       .eq('is_active', true)
-      .eq('is_duplicate', false)
       .not('cover_image_url', 'is', null)
-      .order('rating', { ascending: false })
-      .limit(30);
+      .gt('total_reviews', 10)
+      .or(dentalKeywords.map(k => 'name.ilike.%' + k + '%').join(','))
+      .order('total_reviews', { ascending: false })
+      .limit(12);
 
-    const profiles: HomePageProps['topProfiles'] = [];
-    const seenLocations = new Set<string>();
-    
-    for (const c of (clinicsData || []) as any[]) {
-      if (!c.cover_image_url) continue;
-      const locationKey = c.city?.id || c.id;
-      if (seenLocations.has(locationKey)) continue;
-      seenLocations.add(locationKey);
-      
-      profiles.push({
-        id: c.id,
-        name: c.name,
-        slug: c.slug,
-        type: 'clinic' as const,
-        specialty: 'Dental Clinic',
-        location: c.area?.name || c.city?.name || 'UAE',
-        rating: Number(c.rating) || 0,
-        reviewCount: c.review_count || 0,
-        image: c.cover_image_url,
-        isVerified: c.claim_status === 'claimed' && c.verification_status === 'verified',
-        clinicName: c.name,
-        clinicId: c.id,
-        areaId: c.area?.id || null,
-        cityId: c.city?.id || '',
-      });
-      
-      if (profiles.length >= 20) break;
-    }
+    // Build city->state map
+    const cityStateMap: Record<string, string> = {};
+    const cityNameMap: Record<string, string> = {};
+    (cities || []).forEach(c => {
+      cityStateMap[c.id] = c.state_id;
+      cityNameMap[c.id] = c.name;
+    });
 
-    const statesWithClinicsData = (statesData || []).map((s: any) => ({
+    // Build state name map
+    const stateNameMap: Record<string, string> = {};
+    (states || []).forEach(s => { stateNameMap[s.id] = s.name; });
+
+    // Build state slug map
+    const stateSlugMap: Record<string, string> = {};
+    (states || []).forEach(s => { stateSlugMap[s.id] = s.slug; });
+
+    // Count clinics per state by joining city -> state
+    const { data: allClinicCities } = await supabase
+      .from('clinics')
+      .select('id, city_id')
+      .eq('is_active', true);
+
+    const stateClinicCounts: Record<string, number> = {};
+    (allClinicCities || []).forEach(c => {
+      const sid = cityStateMap[c.city_id];
+      if (sid) stateClinicCounts[sid] = (stateClinicCounts[sid] || 0) + 1;
+    });
+
+    // Compute average rating
+    const avgR = ratingData?.length
+      ? (ratingData.reduce((s: number, r: any) => s + (r.average_rating || 0), 0) / ratingData.length)
+      : 4.7;
+
+    const avgRating = Math.round(avgR * 10) / 10;
+
+    // Build top clinics with city/state names
+    const topDentalClinics = (topClinics || []).map(c => ({
+      id: c.id,
+      name: c.name,
+      slug: c.slug,
+      coverImageUrl: c.cover_image_url,
+      rating: c.average_rating || 0,
+      reviewCount: c.total_reviews || 0,
+      cityName: cityNameMap[c.city_id] || null,
+      stateName: stateNameMap[cityStateMap[c.city_id]] || null,
+    }));
+
+    // Build treatments with counts (approximate from clinic_treatments or use display count)
+    const treatmentsData = (treatments || []).map(t => ({
+      name: t.name,
+      slug: t.slug,
+      count: 0, // real count would need clinic_treatments table
+    }));
+
+    const statesData = (states || []).map(s => ({
       id: s.id,
       name: s.name,
       slug: s.slug,
-      abbreviation: s.abbreviation,
+      clinicCount: stateClinicCounts[s.id] || 0,
     }));
 
-    return {
-      props: {
-        seoData: {
-          title: 'AppointPanda - Find & Book Dental Appointments in UAE',
-          description: 'Find and book appointments with top-rated dental professionals across the UAE. Verified dentists, real reviews, easy booking.',
-        },
-        realCounts: realCountsData,
-        topProfiles: profiles,
-        statesWithClinics: statesWithClinicsData,
-        featuredTreatments: featuredTreatmentsRes.data || [],
-      },
-      revalidate: 300,
+    const citiesData = (cities || []).map(c => ({
+      id: c.id,
+      name: c.name,
+      slug: c.slug,
+      stateId: c.state_id,
+    }));
+
+    const pageData: HomePageData = {
+      clinicCount: totalClinics || 0,
+      reviewCount: totalReviews || 0,
+      avgRating,
+      clinicsWithImages: clinicsWithImages || 0,
+      topDentalClinics,
+      statesData,
+      treatmentsData,
+      citiesData,
     };
-  } catch (error) {
-    console.error('Error fetching homepage data:', error);
+
     return {
-      props: {
-        seoData: {
-          title: 'AppointPanda - Find & Book Dental Appointments in UAE',
-          description: 'Find and book appointments with top-rated dental professionals across the UAE. Verified dentists, real reviews, easy booking.',
-        },
-        realCounts: null,
-        topProfiles: [],
-        statesWithClinics: [],
-        featuredTreatments: [],
-      },
-      revalidate: 300,
+      props: { pageData },
+      revalidate: 3600,
     };
+  } catch (e) {
+    console.error('Failed to fetch homepage data:', e);
+    return { props: { pageData: null }, revalidate: 60 };
   }
 };

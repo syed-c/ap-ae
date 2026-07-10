@@ -1,35 +1,18 @@
 import '@/index.css';
+import '@fontsource/instrument-sans/400.css';
+import '@fontsource/instrument-sans/500.css';
+import '@fontsource/instrument-sans/600.css';
+import '@fontsource/instrument-sans/700.css';
 import type { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider, HydrationBoundary } from '@tanstack/react-query';
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Inter, JetBrains_Mono, Noto_Sans_Arabic } from 'next/font/google';
+import { Noto_Sans_Arabic } from 'next/font/google';
 import { AuthProvider } from '@/hooks/useAuth';
 
 const Toaster = dynamic(() => import('@/components/ui/toaster').then(m => m.Toaster));
 const Sonner = dynamic(() => import('@/components/ui/sonner').then(m => m.Toaster));
 const MetaTagInjector = dynamic(() => import('@/components/analytics/MetaTagInjector').then(m => m.MetaTagInjector));
-
-const displayFont = Inter({
-  subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
-  weight: ['500', '600', '700', '800'],
-});
-
-const bodyFont = Inter({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  display: 'swap',
-  weight: ['400', '500', '600'],
-});
-
-const monoFont = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
-  display: 'swap',
-  weight: ['400', '500', '600'],
-});
 
 const arabicFont = Noto_Sans_Arabic({
   subsets: ['arabic'],
@@ -38,7 +21,6 @@ const arabicFont = Noto_Sans_Arabic({
   weight: ['400', '500', '600', '700'],
 });
 
-// Lazy-load non-critical components — keeps initial JS bundle lean
 const AnalyticsProvider = dynamic(
   () => import('@/components/analytics/AnalyticsProvider').then(m => m.AnalyticsProvider),
   { ssr: false }
@@ -61,7 +43,7 @@ const VisitorTracker = dynamic(
 );
 
 export default function App({ Component, pageProps }: AppProps) {
-  const fontClass = `${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} ${arabicFont.variable}`;
+  const fontClass = `${arabicFont.variable}`;
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -75,7 +57,7 @@ export default function App({ Component, pageProps }: AppProps) {
   );
 
   return (
-    <div className={fontClass}>
+    <div className={fontClass} style={{ fontFamily: "'Instrument Sans', system-ui, -apple-system, sans-serif" }}>
       <QueryClientProvider client={queryClient}>
         <HydrationBoundary state={pageProps.dehydratedState}>
           <AuthProvider>

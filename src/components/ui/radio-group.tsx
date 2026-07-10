@@ -1,15 +1,17 @@
-import * as React from "react";
-import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { Circle } from "lucide-react";
-import { cn } from "@/lib/utils";
+"use client"
+
+import * as React from "react"
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
+import { Circle } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
->(({ className, ...props }, ref) => (
-  <RadioGroupPrimitive.Root className={cn("grid gap-2", className)} {...props} ref={ref} />
-));
-RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
+>(({ className, ...props }, ref) => {
+  return <RadioGroupPrimitive.Root className={cn("grid gap-2", className)} {...props} ref={ref} />
+})
+RadioGroup.displayName = RadioGroupPrimitive.Root.displayName
 
 const RadioGroupItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
@@ -18,9 +20,9 @@ const RadioGroupItem = React.forwardRef<
   <RadioGroupPrimitive.Item
     ref={ref}
     className={cn(
-      "aspect-square h-5 w-5 rounded-full border border-[#1E1E1E] text-[#2D9C84] ring-offset-[#0A0A0A] transition-all duration-200",
-      "hover:border-[rgba(45,156,132,0.5)] data-[state=checked]:border-[#2D9C84]",
-      "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2D9C84] focus-visible:ring-offset-2",
+      "aspect-square h-5 w-5 rounded-full border border-[#D1D5DB] text-[#F59E0B] ring-offset-white transition-all duration-200",
+      "hover:border-[#F59E0B] data-[state=checked]:border-[#F59E0B]",
+      "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B] focus-visible:ring-offset-2",
       "disabled:cursor-not-allowed disabled:opacity-50",
       className,
     )}
@@ -30,7 +32,7 @@ const RadioGroupItem = React.forwardRef<
       <Circle className="h-2.5 w-2.5 fill-current text-current" />
     </RadioGroupPrimitive.Indicator>
   </RadioGroupPrimitive.Item>
-));
-RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
+))
+RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName
 
-export { RadioGroup, RadioGroupItem };
+export { RadioGroup, RadioGroupItem }

@@ -68,14 +68,23 @@ export default function ClinicRedistributionPanel() {
   const fetchStats = async () => {
     setIsLoadingStats(true);
     try {
-      // Fetch from edge function
-      const { data, error } = await supabase.functions.invoke('clinic-redistribution', {
-        body: { action: 'stats' }
-      });
+      // Fetch from edge function (gracefully handle if not deployed)
+      let cityStats = { total: 0, withCoordinates: 0, withoutCoordinates: 0 };
+      let clinicStats = { total: 0, withCoordinates: 0, withoutCoordinates: 0 };
+
+      try {
+        const { data, error } = await supabase.functions.invoke('clinic-redistribution', {
+          body: { action: 'stats' }
+        });
+        if (!error && data?.success) {
+          cityStats = data.cities || cityStats;
+          clinicStats = data.clinics || clinicStats;
+        }
+      } catch {
+        // Edge function not available — fall back to local DB stats
+      }
       
-      if (error) throw error;
-      
-      // Also fetch the list of cities missing coordinates with clinic counts
+      // Fetch the list of cities missing coordinates with clinic counts
       const { data: missingCities } = await supabase
         .from('cities')
         .select(`
@@ -106,15 +115,11 @@ export default function ClinicRedistributionPanel() {
       }
 
       setStats({
-        cities: {
-          ...data.cities,
-          missingList: missingCitiesWithCounts
-        },
-        clinics: data.clinics
+        cities: { ...cityStats, missingList: missingCitiesWithCounts },
+        clinics: clinicStats
       });
     } catch (err: any) {
       console.error('Failed to fetch stats:', err);
-      toast.error('Failed to fetch redistribution stats');
     } finally {
       setIsLoadingStats(false);
     }

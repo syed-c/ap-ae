@@ -35,7 +35,7 @@ function getLetterAvatar(name: string): string {
 
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(
     initials
-  )}&background=0f5f73&color=fff&size=200&font-size=0.42&bold=true`;
+  )}&background=0D9488&color=fff&size=200&font-size=0.42&bold=true`;
 }
 
 function formatReviewCount(reviewCount: number | undefined): string {
@@ -48,7 +48,7 @@ function formatReviewCount(reviewCount: number | undefined): string {
 
 function ProfileMeta({ icon: Icon, children }: { icon: typeof MapPin; children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+    <span className="inline-flex items-center gap-1.5 text-sm text-muted">
       <Icon className="h-4 w-4 text-primary/70" />
       <span className="truncate">{children}</span>
     </span>
@@ -91,8 +91,8 @@ export function ProfileCard({ profile, variant = 'list' }: ProfileCardProps) {
                   Featured
                 </Badge>
               )}
-              <span className="badge-brand">{specialty}</span>
-              <span className="badge-amber">
+              <span className="badge-primary">{specialty}</span>
+              <span className="badge-primary">
                 <Star className="h-3.5 w-3.5 fill-current" />
                 {profile.rating > 0 ? profile.rating.toFixed(1) : 'Unrated'}
               </span>
@@ -162,14 +162,14 @@ export function ProfileCard({ profile, variant = 'list' }: ProfileCardProps) {
               loading="lazy"
             />
             <div className="absolute inset-x-0 top-0 flex items-start justify-between p-4">
-              <span className="badge-amber">
+              <span className="badge-primary">
                 <Star className="h-3.5 w-3.5 fill-current" />
                 {profile.rating > 0 ? profile.rating.toFixed(1) : 'New'}
               </span>
-              {profile.isVerified && <span className="badge-verified">Verified</span>}
+              {profile.isVerified && <span className="badge-primary">Verified</span>}
             </div>
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 to-transparent p-4 text-white">
-              <span className="badge-brand bg-white/12 text-white border-white/10">{specialty}</span>
+              <span className="badge-primary bg-white/12 text-white border-white/10">{specialty}</span>
               <h3 className="mt-3 text-lg font-black">{profile.name}</h3>
               <div className="mt-2 flex items-center gap-1.5 text-sm text-white/74">
                 <MapPin className="h-4 w-4 text-primary" />
@@ -225,17 +225,17 @@ export function ProfileCard({ profile, variant = 'list' }: ProfileCardProps) {
             loading="lazy"
           />
           <div className="absolute inset-x-0 top-0 flex items-start justify-between p-4">
-            <span className="badge-amber">
+            <span className="badge-primary">
               <Star className="h-3.5 w-3.5 fill-current" />
               {profile.rating > 0 ? profile.rating.toFixed(1) : 'New'}
             </span>
-            {profile.isVerified && <span className="badge-verified">Verified</span>}
+            {profile.isVerified && <span className="badge-primary">Verified</span>}
           </div>
         </div>
 
         <div className="flex flex-1 flex-col p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="badge-brand">{specialty}</span>
+            <span className="badge-primary">{specialty}</span>
             {profile.isPinned && (
               <Badge variant="outline" className="rounded-full border-primary/20 bg-primary/8 text-primary">
                 Featured

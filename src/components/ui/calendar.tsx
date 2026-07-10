@@ -1,10 +1,12 @@
-import * as React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
-import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
+"use client"
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+import * as React from "react"
+import { DayPicker } from "react-day-picker"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { buttonVariants } from "@/components/ui/button"
+
+export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
   return (
@@ -15,37 +17,46 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium text-white",
+        caption_label: "text-sm font-medium text-[#111827]",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-7 w-7 bg-transparent p-0 text-[#62626B] hover:text-white",
+          buttonVariants({ variant: "outline" }),
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
-        head_cell: "text-[#62626B] rounded-md w-9 font-normal text-[0.8rem]",
+        head_cell: "text-[#6B7280] rounded-md w-8 font-normal text-[0.8rem]",
         row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-[rgba(45,156,132,0.08)] [&:has([aria-selected])]:bg-[rgba(45,156,132,0.08)] first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day: cn(buttonVariants({ variant: "ghost" }), "h-9 w-9 p-0 font-normal text-white aria-selected:opacity-100 hover:bg-[rgba(45,156,132,0.08)]"),
+        cell: cn(
+          "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-[rgba(245,158,11,0.08)]",
+          props.mode === "range"
+            ? "[&:has(>.day-range-end)]:rounded-r-md [&:has(>.day-range-start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
+            : "[&:has([aria-selected])]:rounded-md",
+        ),
+        day: cn(
+          buttonVariants({ variant: "ghost" }),
+          "h-8 w-8 p-0 font-normal text-[#111827] aria-selected:opacity-100",
+        ),
+        day_range_start: "day-range-start",
         day_range_end: "day-range-end",
-        day_selected: "bg-[#2D9C84] text-white hover:bg-[#2D9C84] hover:text-white focus:bg-[#2D9C84] focus:text-white",
-        day_today: "bg-[rgba(45,156,132,0.08)] text-white",
-        day_outside: "text-[#62626B] opacity-50 aria-selected:bg-[rgba(45,156,132,0.08)] aria-selected:text-[#62626B]",
-        day_disabled: "text-[#62626B] opacity-50",
-        day_range_middle: "aria-selected:bg-[rgba(45,156,132,0.08)] aria-selected:text-white",
+        day_selected: "bg-[#F59E0B] text-white hover:bg-[#F59E0B] hover:text-white focus:bg-[#F59E0B] focus:text-white",
+        day_today: "bg-[rgba(245,158,11,0.08)] text-[#F59E0B]",
+        day_outside: "text-[#9CA3AF] opacity-50",
+        day_disabled: "text-[#9CA3AF] opacity-50",
+        day_range_middle: "aria-selected:bg-[rgba(245,158,11,0.08)] aria-selected:text-[#111827]",
         day_hidden: "invisible",
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        IconLeft: () => <ChevronLeft className="h-4 w-4 text-[#6B7280]" />,
+        IconRight: () => <ChevronRight className="h-4 w-4 text-[#6B7280]" />,
       }}
       {...props}
     />
-  );
+  )
 }
-Calendar.displayName = "Calendar";
+Calendar.displayName = "Calendar"
 
-export { Calendar };
+export { Calendar }

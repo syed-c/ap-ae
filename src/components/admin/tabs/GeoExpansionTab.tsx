@@ -52,7 +52,7 @@ export default function GeoExpansionTab() {
   const [queueFilter, setQueueFilter] = useState<string>("all");
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
-  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useGeoExpansionStats();
+  const { data: stats, isLoading: statsLoading, isError: statsError, refetch: refetchStats } = useGeoExpansionStats();
   const { data: queue = [], isLoading: queueLoading, refetch: refetchQueue } = useGeoExpansionQueue({
     status: queueFilter === "all" ? undefined : queueFilter,
     limit: 100,
@@ -157,10 +157,10 @@ export default function GeoExpansionTab() {
                     <MapPin className="h-4 w-4 text-primary" />
                     <strong>{locationStats?.totalStates || 0}</strong> states
                   </span>
-                  <span className="flex items-center gap-1">
-                    <Building2 className="h-4 w-4 text-teal" />
-                    <strong>{locationStats?.totalCities || 0}</strong> cities
-                  </span>
+                    <span className="flex items-center gap-1">
+                      <Building2 className="h-4 w-4 text-primary" />
+                      <strong>{locationStats?.totalCities || 0}</strong> cities
+                    </span>
                   <span className="flex items-center gap-1">
                     <CheckCircle className="h-4 w-4 text-green-600" />
                     <strong>{locationStats?.activeStatePages || 0}</strong> live state pages
@@ -216,8 +216,8 @@ export default function GeoExpansionTab() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-teal/10 flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-teal" />
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Building2 className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats?.cities.total || 0}</p>

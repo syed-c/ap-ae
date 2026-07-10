@@ -121,11 +121,8 @@ export function SearchBox({ variant = 'compact', className, onSearch }: SearchBo
     }
 
     const params = new URLSearchParams();
-    // Send free-text location query as 'q' for SearchPage
     if (location) params.set('q', location);
-    // If a specific treatment was selected, pass its name as treatment text
     if (treatment) params.set('treatment', treatment);
-    // If a specific insurance was selected, pass its name
     if (insurance) params.set('insurance', insurance);
     router.push(`/search/?${params.toString()}`);
   }, [location, treatment, insurance, onSearch, router]);
@@ -145,23 +142,23 @@ export function SearchBox({ variant = 'compact', className, onSearch }: SearchBo
   }, []);
 
   const inputBase = cn(
-    'w-full h-11 bg-[#0A0A0A] border border-[#1E1E1E] rounded-lg text-sm text-white placeholder:text-[#62626B]',
-    'focus:outline-none focus:border-[#2D9C84] transition-all duration-300 pl-9 pr-3',
+    'w-full h-11 bg-white border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground',
+    'focus:outline-none focus:border-primary transition-all duration-300 pl-9 pr-3',
   );
 
   const dropdown = (filtered: FuzzyOption[], field: 'location' | 'treatment' | 'insurance') => {
     if (filtered.length === 0) return null;
     return (
-      <div className="absolute top-full left-0 right-0 mt-1 bg-[#161616] border border-[#1E1E1E] rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-xl z-50 overflow-hidden">
+      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-border rounded-xl shadow-[0_4px_6px_rgba(0,0,0,0.04),0_10px_15px_rgba(0,0,0,0.06)] z-50 overflow-hidden">
         {filtered.map((opt) => (
           <button
             key={`${opt.type}-${opt.id}`}
             type="button"
             onClick={() => handleSelect(opt, field)}
-            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-[#62626B] hover:text-white hover:bg-[rgba(45,156,132,0.08)] transition-all duration-300 text-left"
+            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-muted hover:text-foreground hover:bg-primary-light transition-all duration-300 text-left"
           >
             {opt.label}
-            <span className="ml-auto text-[10px] uppercase tracking-wider text-[#2D9C84]">{opt.group}</span>
+            <span className="ml-auto text-[10px] uppercase tracking-wider text-primary">{opt.group}</span>
           </button>
         ))}
       </div>
@@ -170,13 +167,13 @@ export function SearchBox({ variant = 'compact', className, onSearch }: SearchBo
 
   if (variant === 'hero') {
     return (
-      <div className={cn('card-glass bg-[rgba(22,22,22,0.8)] backdrop-blur-xl border border-[#1E1E1E] rounded-2xl p-4 md:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]', className)}>
+      <div className={cn('bg-white/80 backdrop-blur-xl border border-border/60 rounded-2xl p-4 md:p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_6px_rgba(0,0,0,0.04)]', className)}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Location */}
           <div ref={locationRef} className="relative">
-            <label className="block text-xs font-medium text-[#62626B] mb-1.5">Location</label>
+            <label className="block text-xs font-medium text-muted mb-1.5">Location</label>
             <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#62626B]" />
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
               <input
                 type="text"
                 value={location}
@@ -186,7 +183,7 @@ export function SearchBox({ variant = 'compact', className, onSearch }: SearchBo
                 className={inputBase}
               />
               {location && (
-                <button onClick={() => { setLocation(''); setFocusedField(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#62626B] hover:text-white transition-all duration-300">
+                <button onClick={() => { setLocation(''); setFocusedField(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-foreground transition-all duration-300">
                   <X className="h-3.5 w-3.5" />
                 </button>
               )}
@@ -196,9 +193,9 @@ export function SearchBox({ variant = 'compact', className, onSearch }: SearchBo
 
           {/* Treatment */}
           <div ref={treatmentRef} className="relative">
-            <label className="block text-xs font-medium text-[#62626B] mb-1.5">Treatment</label>
+            <label className="block text-xs font-medium text-muted mb-1.5">Treatment</label>
             <div className="relative">
-              <Stethoscope className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#62626B]" />
+              <Stethoscope className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
               <input
                 type="text"
                 value={treatment}
@@ -208,7 +205,7 @@ export function SearchBox({ variant = 'compact', className, onSearch }: SearchBo
                 className={inputBase}
               />
               {treatment && (
-                <button onClick={() => { setTreatment(''); setFocusedField(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#62626B] hover:text-white transition-all duration-300">
+                <button onClick={() => { setTreatment(''); setFocusedField(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-foreground transition-all duration-300">
                   <X className="h-3.5 w-3.5" />
                 </button>
               )}
@@ -218,9 +215,9 @@ export function SearchBox({ variant = 'compact', className, onSearch }: SearchBo
 
           {/* Insurance */}
           <div ref={insuranceRef} className="relative">
-            <label className="block text-xs font-medium text-[#62626B] mb-1.5">Insurance</label>
+            <label className="block text-xs font-medium text-muted mb-1.5">Insurance</label>
             <div className="relative">
-              <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#62626B]" />
+              <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
               <input
                 type="text"
                 value={insurance}
@@ -230,7 +227,7 @@ export function SearchBox({ variant = 'compact', className, onSearch }: SearchBo
                 className={inputBase}
               />
               {insurance && (
-                <button onClick={() => { setInsurance(''); setFocusedField(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#62626B] hover:text-white transition-all duration-300">
+                <button onClick={() => { setInsurance(''); setFocusedField(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-foreground transition-all duration-300">
                   <X className="h-3.5 w-3.5" />
                 </button>
               )}
@@ -241,38 +238,46 @@ export function SearchBox({ variant = 'compact', className, onSearch }: SearchBo
 
         <div className="mt-3">
           <Button
-            variant="gold"
+            variant="default"
             size="lg"
             className="w-full"
             onClick={handleSearch}
           >
             <Search className="h-4 w-4" />
             Find Dentist
-            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
     );
   }
 
-  // Compact variant
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex flex-col sm:flex-row gap-2', className)}>
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#62626B]" />
+        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
         <input
           type="text"
-          value={treatment || location}
-          onChange={(e) => {
-            setTreatment(e.target.value);
-            setLocation(e.target.value);
-          }}
-          placeholder="Search treatments, locations..."
-          className="w-full h-10 pl-9 pr-3 bg-[#0A0A0A] border border-[#1E1E1E] rounded-lg text-sm text-white placeholder:text-[#62626B] focus:outline-none focus:border-[#2D9C84] transition-all duration-300"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          onFocus={() => setFocusedField('location')}
+          placeholder="Emirate, city..."
+          className="w-full h-10 pl-9 pr-3 bg-white border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-all duration-300"
         />
       </div>
-      <Button variant="default" size="sm" onClick={handleSearch}>
+      <div className="relative flex-1">
+        <Stethoscope className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+        <input
+          type="text"
+          value={treatment}
+          onChange={(e) => setTreatment(e.target.value)}
+          onFocus={() => setFocusedField('treatment')}
+          placeholder="Treatment"
+          className="w-full h-10 pl-9 pr-3 bg-white border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-all duration-300"
+        />
+      </div>
+      <Button variant="default" onClick={handleSearch} className="h-10">
         <Search className="h-4 w-4" />
+        Search
       </Button>
     </div>
   );
