@@ -63,9 +63,16 @@ export default function FindClinicsPage({ initialClinics }: PageProps) {
       <Head>
         <title>Find a Dentist — {SITE_NAME}.ae</title>
         <meta name="description" content={`Browse verified dental clinics across all 7 UAE emirates. Filter by specialty, insurance, price, and rating. Book instantly.`} />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://www.appointpanda.ae/find-clinics/" />
+        <link rel="alternate" hrefLang="en-AE" href="https://www.appointpanda.ae/find-clinics/" />
+        <link rel="alternate" hrefLang="x-default" href="https://www.appointpanda.ae/find-clinics/" />
         <meta property="og:title" content={`Find a Dentist — ${SITE_NAME}.ae`} />
         <meta property="og:description" content="Search and compare dental clinics across the UAE." />
+        <meta property="og:url" content="https://www.appointpanda.ae/find-clinics/" />
+        <meta property="og:locale" content="en_AE" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content="https://www.appointpanda.ae/find-clinics/" />
       </Head>
 
       <PageHero

@@ -3,7 +3,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Head from 'next/head';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import {
@@ -11,6 +10,7 @@ import {
   Stethoscope, Baby, Syringe, ArrowLeftRight, Activity, Scissors, Sun, Gem,
   Ambulance, Palette, Quote, BadgeCheck, Users,
 } from 'lucide-react';
+import { SEOHead } from '@/components/seo/SEOHead';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { ClinicCard } from '@/components/ClinicCard';
 import {
@@ -79,14 +79,12 @@ export default function IndexPage({ pageData }: IndexPageProps) {
 
   return (
     <PageLayout>
-      <Head>
-        <title>{SITE_NAME}.ae — Find Verified Dental Clinics Across the UAE</title>
-        <meta name="description" content={`${SITE_NAME}.ae connects 200,000+ patients with ${clinicCount.toLocaleString()} verified dental clinics across the UAE. Compare prices, check insurance, and book instantly.`} />
-        <meta property="og:title" content={`${SITE_NAME}.ae — Find Verified Dental Clinics Across the UAE`} />
-        <meta property="og:description" content={`Compare ${clinicCount.toLocaleString()} verified clinics. Real prices in AED. Insurance-matched bookings in under 60 seconds.`} />
-        <meta property="og:image" content={`https://${SITE_DOMAIN}/og-home.jpg`} />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
+      <SEOHead
+        title={`${SITE_NAME}.ae — Find Verified Dental Clinics Across the UAE`}
+        description={`${SITE_NAME}.ae connects 200,000+ patients with ${clinicCount.toLocaleString()} verified dental clinics across the UAE. Compare prices, check insurance, and book instantly.`}
+        canonical="/"
+        ogImage={`https://${SITE_DOMAIN}/og-home.jpg`}
+      />
 
       {/* Hero */}
       <section className="gradient-dark-hero overflow-hidden">
@@ -276,7 +274,7 @@ export default function IndexPage({ pageData }: IndexPageProps) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {(pageData?.statesData?.length ? pageData.statesData : emirates).map((e) => (
-              <Link key={e.slug} href={`/emirates/${e.slug}`} className="card-hover-amber p-5 flex items-start gap-4">
+              <Link key={e.slug} href={`/${e.slug}/`} className="card-hover-amber p-5 flex items-start gap-4">
                 <div className="w-10 h-10 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500 shrink-0">
                   <MapPin className="h-5 w-5" />
                 </div>

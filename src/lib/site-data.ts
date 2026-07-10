@@ -202,7 +202,7 @@ export const navLinks: NavLinkData[] = [
   },
   {
     label: 'Emirates', dropdown: true, children: emirates.map(e => ({
-      label: e.name, href: `/emirates/${e.slug}`,
+      label: e.name, href: `/${e.slug}/`,
     })),
   },
   { label: 'Insurance', href: '/insurance' },

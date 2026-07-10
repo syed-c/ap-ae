@@ -119,9 +119,25 @@ const ServiceLocationPage = ({
     initialData: treatmentDataProp || undefined,
   });
 
-  const [profilesData] = useState(() =>
-    clinicProfilesProp
-      ? clinicProfilesProp.map((c: any) => ({
+  const [profilesData] = useState(() => {
+    if (!clinicProfilesProp) {
+      return [];
+    }
+
+    const hasTaggedClinics = clinicProfilesProp.some(
+      (clinic: any) => Array.isArray(clinic.treatments) && clinic.treatments.length > 0
+    );
+
+    const relevantClinics = hasTaggedClinics
+      ? clinicProfilesProp.filter((clinic: any) =>
+          clinic.treatments?.some(
+            (clinicTreatment: any) =>
+              clinicTreatment.treatment_id === treatmentDataProp?.id || clinicTreatment.treatment?.slug === serviceSlugProp
+          )
+        )
+      : clinicProfilesProp;
+
+    return relevantClinics.map((c: any) => ({
           id: c.id,
           name: c.name,
           slug: c.slug,
@@ -133,12 +149,11 @@ const ServiceLocationPage = ({
           isVerified: c.is_verified,
           isClaimed: c.is_claimed,
           isPinned: c.is_pinned,
-          location: c.location,
+          location: c.city ? `${c.city.name || ''}, ${c.city.state?.abbreviation || c.city.state?.name || ''}` : '',
           cityId: c.city_id,
           languages: c.languages,
-        }))
-      : []
-  );
+        }));
+  });
   const profiles = profilesData;
 
   const { data: allCitiesInEmirate } = useQuery({

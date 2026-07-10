@@ -66,19 +66,26 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
       const cityIds = stateCities.map(c => c.id);
 
       // Get clinics in these cities
-      const { data: clinics } = await supabase
-        .from('clinics')
+      const { data: clinics } = await (supabase
+        .from('clinics') as any)
         .select(`
           id, name, slug, description, cover_image_url, rating, review_count,
           address, phone, verification_status, claim_status,
-          city:cities(name, slug, state:states(name, abbreviation))
+          city:cities(name, slug, state:states(name, abbreviation)),
+          treatments(treatment_id, treatment:treatments(slug))
         `)
         .in('city_id', cityIds)
         .eq('is_active', true)
-        .order('rating', { ascending: false })
-        .limit(50);
+        .order('rating', { ascending: false });
 
-      return (clinics || []).map(c => ({
+      const hasTaggedClinics = (clinics || []).some((clinic: any) => Array.isArray(clinic.treatments) && clinic.treatments.length > 0);
+      const relevantClinics = hasTaggedClinics
+        ? (clinics || []).filter((clinic: any) =>
+            clinic.treatments?.some((clinicTreatment: any) => clinicTreatment.treatment_id === treatment.id || clinicTreatment.treatment?.slug === serviceSlug)
+          )
+        : (clinics || []);
+
+      return relevantClinics.map(c => ({
         id: c.id,
         name: c.name,
         slug: c.slug,
@@ -148,7 +155,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
       <SEOHead
         title={pageTitle}
         description={pageDescription}
-        canonical={`/${normalizedStateSlug}/${serviceSlug}/`}
+        canonical={`/${normalizedStateSlug}/services/${serviceSlug}/`}
         keywords={[`${treatmentName} ${stateName}`, `${treatmentName} cost ${stateName}`, `best ${treatmentName} clinic ${stateName}`]}
       />
       <SyncStructuredData
@@ -158,7 +165,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
             items: [
               { name: 'Home', url: '/' },
               { name: stateName, url: `/${normalizedStateSlug}/` },
-              { name: treatmentName, url: `/${normalizedStateSlug}/${serviceSlug}/` },
+              { name: treatmentName, url: `/${normalizedStateSlug}/services/${serviceSlug}/` },
             ],
           },
           {
@@ -169,7 +176,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
             type: 'medicalProcedure',
             name: treatmentName,
             description: pageDescription,
-            url: `/${normalizedStateSlug}/${serviceSlug}/`,
+            url: `/${normalizedStateSlug}/services/${serviceSlug}/`,
             procedureType: "Dental Procedure",
             bodyLocation: "Oral cavity",
             recognizingAuthority: [

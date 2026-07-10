@@ -24,23 +24,54 @@ const InsuranceDetailWrapper = ({
     clinicCount: number;
     seoData: { title: string; description: string; canonical: string };
 }) => {
+    const insuranceName = insuranceData?.name || insuranceSlug;
+    const breadcrumbSchema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
+            { "@type": "ListItem", position: 2, name: "Insurance", item: `${BASE_URL}/insurance/` },
+            { "@type": "ListItem", position: 3, name: insuranceName, item: `${BASE_URL}${seoData.canonical}` },
+        ]
+    };
+    const insuranceSchema = {
+        "@context": "https://schema.org",
+        "@type": "InsuranceProduct",
+        "name": insuranceName,
+        "description": seoData.description,
+        "url": `${BASE_URL}${seoData.canonical}`,
+        "areaServed": "United Arab Emirates",
+    };
+
     return (
         <>
             <Head>
                 <title>{seoData.title}</title>
                 <meta name="description" content={seoData.description} />
                 <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
+                <meta name="robots" content="index, follow" />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />
                 <meta property="og:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
                 <meta property="og:description" content={seoData.description} />
                 <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
                 <meta property="og:site_name" content="AppointPanda" />
+                <meta property="og:locale" content="en_AE" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:url" content={`${BASE_URL}${seoData.canonical}`} />
                 <meta name="twitter:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
                 <meta name="twitter:description" content={seoData.description} />
                 <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+                <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}${seoData.canonical}`} />
+                <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}${seoData.canonical}`} />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+                />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(insuranceSchema) }}
+                />
             </Head>
             <InsuranceDetailPageComponent 
                 insuranceSlugProp={insuranceSlug}

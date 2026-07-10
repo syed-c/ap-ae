@@ -4,13 +4,28 @@ import { PageLayout } from '@/components/layout/PageLayout';
 import { PageHero } from '@/components/layout/PageHero';
 import { emirates, specialties, insurers, SITE_NAME } from '@/lib/site-data';
 
+const BASE_URL = 'https://www.appointpanda.ae';
+
 export default function SitemapPage() {
   return (
     <PageLayout>
       <Head>
         <title>Sitemap — {SITE_NAME}.ae</title>
         <meta name="description" content={`Complete site map for ${SITE_NAME}.ae — find every page across our dental directory.`} />
-        <meta name="robots" content="noindex" />
+        <link rel="canonical" href={`${BASE_URL}/sitemap/`} />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${BASE_URL}/sitemap/`} />
+        <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
+        <meta property="og:site_name" content="AppointPanda" />
+        <meta property="og:locale" content="en_AE" />
+        <meta name="twitter:url" content={`${BASE_URL}/sitemap/`} />
+        <meta name="twitter:title" content={`Sitemap — ${SITE_NAME}.ae`} />
+        <meta name="twitter:description" content={`Complete site map for ${SITE_NAME}.ae — find every page across our dental directory.`} />
+        <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+        <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}/sitemap/`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/sitemap/`} />
+        <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />
       </Head>
 
       <PageHero
@@ -65,7 +80,7 @@ export default function SitemapPage() {
             <h2 className="font-semibold text-zinc-900 text-sm mb-3">Emirates</h2>
             <ul className="space-y-2">
               {emirates.map(e => (
-                <li key={e.slug}><Link href={`/emirates/${e.slug}`} className="text-sm text-zinc-500 hover:text-amber-700 transition-colors">{e.name}</Link></li>
+                <li key={e.slug}><Link href={`/${e.slug}/`} className="text-sm text-zinc-500 hover:text-amber-700 transition-colors">{e.name}</Link></li>
               ))}
             </ul>
           </div>

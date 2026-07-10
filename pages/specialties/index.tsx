@@ -5,6 +5,8 @@ import { PageLayout } from '@/components/layout/PageLayout';
 import { PageHero } from '@/components/layout/PageHero';
 import { specialties, SITE_NAME, SITE_DOMAIN } from '@/lib/site-data';
 
+const BASE_URL = 'https://www.appointpanda.ae';
+
 const ICON_MAP: Record<string, React.ReactNode> = {
   Stethoscope: <Stethoscope className="h-6 w-6" />,
   Sparkles: <Sparkles className="h-6 w-6" />,
@@ -26,6 +28,20 @@ export default function SpecialtiesPage() {
       <Head>
         <title>Dental Specialties — {SITE_NAME}.ae</title>
         <meta name="description" content={`Browse all dental specialties available across UAE clinics. From general dentistry to implants, veneers, and emergency care.`} />
+        <link rel="canonical" href={`${BASE_URL}/specialties/`} />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${BASE_URL}/specialties/`} />
+        <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
+        <meta property="og:site_name" content="AppointPanda" />
+        <meta property="og:locale" content="en_AE" />
+        <meta name="twitter:url" content={`${BASE_URL}/specialties/`} />
+        <meta name="twitter:title" content={`Dental Specialties — ${SITE_NAME}.ae`} />
+        <meta name="twitter:description" content={`Browse all dental specialties available across UAE clinics. From general dentistry to implants, veneers, and emergency care.`} />
+        <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+        <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}/specialties/`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/specialties/`} />
+        <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />
         <meta property="og:title" content={`Dental Specialties — ${SITE_NAME}.ae`} />
         <meta property="og:description" content="Find the right specialist for your needs." />
         <meta name="twitter:card" content="summary_large_image" />

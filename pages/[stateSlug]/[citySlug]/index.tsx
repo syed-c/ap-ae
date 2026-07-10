@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import CityPageComponent from '@/pages/CityPage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
+import { buildClinicLocationOrFilter } from '@/lib/location/buildClinicLocationFilter';
 
 // Wrapper component to render SEO meta tags server-side with FAQ data for SSR
 const BASE_URL = 'https://www.appointpanda.ae';
@@ -151,8 +152,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
             }
         }
         
-        console.log(`Generated ${paths.length} city paths`);
-        
         return {
             paths,
             fallback: 'blocking'
@@ -261,10 +260,17 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
     let topClinics: any[] = [];
     let clinicProfilesProp: any[] = [];
     if (finalCityData?.id) {
+        const clinicLocationFilter = buildClinicLocationOrFilter({
+            cityId: finalCityData.id,
+            citySlug: finalCityData.slug,
+            cityName: finalCityData.name,
+            stateName: stateData?.name,
+        });
+
         const ratingsData = await supabase
             .from('clinics')
             .select('rating, review_count')
-            .eq('city_id', finalCityData.id)
+            .or(clinicLocationFilter)
             .eq('is_active', true)
             .not('rating', 'is', null)
             .then(r => r.data);
@@ -283,7 +289,7 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
         const topClinicsData = await supabase
             .from('clinics')
             .select('name, slug, rating, review_count')
-            .eq('city_id', finalCityData.id)
+            .or(clinicLocationFilter)
             .eq('is_active', true)
             .not('rating', 'is', null)
             .order('rating', { ascending: false })
@@ -296,15 +302,14 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
             .from('clinics') as any)
             .select(`
                 id, name, slug, type, rating, review_count, image_url, is_verified, is_claimed, is_pinned,
-                location, address, phone, website, languages, area_id, city_id,
-                state:states(name, slug),
+                address, phone, website, languages, area_id, city_id,
+                city:cities(name, slug, state:states(name, abbreviation)),
                 treatments(treatment_id, treatment:treatments(id, name, slug))
             `)
-            .eq('city_id', finalCityData.id)
+            .or(clinicLocationFilter)
             .eq('is_active', true)
             .order('rating', { ascending: false })
-            .order('review_count', { ascending: false })
-            .limit(50);
+            .order('review_count', { ascending: false });
         
         if (allCityClinics.data) {
             clinicProfilesProp = allCityClinics.data;

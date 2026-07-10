@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { getGmbProviderToken, setGmbProviderToken, clearGmbProviderToken } from '@/lib/gmbAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { SEOHead } from '@/components/seo/SEOHead';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
@@ -90,21 +91,6 @@ export default function GMBBusinessSelection() {
       code: null,
     };
   };
-
-  // Set noindex for GMB selection pages
-  useEffect(() => {
-    let meta = document.querySelector('meta[name="robots"]');
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.setAttribute('name', 'robots');
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute('content', 'noindex, nofollow');
-
-    return () => {
-      meta?.setAttribute('content', 'index, follow');
-    };
-  }, []);
 
   useEffect(() => {
     // Wait a moment for auth to settle before checking user
@@ -342,41 +328,55 @@ export default function GMBBusinessSelection() {
     });
   };
 
+  const seoHead = (
+    <SEOHead
+      title="Select Google Business Profile | AppointPanda"
+      description="Choose the correct Google Business Profile to connect your clinic listing with AppointPanda."
+      canonical="/gmb-select/"
+      noindex
+    />
+  );
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Finding Your Businesses...</CardTitle>
-            <CardDescription>
-              Connecting to Google Business Profile
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-center">
-              <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            </div>
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        {seoHead}
+        <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
+          <Card className="w-full max-w-2xl">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">Finding Your Businesses...</CardTitle>
+              <CardDescription>
+                Connecting to Google Business Profile
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+              </div>
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="h-16 w-16 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-4">
-              <AlertCircle className="h-10 w-10 text-coral" />
-            </div>
-            <CardTitle className="text-2xl">Unable to Fetch Businesses</CardTitle>
-            <CardDescription>{error}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {errorCode === 'NO_PROVIDER_TOKEN' || errorCode === 'TOKEN_EXPIRED' ? (
+      <>
+        {seoHead}
+        <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <div className="h-16 w-16 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="h-10 w-10 text-coral" />
+              </div>
+              <CardTitle className="text-2xl">Unable to Fetch Businesses</CardTitle>
+              <CardDescription>{error}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {errorCode === 'NO_PROVIDER_TOKEN' || errorCode === 'TOKEN_EXPIRED' ? (
               <Button onClick={handleRetryAuth} className="w-full">
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Sign in with Google Again
@@ -390,149 +390,156 @@ export default function GMBBusinessSelection() {
             <Button variant="outline" onClick={handleSkipGMB} className="w-full">
               Continue Without Google Business
             </Button>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
   if (businesses.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="h-16 w-16 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-4">
-              <Building2 className="h-10 w-10 text-gold" />
-            </div>
-            <CardTitle className="text-2xl">No Google Business Profiles Found</CardTitle>
-            <CardDescription>
-              We couldn't find any Google Business Profiles linked to your Google account.
-              You can still list your practice manually.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-muted rounded-lg text-sm text-muted-foreground">
-              <p className="font-medium mb-2">Don't have a Google Business Profile?</p>
-              <p>You can create one at <a href="https://business.google.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">business.google.com</a> and come back later to sync it.</p>
-            </div>
-            <Button onClick={handleSkipGMB} className="w-full">
-              Continue with Manual Setup
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-            <Button variant="outline" onClick={handleRetryAuth} className="w-full">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Try Different Google Account
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        {seoHead}
+        <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <div className="h-16 w-16 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-4">
+                <Building2 className="h-10 w-10 text-gold" />
+              </div>
+              <CardTitle className="text-2xl">No Google Business Profiles Found</CardTitle>
+              <CardDescription>
+                We couldn't find any Google Business Profiles linked to your Google account.
+                You can still list your practice manually.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-muted rounded-lg text-sm text-muted-foreground">
+                <p className="font-medium mb-2">Don't have a Google Business Profile?</p>
+                <p>You can create one at <a href="https://business.google.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">business.google.com</a> and come back later to sync it.</p>
+              </div>
+              <Button onClick={handleSkipGMB} className="w-full">
+                Continue with Manual Setup
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+              <Button variant="outline" onClick={handleRetryAuth} className="w-full">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Try Different Google Account
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Select Your Practice</h1>
-          <p className="text-muted-foreground">
-            Choose the Google Business Profile you want to list on AppointPanda
+    <>
+      {seoHead}
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted py-12 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold mb-2">Select Your Practice</h1>
+            <p className="text-muted-foreground">
+              Choose the Google Business Profile you want to list on AppointPanda
+            </p>
+          </div>
+
+          <div className="space-y-4 mb-8">
+            {businesses.map((business) => (
+              <Card
+                key={business.id}
+                className={`cursor-pointer transition-all ${selectedBusiness?.id === business.id
+                  ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
+                  : 'hover:border-primary/30'
+                  }`}
+                onClick={() => setSelectedBusiness(business)}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${selectedBusiness?.id === business.id
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
+                      }`}>
+                      {selectedBusiness?.id === business.id ? (
+                        <CheckCircle className="h-6 w-6" />
+                      ) : (
+                        <Building2 className="h-6 w-6 text-muted-foreground" />
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-bold text-lg truncate">{business.name}</h3>
+                        {business.category && (
+                          <Badge variant="secondary" className="flex-shrink-0">
+                            {business.category}
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className="space-y-1 text-sm text-muted-foreground">
+                        {business.address && (
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">{business.address}</span>
+                          </div>
+                        )}
+                        {business.phone && (
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 flex-shrink-0" />
+                            <span>{business.phone}</span>
+                          </div>
+                        )}
+                        {business.website && (
+                          <div className="flex items-center gap-2">
+                            <Globe className="h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">{business.website}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button
+              onClick={handleSelectBusiness}
+              disabled={!selectedBusiness || isCreating}
+              className="flex-1"
+              size="lg"
+            >
+              {isCreating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Creating Listing...
+                </>
+              ) : (
+                <>
+                  List This Practice
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleSkipGMB}
+              disabled={isCreating}
+              size="lg"
+            >
+              Skip & Enter Manually
+            </Button>
+          </div>
+
+          <p className="text-xs text-center text-muted-foreground mt-6">
+            By listing your practice, you agree to our terms and privacy policy.
+            Your business information will be synced from Google Business Profile.
           </p>
         </div>
-
-        <div className="space-y-4 mb-8">
-          {businesses.map((business) => (
-            <Card
-              key={business.id}
-              className={`cursor-pointer transition-all ${selectedBusiness?.id === business.id
-                ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
-                : 'hover:border-primary/30'
-                }`}
-              onClick={() => setSelectedBusiness(business)}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${selectedBusiness?.id === business.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted'
-                    }`}>
-                    {selectedBusiness?.id === business.id ? (
-                      <CheckCircle className="h-6 w-6" />
-                    ) : (
-                      <Building2 className="h-6 w-6 text-muted-foreground" />
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-lg truncate">{business.name}</h3>
-                      {business.category && (
-                        <Badge variant="secondary" className="flex-shrink-0">
-                          {business.category}
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div className="space-y-1 text-sm text-muted-foreground">
-                      {business.address && (
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 flex-shrink-0" />
-                          <span className="truncate">{business.address}</span>
-                        </div>
-                      )}
-                      {business.phone && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 flex-shrink-0" />
-                          <span>{business.phone}</span>
-                        </div>
-                      )}
-                      {business.website && (
-                        <div className="flex items-center gap-2">
-                          <Globe className="h-4 w-4 flex-shrink-0" />
-                          <span className="truncate">{business.website}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Button
-            onClick={handleSelectBusiness}
-            disabled={!selectedBusiness || isCreating}
-            className="flex-1"
-            size="lg"
-          >
-            {isCreating ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Creating Listing...
-              </>
-            ) : (
-              <>
-                List This Practice
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </>
-            )}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleSkipGMB}
-            disabled={isCreating}
-            size="lg"
-          >
-            Skip & Enter Manually
-          </Button>
-        </div>
-
-        <p className="text-xs text-center text-muted-foreground mt-6">
-          By listing your practice, you agree to our terms and privacy policy.
-          Your business information will be synced from Google Business Profile.
-        </p>
       </div>
-    </div>
+    </>
   );
 }

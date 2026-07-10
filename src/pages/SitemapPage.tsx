@@ -158,7 +158,7 @@ const SitemapPage = () => {
       <SEOHead
         title="Sitemap"
         description="Navigate all pages on AppointPanda - Find dentists, dental services, locations, clinics, and helpful resources across the UAE."
-        canonical="/sitemap"
+        canonical="/sitemap-page/"
       />
 
 

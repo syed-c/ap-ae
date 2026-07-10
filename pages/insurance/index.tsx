@@ -11,9 +11,16 @@ export default function InsurancePage() {
       <Head>
         <title>Dental Insurance — {SITE_NAME}.ae</title>
         <meta name="description" content={`Find dental clinics that accept your insurance. Browse ${insurers.length} major UAE insurance providers including Daman, AXA, Bupa, Cigna, and more.`} />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://www.appointpanda.ae/insurance/" />
+        <link rel="alternate" hrefLang="en-AE" href="https://www.appointpanda.ae/insurance/" />
+        <link rel="alternate" hrefLang="x-default" href="https://www.appointpanda.ae/insurance/" />
         <meta property="og:title" content={`Dental Insurance — ${SITE_NAME}.ae`} />
         <meta property="og:description" content="Find clinics that accept your insurance plan." />
+        <meta property="og:url" content="https://www.appointpanda.ae/insurance/" />
+        <meta property="og:locale" content="en_AE" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content="https://www.appointpanda.ae/insurance/" />
       </Head>
 
       <PageHero

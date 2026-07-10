@@ -173,16 +173,6 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
       />
       <StructuredData
         data={{
-          type: 'breadcrumb',
-          items: [
-            { name: 'Home', url: '/' },
-            { name: 'Services', url: '/services/' },
-            { name: treatmentName, url: serverCanonical },
-          ],
-        }}
-      />
-      <StructuredData
-        data={{
           type: 'medicalProcedure',
           name: treatmentName,
           description: treatment?.description || `Professional ${treatmentName} services across the UAE`,

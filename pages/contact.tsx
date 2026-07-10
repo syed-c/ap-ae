@@ -5,6 +5,8 @@ import { PageLayout } from '@/components/layout/PageLayout';
 import { PageHero } from '@/components/layout/PageHero';
 import { SITE_NAME, SITE_DOMAIN, PHONE_NUMBER, PHONE_HREF } from '@/lib/site-data';
 
+const BASE_URL = 'https://www.appointpanda.ae';
+
 export default function ContactPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -22,6 +24,20 @@ export default function ContactPage() {
       <Head>
         <title>Contact Us — {SITE_NAME}.ae</title>
         <meta name="description" content={`Get in touch with the ${SITE_NAME}.ae team. Call ${PHONE_NUMBER}, email us, or fill out our contact form.`} />
+        <link rel="canonical" href={`${BASE_URL}/contact/`} />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${BASE_URL}/contact/`} />
+        <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
+        <meta property="og:site_name" content="AppointPanda" />
+        <meta property="og:locale" content="en_AE" />
+        <meta name="twitter:url" content={`${BASE_URL}/contact/`} />
+        <meta name="twitter:title" content={`Contact Us — ${SITE_NAME}.ae`} />
+        <meta name="twitter:description" content={`Get in touch with the ${SITE_NAME}.ae team. Call ${PHONE_NUMBER}, email us, or fill out our contact form.`} />
+        <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+        <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}/contact/`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/contact/`} />
+        <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 

@@ -10,6 +10,10 @@ export default function EmergencyDentistWithSEO() {
       <Head>
         <title>Emergency Dentist in UAE | 24/7 Dental Care | AppointPanda</title>
         <meta name="description" content="Find 24/7 emergency dentists in Dubai, Abu Dhabi and across UAE. Same-day appointments available for dental emergencies. Call now or book online. DHA-licensed dentists." />
+        <meta name="robots" content="index, follow" />
+        <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}/emergency-dentist/`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/emergency-dentist/`} />
+        <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />
         <link rel="canonical" href={`${BASE_URL}/emergency-dentist/`} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${BASE_URL}/emergency-dentist/`} />

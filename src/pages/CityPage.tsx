@@ -29,6 +29,7 @@ import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/
 import { usePinnedProfiles, sortWithPinnedFirst } from "@/hooks/usePinnedProfiles";
 import { useAreaLocalContent, generateAreaIntro } from "@/hooks/useAreaLocalContent";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
+import { buildClinicLocationOrFilter } from "@/lib/location/buildClinicLocationFilter";
 import NotFound from "./NotFound";
 import {
   Star,
@@ -122,10 +123,17 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     queryKey: ['city-clinic-count', city?.id],
     queryFn: async () => {
       if (!city) return 0;
+      const clinicLocationFilter = buildClinicLocationOrFilter({
+        cityId: city.id,
+        citySlug: city.slug,
+        cityName: city.name,
+        stateName: state?.name,
+      });
+
       const { count, error } = await supabase
         .from('clinics')
         .select('id', { count: 'exact', head: true })
-        .eq('city_id', city.id)
+        .or(clinicLocationFilter)
         .eq('is_active', true);
       if (error) return 0;
       return count || 0;
@@ -139,6 +147,12 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     queryKey: ['city-profiles', citySlug, pinnedProfiles?.map(p => p.id).join(',')],
     queryFn: async () => {
       const pinnedIds = (pinnedProfiles || []).map(p => p.id);
+      const clinicLocationFilter = buildClinicLocationOrFilter({
+        cityId: city.id,
+        citySlug: city.slug,
+        cityName: city.name,
+        stateName: state?.name,
+      });
 
       const { data: clinics } = await supabase
         .from('clinics')
@@ -147,10 +161,9 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
           address, phone, verification_status, claim_status,
           city:cities(name, slug, state:states(name, abbreviation))
         `)
-        .eq('city_id', city.id)
+        .or(clinicLocationFilter)
         .eq('is_active', true)
-        .order('rating', { ascending: false })
-        .limit(50);
+        .order('rating', { ascending: false });
 
       const resultIds = new Set((clinics || []).map(c => c.id));
       const missingPinnedIds = pinnedIds.filter(id => !resultIds.has(id));
@@ -203,7 +216,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
           slug: c.slug,
           type: 'clinic' as const,
           specialty: 'Dental Clinic',
-          location: c.state ? `${c.state.name || ''}, ${c.state.slug?.substring(0, 2).toUpperCase() || ''}` : '',
+          location: c.city ? `${c.city.name || ''}, ${c.city.state?.abbreviation || ''}` : '',
           rating: c.rating || 0,
           reviewCount: c.review_count || 0,
           image: c.cover_image_url || c.image_url,

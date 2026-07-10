@@ -9,6 +9,11 @@ export default function BlogIndexPage() {
       <Head>
         <title>Dental Health Blog - Expert Tips & Advice | AppointPanda</title>
         <meta name="description" content="Read expert dental health articles, treatment guides, and patient advice from licensed UAE dentists. Stay informed about oral health, procedures, and finding the right dentist." />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:locale" content="en_AE" />
+        <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}/blog/`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/blog/`} />
+        <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />
         <link rel="canonical" href={`${BASE_URL}/blog/`} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${BASE_URL}/blog/`} />

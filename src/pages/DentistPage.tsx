@@ -314,6 +314,17 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp, treatments
       />
       <StructuredData
         data={{
+          type: 'breadcrumb',
+          items: [
+            { name: 'Home', url: '/' },
+            ...(stateSlug ? [{ name: dentist.clinic?.city?.state?.name || '', url: `/${stateSlug}` }] : []),
+            ...(citySlug && stateSlug ? [{ name: cityName, url: `/${stateSlug}/${citySlug}` }] : []),
+            { name: dentist.name },
+          ],
+        }}
+      />
+      <StructuredData
+        data={{
           type: 'person',
           name: dentist.name,
           jobTitle: dentist.title || 'Dental Professional',

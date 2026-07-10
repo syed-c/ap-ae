@@ -59,6 +59,11 @@ const BlogPostPageWithSEO = ({ postSlug, postData, seoData, authorData }: {
             <Head>
                 <title>{seoData.title}</title>
                 <meta name="description" content={seoData.description} />
+                <meta name="robots" content="index, follow" />
+                <meta property="og:locale" content="en_AE" />
+                <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}${seoData.canonical}`} />
+                <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}${seoData.canonical}`} />
+                <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />
                 <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
                 <meta property="og:type" content="article" />
                 <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />

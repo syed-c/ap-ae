@@ -184,13 +184,17 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .then(r => r.data) as Promise<any>
     ]);
 
-    // Fetch state ratings and top clinics
-    const ratingsData = await (supabase as any)
-        .from('clinics')
-        .select('rating, review_count')
-        .eq('state_id', stateData.id)
-        .eq('is_active', true)
-        .not('rating', 'is', null);
+    const stateCityIds = (citiesData || []).map((city: any) => city.id).filter(Boolean);
+
+    // Fetch state ratings and top clinics using city coverage because clinic.state_id is unreliable
+    const ratingsData = stateCityIds.length > 0
+        ? await (supabase as any)
+            .from('clinics')
+            .select('rating, review_count')
+            .in('city_id', stateCityIds)
+            .eq('is_active', true)
+            .not('rating', 'is', null)
+        : { data: [] };
 
     // Calculate state-level aggregate ratings
     let stateRatingsData = { avgRating: 0, totalReviews: 0, clinicCount: 0 };
@@ -205,31 +209,34 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     }
 
     // Fetch top 5 clinics for ItemList schema
-    const topClinicsData = await (supabase as any)
-        .from('clinics')
-        .select('name, slug, rating, review_count')
-        .eq('state_id', stateData.id)
-        .eq('is_active', true)
-        .not('rating', 'is', null)
-        .order('rating', { ascending: false })
-        .order('review_count', { ascending: false })
-        .limit(5);
+    const topClinicsData = stateCityIds.length > 0
+        ? await (supabase as any)
+            .from('clinics')
+            .select('name, slug, rating, review_count')
+            .in('city_id', stateCityIds)
+            .eq('is_active', true)
+            .not('rating', 'is', null)
+            .order('rating', { ascending: false })
+            .order('review_count', { ascending: false })
+            .limit(5)
+        : { data: [] };
 
     // Pre-fetch clinic profiles for SSR
     let clinicProfilesProp: any[] = [];
-    const allStateClinics = await (supabase as any)
-        .from('clinics')
-        .select(`
-            id, name, slug, type, rating, review_count, image_url, is_verified, is_claimed, is_pinned,
-            location, address, phone, website, languages, area_id, city_id, state_id,
-            state:states(id, name, slug),
-            treatments(treatment_id, treatment:treatments(id, name, slug))
-        `)
-        .eq('state_id', stateData.id)
-        .eq('is_active', true)
-        .order('rating', { ascending: false })
-        .order('review_count', { ascending: false })
-        .limit(50);
+    const allStateClinics = stateCityIds.length > 0
+        ? await (supabase as any)
+            .from('clinics')
+            .select(`
+                id, name, slug, type, rating, review_count, image_url, is_verified, is_claimed, is_pinned,
+                address, phone, website, languages, area_id, city_id,
+                city:cities(name, slug, state:states(name, abbreviation)),
+                treatments(treatment_id, treatment:treatments(id, name, slug))
+            `)
+            .in('city_id', stateCityIds)
+            .eq('is_active', true)
+            .order('rating', { ascending: false })
+            .order('review_count', { ascending: false })
+        : { data: [] };
     
     if (allStateClinics.data) {
         clinicProfilesProp = allStateClinics.data;

@@ -1,7 +1,9 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
+import Head from 'next/head';
 import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import ServiceLocationPageComponent from '@/pages/ServiceLocationPage';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
+import { buildClinicLocationOrFilter } from '@/lib/location/buildClinicLocationFilter';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
@@ -41,8 +43,31 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
     const fallbackTitle = `${treatmentName} in ${cityName} (2026) — Find Top-Rated Dentists Near You | AppointPanda`;
     const fallbackDescription = `Need ${treatmentName.toLowerCase()} in ${cityName}? Compare 50+ verified specialists near you. Read patient reviews, check ratings (4.9+ stars), see transparent AED pricing. Book your appointment in minutes. All dentists are DHA/DOH-licensed. Free consultation available.`;
 
+    const metaTitle = seoData?.title || `${treatmentName} in ${cityData?.name || citySlug}`;
+    const metaDescription = seoData?.description || `Find the best ${treatmentName.toLowerCase()} specialists in ${cityData?.name || citySlug}.`;
+
     return (
         <>
+            <Head>
+                <title>{metaTitle}</title>
+                <meta name="description" content={metaDescription} />
+                <link rel="canonical" href={`${BASE_URL}${seoData?.canonical || `/${stateSlug}/${citySlug}/${serviceSlug}/`}`} />
+                <meta name="robots" content="index, follow" />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={`${BASE_URL}${seoData?.canonical || `/${stateSlug}/${citySlug}/${serviceSlug}/`}`} />
+                <meta property="og:title" content={metaTitle} />
+                <meta property="og:description" content={metaDescription} />
+                <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
+                <meta property="og:site_name" content="AppointPanda" />
+                <meta property="og:locale" content="en_AE" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:url" content={`${BASE_URL}${seoData?.canonical || `/${stateSlug}/${citySlug}/${serviceSlug}/`}`} />
+                <meta name="twitter:title" content={metaTitle} />
+                <meta name="twitter:description" content={metaDescription} />
+                <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+                <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}${seoData?.canonical || `/${stateSlug}/${citySlug}/${serviceSlug}/`}`} />
+                <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}${seoData?.canonical || `/${stateSlug}/${citySlug}/${serviceSlug}/`}`} />
+            </Head>
             <ServiceLocationPageComponent 
                 stateSlugProp={stateSlug}
                 citySlugProp={citySlug}
@@ -143,8 +168,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
             }
         }
         
-        console.log(`Service-location paths: ${paths.length} (from ${cities.length} cities × ${treatments.length} treatments, filtered by clinic existence)`);
-        
         return { paths, fallback: 'blocking' };
     } catch (error) {
         console.error('Error generating service location paths:', error);
@@ -236,34 +259,27 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
 
-    // Return 404 if no clinics offer this treatment in this city
-    // This handles edge cases and prevents soft-404 pages
-    const { data: clinicCount } = await supabase
-        .from('clinic_treatments')
-        .select('id', { count: 'exact', head: true })
-        .eq('treatment_id', treatmentData.id)
-        .eq('clinic.is_active', true)
-        .eq('clinic.city_id', cityData.id);
+    // Pre-fetch clinic profiles for SSR. Keep these pages live even when
+    // treatment mapping data is incomplete so the location-service graph remains navigable.
+    const clinicLocationFilter = buildClinicLocationOrFilter({
+        cityId: cityData.id,
+        citySlug: cityData.slug,
+        cityName: cityData.name,
+        stateName: stateData?.name,
+    });
 
-    if (!clinicCount || (clinicCount as any) === 0) {
-        return { notFound: true };
-    }
-
-    // Pre-fetch clinic profiles for SSR - this data will be passed to client
-    // and eliminates the need for client-side API call on first render
     const { data: clinicProfiles } = await (supabase
         .from('clinics') as any)
         .select(`
             id, name, slug, type, rating, review_count, image_url, is_verified, is_claimed, is_pinned,
-            location, address, phone, website, languages, area_id, city_id,
-            state:states(name, slug),
+            address, phone, website, languages, area_id, city_id,
+            city:cities(name, slug, state:states(name, abbreviation)),
             treatments(treatment_id, treatment:treatments(id, name, slug))
         `)
-        .eq('city_id', cityData.id)
+        .or(clinicLocationFilter)
         .eq('is_active', true)
         .order('rating', { ascending: false })
-        .order('review_count', { ascending: false })
-        .limit(50);
+        .order('review_count', { ascending: false });
 
     const stateName = stateData.name;
     const cityName = cityData?.name || citySlug;

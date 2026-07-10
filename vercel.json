@@ -73,15 +73,6 @@
   "rewrites": [
     { "source": "/api/stripe-webhook", "destination": "https://eneuthbghipsdvsqilmb.supabase.co/functions/v1/stripe-webhook" },
     { "source": "/api/whatsapp-webhook", "destination": "https://eneuthbghipsdvsqilmb.supabase.co/functions/v1/whatsapp-webhook" },
-    { "source": "/sitemap.xml", "destination": "/api/sitemap/sitemap.xml" },
-    { "source": "/sitemap-static.xml", "destination": "/api/sitemap/sitemap-static.xml" },
-    { "source": "/sitemap-states.xml", "destination": "/api/sitemap/sitemap-states.xml" },
-    { "source": "/sitemap-cities.xml", "destination": "/api/sitemap/sitemap-cities.xml" },
-    { "source": "/sitemap-services.xml", "destination": "/api/sitemap/sitemap-services.xml" },
-    { "source": "/sitemap-service-locations.xml", "destination": "/api/sitemap/sitemap-service-locations.xml" },
-    { "source": "/sitemap-profiles.xml", "destination": "/api/sitemap/sitemap-profiles.xml" },
-    { "source": "/sitemap-posts.xml", "destination": "/api/sitemap/sitemap-posts.xml" },
-    { "source": "/sitemap-insurance.xml", "destination": "/api/sitemap/sitemap-insurance.xml" },
     { "source": "/robots.txt", "destination": "/robots.txt" },
     { "source": "/llms.txt", "destination": "/llms.txt" },
     { "source": "/llms-full.txt", "destination": "/llms-full.txt" }

@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
+import { SEOHead } from "@/components/seo/SEOHead";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -376,32 +377,14 @@ const ClaimProfilePage = () => {
     { icon: Shield, title: "Control Your Info", description: "Update your profile, services, and photos" },
   ];
 
-  // Set noindex for claim pages
-  useEffect(() => {
-    let meta = document.querySelector('meta[name="robots"]');
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.setAttribute('name', 'robots');
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute('content', 'noindex, nofollow');
-
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute('href', 'https://www.AppointPanda.ae/claim-profile');
-
-    return () => {
-      meta?.setAttribute('content', 'index, follow');
-      canonical?.remove();
-    };
-  }, []);
-
   return (
     <PageLayout>
+      <SEOHead
+        title="Claim Your Profile | AppointPanda"
+        description="Verify ownership of your clinic or practice profile to unlock management tools, reviews, and listing updates on AppointPanda."
+        canonical="/claim-profile/"
+        noindex
+      />
       {/* Compact Hero */}
       <div className="bg-gradient-to-b from-primary/5 to-background pt-8 pb-6">
         <div className="container">

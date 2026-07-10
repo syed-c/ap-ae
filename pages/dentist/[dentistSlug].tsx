@@ -1,10 +1,6 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
-import Head from 'next/head';
 import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
 import DentistPageComponent from '@/pages/DentistPage';
-
-// Wrapper component to render SEO meta tags server-side
-const BASE_URL = 'https://www.appointpanda.ae';
 
 const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData, faqs, treatmentsData, reviewsData }: {
     dentistSlug: string;
@@ -14,102 +10,8 @@ const DentistPageWithSEO = ({ dentistSlug, dentistData, seoData, faqs, treatment
     treatmentsData?: any[];
     reviewsData?: any[];
 }) => {
-    const physicianSchema = {
-        "@context": "https://schema.org",
-        "@type": "Physician",
-        "name": dentistData?.name || '',
-        "description": seoData.description,
-        "url": `${BASE_URL}/dentist/${dentistSlug}/`,
-        "image": dentistData?.image_url || `${BASE_URL}/og-image.png`,
-        "jobTitle": dentistData?.title || 'Dentist',
-        "medicalSpecialty": "Dentistry",
-        ...(dentistData?.qualifications ? {
-            "hasCredential": dentistData.qualifications.map((q: any) => ({
-                "@type": "EducationalOccupationalCredential",
-                "credentialCategory": q.degree || q.title,
-                "name": q.degree || q.title,
-            }))
-        } : undefined),
-        "worksFor": dentistData?.clinic?.name ? {
-            "@type": "Dentist",
-            "name": dentistData.clinic.name,
-            "url": `${BASE_URL}/clinic/${dentistData.clinic.slug}/`,
-            "address": dentistData.clinic.city ? {
-                "@type": "PostalAddress",
-                "addressLocality": dentistData.clinic.city.name,
-                "addressRegion": dentistData.clinic.city.state?.name || '',
-                "addressCountry": "AE",
-            } : undefined,
-        } : undefined,
-        "address": dentistData?.clinic?.city ? {
-            "@type": "PostalAddress",
-            "addressLocality": dentistData.clinic.city.name,
-            "addressRegion": dentistData.clinic.city.state?.name || '',
-            "addressCountry": "AE",
-        } : undefined,
-        ...((dentistData?.rating && dentistData?.rating > 0) ? {
-            "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": String(dentistData.rating),
-                "reviewCount": String(dentistData.review_count || 0),
-            }
-        } : {}),
-        ...(dentistData?.specializations ? {
-            "knowsAbout": dentistData.specializations.map((s: string) => s)
-        } : undefined),
-    };
-
     return (
         <>
-            <Head>
-                <title>{seoData.title}</title>
-                <meta name="description" content={seoData.description} />
-                <link rel="canonical" href={`${BASE_URL}${seoData.canonical}`} />
-                <meta property="og:type" content="profile" />
-                <meta property="og:url" content={`${BASE_URL}${seoData.canonical}`} />
-                <meta property="og:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
-                <meta property="og:description" content={seoData.description} />
-                <meta property="og:image" content={seoData.ogImage || `${BASE_URL}/og-image.png`} />
-                <meta property="og:site_name" content="AppointPanda" />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:url" content={`${BASE_URL}${seoData.canonical}`} />
-                <meta name="twitter:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
-                <meta name="twitter:description" content={seoData.description} />
-                <meta name="twitter:image" content={seoData.ogImage || `${BASE_URL}/og-image.png`} />
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(physicianSchema) }}
-                />
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "BreadcrumbList",
-                        itemListElement: [
-                            { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
-                            { "@type": "ListItem", position: 2, name: "Dentists", item: `${BASE_URL}/search/` },
-                            { "@type": "ListItem", position: 3, name: dentistData?.name || dentistSlug, item: `${BASE_URL}${seoData.canonical}` },
-                        ]
-                    }) }}
-                />
-                {faqs && faqs.length > 0 && (
-                    <script
-                        type="application/ld+json"
-                        dangerouslySetInnerHTML={{ __html: JSON.stringify({
-                            "@context": "https://schema.org",
-                            "@type": "FAQPage",
-                            mainEntity: faqs.map(f => ({
-                                "@type": "Question",
-                                name: f.question,
-                                acceptedAnswer: {
-                                    "@type": "Answer",
-                                    text: f.answer
-                                }
-                            }))
-                        }) }}
-                    />
-                )}
-            </Head>
             <DentistPageComponent 
                 dentistSlugProp={dentistSlug} 
                 dentistDataProp={dentistData}

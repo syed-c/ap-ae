@@ -4,12 +4,28 @@ import { ArrowRight, BarChart3, CalendarCheck, ShieldCheck, Users, Zap, Star, Ch
 import { PageLayout } from '@/components/layout/PageLayout';
 import { SITE_NAME, SITE_DOMAIN, clinics } from '@/lib/site-data';
 
+const BASE_URL = 'https://www.appointpanda.ae';
+
 export default function ForClinicsPage() {
   return (
     <PageLayout>
       <Head>
         <title>List Your Dental Clinic — {SITE_NAME}.ae</title>
         <meta name="description" content={`Join 500+ clinics generating an average of +38 bookings per month through ${SITE_NAME}. Zero commission, 4-week onboarding.`} />
+        <link rel="canonical" href={`${BASE_URL}/for-clinics/`} />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${BASE_URL}/for-clinics/`} />
+        <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
+        <meta property="og:site_name" content="AppointPanda" />
+        <meta property="og:locale" content="en_AE" />
+        <meta name="twitter:url" content={`${BASE_URL}/for-clinics/`} />
+        <meta name="twitter:title" content={`List Your Dental Clinic — ${SITE_NAME}.ae`} />
+        <meta name="twitter:description" content={`Join 500+ clinics generating an average of +38 bookings per month through ${SITE_NAME}. Zero commission, 4-week onboarding.`} />
+        <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+        <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}/for-clinics/`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/for-clinics/`} />
+        <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />
         <meta property="og:title" content={`List Your Dental Clinic — ${SITE_NAME}.ae`} />
         <meta property="og:description" content="Grow your practice with the UAE's leading dental directory." />
         <meta name="twitter:card" content="summary_large_image" />

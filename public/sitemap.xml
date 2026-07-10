@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://www.appointpanda.ae/sitemap-static.xml</loc>
+    <lastmod>2026-07-10</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.appointpanda.ae/sitemap-states.xml</loc>
+    <lastmod>2026-07-10</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.appointpanda.ae/sitemap-cities.xml</loc>
+    <lastmod>2026-07-10</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.appointpanda.ae/sitemap-services.xml</loc>
+    <lastmod>2026-07-10</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.appointpanda.ae/sitemap-service-locations.xml</loc>
+    <lastmod>2026-07-10</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.appointpanda.ae/sitemap-profiles.xml</loc>
+    <lastmod>2026-07-10</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.appointpanda.ae/sitemap-posts.xml</loc>
+    <lastmod>2026-07-10</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.appointpanda.ae/sitemap-insurance.xml</loc>
+    <lastmod>2026-07-10</lastmod>
+  </sitemap>
+</sitemapindex>

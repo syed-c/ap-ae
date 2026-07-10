@@ -5,12 +5,28 @@ import { PageLayout } from '@/components/layout/PageLayout';
 import { PageHero } from '@/components/layout/PageHero';
 import { SITE_NAME, SITE_DOMAIN } from '@/lib/site-data';
 
+const BASE_URL = 'https://www.appointpanda.ae';
+
 export default function AboutPage() {
   return (
     <PageLayout>
       <Head>
         <title>About {SITE_NAME}.ae — UAE Dental Directory</title>
         <meta name="description" content={`${SITE_NAME}.ae is the UAE's leading dental directory, connecting 200,000+ patients with verified licensed clinics. Learn more about our mission.`} />
+        <link rel="canonical" href={`${BASE_URL}/about/`} />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${BASE_URL}/about/`} />
+        <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
+        <meta property="og:site_name" content="AppointPanda" />
+        <meta property="og:locale" content="en_AE" />
+        <meta name="twitter:url" content={`${BASE_URL}/about/`} />
+        <meta name="twitter:title" content={`About ${SITE_NAME}.ae — UAE Dental Directory`} />
+        <meta name="twitter:description" content={`${SITE_NAME}.ae is the UAE's leading dental directory, connecting 200,000+ patients with verified licensed clinics. Learn more about our mission.`} />
+        <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+        <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}/about/`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/about/`} />
+        <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />
         <meta property="og:title" content={`About ${SITE_NAME}.ae`} />
         <meta property="og:description" content="Connecting patients with verified dental care across the UAE." />
         <meta name="twitter:card" content="summary_large_image" />

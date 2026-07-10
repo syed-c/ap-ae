@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, Mail, Clock, ArrowRight, Phone } from "lucide-react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
+const BASE_URL = 'https://www.appointpanda.ae';
+
 const ListYourPracticeSuccessPage = () => {
   const { data: siteSettings } = useSiteSettings();
   const supportEmail = siteSettings?.contactDetails?.support_email || 'support@AppointPanda.ae';
@@ -17,6 +19,20 @@ const ListYourPracticeSuccessPage = () => {
         <title>Submission Received | AppointPanda</title>
         <meta name="description" content="Your practice listing request has been received. Our team will review and verify your details within 24-48 hours." />
         <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href={`${BASE_URL}/list-your-practice/success/`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${BASE_URL}/list-your-practice/success/`} />
+        <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
+        <meta property="og:site_name" content="AppointPanda" />
+        <meta property="og:locale" content="en_AE" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={`${BASE_URL}/list-your-practice/success/`} />
+        <meta name="twitter:title" content="Submission Received | AppointPanda" />
+        <meta name="twitter:description" content="Your practice listing request has been received. Our team will review and verify your details within 24-48 hours." />
+        <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+        <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}/list-your-practice/success/`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/list-your-practice/success/`} />
+        <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />
       </Head>
       <Section size="lg" className="pt-32">
         <div className="max-w-2xl mx-auto text-center">

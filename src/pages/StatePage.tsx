@@ -90,11 +90,6 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
   const seoContent = allSeoDataProp; // From seo_pages table
   const pageContent = pageContentDataProp; // From page_content table
   
-  // DEBUG: Log pageContent to verify data is received
-  if (typeof window !== 'undefined' && pageContent) {
-    console.log('[DEBUG] pageContent received:', pageContent?.hero_intro?.substring(0, 50));
-  }
-  
   const seoContentLoading = false;
   const seoContentFetching = false;
   const isSeoContentPending = false;
@@ -153,8 +148,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
         `)
         .in('city_id', stateCityIds)
         .eq('is_active', true)
-        .order('rating', { ascending: false })
-        .limit(50);
+        .order('rating', { ascending: false });
 
       const resultIds = new Set((clinics || []).map(c => c.id));
       const missingPinnedIds = pinnedIds.filter(id => !resultIds.has(id));
@@ -552,7 +546,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
               {treatments.map((treatment, idx) => (
                 <span key={treatment.id} className="inline-flex items-center">
                   <Link
-                    href={`/${normalizedStateSlug}/${treatment.slug}/`}
+                    href={`/${normalizedStateSlug}/services/${treatment.slug}/`}
                     className="text-primary hover:text-primary/80 font-semibold hover:underline transition-colors"
                   >
                     {treatment.name}

@@ -141,7 +141,7 @@ export function Footer() {
             <ul className="space-y-2.5">
               {emirates.slice(0, 7).map((e) => (
                 <li key={e.slug}>
-                  <Link href={`/emirates/${e.slug}`} className="text-zinc-500 hover:text-amber-400 text-sm transition-colors flex items-center gap-1">
+                  <Link href={`/${e.slug}/`} className="text-zinc-500 hover:text-amber-400 text-sm transition-colors flex items-center gap-1">
                     <MapPin className="h-3 w-3 shrink-0" />
                     {e.name}
                   </Link>

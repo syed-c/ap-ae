@@ -31,11 +31,27 @@ export default function SpecialtyDetailPage({ specialty, clinics }: { specialty:
     ],
   };
 
+  const canonicalPath = `/specialties/${specialty.slug}/`;
+
   return (
     <PageLayout>
       <Head>
         <title>{`${specialty.name} in UAE — ${SITE_NAME}.ae`}</title>
         <meta name="description" content={specialty.description} />
+        <link rel="canonical" href={`${BASE_URL}${canonicalPath}`} />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${BASE_URL}${canonicalPath}`} />
+        <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
+        <meta property="og:site_name" content="AppointPanda" />
+        <meta property="og:locale" content="en_AE" />
+        <meta name="twitter:url" content={`${BASE_URL}${canonicalPath}`} />
+        <meta name="twitter:title" content={`${specialty.name} in UAE — ${SITE_NAME}.ae`} />
+        <meta name="twitter:description" content={specialty.description} />
+        <meta name="twitter:image" content={`${BASE_URL}/og-image.png`} />
+        <link rel="alternate" hrefLang="en-AE" href={`${BASE_URL}${canonicalPath}`} />
+        <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}${canonicalPath}`} />
+        <link rel="sitemap" type="application/xml" href={`${BASE_URL}/sitemap.xml`} />
         <meta property="og:title" content={`${specialty.name} in UAE — ${SITE_NAME}.ae`} />
         <meta property="og:description" content={specialty.description} />
         <meta name="twitter:card" content="summary_large_image" />
