@@ -41,7 +41,7 @@ export function useApproveReview() {
   return useMutation({
     mutationFn: async (reviewId: string) => {
       // Reviews table not yet created
-      console.log('Would approve review:', reviewId);
+      return reviewId;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-reviews'] });
@@ -56,7 +56,7 @@ export function useRejectReview() {
   return useMutation({
     mutationFn: async ({ reviewId, reason }: { reviewId: string; reason: string }) => {
       // Reviews table not yet created
-      console.log('Would reject review:', reviewId, reason);
+      return { reviewId, reason };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-reviews'] });

@@ -191,8 +191,6 @@ export function CalendarBookingForm({
         is_returning_patient: isReturningPatient,
       };
 
-      console.log('Submitting appointment:', appointmentData, 'Returning patient:', isReturningPatient);
-
       const { data: insertedAppointment, error } = await supabase
         .from("appointments")
         .insert(appointmentData as any)

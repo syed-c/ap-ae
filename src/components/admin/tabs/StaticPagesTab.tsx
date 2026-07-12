@@ -194,9 +194,6 @@ export default function StaticPagesTab() {
       refetchStats();
       queryClient.invalidateQueries({ queryKey: ["static-pages-cache"] });
 
-      // Log progress for visibility
-      console.log(`Batch result: ${data.generated} generated, ${data.currentOffset}/${data.totalCount}, ${data.remaining} remaining`);
-
       // If auto-running and not done, continue
       if (autoRunRef.current && !data.done && autoRunTypeRef.current === data.pageType) {
         setTimeout(() => {

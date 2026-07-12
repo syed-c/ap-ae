@@ -52,20 +52,6 @@ export function useWebVitals(options: UseWebVitalsOptions = {}) {
     const reportMetric = (metric: WebVitalsMetric) => {
       metricsRef.current.set(metric.name, metric);
 
-      if (debug) {
-        const color =
-          metric.rating === 'good'
-            ? '#0cce6b'
-            : metric.rating === 'needs-improvement'
-            ? '#ffa400'
-            : '#ff4e42';
-        
-        console.log(
-          `%c[Web Vitals] ${metric.name}: ${metric.value.toFixed(2)}ms (${metric.rating})`,
-          `color: ${color}; font-weight: bold;`
-        );
-      }
-
       onReport?.(metric);
     };
 
