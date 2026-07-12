@@ -16,23 +16,10 @@ import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
 
 import { 
   Star,
-  Search,
-  Verified,
   CheckCircle,
   XCircle,
-  Settings,
-  Sparkles,
-  Menu,
   ChevronDown,
-  Calendar,
-  MapPin,
-  CreditCard,
-  BadgeCheck,
-  Smile,
-  Shield,
-  Phone,
   ChevronRight,
-  Grid3X3
 } from "lucide-react";
 
 interface ServiceLocationPageProps {
@@ -273,135 +260,107 @@ const ServiceLocationPage = ({
   // Desktop Layout - FULL WIDTH, DB POWERED
   const DesktopLayout = () => (
     <div className="hidden lg:block">
-      {/* HERO - with DB page_intro */}
-      <header className="relative h-[85vh] flex items-center overflow-hidden bg-[#0e0e0e] mx-4 mb-4 rounded-[3rem]">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 right-0 w-full h-full border-r border-b border-white/10 [mask-image:radial-gradient(ellipse_at_center,black,transparent)]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-white/5 rounded-full rotate-45" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/5 rounded-full -rotate-12" />
+      <header className="relative mx-4 mb-6 overflow-hidden rounded-[2.5rem] border border-[#163632] bg-[#0f1716]">
+        <div className="absolute inset-0">
+          <div className="absolute left-1/2 top-10 h-56 w-56 -translate-x-1/2 rounded-full bg-[#73ebdc]/12 blur-3xl" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-white/10" />
         </div>
-        
-        <div className="relative z-10 max-w-5xl mx-auto w-full text-center space-y-12 p-8 md:p-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[#73ebdc] mx-auto">
-            <Verified className="text-sm h-4 w-4" />
-            <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Verified Provider Directory</span>
-          </div>
-          
-          <div className="space-y-6">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight tracking-tight max-w-4xl mx-auto">
-              {displayH1}
-            </h1>
-          </div>
-          
-          {/* Search Interface */}
-          <div className="bg-white/10 border border-white/20 p-2 rounded-[2.5rem] shadow-2xl max-w-4xl mx-auto backdrop-blur-xl">
-            <div className="flex flex-col md:flex-row items-center">
-              <div className="flex-1 w-full px-6 py-4 flex items-center gap-4 hover:bg-white/5 rounded-full transition-colors cursor-pointer group">
-                <Grid3X3 className="text-[#73ebdc] group-hover:scale-110 transition-transform" />
-                <div className="text-left">
-                  <label className="block text-[10px] font-bold text-white/50 uppercase tracking-wider">Specialization</label>
-                  <span className="text-white font-semibold">{treatmentName}</span>
-                </div>
-                <ChevronDown className="text-white/20 ml-auto h-4 w-4" />
-              </div>
-              <div className="hidden md:block w-px h-10 bg-white/10" />
-              <div className="flex-1 w-full px-6 py-4 flex items-center gap-4 hover:bg-white/5 rounded-full transition-colors cursor-pointer group">
-                <MapPin className="text-[#73ebdc] group-hover:scale-110 transition-transform" />
-                <div className="text-left">
-                  <label className="block text-[10px] font-bold text-white/50 uppercase tracking-wider">Neighborhood</label>
-                  <span className="text-white font-semibold">{locationName}</span>
-                </div>
-                <ChevronDown className="text-white/20 ml-auto h-4 w-4" />
-              </div>
-              <div className="hidden md:block w-px h-10 bg-white/10" />
-              <div className="flex-1 w-full px-6 py-4 flex items-center gap-4 hover:bg-white/5 rounded-full transition-colors cursor-pointer group">
-                <Shield className="text-[#73ebdc] group-hover:scale-110 transition-transform" />
-                <div className="text-left">
-                  <label className="block text-[10px] font-bold text-white/50 uppercase tracking-wider">Insurance</label>
-                  <span className="text-white font-semibold">All Providers</span>
-                </div>
-                <ChevronDown className="text-white/20 ml-auto h-4 w-4" />
-              </div>
-              <Link href={`/${stateSlug}/${citySlug}/`} className="w-full md:w-auto px-10 py-5 bg-[#73ebdc] text-[#004842] font-black rounded-[2rem] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 m-1">
-                <Search className="h-5 w-5" />
-                Find Specialist
-              </Link>
+
+        <div className="relative z-10 mx-auto max-w-5xl px-8 py-16 text-center md:px-12 md:py-20">
+          <span className="inline-flex rounded-full border border-[#73ebdc]/20 bg-[#73ebdc]/8 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73ebdc]">
+            {locationName} treatment page
+          </span>
+          <h1 className="mx-auto mt-6 max-w-4xl text-4xl font-extrabold tracking-tight text-white md:text-6xl leading-[1.04]">
+            {displayH1}
+          </h1>
+          <p className="mx-auto mt-4 max-w-3xl text-base leading-7 text-white/70 md:text-lg">
+            Find verified {treatmentName.toLowerCase()} providers in {locationName}, compare pricing expectations, and move directly into the live dentist directory for this area.
+          </p>
+
+          <div className="mx-auto mt-8 grid max-w-4xl gap-3 rounded-[2rem] border border-white/10 bg-white/5 p-3 md:grid-cols-[1fr_1fr_1fr_auto]">
+            <div className="rounded-[1.25rem] border border-white/10 bg-black/10 px-5 py-4 text-left">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">Treatment</p>
+              <p className="mt-1 text-sm font-semibold text-white">{treatmentName}</p>
             </div>
+            <div className="rounded-[1.25rem] border border-white/10 bg-black/10 px-5 py-4 text-left">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">Area</p>
+              <p className="mt-1 text-sm font-semibold text-white">{locationName}</p>
+            </div>
+            <div className="rounded-[1.25rem] border border-white/10 bg-black/10 px-5 py-4 text-left">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">Coverage</p>
+              <p className="mt-1 text-sm font-semibold text-white">{profiles?.length || 0}+ live providers</p>
+            </div>
+            <Link href={`/${stateSlug}/${citySlug}/`} className="inline-flex items-center justify-center rounded-[1.25rem] bg-[#73ebdc] px-7 py-4 text-sm font-bold text-[#073c35] transition-colors hover:bg-[#5fe0d0]">
+              View all providers
+            </Link>
           </div>
-          
-          {/* Trust Stats */}
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16 pt-4">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl font-black text-white">{profiles?.length || 0}+</span>
-              <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Verified<br/>Clinics</span>
+
+          <div className="mx-auto mt-8 grid max-w-4xl grid-cols-3 gap-3">
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
+              <div className="text-2xl font-bold text-white">{profiles?.length || 0}+</div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-white/50">Verified clinics</div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl font-black text-white">{profiles?.length * 2 || 0}+</span>
-              <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Active<br/>Specialists</span>
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
+              <div className="text-2xl font-bold text-white">{profiles?.length * 2 || 0}+</div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-white/50">Visible specialists</div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl font-black text-white">4.9/5</span>
-              <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest text-left leading-tight">Patient<br/>Rating</span>
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
+              <div className="text-2xl font-bold text-white">4.9/5</div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-white/50">Patient rating</div>
             </div>
           </div>
         </div>
       </header>
 
       {/* ESTIMATED CARE COSTS - from DB treatment_options/price_min/price_max */}
-      <section className="py-24">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+          <div className="mb-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div className="space-y-4">
-              <h2 className="text-4xl font-bold tracking-tight text-[#2f2f2e]">Transparent Care Costs</h2>
+              <h2 className="text-3xl font-bold tracking-tight text-[#2f2f2e]">Transparent care costs</h2>
               <p className="text-[#5c5b5b] max-w-xl">Quality dental care shouldn't be a mystery. We provide estimated costs based on {locationName} market standards.</p>
             </div>
-            <CreditCard className="text-[#00675f] h-12 w-12" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {costCards.map((card: any, i: number) => (
-              <div key={i} className="group bg-[#f3f0ef] p-8 rounded-[2rem] hover:bg-white transition-all duration-300 border border-transparent hover:border-[#00675f]/10">
-                {card.icon === 'medical_services' && <BadgeCheck className="text-[#00675f] mb-6 text-3xl" />}
-                {card.icon === 'dentistry' && <Smile className="text-[#00675f] mb-6 text-3xl" />}
-                {card.icon === 'auto_fix_high' && <Sparkles className="text-[#00675f] mb-6 text-3xl" />}
-                {card.icon === 'settings_accessibility' && <Settings className="text-[#00675f] mb-6 text-3xl" />}
-                {card.icon === 'clinical_notes' && <BadgeCheck className="text-[#00675f] mb-6 text-3xl" />}
-                <h3 className="font-bold text-xl mb-2 text-[#2f2f2e]">{card.name}</h3>
-                <p className="text-[#5c5b5b] text-sm mb-6">Comprehensive assessment and treatment.</p>
+              <div key={i} className="rounded-[1.75rem] border border-[#d9d5d2] bg-white p-6 transition-colors hover:border-[#00675f]/20">
+                <div className="mb-5 h-1.5 w-12 rounded-full bg-[#00675f]" />
+                <h3 className="mb-2 text-xl font-bold text-[#2f2f2e]">{card.name}</h3>
+                <p className="mb-5 text-sm text-[#5c5b5b]">Comprehensive assessment and treatment.</p>
                 <div className="text-3xl font-black text-[#2f2f2e]">{card.price} <span className="text-xs font-medium text-[#5c5b5b]">Avg.</span></div>
               </div>
             ))}
-            
           </div>
         </div>
       </section>
 
       {/* TOP-RATED SPECIALISTS - from DB profiles */}
       {hasProfiles && (
-      <section className="bg-[#f3f0ef] py-24">
+      <section className="bg-[#f7f4f2] py-16">
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-16">
-            <h2 className="text-4xl font-bold tracking-tight">World-Class Specialists</h2>
+          <div className="mb-10 flex items-center justify-between">
+            <h2 className="text-3xl font-bold tracking-tight text-[#2f2f2e]">Top-rated specialists</h2>
             <Link href={`/${stateSlug}/${citySlug}/`} className="flex items-center gap-2 text-[#00675f] font-bold hover:translate-x-2 transition-transform">
               View All Dentists <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid gap-6 md:grid-cols-2">
             {topDoctors.map((doctor: any, i: number) => (
-              <div key={i} className="flex gap-8 p-8 bg-white rounded-[2.5rem] items-center group">
-                <div className="w-48 h-64 rounded-[2rem] overflow-hidden relative flex-shrink-0">
-                  <img alt={doctor.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src={doctor.image} />
+              <div key={i} className="flex gap-5 rounded-[1.75rem] border border-[#ddd7d2] bg-white p-5 items-center">
+                <div className="h-40 w-32 overflow-hidden rounded-[1.5rem] relative flex-shrink-0">
+                  <img alt={doctor.name} className="h-full w-full object-cover" src={doctor.image} />
                 </div>
-                <div className="flex flex-col justify-center space-y-4">
+                <div className="flex flex-col justify-center space-y-3">
                   <div className="flex items-center gap-2 text-[#00675f]">
                     <Star className="h-4 w-4 fill-current" />
                     <span className="font-bold text-sm">{doctor.rating} ({doctor.reviewCount}+ Reviews)</span>
                   </div>
-                  <h3 className="text-3xl font-bold text-[#2f2f2e]">{doctor.name}</h3>
+                  <h3 className="text-2xl font-bold text-[#2f2f2e]">{doctor.name}</h3>
                   <p className="text-[#5c5b5b] font-medium">{doctor.specialty}</p>
                   <p className="text-sm leading-relaxed text-[#5c5b5b]/80">Expert in delivering precise dental care with cutting-edge technology.</p>
-                  <div className="pt-4 flex gap-3">
+                  <div className="pt-2 flex flex-wrap gap-2">
                     {doctor.languages.map((lang: string, j: number) => (
-                      <span key={j} className="px-3 py-1 bg-[#f3f0ef] rounded-full text-[10px] font-bold uppercase tracking-wider">{lang}</span>
+                      <span key={j} className="rounded-full bg-[#f3f0ef] px-3 py-1 text-[10px] font-bold uppercase tracking-wider">{lang}</span>
                     ))}
                   </div>
                 </div>
@@ -413,27 +372,24 @@ const ServiceLocationPage = ({
       )}
 
       {/* CONCIERGE JOURNEY - from DB process_steps */}
-      <section className="py-24">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold tracking-tight mb-4">The Concierge Journey</h2>
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold tracking-tight mb-3">How booking works</h2>
             <p className="text-[#5c5b5b]">Three simple steps to your new architectural smile.</p>
           </div>
-          <div className="relative grid md:grid-cols-3 gap-8">
-            <div className="hidden md:block absolute top-12 left-0 w-full h-[2px] bg-[#dedcdb] z-0" />
+          <div className="grid gap-5 md:grid-cols-3">
             {(processSteps && processSteps.length > 0 ? processSteps : [
               { step: "01", title: "Find", desc: `Select your preferred specialist in ${locationName}.` },
               { step: "02", title: "Choose", desc: "Pick a time that fits your urban lifestyle." },
               { step: "03", title: "Register", desc: "Simple digital onboarding. No paperwork." },
             ]).map((item: any, i: number) => (
-              <div key={i} className="relative z-10 flex flex-col items-center text-center space-y-6">
-                <div className="w-24 h-24 rounded-[2rem] bg-white border-4 border-[#f3f0ef] shadow-xl flex items-center justify-center text-[#00675f] hover:bg-[#00675f] hover:text-white transition-all">
-                  {i === 0 && <Search className="text-4xl" />}
-                  {i === 1 && <Calendar className="text-4xl" />}
-                  {i === 2 && <BadgeCheck className="text-4xl" />}
+              <div key={i} className="rounded-[1.75rem] border border-[#ddd7d2] bg-white p-6 text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[#00675f]/15 bg-[#00675f]/5 text-sm font-bold text-[#00675f]">
+                  {String(i + 1).padStart(2, '0')}
                 </div>
-                <div>
-                  <h4 className="font-bold text-xl mb-2">{item.title || item.name}</h4>
+                <div className="mt-5">
+                  <h4 className="mb-2 text-xl font-bold">{item.title || item.name}</h4>
                   <p className="text-sm text-[#5c5b5b]">{item.desc || item.description}</p>
                 </div>
               </div>
@@ -443,10 +399,10 @@ const ServiceLocationPage = ({
       </section>
 
       {/* PRECISION SECTION (DARK) - DB content + verification info */}
-      <section className="bg-[#0e0e0e] text-white py-24 sticky top-0 z-40">
+      <section className="bg-[#0f1716] text-white py-16">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-4 gap-6 items-start">
           <div className="lg:col-span-3 space-y-8">
-            <h2 className="text-4xl md:text-5xl font-bold leading-tight">Precision in the Heart of <span className="text-[#73ebdc]">{locationName}.</span></h2>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight">Precision in the heart of <span className="text-[#73ebdc]">{locationName}</span>.</h2>
             {pageContent ? (
               <div className="text-white/60 text-lg leading-relaxed whitespace-pre-line">
                 {pageContent.split('\n').slice(1).join('\n')}
@@ -457,10 +413,7 @@ const ServiceLocationPage = ({
               </p>
             )}
             {/* Content You Can Trust - from DB medical verification fields */}
-            <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem] flex items-start gap-6">
-              <div className="w-14 h-14 rounded-2xl bg-[#73ebdc]/20 flex flex-shrink-0 items-center justify-center text-[#73ebdc]">
-                <Shield className="text-3xl" />
-              </div>
+            <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6">
               <div>
                 <h4 className="font-bold text-xl mb-2 text-white">Content You Can Trust</h4>
                 <p className="text-white/60 text-sm">
@@ -470,8 +423,8 @@ const ServiceLocationPage = ({
               </div>
             </div>
           </div>
-          <div className="lg:col-span-1 lg:sticky lg:top-24">
-            <div className="bg-[#00675f] p-6 rounded-[2rem] text-white">
+          <div className="lg:col-span-1">
+            <div className="rounded-[1.75rem] bg-[#00675f] p-6 text-white">
               <h3 className="font-bold text-xl mb-4">Need a Quote?</h3>
               <p className="text-[#73ebdc] text-sm mb-8">Every smile is unique. Get a personalized estimate after your first consultation.</p>
               <Link href={`/${stateSlug}/${citySlug}/`} className="block w-full py-3 bg-white text-[#00675f] rounded-xl font-bold hover:bg-[#73ebdc] transition-colors text-center">Book Consult</Link>
@@ -481,13 +434,11 @@ const ServiceLocationPage = ({
       </section>
 
       {/* SUITABILITY CARDS - from DB candidates/alternatives */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-6">
-          <div className="flex-1 bg-white/40 border border-[#2eb2a5]/20 p-6 rounded-[2rem] shadow-xl shadow-[#2eb2a5]/5">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-[#2eb2a5]/10 flex items-center justify-center text-[#2eb2a5]">
-                <CheckCircle className="text-xl" />
-              </div>
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto grid gap-6 md:grid-cols-2">
+          <div className="rounded-[1.75rem] border border-[#d8efe9] bg-[#f5fbfa] p-6">
+            <div className="mb-4 border-b border-[#cde8e1] pb-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#00675f]">Best Fit</p>
               <h3 className="text-lg font-bold text-[#2f2f2e]">Recommended For</h3>
             </div>
             <ul className="space-y-2 text-sm">
@@ -504,11 +455,9 @@ const ServiceLocationPage = ({
               )}
             </ul>
           </div>
-          <div className="flex-1 bg-[#f3f0ef]/50 border border-[#aeadac]/10 p-6 rounded-[2rem] shadow-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-red-500/5 flex items-center justify-center text-red-500/60">
-                <XCircle className="text-xl" />
-              </div>
+          <div className="rounded-[1.75rem] border border-[#ead7d7] bg-[#fdf7f7] p-6">
+            <div className="mb-4 border-b border-[#efdddd] pb-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-red-500">Consider Alternatives</p>
               <h3 className="text-lg font-bold text-[#2f2f2e]">May Not Be Suitable</h3>
             </div>
             <ul className="space-y-2 text-sm">
@@ -529,15 +478,15 @@ const ServiceLocationPage = ({
       </section>
 
       {/* FAQS - from DB faqs */}
-      <section className="py-24">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold tracking-tight">Common Inquiries</h2>
+          <div className="mb-10 text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-[#2f2f2e]">Common inquiries</h2>
           </div>
-          <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
+          <div className="grid gap-4 md:grid-cols-2">
             {faqs.slice(0, 10).map((faq: any, i: number) => (
-              <div key={i} className="group p-6 rounded-2xl border border-[#aeadac]/10 hover:bg-[#eae8e7] transition-colors cursor-pointer" onClick={() => setOpenFaqIndex(openFaqIndex === i ? null : i)}>
-                <div className="flex justify-between items-center">
+              <div key={i} className="rounded-[1.5rem] border border-[#ddd7d2] bg-white p-5 transition-colors hover:border-[#00675f]/15" onClick={() => setOpenFaqIndex(openFaqIndex === i ? null : i)}>
+                <div className="flex items-center justify-between gap-4">
                   <h4 className="font-bold text-[#2f2f2e]">{faq.q || faq.question}</h4>
                   <ChevronDown className={`text-[#00675f] group-hover:rotate-180 transition-transform ${openFaqIndex === i ? 'rotate-180' : ''}`} />
                 </div>
@@ -555,22 +504,22 @@ const ServiceLocationPage = ({
       </section>
 
       {/* EXPLORE OTHER LOCATIONS - from DB cities table */}
-      <section className="pb-24">
-        <div className="max-w-7xl mx-auto pt-24 border-t border-[#aeadac]/10">
-          <div className="flex items-center justify-between mb-12">
+      <section className="pb-16">
+        <div className="max-w-7xl mx-auto border-t border-[#aeadac]/10 pt-16">
+          <div className="mb-8 flex items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-3xl font-bold tracking-tight text-[#2f2f2e]">Explore Other Locations</h2>
+              <h2 className="text-3xl font-bold tracking-tight text-[#2f2f2e]">Explore other locations</h2>
               <p className="text-[#5c5b5b] font-medium">Find our verified network of specialists across {stateName}.</p>
             </div>
             <Link href="/find-clinics" className="text-[#2eb2a5] font-bold flex items-center gap-2 hover:translate-x-2 transition-transform">
               Global Directory <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+          <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
             {cities.map((c: any, i: number) => (
-              <Link key={i} href={`/${normalizedStateSlug}/${c.slug}/`} className="group">
-                <div className="text-[#5c5b5b] font-medium group-hover:text-[#2eb2a5] transition-colors">{c.name}</div>
-                <div className="text-[10px] text-[#787676] uppercase tracking-widest font-bold mt-1">{i === 0 ? 'Primary Hub' : `Area ${i + 1}`}</div>
+              <Link key={i} href={`/${normalizedStateSlug}/${c.slug}/`} className="rounded-2xl border border-[#ddd7d2] bg-white px-4 py-4 transition-colors hover:border-[#00675f]/15 hover:bg-[#faf8f7]">
+                <div className="text-[#2f2f2e] font-semibold">{c.name}</div>
+                <div className="mt-2 text-[10px] text-[#787676] uppercase tracking-widest font-bold">{i === 0 ? 'Primary Hub' : `Area ${i + 1}`}</div>
               </Link>
             ))}
           </div>
@@ -582,36 +531,26 @@ const ServiceLocationPage = ({
   // Mobile Layout - matches mobile design file exactly
   const MobileLayout = () => (
     <div className="lg:hidden">
-      {/* 1. Search Hub Hero */}
-      <section className="relative min-h-[500px] flex flex-col justify-end p-6 bg-[#0e0e0e] overflow-hidden">
-        <div className="absolute inset-0">
-          <img className="w-full h-full object-cover opacity-40" alt="clinic" src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&h=600&fit=crop" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-[#0e0e0e]/60 to-transparent" />
-        </div>
-        <div className="relative z-10 space-y-6">
-          <div className="space-y-2">
-            <span className="text-[#73ebdc] font-bold tracking-widest text-[10px] uppercase">{locationName} Hub</span>
-            <h2 className="text-4xl font-extrabold text-white tracking-tight leading-[1.1]">{displayH1}</h2>
+      <section className="overflow-hidden border-b border-white/10 bg-[#0f1716] px-6 py-12 text-center">
+        <span className="inline-flex rounded-full border border-[#73ebdc]/20 bg-[#73ebdc]/8 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#73ebdc]">
+          {locationName} treatment page
+        </span>
+        <h2 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight text-white">{displayH1}</h2>
+        <p className="mt-4 text-sm leading-6 text-white/70">
+          Compare verified {treatmentName.toLowerCase()} providers in {locationName} and jump into the live directory for this area.
+        </p>
+        <div className="mt-6 space-y-3 rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+          <div className="rounded-xl border border-white/10 bg-black/10 px-4 py-3 text-left">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/45">Treatment</p>
+            <p className="mt-1 text-sm font-semibold text-white">{treatmentName}</p>
           </div>
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10 space-y-4">
-            <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold px-1">Specialization</label>
-              <div className="bg-white/10 rounded-lg p-3 flex items-center justify-between text-white border border-white/5">
-                <span className="text-sm">{treatmentName}</span>
-                <ChevronDown className="text-sm" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold px-1">Neighborhood</label>
-              <div className="bg-white/10 rounded-lg p-3 flex items-center justify-between text-white border border-white/5">
-                <span className="text-sm">{locationName}</span>
-                <MapPin className="text-sm" />
-              </div>
-            </div>
-            <Link href={`/${stateSlug}/${citySlug}/`} className="block w-full bg-gradient-to-r from-[#00675f] to-[#73ebdc] text-white py-4 rounded-full font-bold text-sm shadow-lg shadow-[#00675f]/20 text-center">
-              Discover Practices
-            </Link>
+          <div className="rounded-xl border border-white/10 bg-black/10 px-4 py-3 text-left">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/45">Area</p>
+            <p className="mt-1 text-sm font-semibold text-white">{locationName}</p>
           </div>
+          <Link href={`/${stateSlug}/${citySlug}/`} className="block w-full rounded-xl bg-[#73ebdc] py-3 text-sm font-bold text-[#073c35]">
+            View all providers
+          </Link>
         </div>
       </section>
 
@@ -694,11 +633,8 @@ const ServiceLocationPage = ({
           <div className="absolute left-6 top-4 bottom-4 w-px bg-[#00675f]/20" />
           {processSteps && processSteps.length > 0 ? processSteps.slice(0, 4).map((step: any, i: number) => (
             <div key={i} className="relative flex items-start gap-6">
-              <div className="w-12 h-12 rounded-full bg-[#00675f] flex items-center justify-center text-white z-10 shrink-0">
-                {i === 0 && <Search className="text-xl" />}
-                {i === 1 && <Calendar className="text-xl" />}
-                {i === 2 && <BadgeCheck className="text-xl" />}
-                {i === 3 && <Verified className="text-xl" />}
+              <div className="z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#00675f]/15 bg-white text-sm font-bold text-[#00675f]">
+                {String(i + 1).padStart(2, '0')}
               </div>
               <div className="space-y-1 pt-2">
                 <h4 className="font-bold">{step.title || `Step ${i + 1}`}</h4>
@@ -712,11 +648,8 @@ const ServiceLocationPage = ({
             { title: "Confirmed", desc: "Receive your digital concierge pass and appointment brief." }
           ].map((step: any, i: number) => (
             <div key={i} className="relative flex items-start gap-6">
-              <div className="w-12 h-12 rounded-full bg-[#00675f] flex items-center justify-center text-white z-10 shrink-0">
-                {i === 0 && <Search className="text-xl" />}
-                {i === 1 && <Calendar className="text-xl" />}
-                {i === 2 && <BadgeCheck className="text-xl" />}
-                {i === 3 && <Verified className="text-xl" />}
+              <div className="z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#00675f]/15 bg-white text-sm font-bold text-[#00675f]">
+                {String(i + 1).padStart(2, '0')}
               </div>
               <div className="space-y-1 pt-2">
                 <h4 className="font-bold">{step.title}</h4>
@@ -728,14 +661,9 @@ const ServiceLocationPage = ({
       </section>
 
       {/* 5. Precision in Location */}
-      <section className="p-6 bg-[#0e0e0e] text-white">
+      <section className="p-6 bg-[#0f1716] text-white">
         <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-[#00675f]/20 p-2 rounded-lg">
-              <Shield className="text-[#73ebdc] text-2xl" />
-            </div>
-            <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#73ebdc]">Medical Verification</span>
-          </div>
+          <span className="inline-flex rounded-full border border-[#73ebdc]/20 bg-[#73ebdc]/8 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#73ebdc]">Medical Verification</span>
           <h3 className="text-3xl font-bold tracking-tight">Precision in {locationName}</h3>
           {pageContent ? (
             <div className="text-white/70 text-sm leading-relaxed whitespace-pre-line">
@@ -751,12 +679,12 @@ const ServiceLocationPage = ({
               </p>
             </>
           )}
-          <div className="pt-4 flex gap-4">
-            <div className="border-l-2 border-[#73ebdc] pl-4">
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
               <div className="text-xl font-bold">100%</div>
               <div className="text-[10px] uppercase text-white/50 font-bold">Vetted Units</div>
             </div>
-            <div className="border-l-2 border-[#73ebdc] pl-4">
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
               <div className="text-xl font-bold">{profiles?.length || 0}+</div>
               <div className="text-[10px] uppercase text-white/50 font-bold">Patient Success</div>
             </div>
@@ -801,11 +729,18 @@ const ServiceLocationPage = ({
         <h3 className="text-2xl font-bold tracking-tight">Common Inquiries</h3>
         <div className="space-y-4">
           {faqs.slice(0, 10).map((faq: any, i: number) => (
-            <div key={i} className="border-b border-[#aeadac]/20 pb-4">
-              <div className="flex justify-between items-center gap-4">
+            <div key={i} className="rounded-2xl border border-[#d7d3cf] bg-white px-4 py-4">
+              <button type="button" onClick={() => setOpenFaqIndex(openFaqIndex === i ? null : i)} className="flex w-full items-center justify-between gap-4 text-left">
                 <span className="text-sm font-semibold leading-tight">{faq.q || faq.question}</span>
-                <ChevronDown className="text-[#00675f]" />
-              </div>
+                <ChevronDown className={`text-[#00675f] transition-transform ${openFaqIndex === i ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {openFaqIndex === i && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                    <p className="pt-3 text-sm leading-6 text-[#5c5b5b]">{faq.a || faq.answer}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ))}
         </div>

@@ -3,6 +3,14 @@ import https from 'https';
 import dns from 'dns';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
+    if (process.env.ENABLE_IMAGE_PROXY !== 'true') {
+        return res.status(404).json({ error: 'Not found' });
+    }
+
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     const { path: queryPath } = req.query;
     const pathSegments = Array.isArray(queryPath) ? queryPath : [];
 
@@ -12,6 +20,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const projectId = pathSegments[0];
     const realPathSegments = pathSegments.slice(1);
+    const allowedProjectId = process.env.NEXT_PUBLIC_SUPABASE_URL?.match(/^https?:\/\/([^.]+)\.supabase\.co/i)?.[1];
+
+    if (!allowedProjectId || projectId !== allowedProjectId) {
+        return res.status(404).json({ error: 'Not found' });
+    }
+
     const targetHost = `${projectId}.supabase.co`;
     const targetIp = '104.18.38.10'; // Bypasses UAE DNS poisoning
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
@@ -19,8 +33,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     // Build the target path
     const queryString = req.url?.split('?')[1];
     const targetPath = `/${realPathSegments.join('/')}${queryString ? '?' + queryString : ''}`;
-
-    console.log(`[Proxy Image] Routing to ${targetHost}${targetPath}`);
 
     const options: https.RequestOptions = {
         hostname: targetHost,
@@ -42,7 +54,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             }
             dns.lookup(hostname, lookupOptions, (err, address, family) => cb(err, address as any, family as any));
         },
-        rejectUnauthorized: false,
+        rejectUnauthorized: true,
     };
 
     if (!options.headers?.['authorization']) delete options.headers['authorization'];

@@ -1,10 +1,8 @@
 'use client';
 import { useState, useCallback } from "react";
-import { motion } from "framer-motion";
-import { DollarSign, Star, Shield, Sparkles, Filter, ChevronDown, ChevronUp, X, Stethoscope, MapPin } from "lucide-react";
+import { DollarSign, Star, Shield, Filter, ChevronDown, ChevronUp, X, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 
 export interface BudgetFilters {
@@ -25,12 +23,12 @@ interface BudgetFilterSidebarProps {
 }
 
 const BUDGET_PRESETS = [
-  { label: "Under 100 AED", value: 100, icon: "💵" },
-  { label: "Under 500 AED", value: 500, icon: "💰" },
-  { label: "Under 1,000 AED", value: 1000, icon: "💎" },
-  { label: "Under 2,500 AED", value: 2500, icon: "🏆" },
-  { label: "Under 5,000 AED", value: 5000, icon: "⭐" },
-  { label: "Any Budget", value: null, icon: "🎯" },
+  { label: "Under 100 AED", value: 100 },
+  { label: "Under 500 AED", value: 500 },
+  { label: "Under 1,000 AED", value: 1000 },
+  { label: "Under 2,500 AED", value: 2500 },
+  { label: "Under 5,000 AED", value: 5000 },
+  { label: "Any Budget", value: null },
 ];
 
 const RATING_OPTIONS = [
@@ -49,7 +47,6 @@ export function BudgetFilterSidebar({
   totalResults = 0,
   className,
 }: BudgetFilterSidebarProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
   const [showAllServices, setShowAllServices] = useState(false);
 
   const activeFilterCount = 
@@ -89,46 +86,37 @@ export function BudgetFilterSidebar({
   const displayedServices = showAllServices ? availableServices : availableServices.slice(0, 6);
 
   return (
-    <motion.aside
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
+    <aside
       className={cn(
-        "bg-card border border-border rounded-3xl overflow-hidden shadow-lg",
+        "overflow-hidden rounded-2xl border border-border bg-card shadow-sm",
         className
       )}
     >
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary/10 to-primary/5 px-5 py-4 border-b border-border">
+      <div className="border-b border-border bg-muted/25 px-5 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-xl bg-primary/20 flex items-center justify-center">
-              <Filter className="h-4 w-4 text-primary" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background">
+              <Filter className="h-4 w-4 text-foreground" />
             </div>
             <div>
-              <h3 className="font-bold text-foreground text-sm">Smart Filters</h3>
-              <p className="text-xs text-muted-foreground">AI-Powered Matching</p>
+              <h3 className="text-sm font-bold text-foreground">Refine Results</h3>
+              <p className="text-xs text-muted-foreground">Narrow the live directory view</p>
             </div>
           </div>
           {activeFilterCount > 0 && (
-            <Badge className="bg-primary text-primary-foreground text-xs">
+            <Badge className="border border-primary/20 bg-primary/10 text-xs text-primary">
               {activeFilterCount} active
             </Badge>
           )}
         </div>
-        
-        {/* Results summary */}
-        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <Sparkles className="h-3 w-3 text-primary" />
-          <span>
-            <strong className="text-foreground">{totalResults}</strong> clinics
-            {locationName && <> in <strong className="text-foreground">{locationName}</strong></>}
-            {treatmentName && <> for <strong className="text-primary">{treatmentName}</strong></>}
-          </span>
+        <div className="mt-3 rounded-xl border border-border/70 bg-background px-3 py-2 text-xs text-muted-foreground">
+          <strong className="text-foreground">{totalResults}</strong> results
+          {locationName && <> in <strong className="text-foreground">{locationName}</strong></>}
+          {treatmentName && <> for <strong className="text-foreground">{treatmentName}</strong></>}
         </div>
       </div>
 
-      <div className="p-5 space-y-6">
-        {/* Budget Filter - Primary Focus */}
+      <div className="space-y-6 p-5">
         <div>
           <div className="flex items-center gap-2 mb-3">
             <DollarSign className="h-4 w-4 text-primary" />
@@ -140,20 +128,18 @@ export function BudgetFilterSidebar({
                 key={preset.value ?? "any"}
                 onClick={() => handleBudgetChange(preset.value)}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition-all border",
+                  "rounded-xl border px-3 py-2.5 text-left text-xs font-semibold transition-colors",
                   filters.maxBudget === preset.value
-                    ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20"
-                    : "bg-muted/50 text-foreground border-transparent hover:border-primary/30 hover:bg-muted"
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-foreground hover:border-primary/30 hover:bg-muted/40"
                 )}
               >
-                <span>{preset.icon}</span>
                 <span>{preset.label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Rating Filter */}
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Star className="h-4 w-4 text-gold fill-gold" />
@@ -165,10 +151,10 @@ export function BudgetFilterSidebar({
                 key={option.value}
                 onClick={() => handleRatingChange(option.value)}
                 className={cn(
-                  "px-3 py-2 rounded-xl text-xs font-bold transition-all border",
+                  "rounded-xl border px-3 py-2 text-xs font-semibold transition-colors",
                   filters.minRating === option.value
                     ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-muted/50 text-foreground border-transparent hover:border-primary/30"
+                    : "bg-background text-foreground border-border hover:border-primary/30"
                 )}
               >
                 {option.label}
@@ -177,34 +163,29 @@ export function BudgetFilterSidebar({
           </div>
         </div>
 
-        {/* Verified Only Toggle */}
         <div>
           <button
             onClick={handleVerifiedToggle}
             className={cn(
-              "w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all",
+              "w-full flex items-center justify-between rounded-xl border px-4 py-3 transition-colors",
               filters.verifiedOnly
                 ? "bg-primary/10 border-primary/30 text-primary"
-                : "bg-muted/50 border-transparent hover:border-primary/30 text-foreground"
+                : "bg-background border-border hover:border-primary/30 text-foreground"
             )}
           >
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
               <span className="font-bold text-sm">Verified Only</span>
             </div>
-            <div className={cn(
-              "h-5 w-9 rounded-full transition-colors relative",
-              filters.verifiedOnly ? "bg-primary" : "bg-muted"
-            )}>
-              <div className={cn(
-                "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform",
-                filters.verifiedOnly ? "translate-x-4" : "translate-x-0.5"
+              <div className={cn("relative h-5 w-9 rounded-full transition-colors", filters.verifiedOnly ? "bg-primary" : "bg-muted")}> 
+                <div className={cn(
+                  "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform",
+                  filters.verifiedOnly ? "translate-x-4" : "translate-x-0.5"
               )} />
             </div>
           </button>
         </div>
 
-        {/* Services Filter */}
         {availableServices.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
@@ -214,16 +195,16 @@ export function BudgetFilterSidebar({
             <div className="flex flex-wrap gap-2">
               {displayedServices.map((service) => (
                 <button
-                  key={service.id}
-                  onClick={() => handleServiceToggle(service.slug)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full text-xs font-bold transition-all border",
-                    filters.selectedServices.includes(service.slug)
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-muted/50 text-foreground border-transparent hover:border-primary/30"
-                  )}
-                >
-                  {service.name}
+                    key={service.id}
+                    onClick={() => handleServiceToggle(service.slug)}
+                    className={cn(
+                      "rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors",
+                      filters.selectedServices.includes(service.slug)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:border-primary/30"
+                    )}
+                  >
+                    {service.name}
                 </button>
               ))}
             </div>
@@ -242,7 +223,6 @@ export function BudgetFilterSidebar({
           </div>
         )}
 
-        {/* Clear All */}
         {activeFilterCount > 0 && (
           <Button
             variant="ghost"
@@ -255,7 +235,7 @@ export function BudgetFilterSidebar({
           </Button>
         )}
       </div>
-    </motion.aside>
+    </aside>
   );
 }
 

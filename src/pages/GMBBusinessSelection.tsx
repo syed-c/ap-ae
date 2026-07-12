@@ -97,7 +97,6 @@ export default function GMBBusinessSelection() {
     // This prevents redirect loops when session is being restored
     const timer = setTimeout(() => {
       if (!user) {
-        console.log('[GMB] No user found, redirecting to auth');
         router.replace('/auth');
         return;
       }
@@ -126,13 +125,6 @@ export default function GMBBusinessSelection() {
       // 3) session.provider_token (often not persisted in PKCE)
       const storedToken = getGmbProviderToken();
       const providerToken = providerTokenFromNavState ?? storedToken ?? session.provider_token ?? null;
-
-      // Debug (safe): helps diagnose why token isn't available without leaking it.
-      console.log('[GMB] token sources', {
-        nav: !!providerTokenFromNavState,
-        stored: !!storedToken,
-        session: !!session.provider_token,
-      });
 
       // Persist for the rest of the discovery flow.
       if (!storedToken && providerToken) {

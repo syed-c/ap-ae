@@ -70,8 +70,6 @@ export default function GMBConnectionCard({
       const currentOrigin = window.location.origin;
       const redirectTo = `${currentOrigin}/auth/callback?relink=true`;
 
-      console.log('[GMB] Starting OAuth for GMB connection, redirect:', redirectTo);
-
       // IMPORTANT: Use signInWithOAuth to get the GMB token from the Google account
       // The callback will capture the token and then restore the original user session
       const { error } = await supabase.auth.signInWithOAuth({

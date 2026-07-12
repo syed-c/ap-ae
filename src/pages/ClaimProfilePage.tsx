@@ -99,8 +99,9 @@ const ClaimProfilePage = () => {
   const clinicDomain = selectedClinic ? extractDomain(selectedClinic.website) : null;
   const fullBusinessEmail = emailPrefix && clinicDomain ? `${emailPrefix}@${clinicDomain}` : "";
 
-  // Get claim emails from clinic
-  const claimEmails: string[] = selectedClinic?.claim_emails || [];
+  // Never expose stored claim email addresses in the public client flow.
+  // Verification falls back to domain-based email or manual review.
+  const claimEmails: string[] = [];
   const hasClaimEmails = claimEmails.length > 0;
 
   // Redirect to clean URL if query params exist
@@ -124,14 +125,14 @@ const ClaimProfilePage = () => {
       if (searchType === "clinic") {
         const { data } = await supabase
           .from("clinics")
-          .select("id, name, slug, address, email, phone, website, claim_status, verification_status, claim_emails, city:cities(name)")
+          .select("id, name, slug, address, phone, website, claim_status, verification_status, city:cities(name)")
           .ilike("name", `%${sanitized}%`)
           .limit(10);
         return data || [];
       } else {
         const { data } = await supabase
           .from("dentists")
-          .select("id, name, slug, title, clinic:clinics(id, name, slug, website, claim_emails)")
+          .select("id, name, slug, title, clinic:clinics(id, name, slug, website)")
           .ilike("name", `%${sanitized}%`)
           .limit(10);
         return data || [];
@@ -231,7 +232,6 @@ const ClaimProfilePage = () => {
         throw new Error(data.error || "Failed to send verification code");
       }
     } catch (error: any) {
-      console.error('OTP send error:', error);
       toast({
         title: "Failed to Send Code",
         description: error.message || "Please try again later.",
@@ -282,7 +282,6 @@ const ClaimProfilePage = () => {
         throw new Error(data.error || "Verification failed");
       }
     } catch (error: any) {
-      console.error('Verification error:', error);
       toast({
         title: "Verification Failed",
         description: error.message || "Invalid code or expired. Please try again.",
@@ -339,7 +338,6 @@ const ClaimProfilePage = () => {
         description: "Our team will review your claim and contact you shortly.",
       });
     } catch (error: any) {
-      console.error('Manual submit error:', error);
       toast({
         title: "Submission Failed",
         description: error.message || "Please try again later.",

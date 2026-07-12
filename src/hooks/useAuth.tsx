@@ -99,7 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (isRetryable && retryCount < maxRetries) {
         const delay = baseDelay * Math.pow(2, retryCount);
-        console.log(`Retrying fetchUserData in ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, delay));
         return fetchUserData(userId, true, retryCount + 1);
       }

@@ -2,7 +2,25 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import https from 'https';
 import dns from 'dns';
 
+function isAllowedOrigin(origin: string | undefined): boolean {
+    if (!origin) return true;
+
+    const allowedOrigins = new Set([
+        process.env.NEXT_PUBLIC_SITE_URL,
+        'https://www.appointpanda.ae',
+        'https://appointpanda.ae',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+    ].filter(Boolean));
+
+    return allowedOrigins.has(origin);
+}
+
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
+    if (process.env.ENABLE_SUPABASE_PROXY !== 'true') {
+        return res.status(404).json({ error: 'Not found' });
+    }
+
     const targetHost = 'eneuthbghipsdvsqilmb.supabase.co';
     const targetIp = '104.18.38.10';
 
@@ -13,12 +31,16 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const queryString = req.url?.split('?')[1];
     const targetPath = `/${pathStr}${queryString ? '?' + queryString : ''}`;
 
-    // 1. Handle CORS Preflight
+    if (!isAllowedOrigin(req.headers.origin)) {
+        return res.status(403).json({ error: 'Origin not allowed' });
+    }
+
     if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+        const origin = req.headers.origin || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.appointpanda.ae';
+        res.setHeader('Access-Control-Allow-Origin', origin);
         res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] || '*');
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] || 'authorization,apikey,content-type');
+        res.setHeader('Vary', 'Origin');
         res.setHeader('Access-Control-Max-Age', '86400');
         return res.status(204).end();
     }
@@ -40,7 +62,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             }
             dns.lookup(hostname, lookupOptions, (err, address, family) => cb(err, address as any, family as any));
         },
-        rejectUnauthorized: false,
+        rejectUnauthorized: true,
     };
 
     // 2. Forward Request Headers
@@ -76,16 +98,16 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             }
         });
 
-        // 5. Final CORS Response Headers (Force unique)
-        res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        const origin = req.headers.origin || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.appointpanda.ae';
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Vary', 'Origin');
 
         targetRes.pipe(res);
     });
 
     proxy.on('error', (err) => {
         console.error(`[Proxy SB Deep Error] ${req.method} ${targetPath}:`, err);
-        if (!res.headersSent) res.status(502).json({ error: 'Proxy failed', detail: err.message });
+        if (!res.headersSent) res.status(502).json({ error: 'Proxy failed' });
     });
 
     if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'DELETE') {

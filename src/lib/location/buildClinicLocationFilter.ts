@@ -1,4 +1,9 @@
 const CITY_ADDRESS_ALIASES: Record<string, string[]> = {
+  'business-bay': ['Business Bay'],
+  'downtown-dubai': ['Downtown Dubai', 'Downtown'],
+  'dubai-marina': ['Dubai Marina', 'Marina'],
+  'palm-jumeirah': ['Palm Jumeirah', 'The Palm Jumeirah'],
+  'bur-dubai': ['Bur Dubai'],
   'jumeirah-beach-residence': ['Jumeirah Beach Residence', 'JBR'],
   jlt: ['JLT', 'Jumeirah Lakes Towers'],
   jvc: ['JVC', 'Jumeirah Village Circle'],
@@ -13,29 +18,16 @@ const CITY_ADDRESS_ALIASES: Record<string, string[]> = {
   'al-nakheel-rak': ['Al Nakheel'],
 };
 
-function escapeRegex(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function sanitizeFilterTerm(value: string): string {
   return value.replace(/[%_,]/g, '').trim();
 }
 
-function stripTrailingStateName(cityName: string, stateName?: string): string {
-  if (!stateName) {
-    return cityName.trim();
-  }
-
-  return cityName.replace(new RegExp(`\\s+${escapeRegex(stateName)}$`, 'i'), '').trim();
-}
-
 export function getCityAddressTerms(citySlug: string, cityName: string, stateName?: string): string[] {
-  const strippedCityName = stripTrailingStateName(cityName, stateName);
   const aliases = CITY_ADDRESS_ALIASES[citySlug] || [];
 
   return Array.from(
     new Set(
-      [cityName, strippedCityName, ...aliases]
+      [cityName, ...aliases]
         .map((term) => sanitizeFilterTerm(term))
         .filter(Boolean)
     )

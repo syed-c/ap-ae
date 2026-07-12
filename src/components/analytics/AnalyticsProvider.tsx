@@ -38,7 +38,6 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
         const settings = data?.value as GoogleAnalyticsSettings;
         if (settings?.enabled !== false && settings?.measurement_id) {
           setMeasurementId(settings.measurement_id);
-          console.log('[Analytics] Loaded measurement ID from settings');
         }
       } catch (err) {
         console.error('[Analytics] Error fetching settings:', err);

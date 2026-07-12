@@ -17,11 +17,6 @@ export default function ReviewFunnelPage() {
   const [searchParams] = useState(() => new URLSearchParams(window.location.search));
   const source = searchParams.get('source') || 'link';
   
-  // Debug: Log what params we received
-  useEffect(() => {
-    console.log('[ReviewFunnel] Component mounted with params:', { clinicId, clinicSlug, source });
-  }, [clinicId, clinicSlug]);
-
   const [step, setStep] = useState<'initial' | 'negative' | 'success'>('initial');
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -53,16 +48,10 @@ export default function ReviewFunnelPage() {
     enabled: !!(clinicId || clinicSlug),
   });
   
-  // Debug: Log clinic data when it loads
-  useEffect(() => {
-    console.log('[ReviewFunnel] Clinic data loaded:', clinic);
-  }, [clinic]);
-
   // Fetch custom review URL from clinic_oauth_tokens
   const { data: oauthData, isLoading: oauthLoading, error: oauthError } = useQuery({
     queryKey: ['clinic-oauth-review-url', clinic?.id],
     queryFn: async () => {
-      console.log('[ReviewFunnel] Fetching oauth data for clinic:', clinic!.id);
       const { data, error } = await supabase
         .from('clinic_oauth_tokens')
         .select('gmb_data')
@@ -72,7 +61,6 @@ export default function ReviewFunnelPage() {
         console.error('[ReviewFunnel] Error fetching oauth data:', error);
         throw error;
       }
-      console.log('[ReviewFunnel] OAuth query returned:', data);
       return data;
     },
     enabled: !!clinic?.id,
@@ -80,17 +68,7 @@ export default function ReviewFunnelPage() {
     staleTime: 0, // Always fetch fresh data
   });
   
-  // Debug: Log OAuth data when it loads  
-  useEffect(() => {
-    console.log('[ReviewFunnel] OAuth state - data:', oauthData, 'loading:', oauthLoading, 'error:', oauthError);
-    console.log('[ReviewFunnel] Clinic data:', clinic);
-  }, [oauthData, oauthLoading, oauthError, clinic]);
-
   const getGoogleReviewUrl = (): string | null => {
-    console.log('[ReviewFunnel] getGoogleReviewUrl called');
-    console.log('[ReviewFunnel] oauthData:', oauthData);
-    console.log('[ReviewFunnel] clinic:', clinic);
-    
     // Priority 1: Custom review URL from GMB setup (manual or OAuth)
     if (oauthData?.gmb_data) {
       let gmbData: { custom_review_url?: string } = {};
@@ -106,10 +84,8 @@ export default function ReviewFunnelPage() {
         gmbData = oauthData.gmb_data as { custom_review_url?: string };
       }
       
-      console.log('[ReviewFunnel] gmb_data parsed:', gmbData);
       if (gmbData.custom_review_url && gmbData.custom_review_url.trim()) {
         const url = gmbData.custom_review_url.trim();
-        console.log('[ReviewFunnel] Using custom review URL:', url);
         return url;
       }
     }
@@ -117,11 +93,9 @@ export default function ReviewFunnelPage() {
     // Priority 2: Google Place ID to construct review URL
     if (clinic?.google_place_id && clinic.google_place_id.trim()) {
       const url = `https://search.google.com/local/writereview?placeid=${clinic.google_place_id.trim()}`;
-      console.log('[ReviewFunnel] Using Google Place ID URL:', url);
       return url;
     }
-    
-    console.log('[ReviewFunnel] No review URL found - oauth data:', oauthData, 'clinic place id:', clinic?.google_place_id);
+
     return null;
   };
 
@@ -184,14 +158,12 @@ export default function ReviewFunnelPage() {
 
   const handleThumbsUp = async () => {
     if (!clinic) {
-      console.error('[ReviewFunnel] Cannot proceed - clinic data not loaded');
       toast.error('Please wait while we load clinic information...');
       return;
     }
     
     // Wait for OAuth data to be ready if it's still loading
     if (oauthLoading) {
-      console.log('[ReviewFunnel] Waiting for OAuth data to load...');
       toast.info('Loading review settings...');
       return;
     }
@@ -211,16 +183,11 @@ export default function ReviewFunnelPage() {
     // If no URL found and we have a place ID, construct it directly
     if (!googleReviewUrl && clinic.google_place_id) {
       googleReviewUrl = `https://search.google.com/local/writereview?placeid=${clinic.google_place_id}`;
-      console.log('[ReviewFunnel] Using fallback place ID URL:', googleReviewUrl);
     }
-    
-    console.log('[ReviewFunnel] Thumbs up clicked, final Google URL:', googleReviewUrl);
-    
+
     if (googleReviewUrl) {
       recordClick.mutate('google_redirect');
       toast.success('Redirecting to Google Reviews...');
-      // Redirect immediately without timeout
-      console.log('[ReviewFunnel] Redirecting now to:', googleReviewUrl);
       window.location.href = googleReviewUrl;
     } else {
       // No Google review URL configured - show thank you page

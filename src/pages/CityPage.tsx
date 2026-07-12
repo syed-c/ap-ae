@@ -30,16 +30,11 @@ import { usePinnedProfiles, sortWithPinnedFirst } from "@/hooks/usePinnedProfile
 import { useAreaLocalContent, generateAreaIntro } from "@/hooks/useAreaLocalContent";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
 import { buildClinicLocationOrFilter } from "@/lib/location/buildClinicLocationFilter";
+import { sanitizeCmsHtml } from "@/lib/security/sanitizeCmsHtml";
 import NotFound from "./NotFound";
 import {
-  Star,
-  Users,
-  Clock,
-  Stethoscope,
   SlidersHorizontal,
-  MapPin,
   ArrowRight,
-  Shield
 } from "lucide-react";
 import {
   Accordion,
@@ -410,6 +405,10 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
   const pageTitle = pageContentDataProp?.meta_title || seoContent?.meta_title || seoDataProp?.title || null;
   const pageDescription = pageContentDataProp?.meta_description || seoContent?.meta_description || seoDataProp?.description || null;
   const pageH1 = pageContentDataProp?.h1 || seoContent?.h1 || seoH1Prop || null;
+  const sanitizedHeroIntroHtml = sanitizeCmsHtml(pageContentDataProp?.hero_intro || '');
+  const sanitizedSection1Html = sanitizeCmsHtml(section1Content ? section1Content.replace(/\n/g, '<br/>') : '');
+  const sanitizedSection2Html = sanitizeCmsHtml(section2Content ? section2Content.replace(/\n/g, '<br/>') : '');
+  const sanitizedSection3Html = sanitizeCmsHtml(section3Content ? section3Content.replace(/\n/g, '<br/>') : '');
 
   // Note: parseFaqFromContent now returns { q, a }[] format (same as seoContent.faqs after parseFaqs validation)
   const faqs = serverFaqs.length > 0 ? serverFaqs : seoFaqs.length > 0 ? seoFaqs : [];
@@ -448,6 +447,7 @@ const shouldNoIndex = false;
         />
 
       <MarketplaceHero
+        align="center"
         breadcrumbs={breadcrumbs}
         badge="Local Marketplace"
         title={pageH1 || `Find dentists in ${cityName}`}
@@ -457,22 +457,22 @@ const shouldNoIndex = false;
           { href: `/${normalizedStateSlug}/`, label: `Browse ${stateName}`, variant: 'outline' },
         ]}
         stats={[
-          { label: 'Clinics discovered', value: `${profiles?.length || totalClinicCount || 0}+`, icon: <Shield className="h-5 w-5" /> },
-          { label: 'Specialists visible', value: `${(profiles?.length || 0) * 5 || 0}+`, icon: <Users className="h-5 w-5" /> },
-          { label: 'Average rating signal', value: '4.8', icon: <Star className="h-5 w-5" /> },
-          { label: 'Location context', value: stateAbbr, icon: <MapPin className="h-5 w-5" /> },
+          { label: 'Clinics discovered', value: `${profiles?.length || totalClinicCount || 0}+` },
+          { label: 'Specialists visible', value: `${(profiles?.length || 0) * 5 || 0}+` },
+          { label: 'Average rating signal', value: '4.8' },
+          { label: 'Location context', value: stateAbbr },
         ]}
       >
-        <div className="max-w-4xl">
+        <div className="mx-auto max-w-4xl">
           <SearchBox variant="hero" stateSlug={stateSlug} defaultCity={`${citySlug}|${stateSlug}`} />
         </div>
       </MarketplaceHero>
 
       {/* Hero Intro Section - CMS Content Only (no heading) */}
-      {pageContentDataProp?.hero_intro && (
+      {sanitizedHeroIntroHtml && (
         <section className="py-8 px-4">
-          <div className="container max-w-4xl mx-auto">
-            <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: pageContentDataProp.hero_intro }} />
+          <div className="container max-w-5xl mx-auto">
+            <div className="rounded-3xl border border-border bg-card px-6 py-6 md:px-8 prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: sanitizedHeroIntroHtml }} />
           </div>
         </section>
       )}
@@ -480,7 +480,7 @@ const shouldNoIndex = false;
       {/* Main Content: Dentists */}
       <Section size="lg">
         <div className="container px-4">
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
             {/* Mobile Filter Button */}
             <div className="lg:hidden">
               <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
@@ -514,7 +514,7 @@ const shouldNoIndex = false;
             </div>
 
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:block w-72 shrink-0">
+            <aside className="hidden lg:block w-72 shrink-0 self-start">
               <div className="sticky top-24">
                 <BudgetFilterSidebar
                   filters={filters}
@@ -527,7 +527,7 @@ const shouldNoIndex = false;
             </aside>
 
             {/* Main Content Column */}
-            <div className="flex-1 min-w-0 space-y-8">
+            <div className="min-w-0 flex-1 space-y-6">
               {/* Dentist List Frame */}
               <DentistListFrame
                 profiles={profiles}
@@ -543,122 +543,90 @@ const shouldNoIndex = false;
 
               {/* Content Sections from page_content - section_1 to section_3 */}
               {(section1Title && section1Content) || (section2Title && section2Content) || (section3Title && section3Content) ? (
-                <Section size="md">
-                  <div className="container px-4 max-w-4xl mx-auto space-y-8">
+                <div className="rounded-3xl border border-border bg-card px-6 py-6 md:px-8 space-y-8">
                     {section1Title && section1Content && (
                       <div>
                         <h2 className="text-2xl font-bold mb-4">{section1Title}</h2>
-                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: section1Content.replace(/\n/g, '<br/>') }} />
+                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizedSection1Html }} />
                       </div>
                     )}
                     {section2Title && section2Content && (
                       <div>
                         <h2 className="text-2xl font-bold mb-4">{section2Title}</h2>
-                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: section2Content.replace(/\n/g, '<br/>') }} />
+                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizedSection2Html }} />
                       </div>
                     )}
                     {section3Title && section3Content && (
                       <div>
                         <h2 className="text-2xl font-bold mb-4">{section3Title}</h2>
-                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: section3Content.replace(/\n/g, '<br/>') }} />
+                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizedSection3Html }} />
                       </div>
                     )}
                   </div>
-                </Section>
               ) : null}
 
               {/* NEW: All Service-Location Pages - Premium Dark Design */}
               {(serviceLocationPages?.length || 0) > 0 ? (
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-6 px-5">
-                  {/* Background decorative elements */}
-                  <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[100px]" />
-                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-teal-500/15 rounded-full blur-[80px]" />
-                  </div>
-                  
-                  <div className="relative z-10">
-                    {/* Section Header */}
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
-                        <Stethoscope className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold text-white">All Dental Services in {cityName}</h3>
-                        <p className="text-xs text-white/50">{serviceLocationPages?.length || 0} services available</p>
-                      </div>
+                <div className="rounded-3xl border border-border bg-card px-5 py-6 md:px-6">
+                  <div className="mb-5 flex flex-col gap-2 border-b border-border pb-4 md:flex-row md:items-end md:justify-between">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Treatment Links</p>
+                      <h3 className="mt-1 text-xl font-bold text-foreground">All dental services in {cityName}</h3>
                     </div>
+                    <p className="text-sm text-muted-foreground">{serviceLocationPages?.length || 0} live service pages</p>
+                  </div>
 
-                    {/* Services Grid from seo_pages */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
                       {serviceLocationPages?.map((service) => {
-                        // Extract service slug from the full slug (e.g., /abu-dhabi/al-ain/teeth-cleaning -> teeth-cleaning)
                         const slugParts = service.slug?.split('/') || [];
                         const serviceSlug = slugParts[slugParts.length - 1];
-                        
-                        // Get the clean service name from treatments list
                         const treatment = treatments?.find(t => t.slug === serviceSlug);
                         const serviceName = treatment?.name || serviceSlug?.replace(/-/g, ' ') || service.slug;
-                        
+
                         return (
                           <Link
                             key={service.slug}
                             href={`/${service.slug}/`}
-                            className="group flex items-center justify-center px-3 py-2.5 rounded-xl text-sm font-semibold bg-white/5 hover:bg-white/15 border border-white/10 hover:border-primary/30 text-white/80 hover:text-primary transition-all duration-300 text-center"
+                            className="rounded-2xl border border-border bg-background px-3 py-3 text-center text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:text-primary"
                           >
                             <span className="whitespace-normal">{serviceName}</span>
                           </Link>
                         );
                       })}
                     </div>
-                  </div>
                 </div>
               ) : popularTreatments.length > 0 ? (
-                /* Fallback: show all treatments if no service-location pages exist yet */
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-6 px-5">
-                  <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[100px]" />
-                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-teal-500/15 rounded-full blur-[80px]" />
-                  </div>
-                  
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
-                        <Stethoscope className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold text-white">All Dental Services in {cityName}</h3>
-                        <p className="text-xs text-white/50">{popularTreatments.length} services available</p>
-                      </div>
+                <div className="rounded-3xl border border-border bg-card px-5 py-6 md:px-6">
+                  <div className="mb-5 flex flex-col gap-2 border-b border-border pb-4 md:flex-row md:items-end md:justify-between">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Treatment Links</p>
+                      <h3 className="mt-1 text-xl font-bold text-foreground">Browse services in {cityName}</h3>
                     </div>
+                    <p className="text-sm text-muted-foreground">Fallback service index</p>
+                  </div>
 
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
                       {popularTreatments.map((treatment) => (
                         <Link
                           key={treatment.slug}
                           href={`/${normalizedStateSlug}/${citySlug}/${treatment.slug}/`}
-                          className="group flex items-center justify-center px-3 py-2.5 rounded-xl text-sm font-semibold bg-white/5 hover:bg-white/15 border border-white/10 hover:border-primary/30 text-white/80 hover:text-primary transition-all duration-300"
+                          className="rounded-2xl border border-border bg-background px-3 py-3 text-center text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:text-primary"
                         >
-                          <span className="truncate">{treatment.name}</span>
+                          <span className="whitespace-normal">{treatment.name}</span>
                         </Link>
                       ))}
                     </div>
-                  </div>
                 </div>
               ) : null}
 
               {/* NEW: All Areas in Emirate - Premium Card Design */}
               {allEmirateCities.length > 0 && (
-                <div className="bg-gradient-to-br from-muted/30 to-muted/10 rounded-2xl p-5 border border-border/50">
-                  {/* Section Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                        <MapPin className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold text-foreground">Explore {stateName}</h3>
-                        <p className="text-xs text-muted-foreground">{allEmirateCities.length} areas available</p>
-                      </div>
+                <div className="rounded-3xl border border-border bg-card p-5 md:p-6">
+                  <div className="mb-4 flex items-center justify-between border-b border-border pb-4">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Location Links</p>
+                      <h3 className="mt-1 text-xl font-bold text-foreground">Explore more areas in {stateName}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">{allEmirateCities.length} live area pages</p>
                     </div>
                     <Link 
                       href={`/${normalizedStateSlug}/`}
@@ -668,27 +636,20 @@ const shouldNoIndex = false;
                     </Link>
                   </div>
 
-                  {/* Premium Pills Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
                     {allEmirateCities.map((cityItem) => {
                       const isCurrentCity = cityItem.slug === citySlug;
                       return (
                         <Link
                           key={cityItem.slug}
                           href={`/${normalizedStateSlug}/${cityItem.slug}/`}
-                          className={`group relative flex items-center justify-center px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 text-center ${
+                          className={`rounded-2xl border px-3 py-3 text-center text-sm font-medium transition-colors ${
                             isCurrentCity
-                              ? 'bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/25'
-                              : 'bg-white hover:bg-primary/5 border border-border hover:border-primary/30 text-foreground hover:text-primary'
+                              ? 'border-primary bg-primary text-primary-foreground'
+                              : 'border-border bg-background text-foreground hover:border-primary/30 hover:text-primary'
                           }`}
                         >
-                          {isCurrentCity && (
-                            <MapPin className="h-3 w-3 mr-1.5 opacity-80 shrink-0" />
-                          )}
                           <span className="whitespace-normal">{cityItem.name}</span>
-                          {!isCurrentCity && (
-                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                          )}
                         </Link>
                       );
                     })}
@@ -699,16 +660,23 @@ const shouldNoIndex = false;
               {/* Removed duplicate Nearby Cities - keeping only GeographicLinkBlock if needed */}
 
               {/* Geographic Link Block - Show only parent state link, remove duplicate services/cities */}
-              <GeographicLinkBlock
-                pageType="city"
-                stateSlug={normalizedStateSlug || ''}
-                stateName={stateName}
-                citySlug={citySlug}
-                cityName={cityName}
-                nearbyCities={nearbyLocations}
-                services={popularTreatments}
-                showOnlyStateLink={true}
-              />
+              <div className="rounded-3xl border border-border bg-card px-5 py-6 md:px-6">
+                <div className="mb-4 border-b border-border pb-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Navigation Support</p>
+                  <h3 className="mt-1 text-xl font-bold text-foreground">Continue exploring {stateName}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">Move between nearby area pages and supporting treatment paths without dead ends.</p>
+                </div>
+                <GeographicLinkBlock
+                  pageType="city"
+                  stateSlug={normalizedStateSlug || ''}
+                  stateName={stateName}
+                  citySlug={citySlug}
+                  cityName={cityName}
+                  nearbyCities={nearbyLocations}
+                  services={popularTreatments}
+                  showOnlyStateLink={true}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -716,7 +684,7 @@ const shouldNoIndex = false;
 
       {/* AI-Optimized FAQ Section */}
       <Section size="lg" className="bg-muted/30">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto rounded-3xl border border-border bg-card px-6 py-6 md:px-8">
           <ConversationalQABlock
             title={`Dental Care in ${cityName}`}
             subtitle={`Common questions about finding a dentist in ${cityName}, ${stateAbbr}`}

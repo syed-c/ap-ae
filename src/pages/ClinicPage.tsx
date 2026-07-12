@@ -19,6 +19,7 @@ import { SyncStructuredData } from "@/components/seo/SyncStructuredData";
 import { InterlinkingSection } from "@/components/seo/InterlinkingSection";
 import { RelatedClinicsBlock } from "@/components/seo/RelatedClinicsBlock";
 import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
+import { sanitizeCmsHtml } from "@/lib/security/sanitizeCmsHtml";
 import {
   ClinicStickyBooking,
   ClinicTeamSection,
@@ -683,7 +684,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
                           )}
                           <div
                             className="text-muted-foreground leading-relaxed prose prose-sm max-w-none text-sm md:text-base break-words overflow-hidden"
-                            dangerouslySetInnerHTML={{ __html: section.content.replace(/\n/g, '<br/>') }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(section.content.replace(/\n/g, '<br/>')) }}
                           />
                         </div>
                       ))}

@@ -32,6 +32,7 @@ interface MarketplaceHeroProps {
   stats?: StatItem[];
   children?: ReactNode;
   className?: string;
+  align?: 'left' | 'center';
 }
 
 const DEFAULT_STATS: StatItem[] = [
@@ -52,24 +53,29 @@ export function MarketplaceHero({
   stats,
   children,
   className,
+  align = 'left',
 }: MarketplaceHeroProps) {
   const displayStats = stats || DEFAULT_STATS;
+  const isCentered = align === 'center';
 
   return (
     <section className={cn('relative overflow-hidden gradient-hero', className)}>
-      {/* Mesh Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-48 -right-48 w-[700px] h-[700px] bg-primary opacity-[0.04] rounded-full blur-[140px]" />
-        <div className="absolute -bottom-48 -left-48 w-[600px] h-[600px] bg-primary opacity-[0.03] rounded-full blur-[120px]" />
-        <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-primary opacity-[0.02] rounded-full blur-[100px]" />
+        <div className="absolute inset-x-0 top-0 h-px bg-border/70" />
+        <div className="absolute left-1/2 top-12 h-56 w-56 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background/70 to-transparent" />
       </div>
 
-      <div className="relative max-w-[1440px] mx-auto px-4 lg:px-6 py-16 lg:py-24 xl:py-32">
+      <div className={cn(
+        'relative max-w-[1440px] mx-auto px-4 lg:px-6 py-14 lg:py-20 xl:py-24',
+        isCentered && 'text-center'
+      )}>
         {breadcrumbs && breadcrumbs.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
+            className={cn(isCentered && 'flex justify-center')}
           >
             <Breadcrumbs items={breadcrumbs} />
           </motion.div>
@@ -80,9 +86,9 @@ export function MarketplaceHero({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="mt-4"
+            className={cn('mt-4', isCentered && 'flex justify-center')}
           >
-            <span className="badge-primary inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold">
+            <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/8 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
               {badge}
             </span>
           </motion.div>
@@ -92,7 +98,10 @@ export function MarketplaceHero({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-6 text-foreground text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight"
+          className={cn(
+            'mt-6 text-foreground text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.02]',
+            isCentered ? 'mx-auto max-w-4xl' : 'max-w-4xl'
+          )}
         >
           {highlight ? (
             <>
@@ -111,7 +120,10 @@ export function MarketplaceHero({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.35 }}
-            className="mt-4 text-muted text-lg md:text-xl max-w-2xl leading-relaxed"
+            className={cn(
+              'mt-4 text-muted text-base md:text-lg max-w-2xl leading-relaxed',
+              isCentered && 'mx-auto'
+            )}
           >
             {description}
           </motion.p>
@@ -122,7 +134,7 @@ export function MarketplaceHero({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-6 flex flex-wrap gap-3"
+            className={cn('mt-6 flex flex-wrap gap-3', isCentered && 'justify-center')}
           >
             {Array.isArray(actions)
               ? (actions as ActionItem[]).map((a, i) => (
@@ -139,7 +151,7 @@ export function MarketplaceHero({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.45 }}
-            className="mt-8"
+            className={cn('mt-8', isCentered && 'mx-auto max-w-4xl')}
           >
             <SearchBox variant="hero" />
           </motion.div>
@@ -150,16 +162,18 @@ export function MarketplaceHero({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4"
+            className={cn(
+              'mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4',
+              isCentered && 'mx-auto max-w-5xl'
+            )}
           >
             {displayStats.map((stat) => (
               <div
                 key={stat.label}
-                className="bg-white/60 backdrop-blur-xl border border-border/60 rounded-xl px-5 py-4 text-center"
+                className="rounded-2xl border border-border/70 bg-background/85 px-4 py-4 text-center shadow-sm"
               >
-                {stat.icon && <div className="text-primary mb-2 flex justify-center">{stat.icon}</div>}
                 <div className="text-2xl md:text-3xl font-bold text-foreground">{stat.value}</div>
-                <div className="text-xs text-muted mt-1">{stat.label}</div>
+                <div className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{stat.label}</div>
               </div>
             ))}
           </motion.div>
@@ -170,7 +184,7 @@ export function MarketplaceHero({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="mt-8"
+            className={cn('mt-8', isCentered && 'mx-auto max-w-4xl')}
           >
             {children}
           </motion.div>

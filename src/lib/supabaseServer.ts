@@ -35,9 +35,7 @@ export function createServerSupabase() {
  */
 export function createServerSupabaseAdmin() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    // Check for properly named server-only key first, fallback to legacy public-prefixed key
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY 
-             || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!url || !key) {
         console.warn('Missing Supabase service role key - falling back to anon');

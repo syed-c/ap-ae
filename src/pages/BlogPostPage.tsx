@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { getContentBody, calculateReadingTime } from "@/lib/blogContent";
+import { sanitizeCmsHtml } from "@/lib/security/sanitizeCmsHtml";
 import { BlogDentistList } from "@/components/blog/BlogDentistList";
 import { BlogFAQList } from "@/components/blog/BlogFAQList";
 import {
@@ -415,7 +416,9 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp, dehydratedState
     // If content contains HTML tags (and no special markers), render as HTML directly
     if (isHtmlContent(content)) {
       // Replace all H1 tags with H2 tags to avoid duplicate H1s (main title is already H1)
-      const contentWithoutH1 = content.replace(/<h1(\s[^>]*)?>/gi, '<h2$1>').replace(/<\/h1>/gi, '</h2>');
+      const contentWithoutH1 = sanitizeCmsHtml(
+        content.replace(/<h1(\s[^>]*)?>/gi, '<h2$1>').replace(/<\/h1>/gi, '</h2>')
+      );
       return (
         <div
           className="blog-content"

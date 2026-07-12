@@ -119,8 +119,6 @@ export function MetaTagInjector() {
     noscript.appendChild(img);
     document.head.appendChild(noscript);
 
-    console.log('[MetaTagInjector] Facebook Pixel loaded:', pixelId);
-
     return () => {
       script.remove();
       noscript.remove();

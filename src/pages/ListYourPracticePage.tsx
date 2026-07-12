@@ -178,18 +178,15 @@ const ListYourPracticePage = () => {
       const newServices = prev.includes(serviceId)
         ? prev.filter(id => id !== serviceId)
         : [...prev, serviceId];
-      console.log('Service toggle:', serviceId, 'New selection:', newServices);
       return newServices;
     });
   };
 
   const handleCheckboxChange = (serviceId: string, isChecked: boolean) => {
-    console.log('Checkbox change:', serviceId, isChecked);
     setSelectedServices(prev => {
       const newServices = isChecked
         ? [...prev, serviceId]
         : prev.filter(id => id !== serviceId);
-      console.log('New selection:', newServices);
       return newServices;
     });
   };
@@ -277,9 +274,6 @@ const ListYourPracticePage = () => {
     setIsSubmitting(true);
 
     try {
-      console.log('[ListingSubmit] selectedServices:', selectedServices);
-      console.log('[ListingSubmit] treatments[0]:', treatments[0]);
-      
       // Build service IDs - use the same logic as the checkbox key
       const serviceIdsToSave = selectedServices.map(serviceId => {
         // Find the treatment by its key
@@ -290,13 +284,9 @@ const ListYourPracticePage = () => {
         return treatment?.id || serviceId;
       });
       
-      console.log('[ListingSubmit] serviceIdsToSave:', serviceIdsToSave);
-
       const selectedServiceNames = treatments
         .filter((t: any) => selectedServices.includes(t.id))
         .map((t: any) => t.name);
-
-      console.log('[ListingSubmit] selectedServiceNames:', selectedServiceNames);
 
       // Create user account with their password (account will be activated on approval)
       let userId: string | null = null;
@@ -312,7 +302,6 @@ const ListYourPracticePage = () => {
         
         if (userResult?.data?.success) {
           userId = userResult.data.userId;
-          console.log('User account created:', userId);
         } else if (userResult?.error) {
           console.error('Failed to create user account:', userResult.error);
           // Continue anyway - lead will be saved for manual processing

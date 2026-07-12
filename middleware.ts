@@ -1,17 +1,10 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const PUBLIC_PATHS = [
-  '/', '/auth', '/auth/callback', '/search', '/pricing',
-  '/about', '/contact', '/faq', '/how-it-works', '/blog',
-  '/emergency-dentist', '/privacy', '/terms', '/sitemap-page',
-  '/verification-policy', '/medical-review-policy', '/editorial-policy',
-  '/ai-search', '/claim-profile',
-]
-
 const ADMIN_PATHS = ['/admin']
 const DASHBOARD_PATHS = ['/dashboard', '/dashboard-v2']
-const STAFF_PATHS = [...ADMIN_PATHS, ...DASHBOARD_PATHS]
+const SENSITIVE_AUTH_PATHS = ['/claim-profile', '/gmb-select', '/onboarding']
+const STAFF_PATHS = [...ADMIN_PATHS, ...DASHBOARD_PATHS, ...SENSITIVE_AUTH_PATHS]
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

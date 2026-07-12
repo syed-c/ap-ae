@@ -43,7 +43,6 @@ export default function Auth() {
       localStorage.getItem('gmb_restore_session') === 'true';
 
     if (isGmbFlow) {
-      console.log('[Auth] GMB flow in progress, not redirecting');
       return;
     }
 
@@ -135,8 +134,6 @@ export default function Auth() {
       // Use current origin for OAuth callback to ensure proper domain handling
       const currentOrigin = window.location.origin;
       const redirectTo = `${currentOrigin}/auth/callback`;
-
-      console.log('[Auth] Starting Google OAuth, redirect:', redirectTo);
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

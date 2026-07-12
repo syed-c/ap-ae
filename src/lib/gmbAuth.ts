@@ -184,6 +184,4 @@ export function clearAllGmbCache() {
   } catch {
     // ignore
   }
-  
-  console.log('[GMB] All GMB cache cleared');
 }

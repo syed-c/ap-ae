@@ -227,8 +227,6 @@ export default function AuthCallback() {
 
         // Capture the GMB provider token
         const providerToken = providerTokenFromExchange ?? gmbOAuthSession.provider_token ?? null;
-        console.log('Provider token available:', !!providerToken);
-
         if (providerToken) {
           setGmbProviderToken(providerToken);
 
@@ -244,8 +242,6 @@ export default function AuthCallback() {
               });
               if (storeError) {
                 console.warn('Failed to store GMB token server-side:', storeError);
-              } else {
-                console.log('GMB token stored server-side successfully');
               }
             } catch (e) {
               console.warn('Error storing GMB token:', e);
@@ -260,8 +256,6 @@ export default function AuthCallback() {
 
         if (shouldRestoreSession && originalSession && (isRelinkFlow || isGmbCallback)) {
           setMessage('Restoring your session...');
-          console.log('Restoring original user session after GMB OAuth');
-
           try {
             // Don't sign out first - just try to refresh the original session directly
             // This is more reliable than sign out + set session
@@ -291,7 +285,6 @@ export default function AuthCallback() {
             } else {
               session = refreshedSession.session;
               restoredOriginalUser = true;
-              console.log('Original user session restored successfully via refresh');
             }
           } catch (restoreErr) {
             console.error('Failed to restore original session:', restoreErr);
@@ -331,7 +324,6 @@ export default function AuthCallback() {
           gmbSuccess = await handleGmbTransfer(session.access_token);
           if (!gmbSuccess) {
             // If link transfer failed (e.g., expired token), redirect to GMB selection instead
-            console.log('GMB transfer failed, redirecting to business selection');
             shouldSelectGmbBusiness = true;
           }
           roles = await readRoles(session.user.id); // refresh after possible role assignment
@@ -379,7 +371,6 @@ export default function AuthCallback() {
           if (isRelinkFlow || shouldSelectGmbBusiness) {
             localStorage.setItem('gmb_relink_flow', 'true');
           }
-          console.log('Redirecting to GMB selection page', { isRelinkFlow, isListingFlow, restoredOriginalUser });
           router.replace('/gmb-select/');
           return;
         }
@@ -407,8 +398,6 @@ export default function AuthCallback() {
 
               if (bootstrapError) {
                 console.error('Bootstrap error:', bootstrapError);
-              } else {
-                console.log('Bootstrap complete:', bootstrapData);
               }
 
               // Wait a moment for role to propagate
@@ -419,7 +408,6 @@ export default function AuthCallback() {
 
               // Re-read roles to confirm
               const newRoles = await readRoles(session.user.id);
-              console.log('New roles after bootstrap:', newRoles);
 
               // Check if user needs to add a clinic
               if (bootstrapData?.needsClinic) {

@@ -22,9 +22,10 @@ import { useTreatments } from "@/hooks/useTreatments";
 import { useSeoPageContent, parseMarkdownContent, parseFaqFromContent } from "@/hooks/useSeoPageContent";
 import { usePinnedProfiles, sortWithPinnedFirst } from "@/hooks/usePinnedProfiles";
 import { normalizeStateSlug } from "@/lib/slug/normalizeStateSlug";
+import { sanitizeCmsHtml } from "@/lib/security/sanitizeCmsHtml";
 import NotFound from "./NotFound";
 import {
-  Star, Shield, Clock, Building2, ArrowRight, SlidersHorizontal
+  SlidersHorizontal
 } from "lucide-react";
 import {
   Accordion,
@@ -345,6 +346,32 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
 
   const totalClinicCount = Object.values(cityClinicCounts || {}).reduce((a, b) => a + b, 0) || profiles?.length || 0;
   const popularTreatments = (treatments || []).slice(0, 8).map(t => ({ name: t.name, slug: t.slug }));
+  const isDubaiFlagship = normalizedStateSlug === 'dubai';
+  const featuredCityOrder = ['business-bay', 'jumeirah', 'palm-jumeirah', 'dubai-marina', 'downtown-dubai', 'deira', 'al-barsha', 'jlt', 'jumeirah-beach-residence', 'mirdif', 'bur-dubai', 'healthcare-city'];
+  const orderedCities = [...(cities || [])].sort((left, right) => {
+    if (!isDubaiFlagship) {
+      return left.name.localeCompare(right.name);
+    }
+
+    const leftIndex = featuredCityOrder.indexOf(left.slug);
+    const rightIndex = featuredCityOrder.indexOf(right.slug);
+
+    if (leftIndex === -1 && rightIndex === -1) return left.name.localeCompare(right.name);
+    if (leftIndex === -1) return 1;
+    if (rightIndex === -1) return -1;
+    return leftIndex - rightIndex;
+  });
+  const featuredCities = orderedCities.slice(0, 12);
+  const heroDescription = isDubaiFlagship
+    ? 'Explore Dubai dentist pages built as real landing destinations across Business Bay, Jumeirah, Palm Jumeirah, Dubai Marina, Downtown Dubai, Deira, and more. Each area routes directly into live providers and treatment pages.'
+    : `Browse clinics and dentists across ${stateName}, compare trust signals, and move from discovery to booking through a more structured marketplace experience.`;
+  const sanitizedStateBodyHtml = sanitizeCmsHtml(
+    pageContent?.body_content
+      ? pageContent.body_content
+          .replace(/^##\s+(.+)$/gm, '<h2 class="text-2xl font-bold mb-4 mt-8">$1</h2>')
+          .replace(/\n/g, '<br/>')
+      : ''
+  );
 
   return (
     <PageLayout>
@@ -371,19 +398,20 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
       />
 
       <MarketplaceHero
+        align="center"
         breadcrumbs={breadcrumbs}
-        badge="Emirate Marketplace"
+        badge={isDubaiFlagship ? 'Flagship Emirate Landing' : 'Emirate Marketplace'}
         title={pageH1 || `Find dentists across ${stateName}`}
-        description={`Browse clinics and dentists across ${stateName}, compare trust signals, and move from discovery to booking through a more structured marketplace experience.`}
+        description={heroDescription}
         actions={[
           { href: '/search/', label: 'Search the Directory' },
-          { href: '/services/', label: 'Browse Services', variant: 'outline' },
+          { href: '#browse-areas', label: isDubaiFlagship ? 'Browse Dubai Areas' : 'Browse Areas', variant: 'outline' },
         ]}
         stats={[
-          { label: 'Areas in this emirate', value: `${cities?.length || 0}`, icon: <Building2 className="h-5 w-5" /> },
-          { label: 'Marketplace rating signal', value: '4.8', icon: <Star className="h-5 w-5" /> },
-          { label: 'Booking speed', value: '60s', icon: <Clock className="h-5 w-5" /> },
-          { label: 'Trust layer', value: 'Licensed', icon: <Shield className="h-5 w-5" /> },
+          { label: 'Areas in this emirate', value: `${cities?.length || 0}` },
+          { label: 'Marketplace rating signal', value: '4.8' },
+          { label: 'Booking speed', value: '60s' },
+          { label: 'Trust layer', value: 'Licensed' },
         ]}
       />
 
@@ -394,10 +422,39 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
         isLoading={isSeoContentPending}
       />
 
+      {isDubaiFlagship && featuredCities.length > 0 && (
+        <Section size="sm">
+          <div className="mx-auto max-w-6xl rounded-3xl border border-border bg-card px-6 py-6 md:px-8">
+            <div className="mb-5 flex flex-col gap-2 border-b border-border pb-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Dubai Highlights</p>
+                <h2 className="mt-1 text-2xl font-bold text-foreground">Start with Dubai&apos;s highest-demand districts</h2>
+              </div>
+              <p className="max-w-md text-sm leading-6 text-muted-foreground">These area pages are the strongest navigation hubs for Dubai dentist discovery and treatment-level browsing.</p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {featuredCities.slice(0, 8).map((city, index) => (
+                <Link
+                  key={city.id}
+                  href={`/${normalizedStateSlug}/${city.slug}/`}
+                  className="rounded-3xl border border-border bg-background px-5 py-5 transition-colors hover:border-primary/30 hover:bg-muted/30"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-lg font-semibold text-foreground">{city.name}</p>
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">#{index + 1}</span>
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">Open local provider listings, dentist detail pages, and service-specific landing routes.</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </Section>
+      )}
+
       {/* Main Content: Dentists + Filters */}
       <Section size="lg">
         <div className="container px-4">
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 max-w-6xl mx-auto">
+          <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:flex-row lg:gap-8">
             {/* Mobile Filter Button */}
             <div className="lg:hidden">
               <Sheet>
@@ -426,7 +483,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
             </div>
 
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:block w-72 shrink-0">
+            <aside className="hidden lg:block w-72 shrink-0 self-start">
               <div className="sticky top-24">
                 <BudgetFilterSidebar
                   filters={stateFilters}
@@ -439,7 +496,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
             </aside>
 
             {/* Main Content Column */}
-            <div className="flex-1 min-w-0 space-y-8">
+            <div className="min-w-0 flex-1 space-y-6">
               <DentistListFrame
                 profiles={filteredStateProfiles}
                 isLoading={profilesLoading}
@@ -456,33 +513,50 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
       </Section>
 
       {/* SECTION 3: Areas (Text Links) */}
-      <Section size="md">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-6">
-            <span className="inline-block text-xs font-bold text-primary uppercase tracking-widest mb-2">Browse by Area</span>
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              Areas in <span className="text-primary">{stateName}</span>
-            </h2>
+      <Section id="browse-areas" size="md">
+        <div className="mx-auto max-w-6xl rounded-3xl border border-border bg-card px-6 py-6 md:px-8">
+          <div className="mb-6 flex flex-col gap-3 border-b border-border pb-5 md:flex-row md:items-end md:justify-between">
+            <div>
+              <span className="inline-block text-xs font-bold text-primary uppercase tracking-widest mb-2">Browse by Area</span>
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
+                Areas in <span className="text-primary">{stateName}</span>
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+                {isDubaiFlagship
+                  ? 'Start with the highest-intent Dubai districts and move directly into their live clinic and service pages.'
+                  : `Open the strongest area pages in ${stateName} and jump straight into local provider discovery.`}
+              </p>
+            </div>
+            <div className="text-sm text-muted-foreground">{cities?.length || 0} live area pages</div>
           </div>
 
           {citiesLoading ? (
-            <div className="flex flex-wrap gap-2">
-              {[...Array(8)].map((_, i) => (
-                <Skeleton key={i} className="h-8 w-28 rounded-full" />
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton key={i} className="h-28 rounded-3xl" />
               ))}
             </div>
-          ) : cities && cities.length > 0 ? (
-            <div className="flex flex-wrap gap-x-1 gap-y-1.5">
-              {cities.map((city, i) => (
-                <span key={city.id}>
-                  <Link
-                    href={`/${normalizedStateSlug}/${city.slug}/`}
-                    className="text-primary hover:text-primary/80 font-semibold hover:underline transition-colors"
-                  >
-                    {city.name}
-                  </Link>
-                  {i < cities.length - 1 && <span className="text-muted-foreground mx-1">·</span>}
-                </span>
+          ) : featuredCities.length > 0 ? (
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {featuredCities.map((city) => (
+                <Link
+                  key={city.id}
+                  href={`/${normalizedStateSlug}/${city.slug}/`}
+                  className="group rounded-3xl border border-border bg-background px-5 py-5 transition-colors hover:border-primary/30 hover:bg-muted/30"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-lg font-semibold text-foreground group-hover:text-primary">{city.name}</p>
+                      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                        Explore live dentist listings, local treatment pages, and booking-ready provider inventory.
+                      </p>
+                    </div>
+                    <span className="rounded-full border border-border bg-card px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Area page
+                    </span>
+                  </div>
+                  <div className="mt-4 text-sm font-medium text-primary">Open {city.name}</div>
+                </Link>
               ))}
             </div>
           ) : (
@@ -493,7 +567,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
 
       {/* SEO Content Section */}
       <Section size="lg">
-        <div className="max-w-5xl mx-auto">
+        <div className="mx-auto max-w-6xl rounded-3xl border border-border bg-card px-6 py-6 md:px-8">
           <SEOContentBlock
             variant="state"
             locationName={stateName}
@@ -509,13 +583,11 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
       </Section>
 
       {/* Content Section - from page_content body_content */}
-      {pageContent?.body_content && (
+      {sanitizedStateBodyHtml && (
         <Section size="md">
-          <div className="container px-4 max-w-4xl mx-auto">
-            <div className="prose max-w-none">
-              <div dangerouslySetInnerHTML={{ __html: pageContent.body_content
-                .replace(/^##\s+(.+)$/gm, '<h2 class="text-2xl font-bold mb-4 mt-8">$1</h2>')
-                .replace(/\n/g, '<br/>') }} />
+          <div className="container px-4 max-w-5xl mx-auto">
+            <div className="rounded-3xl border border-border bg-card px-6 py-6 md:px-8 prose max-w-none">
+              <div dangerouslySetInnerHTML={{ __html: sanitizedStateBodyHtml }} />
             </div>
           </div>
         </Section>
@@ -523,12 +595,12 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
 
       {/* SECTION 6: Geographic Link Block - SEO Authority Distribution */}
       <Section size="md">
-        <div className="max-w-5xl mx-auto">
+        <div className="mx-auto max-w-6xl rounded-3xl border border-border bg-card px-6 py-6 md:px-8">
           <GeographicLinkBlock
             pageType="state"
             stateSlug={normalizedStateSlug || ''}
             stateName={stateName}
-            topCities={(cities || []).slice(0, 8).map(c => ({ name: c.name, slug: c.slug }))}
+            topCities={(orderedCities || []).slice(0, 8).map(c => ({ name: c.name, slug: c.slug }))}
             services={popularTreatments}
           />
         </div>
@@ -537,22 +609,27 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
       {/* SECTION 7: Services Links */}
       {treatments && treatments.length > 0 && (
         <Section size="md">
-          <div className="max-w-4xl mx-auto">
-            <span className="inline-block text-xs font-bold text-primary uppercase tracking-widest mb-2">Browse Services</span>
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-6">
-              Dental Treatments in <span className="text-primary">{stateName}</span>
-            </h2>
-            <div className="flex flex-wrap gap-x-2 gap-y-2">
-              {treatments.map((treatment, idx) => (
-                <span key={treatment.id} className="inline-flex items-center">
-                  <Link
-                    href={`/${normalizedStateSlug}/services/${treatment.slug}/`}
-                    className="text-primary hover:text-primary/80 font-semibold hover:underline transition-colors"
-                  >
-                    {treatment.name}
-                  </Link>
-                  {idx < treatments.length - 1 && <span className="text-muted-foreground ml-2">·</span>}
-                </span>
+          <div className="mx-auto max-w-6xl rounded-3xl border border-border bg-card px-6 py-6 md:px-8">
+            <div className="mb-6 flex flex-col gap-3 border-b border-border pb-5 md:flex-row md:items-end md:justify-between">
+              <div>
+                <span className="inline-block text-xs font-bold text-primary uppercase tracking-widest mb-2">Browse Services</span>
+                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
+                  Dental Treatments in <span className="text-primary">{stateName}</span>
+                </h2>
+              </div>
+              <div className="text-sm text-muted-foreground">{treatments.length} treatment routes</div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {treatments.map((treatment) => (
+                <Link
+                  key={treatment.id}
+                  href={`/${normalizedStateSlug}/services/${treatment.slug}/`}
+                  className="rounded-3xl border border-border bg-background px-5 py-5 transition-colors hover:border-primary/30 hover:bg-muted/30"
+                >
+                  <p className="text-lg font-semibold text-foreground">{treatment.name}</p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">Compare live providers for {treatment.name.toLowerCase()} across {stateName}.</p>
+                  <div className="mt-4 text-sm font-medium text-primary">Open treatment page</div>
+                </Link>
               ))}
             </div>
           </div>
@@ -562,10 +639,10 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
       {/* FAQs Section from page_content - after Browse Services */}
       {pageContent?.faqs && Array.isArray(pageContent.faqs) && pageContent.faqs.length > 0 && (
         <Section size="md">
-          <div className="container px-4 max-w-4xl mx-auto">
-            <div className="space-y-4">
+          <div className="container px-4 max-w-5xl mx-auto">
+            <div className="rounded-3xl border border-border bg-card px-6 py-6 md:px-8 space-y-4">
               {pageContent.faqs.map((faq: any, index: number) => (
-                <div key={index} className="bg-card rounded-xl p-4">
+                <div key={index} className="rounded-2xl border border-border bg-background p-4">
                   <h3 className="font-semibold mb-2">{faq.question || faq.q}</h3>
                   <p className="text-muted-foreground">{faq.answer || faq.a}</p>
                 </div>

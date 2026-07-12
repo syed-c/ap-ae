@@ -40,8 +40,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const secret = body.secret || req.query.secret;
   const revalidationSecret = process.env.REVALIDATION_SECRET;
 
-  // Validate secret if configured
-  if (revalidationSecret && secret !== revalidationSecret) {
+  if (!revalidationSecret) {
+    return res.status(503).json({ error: 'Revalidation endpoint is not configured' });
+  }
+
+  if (secret !== revalidationSecret) {
     return res.status(401).json({ error: 'Invalid revalidation secret' });
   }
 

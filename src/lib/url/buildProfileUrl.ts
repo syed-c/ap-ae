@@ -152,12 +152,6 @@ function normalizePart(part: string): string {
 }
 
 export function buildUrl(...parts: (string | undefined | null)[]): string {
-  if (process.env.NODE_ENV === 'development') {
-    const rawParts = parts.filter(Boolean);
-    if (rawParts.length && (rawParts[0] === '' || rawParts[0]?.startsWith('/'))) {
-      console.log('[buildUrl] raw input:', parts);
-    }
-  }
   const cleanParts = parts
     .filter(Boolean)
     .map(p => normalizePart(String(p)))

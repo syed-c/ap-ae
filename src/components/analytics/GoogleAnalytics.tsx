@@ -36,7 +36,6 @@ export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
     const existingScript = document.querySelector(`script[src*="gtag/js?id=${measurementId}"]`);
     if (existingScript) {
       scriptLoadedRef.current = true;
-      console.log('[GA4] Script already loaded');
       return;
     }
 
@@ -75,15 +74,10 @@ export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
     const script = document.createElement('script');
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-    script.onload = () => {
-      console.log('[GA4] gtag.js loaded successfully');
-    };
     script.onerror = () => {
       console.error('[GA4] Failed to load gtag.js');
     };
     document.head.appendChild(script);
-
-    console.log('[GA4] Initialized with measurement ID:', measurementId);
   }, [measurementId]);
 
   // Track page views on route change
@@ -101,7 +95,6 @@ export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
         page_title: document.title,
         page_location: window.location.href,
       });
-      console.log('[GA4] Page view:', pathname);
     }, 100);
 
     return () => clearTimeout(timeoutId);
