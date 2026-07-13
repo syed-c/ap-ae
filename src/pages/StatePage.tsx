@@ -362,6 +362,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
     return leftIndex - rightIndex;
   });
   const featuredCities = orderedCities.slice(0, 12);
+  const remainingCities = orderedCities.slice(12);
   const heroDescription = isDubaiFlagship
     ? 'Explore Dubai dentist pages built as real landing destinations across Business Bay, Jumeirah, Palm Jumeirah, Dubai Marina, Downtown Dubai, Deira, and more. Each area routes directly into live providers and treatment pages.'
     : `Browse clinics and dentists across ${stateName}, compare trust signals, and move from discovery to booking through a more structured marketplace experience.`;
@@ -564,6 +565,31 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
           )}
         </div>
       </Section>
+
+      {remainingCities.length > 0 && (
+        <Section size="sm">
+          <div className="mx-auto max-w-6xl rounded-3xl border border-border bg-card px-6 py-6 md:px-8">
+            <div className="mb-5 flex flex-col gap-2 border-b border-border pb-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Full Location Index</p>
+                <h2 className="mt-1 text-2xl font-bold text-foreground">All live area pages in {stateName}</h2>
+              </div>
+              <p className="text-sm text-muted-foreground">Every linked area below opens its dedicated landing page.</p>
+            </div>
+            <div className="flex flex-wrap gap-2.5">
+              {orderedCities.map((city) => (
+                <Link
+                  key={city.id}
+                  href={`/${normalizedStateSlug}/${city.slug}/`}
+                  className="rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:text-primary"
+                >
+                  {city.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </Section>
+      )}
 
       {/* SEO Content Section */}
       <Section size="lg">
