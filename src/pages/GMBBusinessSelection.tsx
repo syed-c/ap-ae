@@ -3,7 +3,16 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { getGmbProviderToken, setGmbProviderToken, clearGmbProviderToken } from '@/lib/gmbAuth';
+import {
+  buildGmbAuthCallbackUrl,
+  clearGmbFlowState,
+  clearGmbProviderToken,
+  createAuthRestoreState,
+  getGmbFlowFlag,
+  getGmbProviderToken,
+  setGmbFlowFlag,
+  setGmbProviderToken,
+} from '@/lib/gmbAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SEOHead } from '@/components/seo/SEOHead';
@@ -118,27 +127,19 @@ export default function GMBBusinessSelection() {
         throw new Error('No active session. Please sign in again.');
       }
 
-      // Get the provider token captured during the OAuth callback.
-      // Priority:
-      // 1) navigation state (survives when browser blocks storage)
-      // 2) dual-storage token helper
-      // 3) session.provider_token (often not persisted in PKCE)
+      // Best-effort client fallback only. The edge function can also load the
+      // provider token from server-side storage when this value is unavailable.
       const storedToken = getGmbProviderToken();
       const providerToken = providerTokenFromNavState ?? storedToken ?? session.provider_token ?? null;
 
-      // Persist for the rest of the discovery flow.
+      // Keep a per-tab copy for the rest of the current flow if available.
       if (!storedToken && providerToken) {
         setGmbProviderToken(providerToken);
       }
 
-      if (!providerToken) {
-        setErrorCode('NO_PROVIDER_TOKEN');
-        throw new Error('Google Business access token not found. Please sign in with Google again.');
-      }
-
       const { data, error: fetchError } = await supabase.functions.invoke('gmb-fetch-businesses', {
         headers: { Authorization: `Bearer ${session.access_token}` },
-        body: { providerToken },
+        body: providerToken ? { providerToken } : {},
       });
 
       if (fetchError) {
@@ -178,7 +179,7 @@ export default function GMBBusinessSelection() {
       }
 
       // Check if this is a re-link flow (existing dentist linking GMB to their clinic)
-      const isRelinkFlow = localStorage.getItem('gmb_relink_flow') === 'true';
+      const isRelinkFlow = getGmbFlowFlag('relink');
 
       if (isRelinkFlow) {
         // For re-link, just update the existing clinic with the new google_place_id
@@ -211,7 +212,7 @@ export default function GMBBusinessSelection() {
           if (updateError) throw updateError;
 
           toast.success('Google Business Profile connected successfully!');
-          localStorage.removeItem('gmb_relink_flow');
+          setGmbFlowFlag('relink', false);
           clearGmbProviderToken();
 
           router.replace('/dashboard?tab=settings&gmb_connected=true');
@@ -235,7 +236,7 @@ export default function GMBBusinessSelection() {
 
       // Tokens are only needed for the discovery step; clear them after the clinic is created.
       clearGmbProviderToken();
-      localStorage.removeItem('gmb_listing_flow');
+      setGmbFlowFlag('listing', false);
 
       // Refresh roles in case dentist role was just assigned
       await refreshRoles();
@@ -262,12 +263,10 @@ export default function GMBBusinessSelection() {
 
   const handleSkipGMB = async () => {
     // If user doesn't want to select a business, check if this is a relink flow
-    const isRelinkFlow = localStorage.getItem('gmb_relink_flow') === 'true';
+    const isRelinkFlow = getGmbFlowFlag('relink');
 
     // Clean up flow flags
-    localStorage.removeItem('gmb_listing_flow');
-    localStorage.removeItem('gmb_relink_flow');
-    localStorage.removeItem('gmb_restore_session');
+    clearGmbFlowState();
     clearGmbProviderToken();
 
     if (isRelinkFlow) {
@@ -283,27 +282,38 @@ export default function GMBBusinessSelection() {
     // Re-initiate Google OAuth
     // - listing flow: create a new clinic
     // - relink flow: update the existing clinic
-    const isRelinkFlow = localStorage.getItem('gmb_relink_flow') === 'true';
+    const isRelinkFlow = getGmbFlowFlag('relink');
 
     // For relink flow, store the current user's session before OAuth
     if (isRelinkFlow) {
       const { data: { session: currentSession } } = await supabase.auth.getSession();
       if (currentSession) {
-        const { storeOriginalSession } = await import('@/lib/gmbAuth');
-        storeOriginalSession(
-          currentSession.access_token,
-          currentSession.refresh_token || '',
-          currentSession.user.id
-        );
-        localStorage.setItem('gmb_restore_session', 'true');
+        const restoreToken = await createAuthRestoreState(currentSession, 'relink');
+        setGmbFlowFlag('restoreSession', true);
+        const redirectTo = buildGmbAuthCallbackUrl(new URLSearchParams({
+          relink: 'true',
+          restore: restoreToken,
+        }));
+        setGmbFlowFlag('relink', true);
+
+        supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            scopes: 'openid email profile https://www.googleapis.com/auth/business.manage',
+            redirectTo,
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'consent select_account',
+            },
+          },
+        });
+        return;
       }
-      localStorage.setItem('gmb_relink_flow', 'true');
     } else {
-      localStorage.setItem('gmb_listing_flow', 'true');
+      setGmbFlowFlag('listing', true);
     }
 
-    // Always use production domain for OAuth callback
-    const redirectTo = `https://www.AppointPanda.ae/auth/callback?${isRelinkFlow ? 'relink=true' : 'listing=true'}`;
+    const redirectTo = buildGmbAuthCallbackUrl(isRelinkFlow ? 'relink=true' : 'listing=true');
 
     // IMPORTANT: Always use signInWithOAuth (not linkIdentity) for GMB flows
     // signInWithOAuth ensures we get a fresh provider_token with business.manage scope

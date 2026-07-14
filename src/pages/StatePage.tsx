@@ -58,9 +58,10 @@ interface StatePageProps {
   allSeoDataProp?: any;
   pageContentDataProp?: any;
   clinicProfilesProp?: any[];
+  treatmentsDataProp?: any[];
 }
 
-const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, faqsProp, seoH1Prop, stateRatingsProp, topClinicsProp, allSeoDataProp, pageContentDataProp, clinicProfilesProp }: StatePageProps = {}) => {
+const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, faqsProp, seoH1Prop, stateRatingsProp, topClinicsProp, allSeoDataProp, pageContentDataProp, clinicProfilesProp, treatmentsDataProp }: StatePageProps = {}) => {
   const router = useRouter();
   const isServerRender = typeof window === 'undefined';
   const stateSlug = isServerRender
@@ -238,7 +239,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
   }, [profiles, stateFilters]);
 
   const hasActiveStateFilters = stateFilters.maxBudget !== null || stateFilters.minRating > 0 || stateFilters.verifiedOnly;
-  const { data: treatments, isLoading: treatmentsLoading } = useTreatments();
+  const { data: treatments, isLoading: treatmentsLoading } = useTreatments(treatmentsDataProp as any);
 
   // Check if state data is available from server prefetch
   const hasStateData = !!state;
@@ -662,12 +663,12 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
         </Section>
       )}
 
-      {/* FAQs Section from page_content - after Browse Services */}
-      {pageContent?.faqs && Array.isArray(pageContent.faqs) && pageContent.faqs.length > 0 && (
+      {/* FAQs Section from page_content or seo_pages - after Browse Services */}
+      {(pageContent?.faqs && Array.isArray(pageContent.faqs) && pageContent.faqs.length > 0) || faqs.length > 0 ? (
         <Section size="md">
           <div className="container px-4 max-w-5xl mx-auto">
             <div className="rounded-3xl border border-border bg-card px-6 py-6 md:px-8 space-y-4">
-              {pageContent.faqs.map((faq: any, index: number) => (
+              {(pageContent?.faqs && Array.isArray(pageContent.faqs) && pageContent.faqs.length > 0 ? pageContent.faqs : faqs).map((faq: any, index: number) => (
                 <div key={index} className="rounded-2xl border border-border bg-background p-4">
                   <h3 className="font-semibold mb-2">{faq.question || faq.q}</h3>
                   <p className="text-muted-foreground">{faq.answer || faq.a}</p>
@@ -676,7 +677,7 @@ const StatePage = ({ stateSlugProp, stateDataProp, citiesDataProp, seoDataProp, 
             </div>
           </div>
         </Section>
-      )}
+      ) : null}
     </PageLayout>
   );
 };

@@ -13,6 +13,7 @@ import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { SyncStructuredData } from "@/components/seo/SyncStructuredData";
@@ -76,6 +77,13 @@ interface ClinicPageProps {
   clinicSlugProp?: string;
   clinicDataProp?: any;
   clinicTreatmentsDataProp?: any[];
+  dentistsDataProp?: any[];
+  reviewsDataProp?: any[];
+  googleReviewsDataProp?: any[];
+  galleryImagesDataProp?: any[];
+  hoursDataProp?: any[];
+  seoContentDataProp?: any;
+  faqsProp?: { question: string; answer: string }[];
   dehydratedStateProp?: any;
   seoDataProp?: {
     title: string;
@@ -84,7 +92,7 @@ interface ClinicPageProps {
   };
 }
 
-const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, seoDataProp }: ClinicPageProps = {}) => {
+const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, dentistsDataProp, reviewsDataProp, googleReviewsDataProp, galleryImagesDataProp, hoursDataProp, seoContentDataProp, faqsProp, seoDataProp }: ClinicPageProps = {}) => {
   const router = useRouter();
   // Always trust clinicSlugProp for SSR - it's passed from getStaticProps
   // Only fall back to router.query for client-side navigations after initial SSR
@@ -97,11 +105,14 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
   const [selectedDentistId, setSelectedDentistId] = useState<string | undefined>();
   const { trackProfileView } = useAnalytics();
 
-  // SEO content from seo_pages table - only use if already loaded (no additional fetch)
-  // Content is fetched server-side via getStaticProps - no client-side trigger
-  const seoContent = null; // Use static data only, no client fetch
-  const parsedContent = null;
-  const seoFaqs = [];
+  // SEO content is fetched server-side and passed in to keep clinic body copy crawlable.
+  const seoContent = seoContentDataProp || null;
+  const parsedContent = seoContent?.content ? parseMarkdownContent(seoContent.content) : null;
+  const seoFaqs = (faqsProp && faqsProp.length > 0)
+    ? faqsProp.map((faq) => ({ question: faq.question, answer: faq.answer }))
+    : (seoContent?.faqs && Array.isArray(seoContent.faqs)
+        ? seoContent.faqs.map((faq: any) => ({ question: faq.question || faq.q, answer: faq.answer || faq.a }))
+        : (seoContent?.content ? parseFaqFromContent(seoContent.content).map((faq) => ({ question: faq.q, answer: faq.a })) : []));
 
   // Fetch clinic data - only exact slug match
   const { data: clinic, isLoading, error } = useQuery({
@@ -134,6 +145,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
         .order("name");
       return data || [];
     },
+    initialData: dentistsDataProp,
     enabled: !!clinic?.id,
   });
 
@@ -148,6 +160,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
         .eq("clinic_id", clinic.id);
       return data || [];
     },
+    initialData: clinicTreatmentsDataProp,
     enabled: !!clinic?.id,
   });
 
@@ -172,6 +185,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
         source: 'internal' as const,
       }));
     },
+    initialData: reviewsDataProp,
     enabled: !!clinic?.id,
   });
 
@@ -188,6 +202,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
         .limit(20);
       return data || [];
     },
+    initialData: googleReviewsDataProp,
     enabled: !!clinic?.id && clinic?.gmb_connected,
   });
 
@@ -203,6 +218,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
         .order("display_order");
       return data || [];
     },
+    initialData: galleryImagesDataProp,
     enabled: !!clinic?.id,
   });
 
@@ -218,6 +234,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
         .order("day_of_week");
       return data || [];
     },
+    initialData: hoursDataProp,
     enabled: !!clinic?.id,
   });
 
@@ -654,7 +671,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
               </div>
 
               {/* Overview Tab */}
-              <TabsContent value="overview" className="space-y-6 animate-fade-in-up">
+              <TabsContent value="overview" forceMount className="space-y-6 animate-fade-in-up">
                 {/* AI Match Badge - Shows why this clinic is a good match */}
                 <AIMatchBadge
                   clinicName={clinic.name}
@@ -706,8 +723,26 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
                   )}
                 </div>
 
+                {seoFaqs.length > 0 && (
+                  <div className="card-modern p-4 md:p-6 overflow-hidden">
+                    <h2 className="font-display text-lg md:text-xl font-bold mb-4">Frequently Asked Questions</h2>
+                    <Accordion type="single" collapsible className="space-y-3">
+                      {seoFaqs.slice(0, 8).map((faq, index) => (
+                        <AccordionItem key={index} value={`clinic-faq-${index}`} className="rounded-2xl border border-border px-4">
+                          <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                            {faq.question}
+                          </AccordionTrigger>
+                          <AccordionContent forceMount className="pb-4 text-muted-foreground">
+                            {faq.answer}
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </div>
+                )}
+
                 {/* AI-Optimized FAQ Section */}
-                {(() => {
+                {seoFaqs.length === 0 && (() => {
                   const clinicQA = generateClinicQA({
                     name: clinic.name,
                     city: clinic.city?.name,
@@ -771,7 +806,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
               </TabsContent>
 
               {/* Team Tab */}
-              <TabsContent value="team" className="animate-fade-in-up">
+              <TabsContent value="team" forceMount className="animate-fade-in-up">
                 <div className="card-modern p-4 md:p-6 overflow-hidden">
                   <h2 className="font-display text-lg md:text-xl font-bold mb-4 md:mb-6">Our Dental Team</h2>
                   <ClinicTeamSection
@@ -783,7 +818,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
               </TabsContent>
 
               {/* Services Tab */}
-              <TabsContent value="services" className="animate-fade-in-up">
+              <TabsContent value="services" forceMount className="animate-fade-in-up">
                 <div className="card-modern p-4 md:p-6 overflow-hidden space-y-6">
                   <h2 className="font-display text-lg md:text-xl font-bold">Services Offered</h2>
 
@@ -808,7 +843,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
               </TabsContent>
 
               {/* Reviews Tab */}
-              <TabsContent value="reviews" className="animate-fade-in-up">
+              <TabsContent value="reviews" forceMount className="animate-fade-in-up">
                 <div className="card-modern p-4 md:p-6 overflow-hidden">
                   <h2 className="font-display text-lg md:text-xl font-bold mb-4 md:mb-6">Patient Reviews</h2>
                   <ClinicReviewsSection
@@ -824,7 +859,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
               </TabsContent>
 
               {/* Insurance Tab */}
-              <TabsContent value="insurance" className="animate-fade-in-up">
+              <TabsContent value="insurance" forceMount className="animate-fade-in-up">
                 <div className="card-modern p-4 md:p-6 overflow-hidden">
                   <h2 className="font-display text-lg md:text-xl font-bold mb-4 md:mb-6">Insurance & Payment</h2>
                   <InsuranceTab clinicId={clinic.id} isClaimed={isClaimed} />
@@ -832,7 +867,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
               </TabsContent>
 
               {/* Before & After Tab */}
-              <TabsContent value="before-after" className="animate-fade-in-up">
+              <TabsContent value="before-after" forceMount className="animate-fade-in-up">
                 <div className="card-modern p-4 md:p-6 overflow-hidden">
                   <h2 className="font-display text-lg md:text-xl font-bold mb-4 md:mb-6">Treatment Results</h2>
                   <BeforeAfterGallery clinicId={clinic.id} isClaimed={isClaimed} />
@@ -841,7 +876,7 @@ const ClinicPage = ({ clinicSlugProp, clinicDataProp, clinicTreatmentsDataProp, 
 
               {/* Photos Tab */}
               {galleryImages && galleryImages.length > 0 && (
-                <TabsContent value="photos" className="animate-fade-in-up">
+                <TabsContent value="photos" forceMount className="animate-fade-in-up">
                   <div className="card-modern p-4 md:p-6 overflow-hidden">
                     <h2 className="font-display text-lg md:text-xl font-bold mb-4">
                       Gallery ({galleryImages.length} photos)

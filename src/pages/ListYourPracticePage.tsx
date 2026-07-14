@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { buildGmbAuthCallbackUrl, setGmbFlowFlag } from '@/lib/gmbAuth';
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/ui/button";
@@ -127,9 +128,8 @@ const ListYourPracticePage = () => {
   const handleGoogleSignIn = async () => {
     setIsConnectingGoogle(true);
     try {
-      localStorage.setItem('gmb_listing_flow', 'true');
-      // Always use production domain for OAuth callback
-      const redirectTo = 'https://www.AppointPanda.ae/auth/callback?listing=true';
+      setGmbFlowFlag('listing', true);
+      const redirectTo = buildGmbAuthCallbackUrl('listing=true');
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -144,7 +144,7 @@ const ListYourPracticePage = () => {
       });
 
       if (error) {
-        localStorage.removeItem('gmb_listing_flow');
+        setGmbFlowFlag('listing', false);
         throw error;
       }
     } catch (error: any) {

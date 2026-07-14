@@ -138,6 +138,7 @@ const DentistPage = ({ dentistSlugProp, dentistDataProp, seoDataProp, treatments
         created_at: r.created_at,
       }));
     },
+    initialData: reviewsData,
     enabled: !!dentist?.clinic_id,
   });
 

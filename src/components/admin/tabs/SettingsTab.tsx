@@ -866,11 +866,11 @@ export default function SettingsTab() {
                   <Badge variant="outline" className="text-[10px]">Editable</Badge>
                 </Label>
                 <div className="flex gap-2">
-                  <Input
-                    value={(getSettingValue('google_oauth')?.callback_url as string) || `${window.location.origin}/auth/callback`}
-                    onChange={(e) => updateFormValue('google_oauth', 'callback_url', e.target.value)}
-                    placeholder="https://www.AppointPanda.ae/auth/callback"
-                  />
+                    <Input
+                      value={(getSettingValue('google_oauth')?.callback_url as string) || `${window.location.origin}/auth/callback`}
+                      onChange={(e) => updateFormValue('google_oauth', 'callback_url', e.target.value)}
+                      placeholder="https://your-domain.example/auth/callback"
+                    />
                   <Button
                     variant="outline"
                     size="icon"
@@ -884,7 +884,7 @@ export default function SettingsTab() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Set your production callback URL (e.g., <strong>https://www.AppointPanda.ae/auth/callback</strong>). Add this URL as an authorized redirect URI in your{' '}
+                  Set your production callback URL (e.g., <strong>https://your-domain.example/auth/callback</strong>). Add this URL as an authorized redirect URI in your{' '}
                   <a
                     href="https://console.cloud.google.com/apis/credentials"
                     target="_blank"

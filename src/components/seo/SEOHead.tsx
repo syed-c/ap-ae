@@ -21,6 +21,21 @@ const SITE_NAME = 'AppointPanda';
 const BASE_URL = 'https://www.appointpanda.ae';
 const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.png`;
 
+function buildCanonicalUrl(pathOrUrl: string): string {
+  const normalizedValue = pathOrUrl.trim();
+
+  if (/^https?:\/\//i.test(normalizedValue)) {
+    const absoluteUrl = new URL(normalizedValue);
+    absoluteUrl.pathname = absoluteUrl.pathname.replace(/\/+/g, '/');
+    return absoluteUrl.toString();
+  }
+
+  const pathname = normalizedValue.startsWith('/') ? normalizedValue : `/${normalizedValue}`;
+  const absoluteUrl = new URL(pathname, BASE_URL);
+  absoluteUrl.pathname = absoluteUrl.pathname.replace(/\/+/g, '/');
+  return absoluteUrl.toString();
+}
+
 export const SEOHead = ({
   title = '',
   description = '',
@@ -53,12 +68,7 @@ export const SEOHead = ({
   // CRITICAL: Always generate canonical URL - use provided or derive from current path
   // Don't add trailing slash - Next.js trailingSlash: true handles redirects
   // This prevents 301 redirect loops and duplicate content issues
-  const canonicalUrl = canonical
-    ? `${BASE_URL}${canonical.startsWith('/') ? canonical : `/${canonical}`}`
-    : `${BASE_URL}${pathWithoutQuery}`;
-
-  // Normalize canonical: just remove duplicate slashes, don't add trailing slash
-  const normalizedCanonical = canonicalUrl.replace(/\/+/g, '/');
+  const normalizedCanonical = buildCanonicalUrl(canonical || pathWithoutQuery || '/');
 
   const imageUrl = ogImage || DEFAULT_OG_IMAGE;
 

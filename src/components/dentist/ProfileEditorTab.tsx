@@ -37,6 +37,13 @@ import {
   Camera,
 } from 'lucide-react';
 import { createAuditLog } from '@/lib/audit';
+import {
+  buildGmbAuthCallbackUrl,
+  clearGmbFlowState,
+  createAuthRestoreState,
+  setGmbFlowFlag,
+  setGmbLinkToken,
+} from '@/lib/gmbAuth';
 
 interface ClinicData {
   id: string;
@@ -411,12 +418,7 @@ export default function ProfileEditorTab() {
       // CRITICAL: Store the original user's session before OAuth
       // This allows us to restore their session after getting the GMB token
       // even if they use a different Google account for GMB
-      const { storeOriginalSession } = await import('@/lib/gmbAuth');
-      storeOriginalSession(
-        currentSession.access_token,
-        currentSession.refresh_token || '',
-        currentUser.id
-      );
+      const restoreToken = await createAuthRestoreState(currentSession, 'gmb');
 
       // Create a secure server-side link request token
       const { data: linkRequest, error: linkError } = await supabase
@@ -434,13 +436,15 @@ export default function ProfileEditorTab() {
       }
 
       // Store the token AND a flag in localStorage - URL params may not be preserved through OAuth
-      localStorage.setItem('gmb_link_token', linkRequest.token);
-      localStorage.setItem('gmb_pending', 'true');
+      setGmbLinkToken(linkRequest.token);
+      setGmbFlowFlag('pending', true);
       // Mark that we need to restore the original user after GMB OAuth
-      localStorage.setItem('gmb_restore_session', 'true');
+      setGmbFlowFlag('restoreSession', true);
 
-      // Always use production domain for OAuth callback
-      const redirectTo = 'https://www.AppointPanda.ae/auth/callback?gmb=true';
+      const redirectTo = buildGmbAuthCallbackUrl(new URLSearchParams({
+        gmb: 'true',
+        restore: restoreToken,
+      }));
 
       // Use signInWithOAuth to get the GMB token
       // The callback handler will capture the token and restore the original user session
@@ -458,9 +462,7 @@ export default function ProfileEditorTab() {
 
       if (error) {
         // Clean up on error
-        localStorage.removeItem('gmb_link_token');
-        localStorage.removeItem('gmb_pending');
-        localStorage.removeItem('gmb_restore_session');
+        clearGmbFlowState();
         throw error;
       }
       // Success path will redirect the browser.

@@ -22,6 +22,9 @@ interface InsuranceInternalLinksProps {
   /** Max items per section */
   maxItems?: number;
   className?: string;
+  insurancesProp?: { name: string; slug: string }[];
+  servicesProp?: { name: string; slug: string }[];
+  emiratesProp?: { name: string; slug: string }[];
 }
 
 export function InsuranceInternalLinks({
@@ -34,6 +37,9 @@ export function InsuranceInternalLinks({
   showLocations = true,
   maxItems = 4,
   className,
+  insurancesProp,
+  servicesProp,
+  emiratesProp,
 }: InsuranceInternalLinksProps) {
   const { data: insurances } = useQuery({
     queryKey: ["internal-links-insurances"],
@@ -48,6 +54,7 @@ export function InsuranceInternalLinks({
     },
     staleTime: 30 * 60 * 1000,
     enabled: showInsurances,
+    initialData: insurancesProp ?? undefined,
   });
 
   const { data: services } = useQuery({
@@ -63,6 +70,7 @@ export function InsuranceInternalLinks({
     },
     staleTime: 30 * 60 * 1000,
     enabled: showServices,
+    initialData: servicesProp ?? undefined,
   });
 
   const { data: emirates } = useQuery({
@@ -77,6 +85,7 @@ export function InsuranceInternalLinks({
     },
     staleTime: 30 * 60 * 1000,
     enabled: showLocations,
+    initialData: emiratesProp ?? undefined,
   });
 
   const filteredInsurances = (insurances || [])

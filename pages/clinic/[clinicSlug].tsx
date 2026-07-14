@@ -66,6 +66,41 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         .select("*, treatment:treatments(*)")
         .eq("clinic_id", clinic.id);
 
+    const [dentistsResult, reviewsResult, googleReviewsResult, galleryResult, hoursResult] = await Promise.all([
+        supabase
+            .from('dentists')
+            .select('*')
+            .eq('clinic_id', clinic.id)
+            .eq('is_active', true)
+            .order('is_primary', { ascending: false })
+            .order('name'),
+        supabase
+            .from('review_funnel_events')
+            .select('*')
+            .eq('clinic_id', clinic.id)
+            .eq('event_type', 'rating_submitted')
+            .order('created_at', { ascending: false })
+            .limit(20),
+        clinic.gmb_connected
+            ? supabase
+                .from('google_reviews')
+                .select('*')
+                .eq('clinic_id', clinic.id)
+                .order('review_time', { ascending: false })
+                .limit(20)
+            : Promise.resolve({ data: [] as any[] }),
+        supabase
+            .from('clinic_images')
+            .select('*')
+            .eq('clinic_id', clinic.id)
+            .order('display_order'),
+        supabase
+            .from('clinic_hours')
+            .select('*')
+            .eq('clinic_id', clinic.id)
+            .order('day_of_week'),
+    ]);
+
     if (treatmentsError) {
         console.error('[getStaticProps] Error fetching treatments:', treatmentsError);
     }
@@ -90,6 +125,20 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             clinicSlug,
             clinicData: clinic,
             clinicTreatmentsData: clinicTreatments || [],
+            dentistsData: dentistsResult.data || [],
+            reviewsData: (reviewsResult.data || []).map((review: any) => ({
+                id: review.id,
+                patient_name: review.visitor_id || 'Anonymous',
+                rating: review.rating || 5,
+                content: review.comment || '',
+                created_at: review.created_at,
+                source: 'internal',
+            })),
+            googleReviewsData: googleReviewsResult.data || [],
+            galleryImagesData: galleryResult.data || [],
+            hoursData: hoursResult.data || [],
+            seoContentData: seoContent,
+            faqsProp: faqs,
             seoData: {
                 title: metaTitle,
                 description: metaDescription,
@@ -102,10 +151,17 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     };
 };
 
-const ClinicPageWithSEO = ({ clinicSlug, clinicData, clinicTreatmentsData, seoData }: {
+const ClinicPageWithSEO = ({ clinicSlug, clinicData, clinicTreatmentsData, dentistsData, reviewsData, googleReviewsData, galleryImagesData, hoursData, seoContentData, faqsProp, seoData }: {
     clinicSlug: string;
     clinicData: any;
     clinicTreatmentsData: any[];
+    dentistsData?: any[];
+    reviewsData?: any[];
+    googleReviewsData?: any[];
+    galleryImagesData?: any[];
+    hoursData?: any[];
+    seoContentData?: any;
+    faqsProp?: { question: string; answer: string }[];
     seoData: { title: string; description: string; canonical: string; ogImage?: string };
 }) => {
     return (
@@ -114,6 +170,13 @@ const ClinicPageWithSEO = ({ clinicSlug, clinicData, clinicTreatmentsData, seoDa
                 clinicSlugProp={clinicSlug} 
                 clinicDataProp={clinicData}
                 clinicTreatmentsDataProp={clinicTreatmentsData}
+                dentistsDataProp={dentistsData}
+                reviewsDataProp={reviewsData}
+                googleReviewsDataProp={googleReviewsData}
+                galleryImagesDataProp={galleryImagesData}
+                hoursDataProp={hoursData}
+                seoContentDataProp={seoContentData}
+                faqsProp={faqsProp}
                 seoDataProp={seoData}
             />
         </>

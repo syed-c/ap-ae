@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { revalidatePath, revalidateTag } from 'next/cache';
 
 /**
  * On-Demand ISR Revalidation API Route
@@ -29,6 +28,15 @@ interface RevalidateRequest {
   tag?: string;
 }
 
+function normalizePath(path: string): string {
+  if (!path || path === '/') {
+    return '/';
+  }
+
+  const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
+  return withLeadingSlash.endsWith('/') ? withLeadingSlash : `${withLeadingSlash}/`;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -55,9 +63,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const paths = body.paths || (body.path ? [body.path] : []);
     for (const path of paths) {
       try {
-        // Ensure path has trailing slash for Next.js trailingSlash config
-        const normalizedPath = path.endsWith('/') ? path : `${path}/`;
-        revalidatePath(normalizedPath);
+        const normalizedPath = normalizePath(path);
+        await res.revalidate(normalizedPath);
         results.push({ path: normalizedPath, success: true });
       } catch (err) {
         results.push({ path, success: false, error: err instanceof Error ? err.message : 'Unknown error' });
@@ -68,8 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const tags = body.tags || (body.tag ? [body.tag] : []);
     for (const tag of tags) {
       try {
-        revalidateTag(tag);
-        results.push({ tag, success: true });
+        results.push({ tag, success: false, error: 'Tag revalidation is only supported for App Router caches.' });
       } catch (err) {
         results.push({ tag, success: false, error: err instanceof Error ? err.message : 'Unknown error' });
       }
@@ -77,7 +83,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // If no paths or tags provided, revalidate homepage
     if (paths.length === 0 && tags.length === 0) {
-      revalidatePath('/');
+      await res.revalidate('/');
       results.push({ path: '/', success: true });
     }
 
@@ -112,7 +118,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-// Disable body parsing for this route to allow raw body access if needed
 export const config = {
   api: {
     bodyParser: true,

@@ -33,6 +33,7 @@ import {
   User
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { buildGmbAuthCallbackUrl, createAuthRestoreState, setGmbFlowFlag } from '@/lib/gmbAuth';
 import GMBConnectionCard from '@/components/reputation/GMBConnectionCard';
 import GMBBookingLinkCard from '@/components/dentist/GMBBookingLinkCard';
 import {
@@ -181,20 +182,17 @@ export default function DentistSettingsTab() {
       // CRITICAL: Store the original user's session before OAuth
       // This allows us to restore their session after getting the GMB token
       // even if they use a different Google account for GMB
-      const { storeOriginalSession } = await import('@/lib/gmbAuth');
-      storeOriginalSession(
-        currentSession.access_token,
-        currentSession.refresh_token || '',
-        currentSession.user.id
-      );
+      const restoreToken = await createAuthRestoreState(currentSession, 'relink');
 
       // Mark as relink flow so /gmb-select updates the existing clinic instead of creating a new one
-      localStorage.setItem('gmb_relink_flow', 'true');
+      setGmbFlowFlag('relink', true);
       // Mark that we need to restore the original user after GMB OAuth
-      localStorage.setItem('gmb_restore_session', 'true');
+      setGmbFlowFlag('restoreSession', true);
 
-      // Always use production domain for OAuth callback
-      const redirectTo = 'https://www.AppointPanda.ae/auth/callback?relink=true';
+      const redirectTo = buildGmbAuthCallbackUrl(new URLSearchParams({
+        relink: 'true',
+        restore: restoreToken,
+      }));
 
       // IMPORTANT: Use signInWithOAuth to get the GMB token from the Google account
       // The callback will capture the token and then restore the original user session

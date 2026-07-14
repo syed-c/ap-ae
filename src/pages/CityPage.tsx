@@ -80,9 +80,12 @@ interface CityPageProps {
   allSeoDataProp?: any;
   pageContentDataProp?: any;
   clinicProfilesProp?: any[];
+  allEmirateCitiesProp?: any[];
+  serviceLocationPagesProp?: any[];
+  treatmentsDataProp?: any[];
 }
 
-const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp, faqsProp, seoH1Prop, cityRatingsProp, topClinicsProp, allSeoDataProp, pageContentDataProp, clinicProfilesProp }: CityPageProps = {}) => {
+const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, seoDataProp, faqsProp, seoH1Prop, cityRatingsProp, topClinicsProp, allSeoDataProp, pageContentDataProp, clinicProfilesProp, allEmirateCitiesProp, serviceLocationPagesProp, treatmentsDataProp }: CityPageProps = {}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isServerRender = typeof window === 'undefined';
@@ -102,7 +105,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
 
   // Fetch SEO content from seo_pages table
   const seoSlug = `${normalizedStateSlug || ''}/${citySlug || ''}`;
-  const { data: seoContent, isLoading: seoContentLoading, isFetching: seoContentFetching } = useSeoPageContent(seoSlug);
+  const { data: seoContent, isLoading: seoContentLoading, isFetching: seoContentFetching } = useSeoPageContent(seoSlug, allSeoDataProp || null);
 
   // IMPORTANT: Don't hide content during background refetches - only show loading state when no data exists
   const isSeoContentPending = !seoContent && (seoContentLoading || seoContentFetching);
@@ -243,7 +246,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
   const profiles = filteredProfiles;
 
   // Fetch treatments (cached via useTreatments hook)
-  const { data: treatments, isLoading: treatmentsLoading } = useTreatments();
+  const { data: treatments, isLoading: treatmentsLoading } = useTreatments(treatmentsDataProp as any);
 
   // Fetch nearby cities for internal linking - filtered by emirate using state_id
   const { data: nearbyCities, isLoading: nearbyCitiesLoading } = useQuery({
@@ -279,6 +282,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     },
     enabled: !!normalizedStateSlug,
     staleTime: 5 * 60 * 1000,
+    initialData: allEmirateCitiesProp ?? undefined,
   });
 
   // Fetch service-location pages from seo_pages for this city (all services)
@@ -303,6 +307,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
     },
     enabled: !!normalizedStateSlug && !!citySlug,
     staleTime: 5 * 60 * 1000,
+    initialData: serviceLocationPagesProp ?? undefined,
   });
 
   // Signal prerender when ALL SEO-critical data loads
@@ -406,6 +411,7 @@ const CityPage = ({ citySlugProp, stateSlugProp, stateDataProp, cityDataProp, se
   const pageDescription = pageContentDataProp?.meta_description || seoContent?.meta_description || seoDataProp?.description || null;
   const pageH1 = pageContentDataProp?.h1 || seoContent?.h1 || seoH1Prop || null;
   const sanitizedHeroIntroHtml = sanitizeCmsHtml(pageContentDataProp?.hero_intro || '');
+  const sanitizedBodyContentHtml = sanitizeCmsHtml(pageContentDataProp?.body_content ? pageContentDataProp.body_content.replace(/\n/g, '<br/>') : '');
   const sanitizedSection1Html = sanitizeCmsHtml(section1Content ? section1Content.replace(/\n/g, '<br/>') : '');
   const sanitizedSection2Html = sanitizeCmsHtml(section2Content ? section2Content.replace(/\n/g, '<br/>') : '');
   const sanitizedSection3Html = sanitizeCmsHtml(section3Content ? section3Content.replace(/\n/g, '<br/>') : '');
@@ -542,6 +548,12 @@ const shouldNoIndex = false;
               />
 
               {/* Content Sections from page_content - section_1 to section_3 */}
+              {sanitizedBodyContentHtml && (
+                <div className="rounded-3xl border border-border bg-card px-6 py-6 md:px-8">
+                  <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizedBodyContentHtml }} />
+                </div>
+              )}
+
               {(section1Title && section1Content) || (section2Title && section2Content) || (section3Title && section3Content) ? (
                 <div className="rounded-3xl border border-border bg-card px-6 py-6 md:px-8 space-y-8">
                     {section1Title && section1Content && (
@@ -682,8 +694,32 @@ const shouldNoIndex = false;
         </div>
       </Section>
 
+      {/* Crawlable FAQ Section */}
+      {faqs.length > 0 && (
+        <Section size="lg" className="bg-muted/30">
+          <div className="max-w-4xl mx-auto rounded-3xl border border-border bg-card px-6 py-6 md:px-8">
+            <div className="mb-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Frequently Asked Questions</p>
+              <h2 className="mt-1 text-2xl font-bold text-foreground">Dental care in {cityName}</h2>
+            </div>
+            <Accordion type="single" collapsible className="space-y-3">
+              {faqs.map((faq, index) => (
+                <AccordionItem key={index} value={`city-faq-${index}`} className="rounded-2xl border border-border px-5">
+                  <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                    {faq.q || faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent forceMount className="pb-4 text-muted-foreground">
+                    {faq.a || faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </Section>
+      )}
+
       {/* AI-Optimized FAQ Section */}
-      <Section size="lg" className="bg-muted/30">
+      {faqs.length === 0 && <Section size="lg" className="bg-muted/30">
         <div className="max-w-4xl mx-auto rounded-3xl border border-border bg-card px-6 py-6 md:px-8">
           <ConversationalQABlock
             title={`Dental Care in ${cityName}`}
@@ -698,7 +734,7 @@ const shouldNoIndex = false;
             defaultOpen={true}
           />
         </div>
-      </Section>
+      </Section>}
 
       {/* AI Discovery Meta */}
       <AIDiscoveryMeta

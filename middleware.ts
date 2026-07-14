@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { getSupabaseAuthTokensFromCookies } from '@/lib/supabaseAuthCookies'
 
 const ADMIN_PATHS = ['/admin']
 const DASHBOARD_PATHS = ['/dashboard', '/dashboard-v2']
@@ -19,25 +20,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Get session from Supabase auth cookie
-  // Supabase stores the session in a cookie named `sb-<project-ref>-auth-token`
-  // We check for the presence of an auth cookie as a basic check
-  const hasAuthCookie = request.cookies.has('sb-eneuthbghipsdvsqilmb-auth-token') ||
-    Array.from(request.cookies.getAll()).some(c => c.name.startsWith('sb-'))
+  const authTokens = getSupabaseAuthTokensFromCookies(request.cookies.getAll())
+  const hasAuthSession = Boolean(authTokens?.accessToken)
 
   // Protected routes
   const isProtected = STAFF_PATHS.some(p => pathname.startsWith(p))
-  const isAdminRoute = ADMIN_PATHS.some(p => pathname.startsWith(p))
-  const isDashboardRoute = DASHBOARD_PATHS.some(p => pathname.startsWith(p))
-
-  if (isProtected && !hasAuthCookie) {
+  if (isProtected && !hasAuthSession) {
     const loginUrl = new URL('/auth', request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
   // Redirect authenticated users away from auth page
-  if (pathname.startsWith('/auth') && hasAuthCookie && !pathname.includes('callback')) {
+  if (pathname.startsWith('/auth') && hasAuthSession && !pathname.includes('callback')) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 

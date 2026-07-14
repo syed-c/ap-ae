@@ -64,6 +64,12 @@ verify_jwt = false  # Custom auth: bearer token validated
 [functions.gmb-booking-link]
 verify_jwt = false  # Custom auth: bearer token validated
 
+[functions.create-auth-restore]
+verify_jwt = false  # Custom auth: bearer token validated
+
+[functions.consume-auth-restore]
+verify_jwt = false  # Custom auth: bearer token validated
+
 # --------------------------------------------------------------------------
 # User Management (Custom auth: bearer token + super_admin role)
 # --------------------------------------------------------------------------

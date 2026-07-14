@@ -32,7 +32,7 @@ import {
   Info,
   RefreshCw,
 } from 'lucide-react';
-import { storeOriginalSession } from '@/lib/gmbAuth';
+import { buildGmbAuthCallbackUrl, createAuthRestoreState, setGmbFlowFlag } from '@/lib/gmbAuth';
 
 interface ReputationSetupTabProps {
   clinicId: string;
@@ -157,11 +157,14 @@ export default function ReputationSetupTab({
         return;
       }
 
-      storeOriginalSession(session.access_token, session.refresh_token || '', session.user.id);
-      localStorage.setItem('gmb_relink_flow', 'true');
-      localStorage.setItem('gmb_restore_session', 'true');
+      const restoreToken = await createAuthRestoreState(session, 'relink');
+      setGmbFlowFlag('relink', true);
+      setGmbFlowFlag('restoreSession', true);
 
-      const redirectTo = 'https://www.AppointPanda.ae/auth/callback?relink=true';
+      const redirectTo = buildGmbAuthCallbackUrl(new URLSearchParams({
+        relink: 'true',
+        restore: restoreToken,
+      }));
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {

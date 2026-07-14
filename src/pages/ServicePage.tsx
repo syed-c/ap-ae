@@ -57,9 +57,14 @@ interface ServicePageProps {
   aiProcessStepsProp?: { step: number; title: string; description: string }[] | null;
   aiCostRangeProp?: { treatment: string; min_aed: number; max_aed: number; notes: string }[] | null;
   aiChecklistProp?: { criteria: string; applies: boolean; description: string }[] | null;
+  treatmentDataProp?: any;
+  relatedTreatmentsDataProp?: any[];
+  profileDataProp?: any[];
+  statesDataProp?: any[];
+  priceRangesDataProp?: any[];
 }
 
-const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, contentProp, faqsProp, aiDefinitionProp, aiProcessStepsProp, aiCostRangeProp, aiChecklistProp }: ServicePageProps = {}) => {
+const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, contentProp, faqsProp, aiDefinitionProp, aiProcessStepsProp, aiCostRangeProp, aiChecklistProp, treatmentDataProp, relatedTreatmentsDataProp, profileDataProp, statesDataProp, priceRangesDataProp }: ServicePageProps = {}) => {
   const router = useRouter();
   const serviceSlug = serviceSlugProp || (typeof router.query?.serviceSlug === 'string' ? router.query.serviceSlug : '');
 
@@ -85,6 +90,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
       const { data } = await supabase.from("treatments").select("*").eq("slug", serviceSlug).maybeSingle();
       return data;
     },
+    initialData: treatmentDataProp,
   });
 
   // Fetch related treatments
@@ -94,16 +100,17 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
       const { data } = await supabase.from("treatments").select("*").eq("is_active", true).neq("slug", serviceSlug).order("display_order").limit(6);
       return data || [];
     },
+    initialData: relatedTreatmentsDataProp,
   });
 
   // Fetch profiles
-  const { data: profiles, isLoading: profilesLoading } = useProfiles({ limit: 50 });
+  const { data: profiles, isLoading: profilesLoading } = useProfiles({ limit: 50, initialData: profileDataProp });
 
   // Fetch states
-  const { data: states } = useStates();
+  const { data: states } = useStates(statesDataProp as any);
 
   // Fetch price ranges
-  const { data: priceRanges } = useServicePriceRanges(serviceSlug);
+  const { data: priceRanges } = useServicePriceRanges(serviceSlug, priceRangesDataProp as any);
 
   const treatmentName = treatment?.name || serviceSlug.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
 
@@ -454,7 +461,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
                     <AccordionTrigger className="text-left font-semibold text-gray-800 hover:no-underline px-6 py-4 hover:bg-gray-50 transition-colors">
                       {faq.question}
                     </AccordionTrigger>
-                    <AccordionContent className="faq-answer text-gray-600 px-6 pb-4">
+                    <AccordionContent forceMount className="faq-answer text-gray-600 px-6 pb-4">
                       {faq.answer}
                     </AccordionContent>
                   </AccordionItem>

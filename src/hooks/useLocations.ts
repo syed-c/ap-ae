@@ -4,7 +4,7 @@ import { State, City, Area } from '@/types/database';
 import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 import { ACTIVE_STATE_SLUGS, isActiveState } from '@/lib/constants/activeStates';
 
-export function useStates() {
+export function useStates(initialData?: State[]) {
   return useQuery({
     queryKey: ['states'],
     queryFn: async () => {
@@ -20,6 +20,7 @@ export function useStates() {
     },
     staleTime: 10 * 60 * 1000, // 10 min cache (rarely change)
     gcTime: 30 * 60 * 1000,
+    initialData: initialData ?? undefined,
   });
 }
 

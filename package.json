@@ -7,9 +7,11 @@
     "dev": "next dev",
     "build": "npm run generate:sitemaps && next build",
     "generate:sitemaps": "node scripts/generate-sitemaps.js",
+    "audit:html": "node scripts/audit-built-html.js",
     "audit:locations": "node scripts/audit-location-coverage.js",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@fontsource/instrument-sans": "^5.2.8",

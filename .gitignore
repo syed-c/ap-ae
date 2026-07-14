@@ -3,19 +3,22 @@ node_modules/
 .pnp/
 .pnp.js
 
-# Next.js build
+# Next.js build output
 .next/
 out/
 build/
 dist/
 
-# Env files (sensitive)
+# Environment and secrets
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env*.local
 *.env
+*.env.*
+!.env.example
 
 # Logs
 npm-debug.log*
@@ -24,78 +27,29 @@ yarn-error.log*
 pnpm-debug.log*
 *.log
 
-# OS files
+# TypeScript cache
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Coverage and local tooling
+coverage/
+.vercel/
+.supabase/
+
+# OS and IDE files
 .DS_Store
 Thumbs.db
-
-# IDE
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# TypeScript cache
-*.tsbuildinfo
-tsconfig.tsbuildinfo
-
-# Large data files
-*.csv
-*.csv.gz
+# Temporary, generated, or exported assets
 public/temp/
 data/
+project.zip
+login_test_output*.json
 
-# Supabase local
-.supabase/
-
-# Misc
-.vercel
-coverage/
-
-# Emergent platform files
+# Platform-specific files
 .emergent/
 .gitconfig
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
-.env*.local

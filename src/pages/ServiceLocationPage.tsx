@@ -54,6 +54,7 @@ interface ServiceLocationPageProps {
   processTimeNoteProp?: string | null;
   allSeoDataProp?: any;
   clinicProfilesProp?: any[];
+  allEmirateCitiesProp?: any[];
 }
 
 const ServiceLocationPage = ({ 
@@ -78,6 +79,7 @@ const ServiceLocationPage = ({
   processTimeMonthsProp,
   processTimeNoteProp,
   clinicProfilesProp,
+  allEmirateCitiesProp,
 }: ServiceLocationPageProps) => {
   const routerQuery = useRouter().query;
   const stateSlug = stateSlugProp || routerQuery.stateSlug as string || '';
@@ -152,6 +154,7 @@ const ServiceLocationPage = ({
       return citiesData || [];
     },
     enabled: !!normalizedStateSlug,
+    initialData: allEmirateCitiesProp ?? undefined,
   });
 
   const locationName = city?.name || citySlug?.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()) || '';
@@ -667,7 +670,7 @@ const ServiceLocationPage = ({
           <h3 className="text-3xl font-bold tracking-tight">Precision in {locationName}</h3>
           {pageContent ? (
             <div className="text-white/70 text-sm leading-relaxed whitespace-pre-line">
-              {pageContent.split('\n').slice(1).join('\n')}
+              {pageContent}
             </div>
           ) : (
             <>
@@ -774,6 +777,23 @@ const ServiceLocationPage = ({
       
       <DesktopLayout />
       <MobileLayout />
+
+      {faqs.length > 0 && (
+        <section className="mx-auto max-w-5xl px-6 py-10">
+          <div className="rounded-3xl border border-border bg-card px-6 py-6 md:px-8">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Frequently Asked Questions</p>
+            <h2 className="mt-1 text-2xl font-bold text-foreground">{treatmentName} in {locationName}</h2>
+            <div className="mt-6 space-y-5">
+              {faqs.map((faq: any, index: number) => (
+                <div key={index} className="rounded-2xl border border-border bg-background p-4">
+                  <h3 className="font-semibold text-foreground">{faq.q || faq.question}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{faq.a || faq.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </PageLayout>
   );
 };

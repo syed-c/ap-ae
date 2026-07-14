@@ -9,6 +9,7 @@ interface UseInsuranceClinicsOptions {
   pageSize?: number;
   sortBy?: "rating" | "reviews" | "name";
   minRating?: number;
+  initialData?: { clinics: ClinicResult[]; totalCount: number };
 }
 
 interface ClinicResult {
@@ -55,6 +56,7 @@ export function useInsuranceClinics({
   pageSize = 20,
   sortBy = "rating",
   minRating,
+  initialData,
 }: UseInsuranceClinicsOptions): UseInsuranceClinicsResult {
   const { data, isLoading, error } = useQuery({
     queryKey: [
@@ -175,6 +177,7 @@ export function useInsuranceClinics({
     },
     enabled: !!insuranceId,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    initialData: initialData ?? undefined,
   });
 
   return {
@@ -189,7 +192,14 @@ export function useInsuranceClinics({
 /**
  * Hook for fetching available filter options (cities) for an insurance
  */
-export function useInsuranceFilterOptions(insuranceId: string | undefined) {
+export function useInsuranceFilterOptions(insuranceId: string | undefined, initialData?: {
+  id: string;
+  name: string;
+  slug: string;
+  stateSlug: string;
+  stateAbbreviation: string;
+  stateName: string;
+}[]) {
   const { data: cities } = useQuery({
     queryKey: ["insurance-cities-v2", insuranceId],
     queryFn: async () => {
@@ -245,6 +255,7 @@ export function useInsuranceFilterOptions(insuranceId: string | undefined) {
     },
     enabled: !!insuranceId,
     staleTime: 10 * 60 * 1000, // 10 minutes
+    initialData: initialData ?? undefined,
   });
 
   return { cities: cities || [] };

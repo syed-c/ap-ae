@@ -1,6 +1,5 @@
 import { GetServerSideProps } from 'next';
-import { createServerSupabase } from '@/lib/supabaseServer';
-import { createClient } from '@supabase/supabase-js';
+import { createServerSupabaseAdmin, getServerUserFromCookieHeader } from '@/lib/supabaseServer';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 
@@ -54,34 +53,26 @@ function DashboardPage({ dashboardType }: DashboardProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    const supabase = createServerSupabase();
+    const supabase = createServerSupabaseAdmin();
     const { req } = ctx;
-
-    // Read auth cookie to determine user
     const cookieHeader = req.headers.cookie || '';
-    const sbCookie = cookieHeader.split(';').find(c => c.trim().startsWith('sb-eneuthbghipsdvsqilmb-auth-token'));
+    const user = await getServerUserFromCookieHeader(cookieHeader);
 
-    if (!sbCookie || !supabase) {
+    if (!user || !supabase) {
         return {
             redirect: { destination: '/auth', permanent: false },
         };
     }
 
     try {
-        // Get user from Supabase
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            return {
-                redirect: { destination: '/auth', permanent: false },
-            };
-        }
-
-        // Read roles
-        const { data: roles } = await supabase
+        const { data: roles, error: rolesError } = await supabase
             .from('user_roles')
             .select('role')
             .eq('user_id', user.id);
+
+        if (rolesError) {
+            throw rolesError;
+        }
 
         const userRoles = (roles || []).map(r => r.role);
 

@@ -14,7 +14,7 @@ export interface ServicePriceRange {
   treatment?: { id: string; name: string; slug: string };
 }
 
-export function useServicePriceRanges(treatmentSlug?: string) {
+export function useServicePriceRanges(treatmentSlug?: string, initialData?: ServicePriceRange[]) {
   return useQuery({
     queryKey: ['service-price-ranges', treatmentSlug],
     queryFn: async () => {
@@ -44,6 +44,7 @@ export function useServicePriceRanges(treatmentSlug?: string) {
       return (data || []) as ServicePriceRange[];
     },
     enabled: true,
+    initialData: initialData ?? undefined,
   });
 }
 

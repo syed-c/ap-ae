@@ -17,6 +17,14 @@ const SITEMAP_FILES = [
   'sitemap-insurance.xml',
 ];
 
+function hasPlaceholderValue(value) {
+  return typeof value === 'string' && (
+    value.includes('your-project-ref')
+    || value.includes('your-public-anon-key')
+    || value.includes('your-service-role-key')
+  );
+}
+
 function escapeXml(text) {
   return text
     .replace(/&/g, '&amp;')
@@ -257,8 +265,8 @@ function createSupabaseClient() {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   const key = adminKey || anonKey;
 
-  if (!url || !key) {
-    throw new Error('Missing Supabase environment variables required for sitemap generation.');
+  if (!url || !key || hasPlaceholderValue(url) || hasPlaceholderValue(key)) {
+    return null;
   }
 
   if (!adminKey) {
@@ -280,15 +288,48 @@ async function writeSitemap(filename, xml) {
 async function main() {
   const supabase = createSupabaseClient();
 
-  const [stateUrls, cityUrls, serviceUrls, serviceLocationUrls, profileUrls, postUrls, insuranceUrls] = await Promise.all([
-    buildStateUrls(supabase),
-    buildCityUrls(supabase),
-    buildServiceUrls(supabase),
-    buildServiceLocationUrls(supabase),
-    buildProfileUrls(supabase),
-    buildPostUrls(supabase),
-    buildInsuranceUrls(supabase),
-  ]);
+  if (!supabase) {
+    const fallbackSitemaps = {
+      'sitemap.xml': generateSitemapIndexXml(),
+      'sitemap-static.xml': generateSitemapXml(buildStaticUrls()),
+      'sitemap-states.xml': generateSitemapXml([]),
+      'sitemap-cities.xml': generateSitemapXml([]),
+      'sitemap-services.xml': generateSitemapXml([]),
+      'sitemap-service-locations.xml': generateSitemapXml([]),
+      'sitemap-profiles.xml': generateSitemapXml([]),
+      'sitemap-posts.xml': generateSitemapXml([]),
+      'sitemap-insurance.xml': generateSitemapXml([]),
+    };
+
+    await Promise.all(
+      Object.entries(fallbackSitemaps).map(([filename, xml]) => writeSitemap(filename, xml))
+    );
+
+    console.warn('[generate-sitemaps] Supabase env is unavailable during build. Generated static-only sitemaps.');
+    return;
+  }
+
+  let stateUrls = [];
+  let cityUrls = [];
+  let serviceUrls = [];
+  let serviceLocationUrls = [];
+  let profileUrls = [];
+  let postUrls = [];
+  let insuranceUrls = [];
+
+  try {
+    [stateUrls, cityUrls, serviceUrls, serviceLocationUrls, profileUrls, postUrls, insuranceUrls] = await Promise.all([
+      buildStateUrls(supabase),
+      buildCityUrls(supabase),
+      buildServiceUrls(supabase),
+      buildServiceLocationUrls(supabase),
+      buildProfileUrls(supabase),
+      buildPostUrls(supabase),
+      buildInsuranceUrls(supabase),
+    ]);
+  } catch (error) {
+    console.warn('[generate-sitemaps] Dynamic sitemap generation failed, falling back to static-only output:', error);
+  }
 
   const sitemapXmlByFile = {
     'sitemap.xml': generateSitemapIndexXml(),

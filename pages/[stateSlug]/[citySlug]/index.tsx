@@ -8,7 +8,7 @@ import { buildClinicLocationOrFilter } from '@/lib/location/buildClinicLocationF
 // Wrapper component to render SEO meta tags server-side with FAQ data for SSR
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, faqs, seoH1, cityRatings, topClinics, allSeoData, pageContentDataProp, clinicProfilesProp }: {
+const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, faqs, seoH1, cityRatings, topClinics, allSeoData, pageContentDataProp, clinicProfilesProp, allEmirateCitiesProp, serviceLocationPagesProp, treatmentsDataProp }: {
     citySlug: string;
     stateSlug: string;
     stateData: any;
@@ -21,6 +21,9 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
     allSeoData?: any;
     pageContentDataProp?: any;
     clinicProfilesProp?: any[];
+    allEmirateCitiesProp?: any[];
+    serviceLocationPagesProp?: any[];
+    treatmentsDataProp?: any[];
 }) => {
     const cityName = cityData?.name || citySlug;
     const stateName = stateData?.name || stateSlug;
@@ -75,6 +78,9 @@ const CityPageWithSEO = ({ citySlug, stateSlug, stateData, cityData, seoData, fa
                 allSeoDataProp={allSeoData}
                 pageContentDataProp={pageContentDataProp}
                 clinicProfilesProp={clinicProfilesProp}
+                allEmirateCitiesProp={allEmirateCitiesProp}
+                serviceLocationPagesProp={serviceLocationPagesProp}
+                treatmentsDataProp={treatmentsDataProp}
             />
         </>
     );
@@ -196,6 +202,9 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 allSeoData: null,
                 pageContentDataProp: null,
                 clinicProfilesProp: [],
+                allEmirateCitiesProp: [],
+                serviceLocationPagesProp: [],
+                treatmentsDataProp: [],
             },
             revalidate: 60,
         };
@@ -204,7 +213,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const seoSlug = `${normalizedStateSlug}/${citySlug}`;
 
     // Direct queries instead of React Query for faster build
-const [stateData, cityData, seoContent, pageContent] = await Promise.all([
+const [stateData, cityData, seoContent, pageContent, treatmentsData] = await Promise.all([
         supabase
             .from('states')
             .select('*')
@@ -234,7 +243,13 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
             .in('page_slug', [citySlug, `/${citySlug}`, `${normalizedStateSlug}/${citySlug}`, `/${normalizedStateSlug}/${citySlug}`])
             .eq('is_published', true)
             .maybeSingle()
-            .then(r => r.data) as Promise<any>
+            .then(r => r.data) as Promise<any>,
+        supabase
+            .from('treatments')
+            .select('id, name, slug, description, icon, image_url, display_order, is_active')
+            .eq('is_active', true)
+            .order('display_order')
+            .then(r => r.data || []) as Promise<any[]>
     ]);
 
     // Also check cityData - return 404 if state is missing (but allow inactive cities)
@@ -259,6 +274,8 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
     let cityRatings = { avgRating: 0, totalReviews: 0, clinicCount: 0 };
     let topClinics: any[] = [];
     let clinicProfilesProp: any[] = [];
+    let allEmirateCitiesProp: any[] = [];
+    let serviceLocationPagesProp: any[] = [];
     if (finalCityData?.id) {
         const clinicLocationFilter = buildClinicLocationOrFilter({
             cityId: finalCityData.id,
@@ -314,6 +331,25 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
         if (allCityClinics.data) {
             clinicProfilesProp = allCityClinics.data;
         }
+
+        const [serviceLocationPagesResult, allEmirateCitiesResult] = await Promise.all([
+            supabase
+                .from('seo_pages')
+                .select('slug, title, h1, meta_title')
+                .eq('page_type', 'service-location' as any)
+                .like('slug', `%/${normalizedStateSlug}/${citySlug}/%`)
+                .eq('is_published', true)
+                .order('title'),
+            supabase
+                .from('cities')
+                .select('id, name, slug, image_url')
+                .eq('state_id', stateData.id)
+                .eq('is_active', true)
+                .order('population', { ascending: false }),
+        ]);
+
+        serviceLocationPagesProp = serviceLocationPagesResult.data || [];
+        allEmirateCitiesProp = allEmirateCitiesResult.data || [];
     }
     
     const cityName = finalCityData?.name || citySlug;
@@ -351,6 +387,9 @@ const [stateData, cityData, seoContent, pageContent] = await Promise.all([
             allSeoData: seoContent,
             pageContentDataProp: pageContent,
             clinicProfilesProp: clinicProfilesProp,
+            allEmirateCitiesProp,
+            serviceLocationPagesProp,
+            treatmentsDataProp: treatmentsData,
         },
         revalidate: 600,
     };

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { storeOriginalSession } from '@/lib/gmbAuth';
+import { buildGmbAuthCallbackUrl, createAuthRestoreState, setGmbFlowFlag } from '@/lib/gmbAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,20 +55,17 @@ export default function GMBConnectionCard({
       // CRITICAL: Store the original user's session before OAuth
       // This allows us to restore their session after getting the GMB token
       // even if they use a different Google account for GMB
-      storeOriginalSession(
-        session.access_token,
-        session.refresh_token || '',
-        session.user.id
-      );
+      const restoreToken = await createAuthRestoreState(session, 'relink');
 
       // This is a "relink" flow: after OAuth we send the user to /gmb-select to pick the exact Business Profile.
-      localStorage.setItem('gmb_relink_flow', 'true');
+      setGmbFlowFlag('relink', true);
       // Mark that we need to restore the original user after GMB OAuth
-      localStorage.setItem('gmb_restore_session', 'true');
+      setGmbFlowFlag('restoreSession', true);
 
-      // Use current origin for OAuth callback to ensure proper domain handling
-      const currentOrigin = window.location.origin;
-      const redirectTo = `${currentOrigin}/auth/callback?relink=true`;
+      const redirectTo = buildGmbAuthCallbackUrl(new URLSearchParams({
+        relink: 'true',
+        restore: restoreToken,
+      }));
 
       // IMPORTANT: Use signInWithOAuth to get the GMB token from the Google account
       // The callback will capture the token and then restore the original user session

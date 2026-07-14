@@ -6,7 +6,7 @@ import { normalizeStateSlug } from '@/lib/slug/normalizeStateSlug';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1, stateRatings, topClinics, pageContentData, allSeoData, clinicProfilesProp }: {
+const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seoH1, stateRatings, topClinics, pageContentData, allSeoData, clinicProfilesProp, treatmentsDataProp }: {
     stateSlug: string;
     stateData: any;
     citiesData: any[];
@@ -18,6 +18,7 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
     pageContentData?: any;
     allSeoData?: any;
     clinicProfilesProp?: any[];
+    treatmentsDataProp?: any[];
 }) => {
     const stateName = stateData?.name || stateSlug;
     const clinicCount = stateRatings?.clinicCount || 0;
@@ -70,6 +71,7 @@ const StatePageWithSEO = ({ stateSlug, stateData, citiesData, seoData, faqs, seo
                 allSeoDataProp={allSeoData}
                 pageContentDataProp={pageContentData}
                 clinicProfilesProp={clinicProfilesProp}
+                treatmentsDataProp={treatmentsDataProp}
             />
         </>
     );
@@ -157,7 +159,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         return { notFound: true };
     }
     
-    const [seoContent, citiesData, pageContent] = await Promise.all([
+    const [seoContent, citiesData, pageContent, treatmentsData] = await Promise.all([
         supabase
             .from("seo_pages")
             .select("id, slug, meta_title, meta_description, content, is_optimized, h1, faqs")
@@ -181,7 +183,13 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .in('page_slug', [normalizedStateSlug, `/${normalizedStateSlug}`])
             .eq('is_published', true)
             .maybeSingle()
-            .then(r => r.data) as Promise<any>
+            .then(r => r.data) as Promise<any>,
+        supabase
+            .from('treatments')
+            .select('id, name, slug, description, icon, image_url, display_order, is_active')
+            .eq('is_active', true)
+            .order('display_order')
+            .then(r => r.data || []) as Promise<any[]>
     ]);
 
     const stateCityIds = (citiesData || []).map((city: any) => city.id).filter(Boolean);
@@ -287,6 +295,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             // Pass page_content for state pages
             pageContentData: pageContent,
             clinicProfilesProp: clinicProfilesProp,
+            treatmentsDataProp: treatmentsData,
         },
         revalidate: 600,
     };

@@ -36,6 +36,11 @@ interface InsuranceDetailPageProps {
   cityDataProp?: any;
   clinicCountProp?: number;
   seoDataProp?: { title: string; description: string; canonical: string };
+  initialClinicsProp?: any[];
+  availableEmiratesProp?: { name: string; slug: string }[];
+  filterCitiesProp?: any[];
+  insuranceLinksProp?: { name: string; slug: string }[];
+  serviceLinksProp?: { name: string; slug: string }[];
   dehydratedStateProp?: any;
 }
 
@@ -47,7 +52,12 @@ const InsuranceDetailPage = ({
   emirateDataProp,
   cityDataProp,
   clinicCountProp,
-  seoDataProp 
+  seoDataProp,
+  initialClinicsProp,
+  availableEmiratesProp,
+  filterCitiesProp,
+  insuranceLinksProp,
+  serviceLinksProp,
 }: InsuranceDetailPageProps) => {
   const router = useRouter();
   const routerSlug = router.query.slug;
@@ -125,9 +135,10 @@ const InsuranceDetailPage = ({
     pageSize: PAGE_SIZE,
     sortBy,
     minRating,
+    initialData: initialClinicsProp ? { clinics: initialClinicsProp as any[], totalCount: clinicCountProp || initialClinicsProp.length } : undefined,
   });
 
-  const { cities } = useInsuranceFilterOptions(insurance?.id);
+  const { cities } = useInsuranceFilterOptions(insurance?.id, filterCitiesProp);
 
   // Fetch emirates that have clinics with this insurance
   const { data: availableEmirates } = useQuery({
@@ -142,6 +153,7 @@ const InsuranceDetailPage = ({
       return data || [];
     },
     enabled: !!insurance?.id,
+    initialData: availableEmiratesProp || undefined,
   });
 
   // Handlers
@@ -380,6 +392,9 @@ const InsuranceDetailPage = ({
           currentInsuranceSlug={insurance.slug}
           currentStateSlug={emirateSlug}
           currentCitySlug={urlCitySlug}
+          insurancesProp={insuranceLinksProp}
+          servicesProp={serviceLinksProp}
+          emiratesProp={availableEmiratesProp}
         />
       </Section>
 

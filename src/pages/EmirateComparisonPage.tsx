@@ -214,7 +214,7 @@ const EmirateComparisonPage = ({ faqsProp }: EmirateComparisonPageProps) => {
             {finalFaqs.map((faq, i) => (
               <AccordionItem key={i} value={`faq-${i}`} className="bg-card border border-border rounded-2xl px-5 data-[state=open]:border-primary/30">
                 <AccordionTrigger className="text-left font-bold hover:no-underline py-4 text-sm md:text-base">{faq.q}</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-4 text-sm">{faq.a}</AccordionContent>
+                <AccordionContent forceMount className="text-muted-foreground pb-4 text-sm">{faq.a}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>

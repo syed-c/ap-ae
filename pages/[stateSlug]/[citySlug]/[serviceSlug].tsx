@@ -7,7 +7,7 @@ import { buildClinicLocationOrFilter } from '@/lib/location/buildClinicLocationF
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
-const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs, seoH1, heroIntro, content, priceMin, priceMax, priceNote, quickAnswer, lastReviewedBy, expertCredential, medicalAccuracyVerified, processSteps, treatmentOptions, benefits, candidates, alternatives, relatedQuestions, processTimeMonths, processTimeNote, allSeoData, clinicProfilesProp }: {
+const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateData, cityData, treatmentData, seoData, faqs, seoH1, heroIntro, content, priceMin, priceMax, priceNote, quickAnswer, lastReviewedBy, expertCredential, medicalAccuracyVerified, processSteps, treatmentOptions, benefits, candidates, alternatives, relatedQuestions, processTimeMonths, processTimeNote, allSeoData, clinicProfilesProp, allEmirateCitiesProp }: {
     stateSlug: string;
     citySlug: string;
     serviceSlug: string;
@@ -36,6 +36,7 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
     processTimeNote?: string | null;
     allSeoData?: any;
     clinicProfilesProp?: any[];
+    allEmirateCitiesProp?: any[];
 }) => {
     const treatmentName = treatmentData?.name || serviceSlug;
     const cityName = cityData?.name || citySlug;
@@ -97,6 +98,7 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
                 processTimeNoteProp={processTimeNote}
                 allSeoDataProp={allSeoData}
                 clinicProfilesProp={clinicProfilesProp}
+                allEmirateCitiesProp={allEmirateCitiesProp}
             />
         </>
     );
@@ -211,6 +213,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 allSeoData: null,
                 pageContentDataProp: null,
                 clinicProfilesProp: [],
+                allEmirateCitiesProp: [],
             },
             revalidate: 60,
         };
@@ -280,6 +283,13 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         .eq('is_active', true)
         .order('rating', { ascending: false })
         .order('review_count', { ascending: false });
+
+    const { data: allEmirateCities } = await supabase
+        .from('cities')
+        .select('id, name, slug, image_url')
+        .eq('state_id', stateData.id)
+        .eq('is_active', true)
+        .order('population', { ascending: false });
 
     const stateName = stateData.name;
     const cityName = cityData?.name || citySlug;
@@ -355,6 +365,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             processTimeNote,
             allSeoData: seoContent,
             clinicProfilesProp: clinicProfiles || [],
+            allEmirateCitiesProp: allEmirateCities || [],
         },
         revalidate: 600,
     };

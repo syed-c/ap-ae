@@ -15,7 +15,7 @@ export interface Treatment {
   children?: Treatment[];
 }
 
-export function useTreatments() {
+export function useTreatments(initialData?: Treatment[]) {
   return useQuery({
     queryKey: ['treatments'],
     queryFn: async () => {
@@ -30,6 +30,7 @@ export function useTreatments() {
     },
     staleTime: 10 * 60 * 1000, // 10 min cache (treatments rarely change)
     gcTime: 30 * 60 * 1000,
+    initialData: initialData ?? undefined,
   });
 }
 

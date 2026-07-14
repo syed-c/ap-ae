@@ -7,10 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { createAuditLog } from '@/lib/audit';
 import {
+  consumeAuthRestoreState,
+  clearGmbFlowState,
+  clearGmbLinkToken,
+  getGmbFlowFlag,
+  getGmbLinkToken,
+  setGmbFlowFlag,
   setGmbProviderToken,
-  getOriginalSession,
-  clearOriginalSession,
-  clearGmbProviderToken
 } from '@/lib/gmbAuth';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -84,11 +87,11 @@ export default function AuthCallback() {
 
     // GMB Sync: complete linking existing clinic to Google
     const handleGmbTransfer = async (accessToken: string) => {
-      const linkToken = localStorage.getItem('gmb_link_token');
+      const linkToken = getGmbLinkToken();
 
       if (!linkToken) {
         console.warn('No GMB link token found - skipping GMB transfer');
-        localStorage.removeItem('gmb_pending');
+        setGmbFlowFlag('pending', false);
         return false;
       }
 
@@ -104,8 +107,8 @@ export default function AuthCallback() {
         if (!data?.success) throw new Error(data?.error || 'Failed to complete GMB link');
 
         // Clear tokens after success
-        localStorage.removeItem('gmb_link_token');
-        localStorage.removeItem('gmb_pending');
+        clearGmbLinkToken();
+        setGmbFlowFlag('pending', false);
 
         return true;
       } catch (err) {
@@ -159,17 +162,19 @@ export default function AuthCallback() {
           return;
         }
 
-        // Distinguish callback types from URL params AND localStorage
+        // Distinguish callback types from URL params AND current-tab flow state.
         const isGmbCallback =
-          searchParams.get('gmb') === 'true' || localStorage.getItem('gmb_pending') === 'true';
+          searchParams.get('gmb') === 'true' || getGmbFlowFlag('pending');
         const isListingFlow =
-          searchParams.get('listing') === 'true' || localStorage.getItem('gmb_listing_flow') === 'true';
+          searchParams.get('listing') === 'true' || getGmbFlowFlag('listing');
         const isRelinkFlow =
-          searchParams.get('relink') === 'true' || localStorage.getItem('gmb_relink_flow') === 'true';
+          searchParams.get('relink') === 'true' || getGmbFlowFlag('relink');
 
-        // Check if we need to restore the original user's session after getting GMB token
-        const shouldRestoreSession = localStorage.getItem('gmb_restore_session') === 'true';
-        const originalSession = getOriginalSession();
+        // Check if we need to restore the original user's session after getting GMB token.
+        // The callback only carries a short-lived opaque restore token, while the actual
+        // Supabase session tokens remain server-side until they are consumed here.
+        const restoreToken = searchParams.get('restore');
+        const shouldRestoreSession = Boolean(restoreToken) && (isRelinkFlow || isGmbCallback);
 
         // IMPORTANT: Google provider_token is often ONLY available on the immediate OAuth exchange response
         // and is NOT reliably persisted in the stored session (PKCE flow). We must capture it here.
@@ -249,16 +254,26 @@ export default function AuthCallback() {
           }
         }
 
-        // CRITICAL: If this is a GMB relink flow and we have the original session stored,
-        // restore the original user's session instead of keeping the GMB Google account logged in
         let session = gmbOAuthSession;
         let restoredOriginalUser = false;
+        let gmbSuccess = false;
+        let shouldSelectGmbBusiness = false;
 
-        if (shouldRestoreSession && originalSession && (isRelinkFlow || isGmbCallback)) {
+        // Complete the link-token transfer while the Google-authenticated session is still active.
+        if (isGmbCallback) {
+          gmbSuccess = await handleGmbTransfer(gmbOAuthSession.access_token);
+          if (!gmbSuccess) {
+            // If link transfer failed (for example, the temporary link token expired),
+            // fall back to the business picker using the original restored session.
+            shouldSelectGmbBusiness = true;
+          }
+        }
+
+        if (shouldRestoreSession && restoreToken) {
           setMessage('Restoring your session...');
           try {
-            // Don't sign out first - just try to refresh the original session directly
-            // This is more reliable than sign out + set session
+            const originalSession = await consumeAuthRestoreState(gmbOAuthSession.access_token, restoreToken);
+
             const { data: refreshedSession, error: refreshError } = await supabase.auth.refreshSession({
               refresh_token: originalSession.refreshToken,
             });
@@ -288,14 +303,10 @@ export default function AuthCallback() {
             }
           } catch (restoreErr) {
             console.error('Failed to restore original session:', restoreErr);
-            // Don't throw - keep the current session and continue
-            // User can still complete the GMB flow, they just might be logged in as a different account
             console.warn('Continuing with current session after restore failure');
           }
 
-          // Clean up stored session regardless of outcome
-          clearOriginalSession();
-          localStorage.removeItem('gmb_restore_session');
+          setGmbFlowFlag('restoreSession', false);
         }
 
         // Audit log for successful authentication
@@ -316,24 +327,9 @@ export default function AuthCallback() {
         const provider = session.user.app_metadata?.provider || 'unknown';
         const isGoogleProvider = provider === 'google';
 
-        // GMB sync flow (existing dentist linking GMB to their clinic)
-        let gmbSuccess = false;
-        let shouldSelectGmbBusiness = false;
-
-        if (isGmbCallback && !restoredOriginalUser) {
-          gmbSuccess = await handleGmbTransfer(session.access_token);
-          if (!gmbSuccess) {
-            // If link transfer failed (e.g., expired token), redirect to GMB selection instead
-            shouldSelectGmbBusiness = true;
-          }
-          roles = await readRoles(session.user.id); // refresh after possible role assignment
-        }
-
-        // Listing/relink flows → redirect to business selection
-        // IMPORTANT: For relink flow with restored session, we still want to go to GMB selection
         const shouldSelectBusiness = isListingFlow || isRelinkFlow;
 
-        if (shouldSelectBusiness && !restoredOriginalUser) {
+        if (isListingFlow && !restoredOriginalUser) {
           // For listing flow (new user), redirect to GMB business selection page
           const listingFlowSuccess = await handleListingFlow(session.access_token);
           if (!listingFlowSuccess) {
@@ -341,13 +337,15 @@ export default function AuthCallback() {
           }
         }
 
-        // Clear flow flags (but keep gmb_listing_flow if redirecting to selection)
-        if (!shouldSelectBusiness && !shouldSelectGmbBusiness && !restoredOriginalUser) {
-          localStorage.removeItem('gmb_listing_flow');
-          localStorage.removeItem('gmb_relink_flow');
+        const willGoToBusinessSelection = shouldSelectBusiness || shouldSelectGmbBusiness;
+
+        // Clear flow flags unless we still need to continue into business selection.
+        if (!willGoToBusinessSelection) {
+          setGmbFlowFlag('listing', false);
+          setGmbFlowFlag('relink', false);
         }
-        localStorage.removeItem('gmb_pending');
-        localStorage.removeItem('gmb_link_token');
+        setGmbFlowFlag('pending', false);
+        clearGmbLinkToken();
 
         // Refresh roles in app state
         await refreshRoles();
@@ -366,10 +364,10 @@ export default function AuthCallback() {
 
         // If this is a GMB relink or listing flow, always go to GMB selection
         // regardless of whether we restored the original user or not
-        if (isRelinkFlow || isListingFlow || shouldSelectGmbBusiness) {
+        if (willGoToBusinessSelection) {
           // Keep the relink flow flag so GMB selection knows to update existing clinic
           if (isRelinkFlow || shouldSelectGmbBusiness) {
-            localStorage.setItem('gmb_relink_flow', 'true');
+            setGmbFlowFlag('relink', true);
           }
           router.replace('/gmb-select/');
           return;
@@ -413,7 +411,7 @@ export default function AuthCallback() {
               if (bootstrapData?.needsClinic) {
                 // New user without clinic - redirect to GMB business selection
                 // so they can add their practice via GMB or manually
-                localStorage.setItem('gmb_listing_flow', 'true');
+                setGmbFlowFlag('listing', true);
                 router.replace('/gmb-select/');
               } else {
                 // User already has a clinic - go to dashboard
@@ -422,7 +420,7 @@ export default function AuthCallback() {
             } catch (err) {
               console.error('Failed to bootstrap dentist:', err);
               // Still try to navigate to GMB selection for new users
-              localStorage.setItem('gmb_listing_flow', 'true');
+              setGmbFlowFlag('listing', true);
               router.replace('/gmb-select/');
             }
           } else {
@@ -437,11 +435,8 @@ export default function AuthCallback() {
         setErrorDetails(err instanceof Error ? err.message : 'Unknown error occurred');
 
         // Clean up any pending state
-        localStorage.removeItem('gmb_link_token');
-        localStorage.removeItem('gmb_pending');
-        localStorage.removeItem('gmb_listing_flow');
-        localStorage.removeItem('gmb_restore_session');
-        clearOriginalSession();
+        clearGmbLinkToken();
+        clearGmbFlowState();
       }
     };
 

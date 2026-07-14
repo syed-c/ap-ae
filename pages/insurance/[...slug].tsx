@@ -5,6 +5,8 @@ import InsuranceDetailPageComponent from '@/pages/InsuranceDetailPage';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
+const PAGE_SIZE = 20;
+
 const InsuranceDetailWrapper = ({ 
     insuranceSlug, 
     emirateSlug,
@@ -13,7 +15,12 @@ const InsuranceDetailWrapper = ({
     emirateData, 
     cityData,
     clinicCount,
-    seoData
+    seoData,
+    initialClinics,
+    availableEmirates,
+    filterCities,
+    insuranceLinks,
+    serviceLinks,
 }: {
     insuranceSlug: string;
     emirateSlug: string | null;
@@ -23,6 +30,11 @@ const InsuranceDetailWrapper = ({
     cityData?: any;
     clinicCount: number;
     seoData: { title: string; description: string; canonical: string };
+    initialClinics?: any[];
+    availableEmirates?: { name: string; slug: string }[];
+    filterCities?: any[];
+    insuranceLinks?: { name: string; slug: string }[];
+    serviceLinks?: { name: string; slug: string }[];
 }) => {
     const insuranceName = insuranceData?.name || insuranceSlug;
     const breadcrumbSchema = {
@@ -82,6 +94,11 @@ const InsuranceDetailWrapper = ({
                 cityDataProp={cityData}
                 clinicCountProp={clinicCount}
                 seoDataProp={seoData}
+                initialClinicsProp={initialClinics}
+                availableEmiratesProp={availableEmirates}
+                filterCitiesProp={filterCities}
+                insuranceLinksProp={insuranceLinks}
+                serviceLinksProp={serviceLinks}
             />
         </>
     );
@@ -140,6 +157,9 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                     description: 'Find dentists that accept your insurance in UAE',
                     canonical: `/insurance/${insuranceSlug}/`,
                 },
+                initialClinics: [],
+                availableEmirates: [],
+                filterCities: [],
             },
             revalidate: 60,
         };
@@ -171,6 +191,36 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     let emirateData = null;
     let cityData = null;
     let clinicCount = 0;
+    let initialClinics: any[] = [];
+    let availableEmirates: { name: string; slug: string }[] = [];
+    let filterCities: any[] = [];
+    let insuranceLinks: { name: string; slug: string }[] = [];
+    let serviceLinks: { name: string; slug: string }[] = [];
+
+    const availableEmiratesResult = await supabase
+        .from('states')
+        .select('name, slug')
+        .eq('is_active', true)
+        .order('display_order');
+    availableEmirates = availableEmiratesResult.data || [];
+
+    const [insuranceLinksResult, serviceLinksResult] = await Promise.all([
+        supabase
+            .from('insurances')
+            .select('name, slug')
+            .eq('is_active', true)
+            .order('display_order')
+            .limit(12),
+        supabase
+            .from('treatments')
+            .select('name, slug')
+            .eq('is_active', true)
+            .order('display_order')
+            .limit(12),
+    ]);
+
+    insuranceLinks = insuranceLinksResult.data || [];
+    serviceLinks = serviceLinksResult.data || [];
 
     if (emirateSlug) {
         const [stateData, countData] = await Promise.all([
@@ -231,6 +281,121 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         clinicCount = count || 0;
     }
 
+    let eligibleClinicIds: string[] | null = null;
+
+    if (cityData?.id) {
+        const cityClinics = await supabase
+            .from('clinics')
+            .select('id')
+            .eq('city_id', cityData.id)
+            .eq('is_active', true)
+            .order('rating', { ascending: false })
+            .limit(200);
+        eligibleClinicIds = (cityClinics.data || []).map((clinic) => clinic.id);
+    } else if (emirateData?.id) {
+        const emirateCities = await supabase
+            .from('cities')
+            .select('id')
+            .eq('state_id', emirateData.id)
+            .eq('is_active', true);
+        const emirateCityIds = (emirateCities.data || []).map((city) => city.id);
+
+        if (emirateCityIds.length > 0) {
+            const emirateClinics = await supabase
+                .from('clinics')
+                .select('id')
+                .in('city_id', emirateCityIds)
+                .eq('is_active', true)
+                .order('rating', { ascending: false })
+                .limit(400);
+            eligibleClinicIds = (emirateClinics.data || []).map((clinic) => clinic.id);
+        } else {
+            eligibleClinicIds = [];
+        }
+    }
+
+    let clinicsQuery = supabase
+        .from('clinic_insurances')
+        .select(`
+            clinic_id,
+            clinics!inner(
+                id, name, slug, rating, review_count, cover_image_url, verification_status, is_active,
+                city_id,
+                cities(id, name, slug, state:states(slug, abbreviation))
+            )
+        `)
+        .eq('insurance_id', insuranceData.id)
+        .eq('clinics.is_active', true)
+        .order('clinics(rating)', { ascending: false, nullsFirst: false });
+
+    if (eligibleClinicIds) {
+        if (eligibleClinicIds.length === 0) {
+            clinicsQuery = clinicsQuery.in('clinic_id', ['00000000-0000-0000-0000-000000000000']);
+        } else {
+            clinicsQuery = clinicsQuery.in('clinic_id', eligibleClinicIds);
+        }
+    }
+
+    const clinicsQueryResult = await clinicsQuery.range(0, PAGE_SIZE - 1);
+
+    initialClinics = (clinicsQueryResult.data || [])
+        .map((row: any) => {
+            const clinic = row.clinics;
+            if (!clinic) return null;
+
+            const city = Array.isArray(clinic.cities) ? clinic.cities[0] : clinic.cities;
+            const state = Array.isArray(city?.state) ? city.state[0] : city?.state;
+
+            return {
+                id: clinic.id,
+                name: clinic.name,
+                slug: clinic.slug,
+                rating: clinic.rating,
+                review_count: clinic.review_count,
+                cover_image_url: clinic.cover_image_url,
+                verification_status: clinic.verification_status,
+                city: city ? {
+                    id: city.id,
+                    name: city.name,
+                    slug: city.slug,
+                    state: state || null,
+                } : null,
+                area: null,
+            };
+        })
+        .filter(Boolean);
+
+    const filterCitiesResult = await supabase
+        .from('clinic_insurances')
+        .select(`
+            clinics!inner(
+                id, is_active, city_id,
+                cities(id, name, slug, state:states(slug, abbreviation, name))
+            )
+        `)
+        .eq('insurance_id', insuranceData.id)
+        .eq('clinics.is_active', true)
+        .limit(1000);
+
+    if (filterCitiesResult.data?.length) {
+        const cityMap = new Map();
+        for (const row of filterCitiesResult.data as any[]) {
+            const clinic = row.clinics;
+            const city = Array.isArray(clinic?.cities) ? clinic.cities[0] : clinic?.cities;
+            const state = Array.isArray(city?.state) ? city.state[0] : city?.state;
+            if (!city?.id || cityMap.has(city.id)) continue;
+            cityMap.set(city.id, {
+                id: city.id,
+                name: city.name,
+                slug: city.slug,
+                stateSlug: state?.slug || '',
+                stateAbbreviation: state?.abbreviation || '',
+                stateName: state?.name || '',
+            });
+        }
+        filterCities = Array.from(cityMap.values()).sort((a: any, b: any) => a.name.localeCompare(b.name));
+    }
+
     let canonical = `/insurance/${insuranceSlug}/`;
     if (emirateSlug) {
         canonical = `/insurance/${insuranceSlug}/${emirateSlug}/`;
@@ -270,6 +435,11 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             emirateData,
             cityData,
             clinicCount,
+            initialClinics,
+            availableEmirates,
+            filterCities,
+            insuranceLinks,
+            serviceLinks,
             seoData: {
                 title: metaTitle,
                 description: metaDescription,

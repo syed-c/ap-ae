@@ -10,6 +10,10 @@ interface StateServiceRouteProps {
   stateId: string;
   treatment: { id: string; name: string; slug: string; description?: string | null };
   faqsProp: { q: string; a: string }[];
+  seoContentProp?: any;
+  citiesProp?: any[];
+  profilesProp?: any[];
+  priceRangesProp?: any[];
 }
 
 export default function StateServiceRoutePage(props: StateServiceRouteProps) {
@@ -89,7 +93,7 @@ export const getStaticProps: GetStaticProps<StateServiceRouteProps> = async ({ p
       .maybeSingle(),
     supabase
       .from('seo_pages')
-      .select('faqs')
+      .select('*')
       .in('slug', [seoSlug, seoSlugWithSlash])
       .order('is_optimized', { ascending: false })
       .limit(1)
@@ -103,12 +107,73 @@ export const getStaticProps: GetStaticProps<StateServiceRouteProps> = async ({ p
     return { notFound: true };
   }
 
+  const [citiesResult, priceRangesResult] = await Promise.all([
+    supabase
+      .from('cities')
+      .select('id, name, slug')
+      .eq('state_id', state.id)
+      .eq('is_active', true)
+      .order('name'),
+    supabase
+      .from('service_price_ranges')
+      .select(`
+        *,
+        state:states(id, name, slug, abbreviation),
+        treatment:treatments(id, name, slug)
+      `)
+      .eq('is_active', true)
+      .eq('treatment_id', treatment.id)
+      .order('price_min'),
+  ]);
+
   const faqsProp = Array.isArray(seoResult.data?.faqs)
     ? seoResult.data.faqs.map((faq: any) => ({
         q: faq.q || faq.question,
         a: faq.a || faq.answer,
       }))
     : [];
+
+  const stateCities = citiesResult.data || [];
+  const cityIds = stateCities.map((city) => city.id);
+  let profilesProp: any[] = [];
+
+  if (cityIds.length > 0) {
+    const [clinicsResult, clinicTreatmentsResult] = await Promise.all([
+      supabase
+        .from('clinics')
+        .select(`
+          id, name, slug, description, cover_image_url, rating, review_count,
+          address, phone, verification_status, claim_status,
+          city:cities(name, slug, state:states(name, abbreviation)),
+          city_id
+        `)
+        .in('city_id', cityIds)
+        .eq('is_active', true)
+        .order('rating', { ascending: false }),
+      supabase
+        .from('clinic_treatments')
+        .select('clinic_id, treatment_id')
+        .eq('treatment_id', treatment.id),
+    ]);
+
+    const allowedClinicIds = new Set((clinicTreatmentsResult.data || []).map((item) => item.clinic_id));
+    profilesProp = (clinicsResult.data || [])
+      .filter((clinic: any) => allowedClinicIds.has(clinic.id))
+      .map((clinic: any) => ({
+        id: clinic.id,
+        name: clinic.name,
+        slug: clinic.slug,
+        type: 'clinic',
+        specialty: treatment.name,
+        location: clinic.city ? `${clinic.city.name}, ${clinic.city.state?.name || ''}` : '',
+        rating: clinic.rating || 0,
+        reviewCount: clinic.review_count || 0,
+        image: clinic.cover_image_url,
+        isVerified: clinic.verification_status === 'verified',
+        isClaimed: clinic.claim_status === 'claimed',
+        isPinned: false,
+      }));
+  }
 
   return {
     props: {
@@ -118,6 +183,10 @@ export const getStaticProps: GetStaticProps<StateServiceRouteProps> = async ({ p
       stateId: state.id,
       treatment,
       faqsProp,
+      seoContentProp: seoResult.data || null,
+      citiesProp: stateCities,
+      profilesProp,
+      priceRangesProp: priceRangesResult.data || [],
     },
     revalidate: 600,
   };

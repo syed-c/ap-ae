@@ -22,8 +22,7 @@ const arabicFont = Noto_Sans_Arabic({
 });
 
 const AnalyticsProvider = dynamic(
-  () => import('@/components/analytics/AnalyticsProvider').then(m => m.AnalyticsProvider),
-  { ssr: false }
+  () => import('@/components/analytics/AnalyticsProvider').then(m => m.AnalyticsProvider)
 );
 const CriticalResourceLoader = dynamic(
   () => import('@/components/common/CriticalResourceLoader').then(m => m.CriticalResourceLoader),
@@ -62,6 +61,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <HydrationBoundary state={pageProps.dehydratedState}>
           <AuthProvider>
             <AnalyticsProvider>
+              <Component {...pageProps} />
               <MetaTagInjector />
               <Toaster />
               <Sonner />
@@ -69,7 +69,6 @@ export default function App({ Component, pageProps }: AppProps) {
               <DynamicFavicon />
               <CriticalResourceLoader delay={3000} />
               <PandaBot />
-              <Component {...pageProps} />
             </AnalyticsProvider>
           </AuthProvider>
         </HydrationBoundary>

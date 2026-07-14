@@ -35,21 +35,25 @@ interface StateServicePageProps {
   stateId: string;
   treatment: { id: string; name: string; slug: string; description?: string | null };
   faqsProp?: { q: string; a: string }[];
+  seoContentProp?: any;
+  citiesProp?: any[];
+  profilesProp?: any[];
+  priceRangesProp?: any[];
 }
 
-const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatment, faqsProp }: StateServicePageProps) => {
+const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatment, faqsProp, seoContentProp, citiesProp, profilesProp, priceRangesProp }: StateServicePageProps) => {
   const normalizedStateSlug = normalizeStateSlug(stateSlug);
   const treatmentName = treatment.name;
 
   // Fetch SEO content for FAQs
   const seoSlug = `${normalizedStateSlug}/${serviceSlug}`;
-  const { data: seoContent } = useSeoPageContent(seoSlug);
+  const { data: seoContent } = useSeoPageContent(seoSlug, seoContentProp || null);
 
   // Fetch cities for this state
-  const { data: cities, isLoading: citiesLoading } = useCitiesByStateSlug(normalizedStateSlug || '');
+  const { data: cities, isLoading: citiesLoading } = useCitiesByStateSlug(normalizedStateSlug || '', citiesProp);
 
   // Fetch price ranges for this service
-  const { data: priceRanges } = useServicePriceRanges(serviceSlug);
+  const { data: priceRanges } = useServicePriceRanges(serviceSlug, priceRangesProp as any);
 
   // Fetch clinics offering this service across the state
   const { data: profiles, isLoading: profilesLoading } = useQuery({
@@ -100,7 +104,8 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
         isPinned: false,
       }));
     },
-    enabled: !!stateId && !!treatment.id,
+    enabled: !!stateId && !!treatment.id && !profilesProp,
+    initialData: profilesProp,
   });
 
   const isDataReady = !profilesLoading && !citiesLoading;
@@ -358,7 +363,7 @@ const StateServicePage = ({ stateSlug, serviceSlug, stateName, stateId, treatmen
                 <AccordionTrigger className="text-left font-bold hover:no-underline py-4 text-sm md:text-base">
                   {faq.q}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-4 text-sm">
+                <AccordionContent forceMount className="text-muted-foreground pb-4 text-sm">
                   {faq.a}
                 </AccordionContent>
               </AccordionItem>

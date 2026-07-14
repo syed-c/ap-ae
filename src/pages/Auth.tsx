@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from "next/router";
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { clearGmbProviderToken } from '@/lib/gmbAuth';
+import { buildGmbAuthCallbackUrl, clearAllGmbCache, hasActiveGmbFlow } from '@/lib/gmbAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,10 +37,7 @@ export default function Auth() {
     if (isLoading || !user || hasRedirected) return;
 
     // Check if there's an active GMB flow - don't redirect if so
-    const isGmbFlow = localStorage.getItem('gmb_listing_flow') === 'true' ||
-      localStorage.getItem('gmb_relink_flow') === 'true' ||
-      localStorage.getItem('gmb_pending') === 'true' ||
-      localStorage.getItem('gmb_restore_session') === 'true';
+    const isGmbFlow = hasActiveGmbFlow();
 
     if (isGmbFlow) {
       return;
@@ -123,17 +120,9 @@ export default function Auth() {
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     try {
-      // Ensure we don't accidentally continue a stale GMB listing/sync flow from localStorage
-      localStorage.removeItem('gmb_listing_flow');
-      localStorage.removeItem('gmb_pending');
-      localStorage.removeItem('gmb_link_token');
-      localStorage.removeItem('gmb_relink_flow');
-      localStorage.removeItem('gmb_restore_session');
-      clearGmbProviderToken();
+      clearAllGmbCache();
 
-      // Use current origin for OAuth callback to ensure proper domain handling
-      const currentOrigin = window.location.origin;
-      const redirectTo = `${currentOrigin}/auth/callback`;
+      const redirectTo = buildGmbAuthCallbackUrl();
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

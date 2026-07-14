@@ -14,7 +14,19 @@ import { useRealCounts } from "@/hooks/useRealCounts";
 import { Calendar, User, ArrowRight, Clock, Tag, MapPin, Search, Star, Sparkles, BookOpen, TrendingUp } from "lucide-react";
 import { format } from "date-fns";
 
-const BlogPage = () => {
+interface BlogPageProps {
+  posts?: any[];
+  featuredPosts?: any[];
+  popularStates?: { name: string; slug: string }[];
+  popularTreatments?: { name: string; slug: string }[];
+}
+
+const BlogPage = ({
+  posts: postsProp = [],
+  featuredPosts: featuredPostsProp = [],
+  popularStates: popularStatesProp = [],
+  popularTreatments: popularTreatmentsProp = [],
+}: BlogPageProps) => {
   const { data: counts } = useRealCounts();
 
   const { data: posts, isLoading } = useQuery({
@@ -28,6 +40,7 @@ const BlogPage = () => {
         .order("created_at", { ascending: false });
       return data || [];
     },
+    initialData: postsProp,
   });
 
   const { data: featuredPosts } = useQuery({
@@ -42,6 +55,7 @@ const BlogPage = () => {
         .limit(3);
       return data || [];
     },
+    initialData: featuredPostsProp,
   });
 
   const { data: popularStates } = useQuery({
@@ -55,6 +69,7 @@ const BlogPage = () => {
         .limit(5);
       return data || [];
     },
+    initialData: popularStatesProp,
   });
 
   const { data: popularTreatments } = useQuery({
@@ -68,6 +83,7 @@ const BlogPage = () => {
         .limit(8);
       return data || [];
     },
+    initialData: popularTreatmentsProp,
   });
 
   const categories = ["Dental Health", "Cosmetic Dentistry", "Oral Hygiene", "Treatments", "Industry News"];

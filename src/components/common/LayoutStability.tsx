@@ -171,7 +171,7 @@ export const ListPlaceholder = ({
   </div>
 );
 
-export default {
+const LayoutStability = {
   AspectRatioBox,
   Skeleton,
   ContentPlaceholder,
@@ -179,3 +179,5 @@ export default {
   CardPlaceholder,
   ListPlaceholder,
 };
+
+export default LayoutStability;

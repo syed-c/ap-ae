@@ -5,13 +5,18 @@ import ServicePageComponent from '@/pages/ServicePage';
 const BASE_URL = 'https://www.appointpanda.ae';
 
 // Wrapper component to render SEO meta tags server-side with FAQ data for SSR
-const ServicePageWithSEO = ({ serviceSlug, seoData, h1, heroIntro, content, faqs }: {
+const ServicePageWithSEO = ({ serviceSlug, seoData, h1, heroIntro, content, faqs, treatmentData, relatedTreatmentsData, profileData, statesData, priceRangesData }: {
     serviceSlug: string;
     seoData: { title: string; description: string; canonical: string };
     h1: string | null;
     heroIntro: string | null;
     content: string | null;
     faqs: { question: string; answer: string }[];
+    treatmentData?: any;
+    relatedTreatmentsData?: any[];
+    profileData?: any[];
+    statesData?: any[];
+    priceRangesData?: any[];
 }) => {
     return (
         <>
@@ -22,6 +27,11 @@ const ServicePageWithSEO = ({ serviceSlug, seoData, h1, heroIntro, content, faqs
                 heroIntroProp={heroIntro}
                 contentProp={content}
                 faqsProp={faqs}
+                treatmentDataProp={treatmentData}
+                relatedTreatmentsDataProp={relatedTreatmentsData}
+                profileDataProp={profileData}
+                statesDataProp={statesData}
+                priceRangesDataProp={priceRangesData}
             />
         </>
     );
@@ -80,6 +90,11 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 heroIntroProp: null,
                 contentProp: null,
                 allSeoData: null,
+                treatmentData: null,
+                relatedTreatmentsData: [],
+                profileData: [],
+                statesData: [],
+                priceRangesData: [],
             },
             revalidate: 60,
         };
@@ -88,13 +103,18 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     const seoSlug = `services/${serviceSlug}`;
     const seoSlugWithSlash = `/${seoSlug}`;
 
-    const [treatment, pageContent, seoContent, allClinics] = await Promise.all([
-        supabase
-            .from('treatments')
-            .select('*')
-            .eq('slug', serviceSlug)
-            .maybeSingle()
-            .then(r => r.data),
+    const treatment = await supabase
+        .from('treatments')
+        .select('*')
+        .eq('slug', serviceSlug)
+        .maybeSingle()
+        .then(r => r.data);
+
+    if (!treatment) {
+        return { notFound: true };
+    }
+
+    const [pageContent, seoContent, allClinics, relatedTreatmentsResult, statesResult, priceRangesResult, clinicsResult] = await Promise.all([
         supabase
             .from('page_content')
             .select('id, page_slug, meta_title, meta_description, h1, hero_intro, body_content, section_1_title, section_1_content, section_2_title, section_2_content, section_3_title, section_3_content, faqs')
@@ -113,12 +133,67 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         supabase
             .from('clinics')
             .select('id', { count: 'exact', head: true })
+            .eq('is_active', true),
+        supabase
+            .from('treatments')
+            .select('*')
             .eq('is_active', true)
-    ]);
+            .neq('slug', serviceSlug)
+            .order('display_order')
+            .limit(6),
+        supabase
+            .from('states')
+            .select('*')
+            .eq('is_active', true)
+            .order('display_order'),
+        supabase
+            .from('service_price_ranges')
+            .select(`
+                *,
+                state:states(id, name, slug, abbreviation),
+                treatment:treatments(id, name, slug)
+            `)
+            .eq('is_active', true)
+            .eq('treatment_id', treatment.id)
+            .order('price_min'),
+        (async () => {
+            const { data } = await supabase
+                .from('clinics')
+                .select(`
+                    id, name, slug, rating, review_count, cover_image_url, verification_status, claim_status,
+                    city:cities(name, slug, state:states(name, abbreviation))
+                `)
+                .eq('is_active', true)
+                .order('rating', { ascending: false })
+                .limit(50);
 
-    if (!treatment) {
-        return { notFound: true };
-    }
+            const { data: clinicTreatments } = await supabase
+                .from('clinic_treatments')
+                .select('clinic_id, treatment_id')
+                .eq('treatment_id', treatment.id);
+
+            const allowedClinicIds = new Set((clinicTreatments || []).map((item) => item.clinic_id));
+            const profiles = (data || [])
+                .filter((clinic: any) => allowedClinicIds.has(clinic.id))
+                .map((clinic: any) => ({
+                    id: clinic.id,
+                    name: clinic.name,
+                    slug: clinic.slug,
+                    type: 'clinic',
+                    specialty: treatment.name,
+                    location: clinic.city ? `${clinic.city.name}, ${clinic.city.state?.abbreviation || ''}` : 'UAE',
+                    rating: Number(clinic.rating) || 0,
+                    reviewCount: clinic.review_count || 0,
+                    image: clinic.cover_image_url || undefined,
+                    isVerified: clinic.claim_status === 'claimed' && clinic.verification_status === 'verified',
+                    isClaimed: clinic.claim_status === 'claimed',
+                    clinicName: clinic.name,
+                    clinicId: clinic.id,
+                }));
+
+            return { data: profiles };
+        })()
+    ]);
     
     // Use page_content if available, otherwise seo_pages
     const content = pageContent || seoContent;
@@ -174,6 +249,11 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             heroIntro,
             content: contentText,
             faqs: ssrFaqs,
+            treatmentData: treatment,
+            relatedTreatmentsData: relatedTreatmentsResult.data || [],
+            profileData: clinicsResult.data || [],
+            statesData: statesResult.data || [],
+            priceRangesData: priceRangesResult.data || [],
         },
         revalidate: 600,
     };

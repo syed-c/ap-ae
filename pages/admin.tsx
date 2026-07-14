@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
-import { createServerSupabase } from '@/lib/supabaseServer';
+import { createServerSupabaseAdmin, getServerUserFromCookieHeader } from '@/lib/supabaseServer';
 
 const AdminDashboard = dynamic(() => import('@/pages/admin/AdminDashboard'), {
     ssr: false,
@@ -15,28 +15,24 @@ export default AdminDashboard;
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     const cookieHeader = req.headers.cookie || '';
-    const hasAuthCookie = cookieHeader.includes('sb-eneuthbghipsdvsqilmb-auth-token') || cookieHeader.includes('sb-');
-    const supabase = createServerSupabase();
+    const user = await getServerUserFromCookieHeader(cookieHeader);
+    const supabase = createServerSupabaseAdmin();
 
-    if (!hasAuthCookie || !supabase) {
+    if (!user || !supabase) {
         return {
             redirect: { destination: '/auth', permanent: false },
         };
     }
 
     try {
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            return {
-                redirect: { destination: '/auth', permanent: false },
-            };
-        }
-
-        const { data: roles } = await supabase
+        const { data: roles, error: rolesError } = await supabase
             .from('user_roles')
             .select('role')
             .eq('user_id', user.id);
+
+        if (rolesError) {
+            throw rolesError;
+        }
 
         const userRoles = (roles || []).map((role) => role.role);
         const isAdmin = userRoles.includes('super_admin') || userRoles.includes('platform_admin') || userRoles.includes('content_moderator');

@@ -1,80 +1,110 @@
+import type { Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+
 // Centralized helpers for Google Business (GMB) OAuth token persistence.
 //
 // Why this exists:
-// - Some browsers clear sessionStorage after cross-site OAuth redirects.
 // - Supabase provider_token is often only available right after the OAuth exchange.
-// - We need a reliable (short-lived) place to keep the token until the business list is fetched.
+// - We keep a best-effort in-memory browser copy for the current tab only.
+// - Long-lived persistence is handled server-side via gmb-store-token.
 //
 // IMPORTANT: When a logged-in user syncs GMB with a DIFFERENT Google account,
 // we need to capture the GMB token but NOT replace their auth session.
-// We store their original session so we can restore it after getting the GMB token.
+// The original Supabase session is stored server-side behind a one-time restore token.
 
 const SESSION_TOKEN_KEY = 'gmb_provider_token';
-const LOCAL_META_KEY = 'gmb_provider_token_meta_v1';
-const ORIGINAL_SESSION_KEY = 'gmb_original_session_v1';
-const ORIGINAL_USER_KEY = 'gmb_original_user_id';
+const GMB_LISTING_FLOW_KEY = 'gmb_listing_flow';
+const GMB_RELINK_FLOW_KEY = 'gmb_relink_flow';
+const GMB_PENDING_KEY = 'gmb_pending';
+const GMB_RESTORE_SESSION_KEY = 'gmb_restore_session';
+const GMB_LINK_TOKEN_KEY = 'gmb_link_token';
 
 type StoredToken = {
   token: string;
   expiresAt: number; // epoch ms
 };
 
-type StoredSession = {
+type RestoredSession = {
   accessToken: string;
   refreshToken: string;
   userId: string;
-  expiresAt: number;
 };
 
-export function setGmbProviderToken(token: string, ttlMinutes = 55) {
-  const meta: StoredToken = {
-    token,
-    expiresAt: Date.now() + ttlMinutes * 60_000,
-  };
+type GmbFlowFlag = 'listing' | 'relink' | 'pending' | 'restoreSession';
 
+const FLOW_FLAG_KEYS: Record<GmbFlowFlag, string> = {
+  listing: GMB_LISTING_FLOW_KEY,
+  relink: GMB_RELINK_FLOW_KEY,
+  pending: GMB_PENDING_KEY,
+  restoreSession: GMB_RESTORE_SESSION_KEY,
+};
+
+function getSessionStorage(): Storage | null {
   try {
-    sessionStorage.setItem(SESSION_TOKEN_KEY, token);
+    return typeof window !== 'undefined' ? window.sessionStorage : null;
+  } catch {
+    return null;
+  }
+}
+
+function getLocalStorage(): Storage | null {
+  try {
+    return typeof window !== 'undefined' ? window.localStorage : null;
+  } catch {
+    return null;
+  }
+}
+
+function readSessionItem(key: string): string | null {
+  try {
+    return getSessionStorage()?.getItem(key) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function writeSessionItem(key: string, value: string) {
+  try {
+    getSessionStorage()?.setItem(key, value);
   } catch {
     // ignore
   }
+}
 
+function removeSessionItem(key: string) {
   try {
-    localStorage.setItem(LOCAL_META_KEY, JSON.stringify(meta));
+    getSessionStorage()?.removeItem(key);
+  } catch {
+    // ignore
+  }
+}
+
+export function setGmbProviderToken(token: string, ttlMinutes = 55) {
+  try {
+    const meta: StoredToken = {
+      token,
+      expiresAt: Date.now() + ttlMinutes * 60_000,
+    };
+    writeSessionItem(SESSION_TOKEN_KEY, JSON.stringify(meta));
   } catch {
     // ignore
   }
 }
 
 export function getGmbProviderToken(): string | null {
-  // 1) Fast path: sessionStorage
   try {
-    const token = sessionStorage.getItem(SESSION_TOKEN_KEY);
-    if (token) return token;
-  } catch {
-    // ignore
-  }
-
-  // 2) Fallback: localStorage meta (with TTL)
-  try {
-    const raw = localStorage.getItem(LOCAL_META_KEY);
+    const raw = readSessionItem(SESSION_TOKEN_KEY);
     if (!raw) return null;
 
     const meta = JSON.parse(raw) as StoredToken;
     if (!meta?.token || !meta?.expiresAt) {
-      localStorage.removeItem(LOCAL_META_KEY);
+      removeSessionItem(SESSION_TOKEN_KEY);
       return null;
     }
 
     if (Date.now() > meta.expiresAt) {
-      localStorage.removeItem(LOCAL_META_KEY);
+      removeSessionItem(SESSION_TOKEN_KEY);
       return null;
-    }
-
-    // Best effort to re-hydrate sessionStorage for the rest of the flow
-    try {
-      sessionStorage.setItem(SESSION_TOKEN_KEY, meta.token);
-    } catch {
-      // ignore
     }
 
     return meta.token;
@@ -84,85 +114,109 @@ export function getGmbProviderToken(): string | null {
 }
 
 export function clearGmbProviderToken() {
-  try {
-    sessionStorage.removeItem(SESSION_TOKEN_KEY);
-  } catch {
-    // ignore
-  }
-
-  try {
-    localStorage.removeItem(LOCAL_META_KEY);
-  } catch {
-    // ignore
-  }
+  removeSessionItem(SESSION_TOKEN_KEY);
 }
 
-/**
- * Store the original user's session before initiating GMB OAuth with a different account.
- * This allows us to restore their session after capturing the GMB token.
- */
-export function storeOriginalSession(accessToken: string, refreshToken: string, userId: string) {
-  const session: StoredSession = {
-    accessToken,
-    refreshToken,
-    userId,
-    expiresAt: Date.now() + 10 * 60_000, // 10 minute TTL
-  };
-
-  try {
-    localStorage.setItem(ORIGINAL_SESSION_KEY, JSON.stringify(session));
-    localStorage.setItem(ORIGINAL_USER_KEY, userId);
-  } catch {
-    // ignore
+export async function createAuthRestoreState(session: Session, flow: 'gmb' | 'relink') {
+  const refreshToken = session.refresh_token;
+  if (!refreshToken) {
+    throw new Error('Missing refresh token for the current session. Please sign in again.');
   }
+
+  const { data, error } = await supabase.functions.invoke('create-auth-restore', {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+    body: {
+      accessToken: session.access_token,
+      refreshToken,
+      flow,
+    },
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data?.restoreToken) {
+    throw new Error('Failed to create an auth restore state.');
+  }
+
+  return data.restoreToken as string;
 }
 
-/**
- * Get the stored original session (if any and not expired)
- */
-export function getOriginalSession(): StoredSession | null {
-  try {
-    const raw = localStorage.getItem(ORIGINAL_SESSION_KEY);
-    if (!raw) return null;
+export async function consumeAuthRestoreState(currentAccessToken: string, restoreToken: string) {
+  const { data, error } = await supabase.functions.invoke('consume-auth-restore', {
+    headers: { Authorization: `Bearer ${currentAccessToken}` },
+    body: { restoreToken },
+  });
 
-    const session = JSON.parse(raw) as StoredSession;
-    if (!session?.refreshToken || !session?.userId || !session?.expiresAt) {
-      clearOriginalSession();
-      return null;
-    }
-
-    if (Date.now() > session.expiresAt) {
-      clearOriginalSession();
-      return null;
-    }
-
-    return session;
-  } catch {
-    return null;
+  if (error) {
+    throw error;
   }
+
+  const restoredSession = data as RestoredSession | null;
+  if (!restoredSession?.accessToken || !restoredSession?.refreshToken || !restoredSession?.userId) {
+    throw new Error('Auth restore state was missing required session data.');
+  }
+
+  return restoredSession;
 }
 
-/**
- * Get the original user ID (used to verify we're restoring the right user)
- */
-export function getOriginalUserId(): string | null {
-  try {
-    return localStorage.getItem(ORIGINAL_USER_KEY);
-  } catch {
-    return null;
+export function setGmbFlowFlag(flag: GmbFlowFlag, enabled: boolean) {
+  const key = FLOW_FLAG_KEYS[flag];
+  if (enabled) {
+    writeSessionItem(key, 'true');
+    return;
   }
+
+  removeSessionItem(key);
 }
 
-/**
- * Clear the stored original session
- */
-export function clearOriginalSession() {
-  try {
-    localStorage.removeItem(ORIGINAL_SESSION_KEY);
-    localStorage.removeItem(ORIGINAL_USER_KEY);
-  } catch {
-    // ignore
+export function getGmbFlowFlag(flag: GmbFlowFlag): boolean {
+  return readSessionItem(FLOW_FLAG_KEYS[flag]) === 'true';
+}
+
+export function setGmbLinkToken(token: string) {
+  writeSessionItem(GMB_LINK_TOKEN_KEY, token);
+}
+
+export function getGmbLinkToken(): string | null {
+  return readSessionItem(GMB_LINK_TOKEN_KEY);
+}
+
+export function clearGmbLinkToken() {
+  removeSessionItem(GMB_LINK_TOKEN_KEY);
+}
+
+export function clearGmbFlowState() {
+  removeSessionItem(GMB_LISTING_FLOW_KEY);
+  removeSessionItem(GMB_RELINK_FLOW_KEY);
+  removeSessionItem(GMB_PENDING_KEY);
+  removeSessionItem(GMB_RESTORE_SESSION_KEY);
+  removeSessionItem(GMB_LINK_TOKEN_KEY);
+}
+
+export function hasActiveGmbFlow() {
+  return getGmbFlowFlag('listing')
+    || getGmbFlowFlag('relink')
+    || getGmbFlowFlag('pending')
+    || getGmbFlowFlag('restoreSession');
+}
+
+export function buildGmbAuthCallbackUrl(query?: string | URLSearchParams) {
+  if (typeof window === 'undefined') {
+    return '/auth/callback';
   }
+
+  const callbackUrl = new URL('/auth/callback', window.location.origin);
+
+  if (typeof query === 'string') {
+    const params = new URLSearchParams(query.startsWith('?') ? query.slice(1) : query);
+    params.forEach((value, key) => callbackUrl.searchParams.set(key, value));
+  } else if (query instanceof URLSearchParams) {
+    query.forEach((value, key) => callbackUrl.searchParams.set(key, value));
+  }
+
+  return callbackUrl.toString();
 }
 
 /**
@@ -172,15 +226,19 @@ export function clearOriginalSession() {
 export function clearAllGmbCache() {
   // Clear provider tokens
   clearGmbProviderToken();
-  
-  // Clear original session
-  clearOriginalSession();
-  
-  // Clear any flow markers
+
+  // Clear any flow markers and old legacy localStorage remnants.
+  clearGmbFlowState();
+
   try {
-    localStorage.removeItem('gmb_relink_flow');
-    localStorage.removeItem('gmb_restore_session');
-    sessionStorage.removeItem('gmb_provider_token');
+    const legacyLocalStorage = getLocalStorage();
+    legacyLocalStorage?.removeItem(GMB_LISTING_FLOW_KEY);
+    legacyLocalStorage?.removeItem(GMB_RELINK_FLOW_KEY);
+    legacyLocalStorage?.removeItem(GMB_PENDING_KEY);
+    legacyLocalStorage?.removeItem(GMB_RESTORE_SESSION_KEY);
+    legacyLocalStorage?.removeItem(GMB_LINK_TOKEN_KEY);
+    legacyLocalStorage?.removeItem('gmb_original_session_v1');
+    legacyLocalStorage?.removeItem('gmb_original_user_id');
   } catch {
     // ignore
   }

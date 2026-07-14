@@ -52,7 +52,7 @@ export interface SeoPageContent {
 /**
  * Hook to fetch SEO content from seo_pages table for any page by slug
  */
-export function useSeoPageContent(slug: string | undefined) {
+export function useSeoPageContent(slug: string | undefined, initialData?: SeoPageContent | null) {
   return useQuery({
     queryKey: ["seo-page-content", slug],
     queryFn: async (): Promise<SeoPageContent | null> => {
@@ -276,6 +276,7 @@ export function useSeoPageContent(slug: string | undefined) {
     enabled: !!slug,
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+    initialData: initialData ?? undefined,
   });
 }
 
