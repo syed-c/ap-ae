@@ -164,6 +164,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                     city:cities(name, slug, state:states(name, abbreviation))
                 `)
                 .eq('is_active', true)
+                .eq('is_likely_dental', true)
                 .order('rating', { ascending: false })
                 .limit(50);
 

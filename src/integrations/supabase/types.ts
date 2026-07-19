@@ -1633,6 +1633,7 @@ export type Database = {
           is_active_listing: boolean | null
           is_duplicate: boolean
           is_featured: boolean
+          is_likely_dental: boolean
           is_suspended: boolean
           latitude: number | null
           location_pending_approval: boolean
@@ -1681,6 +1682,7 @@ export type Database = {
           is_active_listing?: boolean | null
           is_duplicate?: boolean
           is_featured?: boolean
+          is_likely_dental?: boolean
           is_suspended?: boolean
           latitude?: number | null
           location_pending_approval?: boolean
@@ -1729,6 +1731,7 @@ export type Database = {
           is_active_listing?: boolean | null
           is_duplicate?: boolean
           is_featured?: boolean
+          is_likely_dental?: boolean
           is_suspended?: boolean
           latitude?: number | null
           location_pending_approval?: boolean

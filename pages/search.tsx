@@ -114,6 +114,7 @@ export const getServerSideProps: GetServerSideProps<SearchPageSSRProps> = async 
         `)
         .eq('is_active', true)
         .eq('is_duplicate', false)
+        .eq('is_likely_dental', true)
         .order('rating', { ascending: false })
         .limit(24),
     ]);

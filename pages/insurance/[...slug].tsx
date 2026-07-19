@@ -261,9 +261,10 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                     if (!city) return 0;
                     const { count } = await supabase
                         .from("clinic_insurances")
-                        .select("clinic_id, clinics!inner(id, is_active)", { count: "exact", head: true })
+                        .select("clinic_id, clinics!inner(id, is_active, is_likely_dental)", { count: "exact", head: true })
                         .eq("insurance_id", insuranceData.id)
                         .eq("clinics.is_active", true)
+                        .eq("clinics.is_likely_dental", true)
                         .eq("clinics.city_id", city.id);
                     return count || 0;
                 })()
@@ -275,9 +276,10 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     } else {
         const { count } = await supabase
             .from("clinic_insurances")
-            .select("clinic_id, clinics!inner(id, is_active)", { count: "exact", head: true })
+            .select("clinic_id, clinics!inner(id, is_active, is_likely_dental)", { count: "exact", head: true })
             .eq("insurance_id", insuranceData.id)
-            .eq("clinics.is_active", true);
+            .eq("clinics.is_active", true)
+            .eq("clinics.is_likely_dental", true);
         clinicCount = count || 0;
     }
 
@@ -289,6 +291,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .select('id')
             .eq('city_id', cityData.id)
             .eq('is_active', true)
+            .eq('is_likely_dental', true)
             .order('rating', { ascending: false })
             .limit(200);
         eligibleClinicIds = (cityClinics.data || []).map((clinic) => clinic.id);
@@ -306,6 +309,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
                 .select('id')
                 .in('city_id', emirateCityIds)
                 .eq('is_active', true)
+                .eq('is_likely_dental', true)
                 .order('rating', { ascending: false })
                 .limit(400);
             eligibleClinicIds = (emirateClinics.data || []).map((clinic) => clinic.id);
@@ -326,6 +330,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         `)
         .eq('insurance_id', insuranceData.id)
         .eq('clinics.is_active', true)
+        .eq('clinics.is_likely_dental', true)
         .order('clinics(rating)', { ascending: false, nullsFirst: false });
 
     if (eligibleClinicIds) {

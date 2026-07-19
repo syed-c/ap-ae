@@ -281,6 +281,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         `)
         .or(clinicLocationFilter)
         .eq('is_active', true)
+        .eq('is_likely_dental', true)
         .order('rating', { ascending: false })
         .order('review_count', { ascending: false });
 
