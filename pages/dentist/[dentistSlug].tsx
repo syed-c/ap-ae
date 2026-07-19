@@ -80,6 +80,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
         .from("dentists")
         .select("*, clinic:clinics(id, name, slug, city:cities(name, slug, state:states(name, slug, abbreviation)))")
         .eq("slug", dentistSlug)
+        .eq("is_active", true)
         .maybeSingle()
         .then(r => r.data);
 

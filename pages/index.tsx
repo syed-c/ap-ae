@@ -2,6 +2,7 @@ import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import IndexPage from '@/pages/Index';
 import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
+import { faqs } from '@/lib/site-data';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
@@ -42,12 +43,29 @@ export default function IndexPageWithSEO({ pageData }: { pageData: HomePageData 
     }
   };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map((faq) => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a,
+      },
+    })),
+  };
+
   return (
     <>
       <Head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       </Head>
       <IndexPage pageData={pageData} />

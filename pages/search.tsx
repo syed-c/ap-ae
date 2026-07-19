@@ -45,6 +45,7 @@ const SearchPageWithSEO = ({ emirates, treatments, insurances, initialResults, s
         <meta property="og:description" content={seoData.description} />
         <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
         <meta property="og:site_name" content="AppointPanda" />
+        <meta property="og:locale" content="en_AE" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:url" content={`${BASE_URL}${seoData.canonical}`} />
         <meta name="twitter:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />

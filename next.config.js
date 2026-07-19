@@ -56,7 +56,12 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'https', hostname: 'eneuthbghipsdvsqilmb.supabase.co' },
+      // Wildcard covers the live Supabase storage host and any prior/future
+      // project ref — the live site currently serves most clinic images from
+      // apztvwpogywvounohqtk.supabase.co while some legacy rows still point
+      // at eneuthbghipsdvsqilmb.supabase.co, so a single fixed hostname is
+      // not safe here.
+      { protocol: 'https', hostname: '**.supabase.co' },
     ],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
   },

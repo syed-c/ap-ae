@@ -229,12 +229,12 @@ export const blogPosts = [
 ];
 
 export const faqs = [
-  { q: 'Are the clinics on AppointPanda verified?', a: 'Yes. Every clinic listed on AppointPanda has been verified against UAE regulatory licensing databases. We also verify insurance panel participation and patient reviews for authenticity.' },
-  { q: 'How accurate are the prices shown?', a: 'Prices are provided directly by clinics and updated monthly. While most clinics honour these prices, we recommend confirming at the time of booking. Starred prices (★) are guaranteed for AppointPanda bookings.' },
+  { q: 'Are the clinics on AppointPanda verified?', a: 'Clinic profiles show a verification status — from newly listed to fully verified — based on the business and licensing details we\'ve checked as part of onboarding and profile claiming. Look for the verification badge on a clinic\'s profile to see its current status before booking.' },
+  { q: 'How accurate are the prices shown?', a: 'Prices are provided directly by clinics and may change. Treat listed prices as an estimate of cost and confirm the final price, and what it includes, with the clinic before your appointment.' },
   { q: 'Does my insurance cover treatment?', a: 'Each clinic profile lists accepted insurance plans. Many clinics offer direct billing. Use our insurance filter to find clinics that accept your provider.' },
   { q: 'Can I cancel or reschedule my appointment?', a: 'Cancellation policies vary by clinic. Most require 24 hours\' notice. You can cancel or reschedule directly through your AppointPanda dashboard.' },
-  { q: 'What if I need emergency treatment?', a: 'Call our 24/7 hotline at 800-APANDA. We\'ll connect you with an open clinic near you. Many clinics in our network keep emergency slots available daily.' },
-  { q: 'Is the site available in Arabic?', a: 'Yes. You can switch to Arabic using the toggle in the top bar. Our interface and clinic listings are fully bilingual.' },
+  { q: 'What if I need emergency treatment?', a: 'Call our hotline at 800-APANDA and we\'ll help you find a nearby clinic with emergency availability. For severe symptoms — such as uncontrolled bleeding, facial swelling, or difficulty breathing or swallowing — seek urgent medical care immediately rather than waiting for a dental appointment.' },
+  { q: 'Is the site available in Arabic?', a: 'AppointPanda is currently available in English only.' },
 ];
 
 export function getClinicBySlug(slug: string): ClinicData | undefined {
