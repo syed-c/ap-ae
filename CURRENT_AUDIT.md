@@ -1,7 +1,52 @@
 # AppointPanda — Current-State Audit (Consolidated)
 
-**Date:** 2026-07-19
-**Scope:** Reconciles nine prior audit/fix reports in this repo against the actual current code, verifies which of their findings are still real, and fixes the safe, code-level issues found in the process. This is **not** a full pass through the 50-section rebuild brief — see "What this session did not cover" at the end.
+**Date:** 2026-07-19 (updated same day with a live-database audit once correct credentials were confirmed)
+**Scope:** Reconciles nine prior audit/fix reports in this repo against the actual current code, verifies which of their findings are still real, and fixes the safe, code-level issues found in the process. Section 0 adds a real, read-only audit against the live production database (`eneuthbghipsdvsqilmb.supabase.co`, confirmed as the correct project — it matches the repo's own linked config and its 127-table schema matches every table the code references). This is **not** a full pass through the 50-section rebuild brief — see "What this session did not cover" at the end.
+
+---
+
+## 0. Live database audit — critical findings
+
+Read-only queries against the real database via its REST API with the service-role key (no writes performed). This directly checks several claims from prior reports and from the platform's own stated identity.
+
+### 0.1 CRITICAL — Most listed "clinics" are not dental businesses
+
+The core positioning ("AppointPanda is a UAE **dental** directory... not a dental clinic... helps users find **dentists and dental clinics**") does not match the underlying data:
+
+- **785 of 1,301 active "clinics" (60%) don't even have "dent" in their name.** Spot-checked sample: *Aster Clinic, Al Barsha* (its own description says "Internal Medicine, Pediatrics, Dermatology, Dentistry, Orthopedics" — dentistry is one of five departments), *King's Mudon Medical Centre*, *Al Sham Medical Center*, *American Academy of Cosmetic Surgery Hospital*, *Health Call Medical and Aesthetic Center*, *LMC Sharjah*. These read as general medical centers and hospitals pulled from a broad Google Business Profile scrape (`source: "gmb"`, `gmb_data.types` includes `medical_clinic`, `doctor`, `health`), not curated dental practices.
+- The homepage's displayed clinic count (`pages/index.tsx` → `clinics` count where `is_active = true`) has **no dental filter at all** — it counts all 1,301, so whatever number is shown to users as "clinics on AppointPanda" almost certainly includes hundreds of general hospitals and medical centers with no confirmed dental service.
+- This is exactly the failure mode the brief itself warns against ("do not publish empty categories," "do not present itself as a healthcare provider" it isn't, "do not invent clinics"). It's not that data was invented — it's that a general-medical GMB scrape is being presented as a dental directory without a dental-relevance filter.
+
+**This needs a business decision, not a code fix**: either (a) filter the live directory to clinics with a confirmed dental department/service, (b) re-scope what counts as "listed" vs "browsable," or (c) something else your team decides — I did not touch clinic data.
+
+### 0.2 CRITICAL — The core price-comparison feature has no underlying data
+
+- `clinic_treatments` (the per-clinic treatment+price junction table) — **0 rows**, despite 1,301 clinics existing.
+- `service_price_ranges` — **0 rows**.
+- The `clinics` table itself has no treatment/price columns at all (checked its full 46-column schema).
+- The only price data anywhere is `seo_pages.price_min/max/currency/note` — page-level, editorial/estimated figures for **76 of 203** SEO pages (e.g. an aggregate "dental implant prices in Dubai" page), not sourced from real per-clinic quotes.
+
+**In short: there is currently no clinic-level, sourced pricing data behind the platform's headline "compare treatment prices" promise.** The brief's price-comparison requirements (§12) — fixed/range/per-unit types, inclusions, last-confirmed dates, per-clinic offers — have nowhere to attach today. This is the single biggest gap versus the brief and needs a real data-sourcing plan (getting clinics to submit prices, or a structured import) before any UI work on price comparison is worth doing.
+
+### 0.3 CRITICAL — Dentist profiles are almost entirely test data
+
+- The `dentists` table has **2 rows total**, both look like test records: "Dr. Syed Rayyan" (`contact@syedrayyan.com`) and "**Dr. Tester**" (`syedrayyan7117@gmail.com`). No bio, specializations, languages, qualifications, or license number populated on either.
+- Every dentist-specific feature in the brief (dentist profiles, dentist verification, dentist-level booking) has essentially no real content behind it right now — the platform's real inventory is almost entirely clinic-level (1,301 rows, scraped from Google), not dentist-level.
+
+### 0.4 HIGH — Test/dummy records live in production
+
+At least 2 active clinics have "test" in their name, including one literally named **"Test #6"**, currently `is_active = true` and would appear in live search results and the sitemap. Did not delete — flagging for your call, since removing live rows is a write action I didn't take without confirmation.
+
+### 0.5 HIGH — The location-linkage bug from the April `DATABASE_CONTENT_AUDIT.md` was never actually fixed
+
+That report recommended specific SQL to link `cities`/`states` to `seo_pages` and backfill `clinic_count`/`dentist_count`. Checked directly: **still 0 of 68 cities have `clinic_count > 0`, and 0 have `seo_page_id` linked**, months later. The recommendation was written but never applied. This is a safe, well-scoped backfill (`UPDATE cities SET clinic_count = (SELECT COUNT(*) FROM clinics WHERE city_id = cities.id AND is_active = true)`, one-time, easily verified) — I have not run it, since it's a write against production data and I'd rather confirm with you first given how much else in this section touches data quality.
+
+### 0.6 Confirmed accurate / already fine
+
+- `treatments` (35 rows) — legitimate, real dental treatment taxonomy (general dentistry, teeth cleaning, root canal, wisdom teeth removal, etc.), matches the brief's expected list well.
+- `google_reviews` — 5,671 real rows, looks properly populated.
+- `insurances` (40), `subscription_plans` (4), `blog_posts` (37) — all populated, non-trivially.
+- `clinics.claim_status` / `verification_status` — the tiered verification system I described honestly in the FAQ fix (§2) is real and populated (`unclaimed`/`unverified` is in fact the default/common state), confirming that fix was the right call.
 
 This report supersedes, for accuracy purposes: `AUDIT_REPORT.md`, `SEO-AUDIT-REPORT.md`, `DATABASE_CONTENT_AUDIT.md`, `SEO_FIXES_REPORT.md`, `SSG_MIGRATION_COMPLETE.md`, `CMS_FIX_REPORT.md`, `DATA_FIX_REPORT.md`, and the five reports under `Report ap-ae/`. Those files are left in place as history but should not be treated as current.
 
