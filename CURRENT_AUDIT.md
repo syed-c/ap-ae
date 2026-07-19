@@ -1,23 +1,23 @@
 # AppointPanda — Current-State Audit (Consolidated)
 
-**Date:** 2026-07-19 (updated same day with a live-database audit once correct credentials were confirmed)
-**Scope:** Reconciles nine prior audit/fix reports in this repo against the actual current code, verifies which of their findings are still real, and fixes the safe, code-level issues found in the process. Section 0 adds a real, read-only audit against the live production database (`eneuthbghipsdvsqilmb.supabase.co`, confirmed as the correct project — it matches the repo's own linked config and its 127-table schema matches every table the code references). This is **not** a full pass through the 50-section rebuild brief — see "What this session did not cover" at the end.
+**Date:** 2026-07-19
+**Scope:** Reconciles nine prior audit/fix reports in this repo against the actual current code, verifies which of their findings are still real, and fixes the safe, code-level issues found in the process. Section 0 adds a real audit against the live production database (`eneuthbghipsdvsqilmb.supabase.co`, confirmed correct — see §1), plus the specific data fixes and a dental-relevance search filter implemented after checking each one with the site owner (§0.7). This is **not** a full pass through the 50-section rebuild brief — see "What this session did not cover" at the end.
 
 ---
 
 ## 0. Live database audit — critical findings
 
-Read-only queries against the real database via its REST API with the service-role key (no writes performed). This directly checks several claims from prior reports and from the platform's own stated identity.
+Initially read-only queries against the real database via its REST API with the service-role key. After you confirmed direction on three items, I made the specific writes described in **§0.7** below — everything else in this section remains observation only.
 
-### 0.1 CRITICAL — Most listed "clinics" are not dental businesses
+### 0.1 RESOLVED — Most listed "clinics" were not dental businesses
 
-The core positioning ("AppointPanda is a UAE **dental** directory... not a dental clinic... helps users find **dentists and dental clinics**") does not match the underlying data:
+The core positioning ("AppointPanda is a UAE **dental** directory... not a dental clinic... helps users find **dentists and dental clinics**") did not match the underlying data:
 
-- **785 of 1,301 active "clinics" (60%) don't even have "dent" in their name.** Spot-checked sample: *Aster Clinic, Al Barsha* (its own description says "Internal Medicine, Pediatrics, Dermatology, Dentistry, Orthopedics" — dentistry is one of five departments), *King's Mudon Medical Centre*, *Al Sham Medical Center*, *American Academy of Cosmetic Surgery Hospital*, *Health Call Medical and Aesthetic Center*, *LMC Sharjah*. These read as general medical centers and hospitals pulled from a broad Google Business Profile scrape (`source: "gmb"`, `gmb_data.types` includes `medical_clinic`, `doctor`, `health`), not curated dental practices.
-- The homepage's displayed clinic count (`pages/index.tsx` → `clinics` count where `is_active = true`) has **no dental filter at all** — it counts all 1,301, so whatever number is shown to users as "clinics on AppointPanda" almost certainly includes hundreds of general hospitals and medical centers with no confirmed dental service.
-- This is exactly the failure mode the brief itself warns against ("do not publish empty categories," "do not present itself as a healthcare provider" it isn't, "do not invent clinics"). It's not that data was invented — it's that a general-medical GMB scrape is being presented as a dental directory without a dental-relevance filter.
+- **785 of 1,301 active "clinics" (60%) didn't even have "dent" in their name.** Spot-checked sample: *Aster Clinic, Al Barsha* (its own description says "Internal Medicine, Pediatrics, Dermatology, Dentistry, Orthopedics" — dentistry is one of five departments), *King's Mudon Medical Centre*, *Al Sham Medical Center*, *American Academy of Cosmetic Surgery Hospital*, *Health Call Medical and Aesthetic Center*, *LMC Sharjah*. These read as general medical centers and hospitals pulled from a broad Google Business Profile scrape (`source: "gmb"`, `gmb_data.types` includes `medical_clinic`, `doctor`, `health`), not curated dental practices.
+- The homepage's displayed clinic count (`pages/index.tsx` → `clinics` count where `is_active = true`) still has **no dental filter** — that specific number was explicitly left out of scope (see §0.7) and still counts all 1,301.
+- This was exactly the failure mode the brief itself warns against ("do not publish empty categories," "do not present itself as a healthcare provider" it isn't, "do not invent clinics"). It wasn't that data was invented — a general-medical GMB scrape was being presented as a dental directory without a dental-relevance filter.
 
-**This needs a business decision, not a code fix**: either (a) filter the live directory to clinics with a confirmed dental department/service, (b) re-scope what counts as "listed" vs "browsable," or (c) something else your team decides — I did not touch clinic data.
+**Fixed:** added `clinics.is_likely_dental` (combined name-keyword + Google category-tag heuristic, 943 flagged dental / 358 flagged non-dental) and wired it into every public search/listing query. Full detail in §0.7. The homepage's numeric "clinics" stat and the sitemap were deliberately left unfiltered — your call, not mine, and not yet made.
 
 ### 0.2 CRITICAL — The core price-comparison feature has no underlying data
 
@@ -33,13 +33,17 @@ The core positioning ("AppointPanda is a UAE **dental** directory... not a denta
 - The `dentists` table has **2 rows total**, both look like test records: "Dr. Syed Rayyan" (`contact@syedrayyan.com`) and "**Dr. Tester**" (`syedrayyan7117@gmail.com`). No bio, specializations, languages, qualifications, or license number populated on either.
 - Every dentist-specific feature in the brief (dentist profiles, dentist verification, dentist-level booking) has essentially no real content behind it right now — the platform's real inventory is almost entirely clinic-level (1,301 rows, scraped from Google), not dentist-level.
 
-### 0.4 HIGH — Test/dummy records live in production
+### 0.4 RESOLVED — Test/dummy record live in production
 
-At least 2 active clinics have "test" in their name, including one literally named **"Test #6"**, currently `is_active = true` and would appear in live search results and the sitemap. Did not delete — flagging for your call, since removing live rows is a write action I didn't take without confirmation.
+2 active clinics matched a "test" name search. Checked both in full before touching anything: **"Test #6"** (`source: "list-your-practice"`, zero leads, created via the public onboarding form) was genuine dummy data and has been deactivated (`is_active = false`). **"800DOCTOR - Dubai | Home Nursing, Home IV Infusion, Home Blood Test"** was a false positive — a real (non-dental) GMB listing whose name happens to contain the word "Test" — left untouched; it's now excluded from dental search surfaces by §0.1's fix instead.
 
-### 0.5 HIGH — The location-linkage bug from the April `DATABASE_CONTENT_AUDIT.md` was never actually fixed
+### 0.5 RESOLVED — The location-linkage bug from the April `DATABASE_CONTENT_AUDIT.md` was never actually fixed
 
-That report recommended specific SQL to link `cities`/`states` to `seo_pages` and backfill `clinic_count`/`dentist_count`. Checked directly: **still 0 of 68 cities have `clinic_count > 0`, and 0 have `seo_page_id` linked**, months later. The recommendation was written but never applied. This is a safe, well-scoped backfill (`UPDATE cities SET clinic_count = (SELECT COUNT(*) FROM clinics WHERE city_id = cities.id AND is_active = true)`, one-time, easily verified) — I have not run it, since it's a write against production data and I'd rather confirm with you first given how much else in this section touches data quality.
+That report recommended SQL to link `cities`/`states` to `seo_pages` and backfill `clinic_count`/`dentist_count`. Checked directly: **still 0 of 68 cities showed `dentist_count`/`seo_page_id` set, and 0 of 7 states showed `clinic_count > 0`**, months later — the recommendation was written but never applied, and its assumptions were partly wrong (`cities` has no `clinic_count` column at all, only `dentist_count`; the linkage isn't a slug-match as suggested — `seo_pages.city_id`/`state_id` exist as columns but are entirely unpopulated, so I matched on `seo_pages.slug` directly against `{state.slug}/{city.slug}` instead). Backfilled properly this time — see §0.7 for the real numbers, which surfaced a much bigger finding (§0.5b).
+
+### 0.5b CRITICAL (new) — Clinic data is almost entirely Dubai/Sharjah; the other 5 emirates are essentially uncovered
+
+Once real counts existed, the geographic imbalance became stark: **Dubai 1,136 clinics, Sharjah 144, Ajman 2, Abu Dhabi 0, Fujairah 0, Ras Al Khaimah 0, Umm Al Quwain 0.** Abu Dhabi does have real clinics in the dataset (confirmed at least 3, e.g. "Dentacare Centre (Dental & Orthodontics) Hamdan," "Boston Dental Center") but they — along with 15 others — have `city_id = NULL`, so they're geographically orphaned and invisible on any city/emirate page or filtered search. I did not attempt to re-assign these 18 orphaned clinics to cities by parsing their addresses; that's a real data-engineering task, not something to guess at via string matching. A `reassign_clinic_to_nearest_city` RPC already exists in the database (probably built for exactly this) — worth having your team run it or review what it does.
 
 ### 0.6 Confirmed accurate / already fine
 
@@ -48,25 +52,25 @@ That report recommended specific SQL to link `cities`/`states` to `seo_pages` an
 - `insurances` (40), `subscription_plans` (4), `blog_posts` (37) — all populated, non-trivially.
 - `clinics.claim_status` / `verification_status` — the tiered verification system I described honestly in the FAQ fix (§2) is real and populated (`unclaimed`/`unverified` is in fact the default/common state), confirming that fix was the right call.
 
+### 0.7 Actions taken this session (all confirmed with you first)
+
+1. **Deactivated** the one genuine test clinic record (`Test #6`, `is_active = false`). Reversible.
+2. **Added `clinics.is_likely_dental`** (boolean column + partial index, DDL run by you via the SQL Editor since these API keys don't carry schema privileges). Backfilled via a combined heuristic — name contains one of `dent/orthodont/veneer/braces/implant/oral surg/invisalign/root canal/hollywood smile`, OR Google's own `dental_clinic`/`dentist` category tag is present in the imported `gmb_data.types`. Result: **943 flagged dental, 358 flagged non-dental**, out of 1,301 total. Wired into every public search/listing query (main search SSR + client-side, emirate pages, city pages, service-location pages, state-service pages, treatment pages, insurance clinic finder) — see the commit for the full file list. Deliberately **not** wired into the homepage's numeric clinic count, the sitemap, or individual clinic profile pages, per your explicit scope choice.
+3. **Backfilled `cities.dentist_count`, `cities.seo_page_id`, `states.dentist_count`, `states.clinic_count`, `states.seo_page_id`** from real current data (real `clinics`/`dentists` counts grouped by location; `seo_page_id` matched by exact slug against the `city`-type rows in `seo_pages`). 46 of 68 cities got a `seo_page_id` match (the other 22 have no corresponding SEO page yet — that's accurate, not a bug). All 7 states matched.
+
+None of these were guessed at — each was confirmed with you before running, and the heuristic/backfill logic and resulting counts are documented here so they're auditable.
+
 This report supersedes, for accuracy purposes: `AUDIT_REPORT.md`, `SEO-AUDIT-REPORT.md`, `DATABASE_CONTENT_AUDIT.md`, `SEO_FIXES_REPORT.md`, `SSG_MIGRATION_COMPLETE.md`, `CMS_FIX_REPORT.md`, `DATA_FIX_REPORT.md`, and the five reports under `Report ap-ae/`. Those files are left in place as history but should not be treated as current.
 
 ---
 
-## 1. Critical — unresolved, needs your direct action
+## 1. RESOLVED — Supabase project confirmed
 
-### 1.1 The repo's linked Supabase project does not match the live site's data source
+Two prior project refs supplied earlier in this process (`pgqobeklrxuszbzivsdf`, `fcqnxwsjcyvnlpgddpge`) were queried directly and ruled out — both effectively empty, neither matching this codebase's schema. **`eneuthbghipsdvsqilmb`** was then confirmed as correct: it matches every config file in the repo (`supabase/config.toml`, `vercel.json`, `next.config.js`) and its live 127-table schema matches every table the code references (`dentists`, `cities`, `states`, `seo_pages`, `service_price_ranges`, etc.). All of §0's findings and §0.7's actions were run against this project.
 
-This blocked live-data verification this session and is worth fixing before any further data-dependent work.
+One loose end from earlier investigation, not fully explained: the live homepage's embedded clinic image URLs mostly resolve to a *different* host, `apztvwpogywvounohqtk.supabase.co`, with a minority on `eneuthbghipsdvsqilmb.supabase.co`. Possible explanation: storage (images) may live on a separate Supabase project from the database, or this is a leftover from a past migration — either way it doesn't affect data correctness, only image hosting. Not investigated further since it's cosmetic, not a data-integrity issue.
 
-- `supabase/config.toml`, `supabase/.temp/project-ref`, `vercel.json`, `next.config.js`, and `pages/_document.tsx` (dns-prefetch) all reference project **`eneuthbghipsdvsqilmb`**.
-- Two other project refs were supplied during this session as "the" database (`pgqobeklrxuszbzivsdf`, `fcqnxwsjcyvnlpgddpge`) — both queried directly via their REST API with service-role keys, and **neither matches this codebase's schema**. Both are effectively empty and use different table names than the code ever references (e.g. no `dentists`/`cities`/`states` tables in either).
-- Fetching `https://www.appointpanda.ae/` directly and reading the embedded clinic data (public by design — these are `NEXT_PUBLIC_*` values and public image URLs) shows most live `coverImageUrl` values actually resolve to **`apztvwpogywvounohqtk.supabase.co`**, with a minority of legacy rows still pointing at `eneuthbghipsdvsqilmb.supabase.co`.
-
-**Read as:** the project most likely migrated from `eneuthbghipsdvsqilmb` to `apztvwpogywvounohqtk` at some point (or vice versa), and the repo's own config files were never fully updated, and/or some clinic image URLs were never re-pointed after the migration.
-
-**Action needed from you:** check the deployed app's actual `NEXT_PUBLIC_SUPABASE_URL` (Vercel project → Settings → Environment Variables is the source of truth, not any file in this repo) and share the credentials for *that* project. Until then, no further live-data verification, migrations, or the price-comparison data-model work can safely proceed — I won't guess at or run schema changes against an unconfirmed database.
-
-**Fixed regardless of the above (safe either way):**
+**Fixed regardless:**
 - `next.config.js` — `images.remotePatterns` only whitelisted `eneuthbghipsdvsqilmb.supabase.co`; changed to a `**.supabase.co` wildcard so `next/image` doesn't throw a "hostname not configured" error against either host.
 - `pages/_document.tsx` — added a `dns-prefetch` hint for `apztvwpogywvounohqtk.supabase.co` alongside the existing one, since that's the host actually serving most live clinic images.
 
