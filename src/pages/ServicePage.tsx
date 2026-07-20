@@ -143,8 +143,8 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
       a: treatment?.description || `${treatmentName} is a professional dental procedure performed by certified specialists.`,
     },
     {
-      q: `How do I find the best ${treatmentName} specialist in the UAE?`,
-      a: `Use our directory to compare verified specialists across Dubai, Abu Dhabi, and all emirates. All dentists are DHA/DOH/MOHAP certified.`,
+      q: `How do I find a ${treatmentName} specialist in the UAE?`,
+      a: `Use our directory to browse clinics and specialists across the UAE emirates. Each profile shows a verification status — check the badge on a specific profile before booking.`,
     },
     {
       q: `Does insurance cover ${treatmentName}?`,
@@ -499,7 +499,7 @@ const ServicePage = ({ serviceSlugProp, seoDataProp, h1Prop, heroIntroProp, cont
               </li>
             </ul>
             <p className="text-xs text-muted-foreground mt-4 pt-4 border-t border-border">
-              Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}. Content reviewed by licensed dental professionals.
+              Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}. This page is for general information only and is not a substitute for professional dental advice — consult a dentist to assess your specific situation.
             </p>
           </div>
         </div>

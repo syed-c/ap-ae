@@ -213,15 +213,6 @@ export const navLinks: NavLinkData[] = [
 
 export const popularSearches = ['Implants', 'Invisalign', 'Veneers', 'Whitening', 'Kids Dentistry', 'Root Canal', 'Emergency'];
 
-export const testimonials = [
-  { quote: "I was nervous about my root canal, but Dr. Amira made it completely painless. The clinic is beautiful and the staff are wonderful.", name: 'Sarah M.', emirate: 'Dubai', treatment: 'Root Canal' },
-  { quote: "Found the perfect orthodontist for my son through AppointPanda. The profiles are detailed and the reviews are genuine. Highly recommend.", name: 'Ahmed Al T.', emirate: 'Abu Dhabi', treatment: 'Invisalign' },
-  { quote: "Saved over AED 1,200 on my veneers compared to my previous clinic. The price transparency is a game-changer.", name: 'Layla R.', emirate: 'Sharjah', treatment: 'Veneers' },
-  { quote: "Needed an emergency dentist on a Friday night. AppointPanda connected me with a clinic open until 11 PM within minutes.", name: 'James K.', emirate: 'Dubai', treatment: 'Emergency' },
-  { quote: "The insurance matching feature is incredible. My plan covered 80% of the cost — I had no idea until I used the site.", name: 'Mona S.', emirate: 'Abu Dhabi', treatment: 'Check-up' },
-  { quote: "Found a brilliant paediatric dentist for my 4-year-old. The clinic profile had all the info we needed — even photos of the play area.", name: 'Omar H.', emirate: 'Dubai', treatment: 'Pediatric' },
-];
-
 export const blogPosts = [
   { slug: 'choosing-right-dentist-uae', title: 'How to choose the right dentist in the UAE', category: 'Guides', excerpt: 'From regulatory licensing to insurance panels — our complete guide to finding your perfect dentist in the Emirates.', readingTime: '5 min', image: 1 },
   { slug: 'cost-of-dental-implants-uae', title: 'The real cost of dental implants in the UAE (2026)', category: 'Cost & Finance', excerpt: 'We surveyed 87 clinics across all 7 emirates to bring you transparent implant pricing. The results may surprise you.', readingTime: '7 min', image: 2 },
@@ -229,12 +220,12 @@ export const blogPosts = [
 ];
 
 export const faqs = [
-  { q: 'Are the clinics on AppointPanda verified?', a: 'Yes. Every clinic listed on AppointPanda has been verified against UAE regulatory licensing databases. We also verify insurance panel participation and patient reviews for authenticity.' },
-  { q: 'How accurate are the prices shown?', a: 'Prices are provided directly by clinics and updated monthly. While most clinics honour these prices, we recommend confirming at the time of booking. Starred prices (★) are guaranteed for AppointPanda bookings.' },
+  { q: 'Are the clinics on AppointPanda verified?', a: 'Clinic profiles show a verification status — from newly listed to fully verified — based on the business and licensing details we\'ve checked as part of onboarding and profile claiming. Look for the verification badge on a clinic\'s profile to see its current status before booking.' },
+  { q: 'How accurate are the prices shown?', a: 'Prices are provided directly by clinics and may change. Treat listed prices as an estimate of cost and confirm the final price, and what it includes, with the clinic before your appointment.' },
   { q: 'Does my insurance cover treatment?', a: 'Each clinic profile lists accepted insurance plans. Many clinics offer direct billing. Use our insurance filter to find clinics that accept your provider.' },
   { q: 'Can I cancel or reschedule my appointment?', a: 'Cancellation policies vary by clinic. Most require 24 hours\' notice. You can cancel or reschedule directly through your AppointPanda dashboard.' },
-  { q: 'What if I need emergency treatment?', a: 'Call our 24/7 hotline at 800-APANDA. We\'ll connect you with an open clinic near you. Many clinics in our network keep emergency slots available daily.' },
-  { q: 'Is the site available in Arabic?', a: 'Yes. You can switch to Arabic using the toggle in the top bar. Our interface and clinic listings are fully bilingual.' },
+  { q: 'What if I need emergency treatment?', a: 'Call our hotline at 800-APANDA and we\'ll help you find a nearby clinic with emergency availability. For severe symptoms — such as uncontrolled bleeding, facial swelling, or difficulty breathing or swallowing — seek urgent medical care immediately rather than waiting for a dental appointment.' },
+  { q: 'Is the site available in Arabic?', a: 'AppointPanda is currently available in English only.' },
 ];
 
 export function getClinicBySlug(slug: string): ClinicData | undefined {

@@ -191,7 +191,8 @@ function useSearchResults(
           .from('clinics')
           .select('id')
           .eq('city_id', filters.areaId)
-          .eq('is_active', true);
+          .eq('is_active', true)
+          .eq('is_likely_dental', true);
 
         eligibleClinicIds = new Set((clinics || []).map((clinic) => clinic.id));
 
@@ -215,7 +216,8 @@ function useSearchResults(
           .from('clinics')
           .select('id')
           .in('city_id', cityIds)
-          .eq('is_active', true);
+          .eq('is_active', true)
+          .eq('is_likely_dental', true);
 
         eligibleClinicIds = new Set((clinics || []).map((clinic) => clinic.id));
 
@@ -337,7 +339,8 @@ function useSearchResults(
             city:cities(name, slug, state_id, state:states(name, slug)),
             area:areas(name, slug)
           `)
-          .eq('is_active', true);
+          .eq('is_active', true)
+          .eq('is_likely_dental', true);
 
         if (clinicIdArray && clinicIdArray.length > 0) {
           clinicQuery = clinicQuery.in('id', clinicIdArray);

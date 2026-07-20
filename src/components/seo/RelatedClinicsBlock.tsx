@@ -35,6 +35,7 @@ export function RelatedClinicsBlock({
         .neq("id", clinicId)
         .eq("is_active", true)
         .eq("is_suspended", false)
+        .eq("is_likely_dental", true)
         .order("rating", { ascending: false })
         .limit(limit);
 

@@ -8,7 +8,7 @@ class MyDocument extends Document {
 
   render() {
     return (
-      <Html lang="en">
+      <Html lang="en-AE">
         <Head>
           <link rel="icon" type="image/png" href="/favicon.png?v=5" />
           <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png?v=5" />
@@ -25,6 +25,10 @@ class MyDocument extends Document {
 
           {/* Critical preconnects for LCP */}
           <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+          {/* Two Supabase storage hosts appear in live clinic image URLs:
+              apztvwpogywvounohqtk (current) and eneuthbghipsdvsqilmb (legacy
+              rows not yet migrated). Prefetch both until data is consolidated. */}
+          <link rel="dns-prefetch" href="https://apztvwpogywvounohqtk.supabase.co" />
           <link rel="dns-prefetch" href="https://eneuthbghipsdvsqilmb.supabase.co" />
 
           {/* Base Organization Schema */}

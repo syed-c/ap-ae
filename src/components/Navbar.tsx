@@ -33,7 +33,7 @@ export function Navbar() {
             24/7 Dental Emergency hotline: {PHONE_NUMBER}
           </a>
           <div className="flex items-center gap-4 text-xs text-zinc-400">
-            <span className="hover:text-zinc-200 transition-colors cursor-default">Trusted by 200,000+ UAE residents</span>
+            <span className="hover:text-zinc-200 transition-colors cursor-default">Dental clinics across all 7 Emirates</span>
             <span className="opacity-50">|</span>
             <button className="flex items-center gap-1 hover:text-zinc-200 transition-colors">
               <Languages className="h-3 w-3" />

@@ -149,6 +149,7 @@ export const getStaticProps: GetStaticProps<StateServiceRouteProps> = async ({ p
         `)
         .in('city_id', cityIds)
         .eq('is_active', true)
+        .eq('is_likely_dental', true)
         .order('rating', { ascending: false }),
       supabase
         .from('clinic_treatments')

@@ -43,6 +43,38 @@ const HomeV2 = () => {
   const { data: seoContent } = useSeoPageContent("/");
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
+  // Real Google reviews of listed clinics - never replace with invented quotes
+  // (see CURRENT_AUDIT.md -2b for why this matters).
+  const { data: realTestimonials } = useQuery({
+    queryKey: ['homev2-testimonials'],
+    queryFn: async () => {
+      const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString();
+      const { data } = await supabase
+        .from('google_reviews')
+        .select('author_name, text_content, rating, clinics(name, city:cities(name))')
+        .eq('rating', 5)
+        .eq('hipaa_flagged', false)
+        .not('text_content', 'is', null)
+        .gte('review_time', oneYearAgo)
+        .order('review_time', { ascending: false })
+        .limit(60);
+      return (data || [])
+        .filter((r: any) => r.text_content && r.text_content.length >= 60 && r.text_content.length <= 280 && r.author_name)
+        .slice(0, 6)
+        .map((r: any) => {
+          const clinic = Array.isArray(r.clinics) ? r.clinics[0] : r.clinics;
+          const city = clinic?.city ? (Array.isArray(clinic.city) ? clinic.city[0] : clinic.city) : null;
+          return {
+            name: r.author_name as string,
+            location: city?.name ? `via Google, ${city.name}` : 'via Google',
+            text: r.text_content as string,
+            rating: r.rating as number,
+          };
+        });
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
   const { data: dubaiAreas } = useQuery({
     queryKey: ['dubai-areas-homepage'],
     queryFn: async () => {
@@ -73,27 +105,7 @@ const HomeV2 = () => {
     staleTime: 1000 * 60 * 30,
   });
 
-  const testimonials = [
-    {
-      name: "Fatima A.",
-      location: "Dubai Marina, Dubai",
-      text: "Found an amazing cosmetic dentist in JLT within my budget. The whole process took less than 5 minutes!",
-      rating: 5,
-    },
-    {
-      name: "Ahmed R.",
-      location: "Al Majaz, Sharjah",
-      text: "I was nervous about finding a new dentist after moving to Sharjah. AppointPanda made it so easy to compare clinics.",
-      rating: 5,
-    },
-    {
-      name: "Sarah K.",
-      location: "Khalifa City, Abu Dhabi",
-      text: "The reviews and AED pricing were super helpful. Found a great pediatric dentist for my kids!",
-      rating: 5,
-    },
-  ];
-
+  const testimonials = realTestimonials && realTestimonials.length > 0 ? realTestimonials : [];
   const popularTreatments = treatments?.slice(0, 8) || [];
 
   const carouselProfiles = profiles?.map(p => ({
@@ -151,8 +163,8 @@ const HomeV2 = () => {
           {/* Trust indicators */}
           <motion.div {...fadeUp} transition={{ delay: 0.25 }} className="flex flex-wrap items-center justify-center gap-4 md:gap-6 mb-8">
             {[
-              { icon: Shield, text: "DHA Verified" },
-              { icon: Star, text: "4.9 Rating" },
+              { icon: Shield, text: "Verification badges on profiles" },
+              { icon: Star, text: "Real patient reviews" },
               { icon: Building2, text: `${realCounts?.clinics?.toLocaleString() || '500+'} Clinics` },
               { icon: Timer, text: "60s Booking" },
             ].map((item, i) => (
@@ -255,9 +267,9 @@ const HomeV2 = () => {
               </h2>
               <div className="space-y-4">
                 {[
-                  { icon: Shield, title: "DHA & MOHAP Verified", desc: "Every listed clinic is verified against UAE health authority standards." },
+                  { icon: Shield, title: "Verification Status on Every Profile", desc: "Each clinic profile shows a verification status, from newly listed to fully verified — check the badge before booking." },
                   { icon: Star, title: "Real Patient Reviews", desc: "Authentic, unfiltered reviews from actual patients across UAE." },
-                  { icon: Heart, title: "Transparent AED Pricing", desc: "Clear cost ranges in AED for every dental service." },
+                  { icon: Heart, title: "AED Pricing Where Available", desc: "Cost estimates in AED where clinics have provided them — always confirm final pricing with the clinic." },
                   { icon: Timer, title: "Book in 60 Seconds", desc: "No phone calls needed. Schedule your appointment instantly online." },
                 ].map((item, i) => (
                   <motion.div
@@ -381,7 +393,8 @@ const HomeV2 = () => {
         </section>
       )}
 
-      {/* ══════════ TESTIMONIALS ══════════ */}
+      {/* ══════════ TESTIMONIALS - real Google reviews, not invented quotes ══════════ */}
+      {testimonials.length > 0 && (
       <section className="py-16 md:py-20 bg-muted/30">
         <div className="container px-4">
           <motion.div {...fadeUp} className="text-center mb-10">
@@ -392,14 +405,14 @@ const HomeV2 = () => {
             <AnimatePresence mode="wait">
               <motion.div key={activeTestimonial} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="bg-card border border-border rounded-2xl p-6 md:p-8">
                 <Quote className="h-8 w-8 text-primary/20 mb-4" />
-                <p className="text-base md:text-lg text-foreground leading-relaxed mb-5">"{testimonials[activeTestimonial].text}"</p>
+                <p className="text-base md:text-lg text-foreground leading-relaxed mb-5">"{testimonials[activeTestimonial % testimonials.length].text}"</p>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-bold text-foreground">{testimonials[activeTestimonial].name}</p>
-                    <p className="text-xs text-muted-foreground">{testimonials[activeTestimonial].location}</p>
+                    <p className="text-sm font-bold text-foreground">{testimonials[activeTestimonial % testimonials.length].name}</p>
+                    <p className="text-xs text-muted-foreground">{testimonials[activeTestimonial % testimonials.length].location}</p>
                   </div>
                   <div className="flex gap-0.5">
-                    {Array.from({ length: testimonials[activeTestimonial].rating }).map((_, i) => (
+                    {Array.from({ length: testimonials[activeTestimonial % testimonials.length].rating }).map((_, i) => (
                       <Star key={i} className="h-4 w-4 text-gold fill-gold" />
                     ))}
                   </div>
@@ -414,6 +427,7 @@ const HomeV2 = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* ══════════ DENTIST CAROUSEL ══════════ */}
       {carouselProfiles.length > 0 && (
@@ -483,10 +497,10 @@ const HomeV2 = () => {
             </motion.div>
             <div className="prose prose-sm max-w-none text-muted-foreground space-y-3">
               <p>
-                AppointPanda is the UAE's leading dental directory platform, built to help patients across Dubai, Sharjah, Abu Dhabi, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain find trusted dental professionals. Whether you need teeth cleaning, implants, Invisalign, or emergency care, we connect you with verified clinics — all with transparent AED pricing and real patient reviews.
+                AppointPanda is a UAE dental directory platform, built to help patients across Dubai, Sharjah, Abu Dhabi, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain find dental professionals. Whether you need teeth cleaning, implants, Invisalign, or emergency care, browse clinic profiles — each showing its own verification status — with AED pricing where available and real patient reviews.
               </p>
               <p>
-                Every clinic listed is verified against DHA, DoH, and MOHAP standards. Our platform covers {realCounts?.clinics?.toLocaleString() || '500'}+ dental practices offering {treatments?.length || '15'}+ services including cosmetic dentistry, orthodontics, pediatric care, and oral surgery.
+                Our platform lists {realCounts?.clinics?.toLocaleString() || '500'}+ dental practices offering {treatments?.length || '15'}+ services including cosmetic dentistry, orthodontics, pediatric care, and oral surgery. Check each profile's verification badge rather than assuming a uniform verification level across listings.
               </p>
             </div>
             <div className="mt-6 grid sm:grid-cols-3 gap-3">
@@ -519,7 +533,7 @@ const HomeV2 = () => {
               {[
                 { q: "How do I find a dentist near me in Dubai?", a: "Use AppointPanda's search to select your emirate and area. Browse verified clinic profiles with real patient reviews, AED pricing, and available services." },
                 { q: "Is AppointPanda free for patients?", a: "Yes, AppointPanda is completely free for patients. Search, compare, and book appointments across all seven UAE Emirates at no cost." },
-                { q: "Are the dentists on AppointPanda verified?", a: "All clinics are verified against DHA, DoH, and MOHAP standards. Look for the verified badge on clinic profiles." },
+                { q: "Are the dentists on AppointPanda verified?", a: "Each clinic profile shows its own verification status, from newly listed to fully verified. Look for the verification badge on a specific profile rather than assuming all listings carry the same status." },
                 { q: "Can I search by dental insurance provider?", a: "Yes. Use our insurance search to find dentists who accept your plan — including Daman, Oman Insurance, AXA, and MetLife." },
                 { q: "How accurate are the prices shown?", a: "Prices shown are estimated ranges in AED. Final costs require an in-person consultation. We encourage confirming pricing directly with your chosen clinic." },
               ].map((faq, i) => (

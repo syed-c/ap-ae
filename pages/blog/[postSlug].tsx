@@ -118,7 +118,8 @@ const supabase = createServerSupabaseAdmin();
         
         const { data: posts } = await supabase
             .from('blog_posts')
-            .select('slug');
+            .select('slug')
+            .eq('status', 'published');
         
         const paths = (posts || []).map((post) => ({
             params: { postSlug: post.slug }

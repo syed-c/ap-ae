@@ -201,6 +201,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .select('rating, review_count')
             .in('city_id', stateCityIds)
             .eq('is_active', true)
+            .eq('is_likely_dental', true)
             .not('rating', 'is', null)
         : { data: [] };
 
@@ -223,6 +224,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             .select('name, slug, rating, review_count')
             .in('city_id', stateCityIds)
             .eq('is_active', true)
+            .eq('is_likely_dental', true)
             .not('rating', 'is', null)
             .order('rating', { ascending: false })
             .order('review_count', { ascending: false })
@@ -242,10 +244,11 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
             `)
             .in('city_id', stateCityIds)
             .eq('is_active', true)
+            .eq('is_likely_dental', true)
             .order('rating', { ascending: false })
             .order('review_count', { ascending: false })
         : { data: [] };
-    
+
     if (allStateClinics.data) {
         clinicProfilesProp = allStateClinics.data;
     }

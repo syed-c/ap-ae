@@ -18,11 +18,11 @@ interface SearchPageSSRProps {
       title?: string;
       rating: number;
       reviewCount: number;
-      image?: string;
+      image?: string | null;
       isVerified: boolean;
       clinicName?: string;
-      emirateName?: string;
-      areaName?: string;
+      emirateName?: string | null;
+      areaName?: string | null;
       languages?: string[];
       gender?: string;
       specializations?: string[];
@@ -45,6 +45,7 @@ const SearchPageWithSEO = ({ emirates, treatments, insurances, initialResults, s
         <meta property="og:description" content={seoData.description} />
         <meta property="og:image" content={`${BASE_URL}/og-image.png`} />
         <meta property="og:site_name" content="AppointPanda" />
+        <meta property="og:locale" content="en_AE" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:url" content={`${BASE_URL}${seoData.canonical}`} />
         <meta name="twitter:title" content={seoData.title.includes('AppointPanda') ? seoData.title : `${seoData.title} | AppointPanda`} />
@@ -113,6 +114,7 @@ export const getServerSideProps: GetServerSideProps<SearchPageSSRProps> = async 
         `)
         .eq('is_active', true)
         .eq('is_duplicate', false)
+        .eq('is_likely_dental', true)
         .order('rating', { ascending: false })
         .limit(24),
     ]);
@@ -130,11 +132,11 @@ export const getServerSideProps: GetServerSideProps<SearchPageSSRProps> = async 
         title: 'Dental Clinic',
         rating: Number(clinic.rating) || 0,
         reviewCount: clinic.review_count || 0,
-        image: clinic.cover_image_url || undefined,
+        image: clinic.cover_image_url || null,
         isVerified: clinic.claim_status === 'claimed' && clinic.verification_status === 'verified',
         clinicName: clinic.name,
-        emirateName: clinic.city?.state?.name,
-        areaName: clinic.area?.name || clinic.city?.name,
+        emirateName: clinic.city?.state?.name || null,
+        areaName: clinic.area?.name || clinic.city?.name || null,
       })),
       total: topClinicsRes.count || (topClinicsRes.data?.length || 0),
     };

@@ -289,6 +289,7 @@ const [stateData, cityData, seoContent, pageContent, treatmentsData] = await Pro
             .select('rating, review_count')
             .or(clinicLocationFilter)
             .eq('is_active', true)
+            .eq('is_likely_dental', true)
             .not('rating', 'is', null)
             .then(r => r.data);
         
@@ -308,6 +309,7 @@ const [stateData, cityData, seoContent, pageContent, treatmentsData] = await Pro
             .select('name, slug, rating, review_count')
             .or(clinicLocationFilter)
             .eq('is_active', true)
+            .eq('is_likely_dental', true)
             .not('rating', 'is', null)
             .order('rating', { ascending: false })
             .order('review_count', { ascending: false })
@@ -325,9 +327,10 @@ const [stateData, cityData, seoContent, pageContent, treatmentsData] = await Pro
             `)
             .or(clinicLocationFilter)
             .eq('is_active', true)
+            .eq('is_likely_dental', true)
             .order('rating', { ascending: false })
             .order('review_count', { ascending: false });
-        
+
         if (allCityClinics.data) {
             clinicProfilesProp = allCityClinics.data;
         }

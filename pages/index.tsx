@@ -2,6 +2,7 @@ import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import IndexPage from '@/pages/Index';
 import { createServerSupabaseAdmin } from '@/lib/supabaseServer';
+import { faqs } from '@/lib/site-data';
 
 const BASE_URL = 'https://www.appointpanda.ae';
 
@@ -23,6 +24,7 @@ export interface HomePageData {
   statesData: { id: string; name: string; slug: string; clinicCount: number }[];
   treatmentsData: { name: string; slug: string; count: number }[];
   citiesData: { id: string; name: string; slug: string; stateId: string }[];
+  testimonials: { quote: string; authorName: string; clinicName: string | null; rating: number }[];
 }
 
 export default function IndexPageWithSEO({ pageData }: { pageData: HomePageData }) {
@@ -42,12 +44,29 @@ export default function IndexPageWithSEO({ pageData }: { pageData: HomePageData 
     }
   };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map((faq) => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a,
+      },
+    })),
+  };
+
   return (
     <>
       <Head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       </Head>
       <IndexPage pageData={pageData} />
@@ -89,6 +108,18 @@ export const getStaticProps: GetStaticProps = async () => {
       .or(dentalKeywords.map(k => 'name.ilike.%' + k + '%').join(','))
       .order('total_reviews', { ascending: false })
       .limit(12);
+
+    // Real testimonials sourced from actual Google reviews on listed clinics -
+    // do not replace this with invented quotes (see CURRENT_AUDIT.md -2b).
+    const { data: reviewRows } = await supabase
+      .from('google_reviews')
+      .select('author_name, text_content, rating, clinic_id, clinics(name)')
+      .eq('rating', 5)
+      .eq('hipaa_flagged', false)
+      .not('text_content', 'is', null)
+      .gte('review_time', new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString())
+      .order('review_time', { ascending: false })
+      .limit(60);
 
     // Build city->state map
     const cityStateMap: Record<string, string> = {};
@@ -158,6 +189,17 @@ export const getStaticProps: GetStaticProps = async () => {
       stateId: c.state_id,
     }));
 
+    // Pick reasonably-sized, real quotes for display - skip one-liners and essays
+    const testimonials = (reviewRows || [])
+      .filter((r: any) => r.text_content && r.text_content.length >= 60 && r.text_content.length <= 280 && r.author_name)
+      .slice(0, 6)
+      .map((r: any) => ({
+        quote: r.text_content as string,
+        authorName: r.author_name as string,
+        clinicName: (Array.isArray(r.clinics) ? r.clinics[0]?.name : r.clinics?.name) || null,
+        rating: r.rating as number,
+      }));
+
     const pageData: HomePageData = {
       clinicCount: totalClinics || 0,
       reviewCount: totalReviews || 0,
@@ -167,6 +209,7 @@ export const getStaticProps: GetStaticProps = async () => {
       statesData,
       treatmentsData,
       citiesData,
+      testimonials,
     };
 
     return {

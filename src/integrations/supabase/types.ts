@@ -1633,6 +1633,7 @@ export type Database = {
           is_active_listing: boolean | null
           is_duplicate: boolean
           is_featured: boolean
+          is_likely_dental: boolean
           is_suspended: boolean
           latitude: number | null
           location_pending_approval: boolean
@@ -1681,6 +1682,7 @@ export type Database = {
           is_active_listing?: boolean | null
           is_duplicate?: boolean
           is_featured?: boolean
+          is_likely_dental?: boolean
           is_suspended?: boolean
           latitude?: number | null
           location_pending_approval?: boolean
@@ -1729,6 +1731,7 @@ export type Database = {
           is_active_listing?: boolean | null
           is_duplicate?: boolean
           is_featured?: boolean
+          is_likely_dental?: boolean
           is_suspended?: boolean
           latitude?: number | null
           location_pending_approval?: boolean
@@ -2851,6 +2854,8 @@ export type Database = {
           comment: string | null
           created_at: string
           google_review_id: string | null
+          hipaa_flag_reason: string | null
+          hipaa_flagged: boolean | null
           id: string
           rating: number | null
           reply: string | null
@@ -2870,6 +2875,8 @@ export type Database = {
           comment?: string | null
           created_at?: string
           google_review_id?: string | null
+          hipaa_flag_reason?: string | null
+          hipaa_flagged?: boolean | null
           id?: string
           rating?: number | null
           reply?: string | null
@@ -2889,6 +2896,8 @@ export type Database = {
           comment?: string | null
           created_at?: string
           google_review_id?: string | null
+          hipaa_flag_reason?: string | null
+          hipaa_flagged?: boolean | null
           id?: string
           rating?: number | null
           reply?: string | null

@@ -31,7 +31,7 @@ const FAQPage = () => {
       faqs: [
         {
           q: "How do I find a DHA-licensed dentist in Dubai?",
-          a: "Use our search feature to filter by emirate, area, or treatment type. All dentists on AppointPanda are licensed by DHA (Dubai), DOH (Abu Dhabi), or MOHAP. Dentists with the 'Verified' badge have completed our additional credential verification."
+          a: "Use our search feature to filter by emirate, area, or treatment type. Dental practices in the UAE are required to hold DHA (Dubai), DOH (Abu Dhabi), or MOHAP licensing to operate. Profiles with the 'Verified' badge have completed AppointPanda's additional credential verification — check a profile's badge for its current status."
         },
         {
           q: "What is the average cost of dental treatment in Dubai (AED)?",
