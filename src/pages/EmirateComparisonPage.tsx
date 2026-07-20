@@ -167,8 +167,7 @@ const EmirateComparisonPage = ({ faqsProp }: EmirateComparisonPageProps) => {
                   </div>
                   <p className="text-muted-foreground leading-relaxed">
                     <strong className="text-primary">{cheaperEmirate}</strong> is approximately <strong>{savingsPercent}%</strong> more affordable for {treatmentName.toLowerCase()}. 
-                    You could save around <strong className="text-primary">AED {Math.abs(priceDiff).toLocaleString()}</strong> on average by choosing {cheaperEmirate}. 
-                    Both emirates have DHA/DOH/MOHAP licensed clinics ensuring quality standards.
+                    You could save around <strong className="text-primary">AED {Math.abs(priceDiff).toLocaleString()}</strong> on average by choosing {cheaperEmirate}, based on listed price estimates — confirm final pricing directly with the clinic.
                   </p>
                 </div>
               )}

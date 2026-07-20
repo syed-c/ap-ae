@@ -151,8 +151,8 @@ const HomeV2 = () => {
           {/* Trust indicators */}
           <motion.div {...fadeUp} transition={{ delay: 0.25 }} className="flex flex-wrap items-center justify-center gap-4 md:gap-6 mb-8">
             {[
-              { icon: Shield, text: "DHA Verified" },
-              { icon: Star, text: "4.9 Rating" },
+              { icon: Shield, text: "Verification badges on profiles" },
+              { icon: Star, text: "Real patient reviews" },
               { icon: Building2, text: `${realCounts?.clinics?.toLocaleString() || '500+'} Clinics` },
               { icon: Timer, text: "60s Booking" },
             ].map((item, i) => (
@@ -255,9 +255,9 @@ const HomeV2 = () => {
               </h2>
               <div className="space-y-4">
                 {[
-                  { icon: Shield, title: "DHA & MOHAP Verified", desc: "Every listed clinic is verified against UAE health authority standards." },
+                  { icon: Shield, title: "Verification Status on Every Profile", desc: "Each clinic profile shows a verification status, from newly listed to fully verified — check the badge before booking." },
                   { icon: Star, title: "Real Patient Reviews", desc: "Authentic, unfiltered reviews from actual patients across UAE." },
-                  { icon: Heart, title: "Transparent AED Pricing", desc: "Clear cost ranges in AED for every dental service." },
+                  { icon: Heart, title: "AED Pricing Where Available", desc: "Cost estimates in AED where clinics have provided them — always confirm final pricing with the clinic." },
                   { icon: Timer, title: "Book in 60 Seconds", desc: "No phone calls needed. Schedule your appointment instantly online." },
                 ].map((item, i) => (
                   <motion.div
@@ -483,10 +483,10 @@ const HomeV2 = () => {
             </motion.div>
             <div className="prose prose-sm max-w-none text-muted-foreground space-y-3">
               <p>
-                AppointPanda is the UAE's leading dental directory platform, built to help patients across Dubai, Sharjah, Abu Dhabi, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain find trusted dental professionals. Whether you need teeth cleaning, implants, Invisalign, or emergency care, we connect you with verified clinics — all with transparent AED pricing and real patient reviews.
+                AppointPanda is a UAE dental directory platform, built to help patients across Dubai, Sharjah, Abu Dhabi, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain find dental professionals. Whether you need teeth cleaning, implants, Invisalign, or emergency care, browse clinic profiles — each showing its own verification status — with AED pricing where available and real patient reviews.
               </p>
               <p>
-                Every clinic listed is verified against DHA, DoH, and MOHAP standards. Our platform covers {realCounts?.clinics?.toLocaleString() || '500'}+ dental practices offering {treatments?.length || '15'}+ services including cosmetic dentistry, orthodontics, pediatric care, and oral surgery.
+                Our platform lists {realCounts?.clinics?.toLocaleString() || '500'}+ dental practices offering {treatments?.length || '15'}+ services including cosmetic dentistry, orthodontics, pediatric care, and oral surgery. Check each profile's verification badge rather than assuming a uniform verification level across listings.
               </p>
             </div>
             <div className="mt-6 grid sm:grid-cols-3 gap-3">
@@ -519,7 +519,7 @@ const HomeV2 = () => {
               {[
                 { q: "How do I find a dentist near me in Dubai?", a: "Use AppointPanda's search to select your emirate and area. Browse verified clinic profiles with real patient reviews, AED pricing, and available services." },
                 { q: "Is AppointPanda free for patients?", a: "Yes, AppointPanda is completely free for patients. Search, compare, and book appointments across all seven UAE Emirates at no cost." },
-                { q: "Are the dentists on AppointPanda verified?", a: "All clinics are verified against DHA, DoH, and MOHAP standards. Look for the verified badge on clinic profiles." },
+                { q: "Are the dentists on AppointPanda verified?", a: "Each clinic profile shows its own verification status, from newly listed to fully verified. Look for the verification badge on a specific profile rather than assuming all listings carry the same status." },
                 { q: "Can I search by dental insurance provider?", a: "Yes. Use our insurance search to find dentists who accept your plan — including Daman, Oman Insurance, AXA, and MetLife." },
                 { q: "How accurate are the prices shown?", a: "Prices shown are estimated ranges in AED. Final costs require an in-person consultation. We encourage confirming pricing directly with your chosen clinic." },
               ].map((faq, i) => (

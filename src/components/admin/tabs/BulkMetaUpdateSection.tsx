@@ -30,30 +30,34 @@ interface BulkMetaConfig {
 // Default templates for each page type - optimized for CTR (both mobile & desktop)
 // Desktop shows ~155-160 chars, mobile ~120 chars - we optimize for both
 
+// IMPORTANT: Do not add fabricated numbers (review counts, ratings, clinic counts) or
+// blanket verification/licensing claims here - these get written directly into live
+// meta_description fields. State only what's actually true: clinics/dentists carry a
+// per-profile verification status, and prices are estimates to confirm with the clinic.
 const DEFAULT_TEMPLATES: Record<string, { title: string; description: string }> = {
   "state": {
-    title: "Best Dentists in {{state}}, UAE ({{year}}) — Book Online Today",
-    description: "Compare 6,600+ verified DHA-licensed dentists across {{state}}, UAE. Read 50,000+ real patient reviews, see transparent AED pricing for implants, braces, veneers. Book appointments instantly with top-rated dental professionals. Your perfect smile starts here."
+    title: "Dentists in {{state}}, UAE ({{year}}) — Compare & Book Online",
+    description: "Browse dental clinics and dentists across {{state}}, UAE. Compare AED pricing where available, read real patient reviews, and check each profile's verification status. Book your appointment online."
   },
   "city": {
-    title: "Best Dentists in {{city}}, {{state}} ({{year}}) — Compare 200+ Clinics",
-    description: "Find the best dentists in {{city}}, {{state}}. Compare 200+ verified dental clinics with 4.9+ star ratings. Read real patient reviews, check AED prices for implants, whitening, invisalign. Book your appointment online in minutes. Free consultation available."
+    title: "Dentists in {{city}}, {{state}} ({{year}}) — Compare & Book Online",
+    description: "Find dentists in {{city}}, {{state}}. Compare clinics, read real patient reviews, and check AED pricing where available for implants, whitening, and Invisalign. Book your appointment online."
   },
   "service": {
-    title: "{{service}} in UAE ({{year}}) — Find Top Dentists & Book Online",
-    description: "Get {{service}} treatment in UAE. Compare 200+ verified specialists across Dubai, Abu Dhabi, Sharjah. Read patient reviews, see transparent AED pricing, check dentist credentials (BDS, MDS, DHA-licensed). Book your appointment instantly. Most clinics offer free consultation."
+    title: "{{service}} in UAE ({{year}}) — Find Dentists & Book Online",
+    description: "Get {{service}} treatment in the UAE. Compare specialists across Dubai, Abu Dhabi, Sharjah and other emirates. Read patient reviews and see AED pricing where clinics have provided it. Book your appointment online."
   },
   "service-location": {
-    title: "{{service}} in {{city}} ({{year}}) — Find Top-Rated Dentists Near You",
-    description: "Need {{service}} in {{city}}? Compare 50+ verified specialists near you. Read patient reviews, check ratings (4.9+ stars), see transparent AED pricing. Book your appointment in minutes. All dentists are DHA/DOH-licensed. Free consultation available."
+    title: "{{service}} in {{city}} ({{year}}) — Find Dentists Near You",
+    description: "Need {{service}} in {{city}}? Compare nearby specialists, read patient reviews, and see AED pricing where available. Check each profile's verification status before booking."
   },
   "clinic": {
-    title: "{{clinic}} - Top-Rated Dental Clinic in {{city}} ({{year}})",
-    description: "Book at {{clinic}} — one of the top-rated dental clinics in {{city}}, {{state}}. Our 500+ verified patient reviews show 4.9+ star satisfaction. We offer transparent AED pricing, modern equipment, and DHA-licensed dentists. Book your visit online in 30 seconds."
+    title: "{{clinic}} - Dental Clinic in {{city}} ({{year}})",
+    description: "View {{clinic}} in {{city}}, {{state}} — read patient reviews, check the clinic's verification status, and see AED pricing where available. Book your visit online."
   },
   "dentist": {
     title: "{{dentist}} - Dentist in {{city}} ({{year}}) — Book Appointment",
-    description: "Book an appointment with {{dentist}} — a highly rated dentist in {{city}}, {{state}}. With 100+ verified patient reviews and 4.9+ stars, specializing in modern dental techniques. DHA-licensed. Book your appointment instantly."
+    description: "View {{dentist}}'s profile — a dentist in {{city}}, {{state}}. Read patient reviews, check the profile's verification status, and book your appointment online."
   }
 };
 

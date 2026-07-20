@@ -1,7 +1,41 @@
 # AppointPanda — Current-State Audit (Consolidated)
 
-**Date:** 2026-07-19
+**Date:** 2026-07-19 (updated same day — §-1 added: CI diagnosis, build verification, and a systemic false-claims sweep across live templates)
 **Scope:** Reconciles nine prior audit/fix reports in this repo against the actual current code, verifies which of their findings are still real, and fixes the safe, code-level issues found in the process. Section 0 adds a real audit against the live production database (`eneuthbghipsdvsqilmb.supabase.co`, confirmed correct — see §1), plus the specific data fixes and a dental-relevance search filter implemented after checking each one with the site owner (§0.7). This is **not** a full pass through the 50-section rebuild brief — see "What this session did not cover" at the end.
+
+---
+
+## -1. Build/CI diagnosis and a systemic content-integrity sweep
+
+### -1.1 "Push not going through GitHub" — root cause found
+
+`.github/workflows/ci.yml` only triggers `on: push` to `main`/`master`, or `on: pull_request`. Every push this session went straight to the feature branch with no PR open, so **CI has never run once** (0 workflow runs total, confirmed via the GitHub Actions API). This isn't a failure — it's simply never been triggered. Opening a PR (§11) fixes this by triggering the `pull_request` event.
+
+To catch real errors independent of CI, ran the actual production build twice locally with live DB credentials (`npm run build`, i.e. `generate:sitemaps && next build`): **both succeeded, 1,483 static pages generated, zero errors.** The codebase itself is not broken.
+
+### -1.2 CRITICAL — Fabricated "DHA/MOHAP verified" and fake statistics were live across multiple real page templates
+
+While auditing on-page content for SEO/AI-search readiness, found the same false-claim pattern already fixed once in the homepage FAQ (see §2) repeated across **at least 7 more live-rendered files** — not stale reports, actual components serving real traffic:
+
+| File | Live route | What was wrong |
+|---|---|---|
+| `src/pages/ServicePage.tsx` | `/services/[serviceSlug]` | Fallback FAQ: "All dentists are DHA/DOH/MOHAP certified." Fallback "Clinical References" footer: "Content reviewed by licensed dental professionals" (no actual reviewer, no review process behind it) |
+| `src/pages/ServiceLocationPage.tsx` | `/[state]/[city]/[service]` | Fallback FAQ: "All dentists are licensed and verified." A hero stat block showing a **hardcoded "4.9/5" rating on every page regardless of real data**, and a "Visible specialists" stat computed as `profiles.length × 2` — a real number arbitrarily doubled. A "Medical Verification" section claiming a fabricated "48-point diagnostic audit" and "100% Vetted Units". Marketing copy claiming a "curated network" of "hand-select"ed practices (the real data is an unfiltered GMB scrape, not manual curation) |
+| `src/pages/HomeV2.tsx` | `/home-v2` (live SSG route) | Static "DHA Verified" and "4.9 Rating" trust badges with no backing data. "Every listed clinic is verified against UAE health authority standards." Same false claim repeated in an FAQ answer |
+| `src/pages/BlogPostPage.tsx` | `/blog/[postSlug]` | Footer on every post: "Content verified by licensed dental professionals" |
+| `src/pages/EmirateComparisonPage.tsx` | `/compare/[comparison]` | "Both emirates have DHA/DOH/MOHAP licensed clinics ensuring quality standards" |
+| `src/pages/FAQPage.tsx` | `/faq` | "All dentists on AppointPanda are licensed by DHA (Dubai), DOH (Abu Dhabi), or MOHAP" |
+| `pages/[stateSlug]/[citySlug]/[serviceSlug].tsx` | service-location pages | Dead code (defined, never referenced): a fallback meta description with "Compare 50+ verified specialists... ratings (4.9+ stars)... All dentists are DHA/DOH-licensed." Removed since unused, but flagging because... |
+
+**...that exact fabricated text also exists as live templates in two more places, not yet fixed:**
+
+- `src/lib/desktopMeta.ts` — a whole file of meta-description templates per page type, all with invented numbers: *"Compare 6,600+ verified DHA-licensed dentists... Read 50,000+ real patient reviews"* (real numbers: 2 dentists, 5,671 reviews), *"500+ verified patient reviews show 4.9+ star satisfaction"* per clinic, *"100+ verified patient reviews and 4.9+ stars"* per dentist. **Confirmed not imported anywhere** — dead code, zero live risk today, but a landmine if wired in later.
+- `src/components/admin/tabs/BulkMetaUpdateSection.tsx` — an **admin tool** with the identical fabricated templates, meant to bulk-write these into `seo_pages`/`page_content` meta descriptions. Checked the live database directly: none of these specific fabricated numbers ("6,600+", "50,000+", "4.9+") appear in any live `meta_description` — **this tool has apparently never been run against production**, or if it has, not with these exact strings. Recommend either fixing its templates to match the honest pattern used elsewhere in this fix, or removing it, before anyone runs it.
+- `src/components/seo/LocationSEOContent.tsx` and `src/components/seo/QuickAnswer.tsx` also contain the same pattern (including one that literally says *"licensed by the {stateName} Board of Dental Examiners"* — a US-style regulatory body name, not a real UAE authority, suggesting leftover copy from an unlocalized template). **Confirmed not imported by any live page component** — dead code, not fixed, but worth cleaning up or deleting so nobody wires them in as-is.
+
+All of the confirmed-live instances (the 7-file table above) were rewritten to describe what's actually true: a tiered, per-profile verification badge system (real, confirmed in the data), prices as clinic-supplied estimates to confirm before booking, and no blanket regulatory-verification or fabricated review/rating claims. Verified with a full rebuild afterward (1,483 pages, zero errors).
+
+**Why this matters more than a typical copy fix:** this is exactly the kind of content AI assistants and AI Overviews extract and repeat verbatim (it's FAQ-formatted, some of it was wrapped in `FAQPage` JSON-LD), and it directly touches medical/regulatory claims about a healthcare-adjacent platform — squarely the brief's own non-negotiable rules (`Do not invent licences`, `Do not claim work is complete`, `Do not promise treatment outcomes`, `Do not claim direct regulator integration unless one exists`).
 
 ---
 

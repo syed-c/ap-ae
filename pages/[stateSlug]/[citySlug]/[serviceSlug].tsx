@@ -41,8 +41,6 @@ const ServiceLocationPageWithSEO = ({ stateSlug, citySlug, serviceSlug, stateDat
     const treatmentName = treatmentData?.name || serviceSlug;
     const cityName = cityData?.name || citySlug;
     const stateName = stateData?.name || stateSlug;
-    const fallbackTitle = `${treatmentName} in ${cityName} (2026) — Find Top-Rated Dentists Near You | AppointPanda`;
-    const fallbackDescription = `Need ${treatmentName.toLowerCase()} in ${cityName}? Compare 50+ verified specialists near you. Read patient reviews, check ratings (4.9+ stars), see transparent AED pricing. Book your appointment in minutes. All dentists are DHA/DOH-licensed. Free consultation available.`;
 
     const metaTitle = seoData?.title || `${treatmentName} in ${cityData?.name || citySlug}`;
     const metaDescription = seoData?.description || `Find the best ${treatmentName.toLowerCase()} specialists in ${cityData?.name || citySlug}.`;

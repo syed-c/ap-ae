@@ -186,9 +186,9 @@ const ServiceLocationPage = ({
     : seoDataFromProps?.content ? parseFaqFromContent(seoDataFromProps.content) : [];
 
   const faqs = seoFaqs.length > 0 ? seoFaqs : [
-    { q: `Where can I find ${treatmentName} specialists in ${locationName}?`, a: `We have ${profiles?.length || 0}+ verified specialists in ${locationName}.` },
-    { q: `How much does ${treatmentName} cost in ${locationName}?`, a: `Prices vary by clinic. Book a consultation for accurate quotes.` },
-    { q: `Are the dentists in ${locationName} verified?`, a: `All dentists are licensed and verified.` },
+    { q: `Where can I find ${treatmentName} specialists in ${locationName}?`, a: `We list ${profiles?.length || 0}+ clinic and specialist profiles in ${locationName} — check each profile's verification badge for its current status.` },
+    { q: `How much does ${treatmentName} cost in ${locationName}?`, a: `Prices vary by clinic. Book a consultation for an accurate quote.` },
+    { q: `Are the dentists in ${locationName} verified?`, a: `Every profile shows a verification status, from newly listed to fully verified, based on what's been confirmed during onboarding. Check the badge on a specific profile rather than assuming a uniform verification level.` },
     { q: `How do I book an appointment?`, a: `Click "Book Now" on any profile to book.` },
   ];
 
@@ -232,6 +232,12 @@ const ServiceLocationPage = ({
 
   const cities = allCitiesInEmirate || [];
   const hasProfiles = (profiles || []).length > 0;
+
+  // Real average rating computed from listed profiles - only shown when actual rating data exists
+  const ratedProfiles = (profiles || []).filter((p) => typeof p.rating === 'number' && p.rating > 0);
+  const avgProfileRating = ratedProfiles.length > 0
+    ? (ratedProfiles.reduce((sum, p) => sum + p.rating, 0) / ratedProfiles.length).toFixed(1)
+    : null;
 
   // Dynamic doctor profiles from DB
   const topDoctors = (profiles || []).slice(0, 4).map((profile) => ({
@@ -301,14 +307,14 @@ const ServiceLocationPage = ({
           <div className="mx-auto mt-8 grid max-w-4xl grid-cols-3 gap-3">
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
               <div className="text-2xl font-bold text-white">{profiles?.length || 0}+</div>
-              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-white/50">Verified clinics</div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-white/50">Clinics &amp; specialists</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-              <div className="text-2xl font-bold text-white">{profiles?.length * 2 || 0}+</div>
-              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-white/50">Visible specialists</div>
+              <div className="text-2xl font-bold text-white">7</div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-white/50">Emirates covered</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-              <div className="text-2xl font-bold text-white">4.9/5</div>
+              <div className="text-2xl font-bold text-white">{avgProfileRating ? `${avgProfileRating}/5` : 'New'}</div>
               <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-white/50">Patient rating</div>
             </div>
           </div>
@@ -412,7 +418,7 @@ const ServiceLocationPage = ({
               </div>
             ) : (
               <p className="text-white/60 text-lg leading-relaxed">
-                Located amidst the bustling district of {locationName}, our curated dental network represents the pinnacle of {stateName}'s medical landscape. We hand-select practices that demonstrate not only clinical excellence but also an architectural approach to patient comfort.
+                Located in {locationName}, browse dental clinics and specialists across {stateName} and compare based on ratings, reviews, and the treatments they offer.
               </p>
             )}
             {/* Content You Can Trust - from DB medical verification fields */}
@@ -420,8 +426,8 @@ const ServiceLocationPage = ({
               <div>
                 <h4 className="font-bold text-xl mb-2 text-white">Content You Can Trust</h4>
                 <p className="text-white/60 text-sm">
-                  {expertCredential ? `Content verified by ${expertCredential}. ` : 'Every clinic listing and specialist profile undergoes a rigorous 20-point verification process. '}
-                  {medicalVerified ? 'Medical accuracy verified by our editorial team.' : 'Our editorial team updates pricing and availability daily.'}
+                  {expertCredential ? `Content reviewed with input from ${expertCredential}. ` : 'Clinic and specialist profiles carry a verification status shown on each listing — check the badge on a profile for its current status. '}
+                  {medicalVerified ? 'This page has been checked for medical accuracy by our editorial team.' : 'Prices and details are supplied by clinics and may change — confirm with the clinic before booking.'}
                 </p>
               </div>
             </div>
@@ -666,8 +672,8 @@ const ServiceLocationPage = ({
       {/* 5. Precision in Location */}
       <section className="p-6 bg-[#0f1716] text-white">
         <div className="space-y-6">
-          <span className="inline-flex rounded-full border border-[#73ebdc]/20 bg-[#73ebdc]/8 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#73ebdc]">Medical Verification</span>
-          <h3 className="text-3xl font-bold tracking-tight">Precision in {locationName}</h3>
+          <span className="inline-flex rounded-full border border-[#73ebdc]/20 bg-[#73ebdc]/8 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#73ebdc]">Verification & Trust</span>
+          <h3 className="text-3xl font-bold tracking-tight">Dental Care in {locationName}</h3>
           {pageContent ? (
             <div className="text-white/70 text-sm leading-relaxed whitespace-pre-line">
               {pageContent}
@@ -675,21 +681,21 @@ const ServiceLocationPage = ({
           ) : (
             <>
               <p className="text-white/70 text-sm leading-relaxed">
-                Our {locationName} hub represents the pinnacle of dental curation in {stateName}. Each featured practice undergoes a rigorous 48-point diagnostic audit.
+                Clinic and specialist profiles in {locationName} carry a verification status shown on each listing — check the badge on a profile to see what's been confirmed.
               </p>
               <p className="text-white/70 text-sm leading-relaxed">
-                We ensure that your selection is backed by architectural precision and uncompromising medical standards.
+                Prices and details are supplied by clinics and may change — confirm with the clinic before booking.
               </p>
             </>
           )}
           <div className="grid grid-cols-2 gap-3 pt-2">
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-              <div className="text-xl font-bold">100%</div>
-              <div className="text-[10px] uppercase text-white/50 font-bold">Vetted Units</div>
+              <div className="text-xl font-bold">{profiles?.length || 0}+</div>
+              <div className="text-[10px] uppercase text-white/50 font-bold">Listings in {locationName}</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-              <div className="text-xl font-bold">{profiles?.length || 0}+</div>
-              <div className="text-[10px] uppercase text-white/50 font-bold">Patient Success</div>
+              <div className="text-xl font-bold">7</div>
+              <div className="text-[10px] uppercase text-white/50 font-bold">Emirates Covered</div>
             </div>
           </div>
         </div>

@@ -590,7 +590,7 @@ const BlogPostPage = ({ postSlugProp, postDataProp, seoDataProp, dehydratedState
                     </li>
                   </ul>
                   <p className="text-xs text-muted-foreground mt-3 pt-3 border-t border-border">
-                    Last reviewed: {post.updated_at ? new Date(post.updated_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently'}. Content verified by licensed dental professionals.
+                    Last updated: {post.updated_at ? new Date(post.updated_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently'}. This article is for general information only and is not a substitute for professional dental advice.
                   </p>
                 </div>
               </div>
