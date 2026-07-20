@@ -1,7 +1,24 @@
 # AppointPanda — Current-State Audit (Consolidated)
 
-**Date:** 2026-07-19 (updated same day — §-1 added: CI diagnosis, build verification, and a systemic false-claims sweep across live templates)
+**Date:** 2026-07-19 (updated same day — §-1 added: CI diagnosis, build verification, and a systemic false-claims sweep across live templates; §-2 added: the platform's actual booking/email functionality was found broken)
 **Scope:** Reconciles nine prior audit/fix reports in this repo against the actual current code, verifies which of their findings are still real, and fixes the safe, code-level issues found in the process. Section 0 adds a real audit against the live production database (`eneuthbghipsdvsqilmb.supabase.co`, confirmed correct — see §1), plus the specific data fixes and a dental-relevance search filter implemented after checking each one with the site owner (§0.7). This is **not** a full pass through the 50-section rebuild brief — see "What this session did not cover" at the end.
+
+---
+
+## -2. CRITICAL — Booking confirmation emails have never actually worked
+
+Checked the real `appointments` table: **only 2 appointments have ever been created**, both from real patients (real names, phone numbers), both submitted through the live site (`source: "website"`). Both are still sitting in `status: "pending"` — one since **2026-04-01**, one since **2026-05-07** — roughly 2.5–3.5 months with no confirmation, no follow-up, nothing.
+
+Root cause found: `global_settings.resend` (the email provider config row) shows `"enabled": false` with a stored error from a March 2026 test: `"RESEND_API_KEY not configured. Please add your Resend API key in secrets."` The edge function (`supabase/functions/send-booking-email/index.ts:438`) reads the key via `Deno.env.get('RESEND_API_KEY')` — a Supabase Edge Function secret, entirely separate from the `global_settings` database row. Someone entered a real API key into the admin UI at some point, but it was **never actually set as the Edge Function secret**, so every booking confirmation email has been silently failing since the row shows `enabled: false`.
+
+Verified the key itself still works: called Resend's API directly (`GET /domains`, read-only, no email sent) — the key authenticates successfully and `appointpanda.ae` shows as a **verified sending domain**. The email infrastructure is fully ready; it's one missing secret away from working.
+
+**I cannot fix this myself** — setting an Edge Function secret requires the Supabase CLI (`supabase secrets set`) or Dashboard access, neither of which is available through the database credentials I have. This needs you (or whoever holds Supabase project access) to:
+1. Go to Supabase Dashboard → Edge Functions → Manage secrets (or `supabase secrets set RESEND_API_KEY=<the key already in global_settings.resend.api_key> --project-ref eneuthbghipsdvsqilmb`)
+2. Update `global_settings.resend.enabled` to `true` once confirmed working
+3. Manually follow up with the 2 real patients whose bookings never got a response — their contact details are in the `appointments` table
+
+This is very likely the single highest-impact fix available on the whole platform: it's the difference between the booking flow being completely non-functional in practice (silent failure, real patients being ghosted) versus actually working end-to-end. Did not check SMS/WhatsApp (Twilio) configuration in similar depth — no `twilio`/`sms`/`messaging` key exists in `global_settings` at all, suggesting it was likely never configured either, but worth a follow-up check.
 
 ---
 
