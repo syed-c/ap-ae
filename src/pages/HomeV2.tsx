@@ -43,6 +43,38 @@ const HomeV2 = () => {
   const { data: seoContent } = useSeoPageContent("/");
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
+  // Real Google reviews of listed clinics - never replace with invented quotes
+  // (see CURRENT_AUDIT.md -2b for why this matters).
+  const { data: realTestimonials } = useQuery({
+    queryKey: ['homev2-testimonials'],
+    queryFn: async () => {
+      const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString();
+      const { data } = await supabase
+        .from('google_reviews')
+        .select('author_name, text_content, rating, clinics(name, city:cities(name))')
+        .eq('rating', 5)
+        .eq('hipaa_flagged', false)
+        .not('text_content', 'is', null)
+        .gte('review_time', oneYearAgo)
+        .order('review_time', { ascending: false })
+        .limit(60);
+      return (data || [])
+        .filter((r: any) => r.text_content && r.text_content.length >= 60 && r.text_content.length <= 280 && r.author_name)
+        .slice(0, 6)
+        .map((r: any) => {
+          const clinic = Array.isArray(r.clinics) ? r.clinics[0] : r.clinics;
+          const city = clinic?.city ? (Array.isArray(clinic.city) ? clinic.city[0] : clinic.city) : null;
+          return {
+            name: r.author_name as string,
+            location: city?.name ? `via Google, ${city.name}` : 'via Google',
+            text: r.text_content as string,
+            rating: r.rating as number,
+          };
+        });
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
   const { data: dubaiAreas } = useQuery({
     queryKey: ['dubai-areas-homepage'],
     queryFn: async () => {
@@ -73,27 +105,7 @@ const HomeV2 = () => {
     staleTime: 1000 * 60 * 30,
   });
 
-  const testimonials = [
-    {
-      name: "Fatima A.",
-      location: "Dubai Marina, Dubai",
-      text: "Found an amazing cosmetic dentist in JLT within my budget. The whole process took less than 5 minutes!",
-      rating: 5,
-    },
-    {
-      name: "Ahmed R.",
-      location: "Al Majaz, Sharjah",
-      text: "I was nervous about finding a new dentist after moving to Sharjah. AppointPanda made it so easy to compare clinics.",
-      rating: 5,
-    },
-    {
-      name: "Sarah K.",
-      location: "Khalifa City, Abu Dhabi",
-      text: "The reviews and AED pricing were super helpful. Found a great pediatric dentist for my kids!",
-      rating: 5,
-    },
-  ];
-
+  const testimonials = realTestimonials && realTestimonials.length > 0 ? realTestimonials : [];
   const popularTreatments = treatments?.slice(0, 8) || [];
 
   const carouselProfiles = profiles?.map(p => ({
@@ -381,7 +393,8 @@ const HomeV2 = () => {
         </section>
       )}
 
-      {/* ══════════ TESTIMONIALS ══════════ */}
+      {/* ══════════ TESTIMONIALS - real Google reviews, not invented quotes ══════════ */}
+      {testimonials.length > 0 && (
       <section className="py-16 md:py-20 bg-muted/30">
         <div className="container px-4">
           <motion.div {...fadeUp} className="text-center mb-10">
@@ -392,14 +405,14 @@ const HomeV2 = () => {
             <AnimatePresence mode="wait">
               <motion.div key={activeTestimonial} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="bg-card border border-border rounded-2xl p-6 md:p-8">
                 <Quote className="h-8 w-8 text-primary/20 mb-4" />
-                <p className="text-base md:text-lg text-foreground leading-relaxed mb-5">"{testimonials[activeTestimonial].text}"</p>
+                <p className="text-base md:text-lg text-foreground leading-relaxed mb-5">"{testimonials[activeTestimonial % testimonials.length].text}"</p>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-bold text-foreground">{testimonials[activeTestimonial].name}</p>
-                    <p className="text-xs text-muted-foreground">{testimonials[activeTestimonial].location}</p>
+                    <p className="text-sm font-bold text-foreground">{testimonials[activeTestimonial % testimonials.length].name}</p>
+                    <p className="text-xs text-muted-foreground">{testimonials[activeTestimonial % testimonials.length].location}</p>
                   </div>
                   <div className="flex gap-0.5">
-                    {Array.from({ length: testimonials[activeTestimonial].rating }).map((_, i) => (
+                    {Array.from({ length: testimonials[activeTestimonial % testimonials.length].rating }).map((_, i) => (
                       <Star key={i} className="h-4 w-4 text-gold fill-gold" />
                     ))}
                   </div>
@@ -414,6 +427,7 @@ const HomeV2 = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* ══════════ DENTIST CAROUSEL ══════════ */}
       {carouselProfiles.length > 0 && (

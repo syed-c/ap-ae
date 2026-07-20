@@ -15,7 +15,7 @@ import { PageLayout } from '@/components/layout/PageLayout';
 import { ClinicCard } from '@/components/ClinicCard';
 import {
   SITE_NAME, SITE_DOMAIN, emirates, specialties, insurers,
-  testimonials, blogPosts, faqs, popularSearches,
+  blogPosts, faqs, popularSearches,
 } from '@/lib/site-data';
 import type { HomePageData } from '../../pages/index';
 
@@ -60,6 +60,7 @@ export default function IndexPage({ pageData }: IndexPageProps) {
   const clinicsWithImages = pageData?.clinicsWithImages || 1181;
   const statesData = pageData?.statesData || [];
   const treatmentsData = pageData?.treatmentsData || [];
+  const testimonials = pageData?.testimonials || [];
 
   const featuredClinics = useMemo(() => realClinics.slice(0, 10), [realClinics]);
 
@@ -81,7 +82,7 @@ export default function IndexPage({ pageData }: IndexPageProps) {
     <PageLayout>
       <SEOHead
         title={`${SITE_NAME}.ae — Find Verified Dental Clinics Across the UAE`}
-        description={`${SITE_NAME}.ae connects 200,000+ patients with ${clinicCount.toLocaleString()} verified dental clinics across the UAE. Compare prices, check insurance, and book instantly.`}
+        description={`${SITE_NAME}.ae connects patients with ${clinicCount.toLocaleString()} dental clinics across the UAE. Compare prices, check insurance, and book instantly.`}
         canonical="/"
         ogImage={`https://${SITE_DOMAIN}/og-home.jpg`}
       />
@@ -96,7 +97,7 @@ export default function IndexPage({ pageData }: IndexPageProps) {
             </span>
             <span className="text-zinc-600 hidden sm:inline">|</span>
             <span className="flex items-center gap-1.5 text-zinc-300">
-              <BadgeCheck className="h-3.5 w-3.5 text-emerald-500" /> {clinicCount.toLocaleString()} licensed clinics
+              <BadgeCheck className="h-3.5 w-3.5 text-emerald-500" /> {clinicCount.toLocaleString()} clinics listed
             </span>
             <span className="text-zinc-600 hidden sm:inline">|</span>
             <span className="flex items-center gap-1.5 text-zinc-300">
@@ -110,7 +111,7 @@ export default function IndexPage({ pageData }: IndexPageProps) {
               Exceptional dental care,<br />across the Emirates.
             </h1>
             <p className="text-zinc-400 text-base md:text-lg mt-5 max-w-2xl mx-auto leading-relaxed font-[425]">
-              Compare {clinicCount.toLocaleString()} licensed clinics, see real AED prices, check your insurance coverage — and book in under 60 seconds.
+              Compare {clinicCount.toLocaleString()} dental clinics, see real AED prices, check your insurance coverage — and book in under 60 seconds.
             </p>
           </div>
 
@@ -170,9 +171,9 @@ export default function IndexPage({ pageData }: IndexPageProps) {
           <div className="mt-12 pt-8 border-t border-white/5 max-w-3xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-6 text-center">
               {[
-                { number: clinicCount.toLocaleString(), label: 'Licensed Clinics' },
-                { number: reviewCount.toLocaleString(), label: 'Verified Reviews' },
-                { number: '200k+', label: 'Patients Served' },
+                { number: clinicCount.toLocaleString(), label: 'Clinics Listed' },
+                { number: reviewCount.toLocaleString(), label: 'Patient Reviews' },
+                { number: '7', label: 'Emirates Covered' },
                 { number: `${avgRating}★`, label: 'Average Rating' },
               ].map((stat) => (
                 <div key={stat.label} className="space-y-0.5">
@@ -185,18 +186,6 @@ export default function IndexPage({ pageData }: IndexPageProps) {
         </div>
       </section>
 
-      {/* Press strip */}
-      <div className="border-b border-zinc-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-7">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400 text-center mb-4">As featured in</p>
-          <div className="flex flex-wrap justify-center items-center gap-x-10 gap-y-3">
-            {['Gulf News', 'The National', 'Khaleej Times', 'Time Out Dubai', 'Arabian Business'].map((name) => (
-              <span key={name} className="text-sm font-semibold text-zinc-300 tracking-tight uppercase">{name}</span>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Trust pillars */}
       <section aria-label="Why choose us" className="py-16 lg:py-20 bg-[#fafafa]">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
@@ -206,10 +195,10 @@ export default function IndexPage({ pageData }: IndexPageProps) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
-              { icon: <ShieldCheck className="h-6 w-6" />, title: 'All Licensed & Verified', desc: `Every clinic verified against UAE regulatory databases. ${clinicsWithImages.toLocaleString()} clinics with complete profiles.` },
-              { icon: <Star className="h-6 w-6" />, title: 'Real-Patient Reviews', desc: `${reviewCount.toLocaleString()} authenticated reviews from verified patients. No fake ratings, ever.` },
-              { icon: <span className="text-lg font-bold">AED</span>, title: 'Transparent AED Pricing', desc: 'Real prices posted by clinics. No hidden fees, no surprises.' },
-              { icon: <Sparkles className="h-6 w-6" />, title: 'Insurance Pre-Matched', desc: 'See exactly what your plan covers before you book across 40+ insurance providers.' },
+              { icon: <ShieldCheck className="h-6 w-6" />, title: 'Verification Status on Every Profile', desc: `Each clinic profile shows a verification status, from newly listed to fully verified. ${clinicsWithImages.toLocaleString()} clinics have complete profiles.` },
+              { icon: <Star className="h-6 w-6" />, title: 'Real Patient Reviews', desc: `${reviewCount.toLocaleString()} patient reviews collected from Google.` },
+              { icon: <span className="text-lg font-bold">AED</span>, title: 'AED Pricing Where Available', desc: 'Prices posted by clinics where available — always confirm final pricing directly with the clinic.' },
+              { icon: <Sparkles className="h-6 w-6" />, title: 'Search by Insurance', desc: 'Filter clinics by the insurance provider you have, across 40+ UAE insurance providers.' },
             ].map((pillar) => (
               <div key={pillar.title} className="card-hover-amber p-6">
                 <div className="w-12 h-12 rounded-xl bg-amber-700/10 flex items-center justify-center text-amber-700 mb-4">
@@ -321,9 +310,9 @@ export default function IndexPage({ pageData }: IndexPageProps) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { step: '01', title: 'Search', desc: `Browse ${clinicCount.toLocaleString()} clinics by emirate, specialty, or insurance. Filter by price, rating, and availability.` },
-              { step: '02', title: 'Compare & Read Reviews', desc: `Compare ${reviewCount.toLocaleString()} verified patient reviews, real AED prices, and doctor credentials side by side.` },
-              { step: '03', title: 'Book Instantly', desc: 'Book your appointment online. Your insurance is auto-verified at checkout.' },
+              { step: '01', title: 'Search', desc: `Browse ${clinicCount.toLocaleString()} clinics by emirate, specialty, or insurance. Filter by price and rating.` },
+              { step: '02', title: 'Compare & Read Reviews', desc: `Compare ${reviewCount.toLocaleString()} patient reviews and AED prices side by side.` },
+              { step: '03', title: 'Book Instantly', desc: 'Book your appointment online and confirm your insurance directly with the clinic.' },
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="w-14 h-14 rounded-full bg-amber-700/10 flex items-center justify-center mx-auto mb-4">
@@ -337,7 +326,7 @@ export default function IndexPage({ pageData }: IndexPageProps) {
           <div className="mt-8 text-center">
             <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full">
               <ShieldCheck className="h-3.5 w-3.5" />
-              Insurance auto-verified at every booking
+              Search clinics by your insurance provider
             </span>
           </div>
         </div>
@@ -357,28 +346,30 @@ export default function IndexPage({ pageData }: IndexPageProps) {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section aria-label="Patient testimonials" className="py-16 lg:py-20 bg-[#fafafa]">
+      {/* Testimonials - real Google reviews of listed clinics, not invented quotes */}
+      {testimonials.length > 0 && (
+      <section aria-label="Patient reviews" className="py-16 lg:py-20 bg-[#fafafa]">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-10">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-700 mb-2">Real patients, real stories</p>
-            <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-zinc-900">Trusted by thousands</h2>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-700 mb-2">From Google reviews</p>
+            <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-zinc-900">What patients are saying</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
               <div key={i} className="card-hover-amber p-6">
                 <Quote className="h-6 w-6 text-amber-700/30 mb-3" />
-                <StarRating rating={5} />
+                <StarRating rating={t.rating} />
                 <p className="text-zinc-600 text-sm mt-3 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
                 <div className="mt-4 pt-3 border-t border-zinc-100">
-                  <p className="font-semibold text-zinc-900 text-sm">{t.name}</p>
-                  <p className="text-zinc-400 text-xs">{t.emirate} &middot; {t.treatment}</p>
+                  <p className="font-semibold text-zinc-900 text-sm">{t.authorName}</p>
+                  <p className="text-zinc-400 text-xs">{t.clinicName ? `${t.clinicName} · ` : ''}via Google</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+      )}
 
       {/* Blog preview */}
       <section aria-label="Latest from our blog" className="py-16 lg:py-20 bg-white">

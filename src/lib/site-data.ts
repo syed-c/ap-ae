@@ -213,15 +213,6 @@ export const navLinks: NavLinkData[] = [
 
 export const popularSearches = ['Implants', 'Invisalign', 'Veneers', 'Whitening', 'Kids Dentistry', 'Root Canal', 'Emergency'];
 
-export const testimonials = [
-  { quote: "I was nervous about my root canal, but Dr. Amira made it completely painless. The clinic is beautiful and the staff are wonderful.", name: 'Sarah M.', emirate: 'Dubai', treatment: 'Root Canal' },
-  { quote: "Found the perfect orthodontist for my son through AppointPanda. The profiles are detailed and the reviews are genuine. Highly recommend.", name: 'Ahmed Al T.', emirate: 'Abu Dhabi', treatment: 'Invisalign' },
-  { quote: "Saved over AED 1,200 on my veneers compared to my previous clinic. The price transparency is a game-changer.", name: 'Layla R.', emirate: 'Sharjah', treatment: 'Veneers' },
-  { quote: "Needed an emergency dentist on a Friday night. AppointPanda connected me with a clinic open until 11 PM within minutes.", name: 'James K.', emirate: 'Dubai', treatment: 'Emergency' },
-  { quote: "The insurance matching feature is incredible. My plan covered 80% of the cost — I had no idea until I used the site.", name: 'Mona S.', emirate: 'Abu Dhabi', treatment: 'Check-up' },
-  { quote: "Found a brilliant paediatric dentist for my 4-year-old. The clinic profile had all the info we needed — even photos of the play area.", name: 'Omar H.', emirate: 'Dubai', treatment: 'Pediatric' },
-];
-
 export const blogPosts = [
   { slug: 'choosing-right-dentist-uae', title: 'How to choose the right dentist in the UAE', category: 'Guides', excerpt: 'From regulatory licensing to insurance panels — our complete guide to finding your perfect dentist in the Emirates.', readingTime: '5 min', image: 1 },
   { slug: 'cost-of-dental-implants-uae', title: 'The real cost of dental implants in the UAE (2026)', category: 'Cost & Finance', excerpt: 'We surveyed 87 clinics across all 7 emirates to bring you transparent implant pricing. The results may surprise you.', readingTime: '7 min', image: 2 },

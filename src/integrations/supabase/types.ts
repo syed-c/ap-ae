@@ -2854,6 +2854,8 @@ export type Database = {
           comment: string | null
           created_at: string
           google_review_id: string | null
+          hipaa_flag_reason: string | null
+          hipaa_flagged: boolean | null
           id: string
           rating: number | null
           reply: string | null
@@ -2873,6 +2875,8 @@ export type Database = {
           comment?: string | null
           created_at?: string
           google_review_id?: string | null
+          hipaa_flag_reason?: string | null
+          hipaa_flagged?: boolean | null
           id?: string
           rating?: number | null
           reply?: string | null
@@ -2892,6 +2896,8 @@ export type Database = {
           comment?: string | null
           created_at?: string
           google_review_id?: string | null
+          hipaa_flag_reason?: string | null
+          hipaa_flagged?: boolean | null
           id?: string
           rating?: number | null
           reply?: string | null
