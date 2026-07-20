@@ -1,6 +1,6 @@
 # AppointPanda — Current-State Audit (Consolidated)
 
-**Date:** 2026-07-19 (updated same day — §-1 added: CI diagnosis, build verification, and a systemic false-claims sweep across live templates; §-2 added: the platform's actual booking/email functionality was found broken)
+**Date:** 2026-07-19/20 (updated — §-1 added: CI diagnosis, build verification, and a systemic false-claims sweep across live templates; §-2 added: the platform's actual booking/email functionality was found broken; §-2b added: fabricated testimonials and fake stats found live on the homepage/footer via functional browser testing, not code reading)
 **Scope:** Reconciles nine prior audit/fix reports in this repo against the actual current code, verifies which of their findings are still real, and fixes the safe, code-level issues found in the process. Section 0 adds a real audit against the live production database (`eneuthbghipsdvsqilmb.supabase.co`, confirmed correct — see §1), plus the specific data fixes and a dental-relevance search filter implemented after checking each one with the site owner (§0.7). This is **not** a full pass through the 50-section rebuild brief — see "What this session did not cover" at the end.
 
 ---
@@ -22,6 +22,24 @@ This is very likely the single highest-impact fix available on the whole platfor
 
 ---
 
+## -2b. RESOLVED — Fabricated testimonials and stats live on the homepage/footer
+
+Found by actually running the dev server and driving it with a headless-browser script — not by reading code — since fabricated marketing copy doesn't show up in a `grep` for suspicious keywords the way it shows up when you look at the rendered page.
+
+The main homepage hero (top bar + hero stats), the Footer (rendered on **every page**), a secondary `/home-v2` route, and a dedicated `/reviews` page all carried fabricated content:
+
+- **"Trusted by 200,000+ UAE residents"** (top bar, every page) and **"Connecting 200,000+ patients..."** (footer tagline, every page) and **"200k+ Patients Served"** (homepage hero stat) — no basis for any of these; the platform has had **2 real appointments ever** (§-2).
+- **A testimonials section** titled "Real patients, real stories" / "Trusted by thousands," present on the homepage, `/home-v2`, **and** a dedicated `/reviews` page — all three pulled from one static array of **fully invented quotes**, attributed to fake named patients ("Sarah M.," "Ahmed Al T.," etc.), a fake dentist ("Dr. Amira"), a fake specific savings figure ("Saved over AED 1,200"), and a fake insurance coverage percentage ("covered 80%"). The `/reviews` page's own subtitle read *"Every review comes from a confirmed patient. No fake ratings, no paid testimonials"* — directly contradicting what it displayed — and its meta description claimed **"47,900+ verified patient reviews"** (real count: 5,671).
+- **A fake "As featured in" press strip** on the homepage listing Gulf News, The National, Khaleej Times, Time Out Dubai, and Arabian Business — no evidence of any such coverage.
+- **Fake "Download on the App Store" / "Get it on Google Play" badges** in the footer — static, non-clickable `<div>`s with no `href`, styled to look like real app-store buttons. No mobile app exists anywhere in this codebase.
+- The same "All Licensed & Verified" / blanket regulatory-verification pattern fixed elsewhere this session, plus an "insurance auto-verified at checkout" claim with no real verification integration behind it anywhere in the codebase.
+
+**Fixed properly, not just deleted**: real testimonials data exists (5,671 rows in `google_reviews`, scraped from actual Google Business reviews of listed clinics). Wired real reviews into all three surfaces — `pages/index.tsx` fetches them server-side, `HomeV2.tsx` fetches them client-side via the pattern already used in that file, and `pages/reviews.tsx` was rebuilt with `getStaticProps` to show ~60 real reviews with working emirate filtering (via a real join through `clinics → cities → states`). Removed the fake array from `src/lib/site-data.ts` entirely after confirming zero remaining consumers. The press strip and app-store badges were removed outright — there was no honest version of either to keep.
+
+**Also found this way**: a real, reproducible React "duplicate key" console warning, present on every page — traced to `Footer.tsx`'s `CLINIC_LINKS` and `COMPANY_LINKS` arrays, each of which had two entries pointing to the same `href` (`/for-clinics` and `/about`, the latter mislabeled "Careers" with no real careers page behind it). Fixed by removing the redundant/misleading entries. Verified zero console errors afterward via a Playwright pass against the running dev server.
+
+---
+
 ## -1. Build/CI diagnosis and a systemic content-integrity sweep
 
 ### -1.1 "Push not going through GitHub" — root cause found
@@ -29,6 +47,10 @@ This is very likely the single highest-impact fix available on the whole platfor
 `.github/workflows/ci.yml` only triggers `on: push` to `main`/`master`, or `on: pull_request`. Every push this session went straight to the feature branch with no PR open, so **CI has never run once** (0 workflow runs total, confirmed via the GitHub Actions API). This isn't a failure — it's simply never been triggered. Opening a PR (§11) fixes this by triggering the `pull_request` event.
 
 To catch real errors independent of CI, ran the actual production build twice locally with live DB credentials (`npm run build`, i.e. `generate:sitemaps && next build`): **both succeeded, 1,483 static pages generated, zero errors.** The codebase itself is not broken.
+
+**A real CI failure did surface once the PR triggered the first-ever run**: `next build`'s "collecting page data" step crashed with `Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable`. Root cause: `src/integrations/supabase/client.ts` threw at module import time when these env vars were absent, and Next.js imports every page module during that build step (even pages that never call `supabase`) — so any environment without production secrets, including CI (which intentionally doesn't carry them), crashed the entire build. Server-side code already had the correct pattern (`src/lib/supabaseServer.ts` returns `null` gracefully); this one client-side file was the outlier. Fixed to fall back to a placeholder client instead of throwing. Verified by simulating CI locally: `npm run build` with zero Supabase env vars set now succeeds.
+
+**Also found via actually running the dev server and driving it with Playwright** (not just reading code): `/search/` — one of the most important pages on the site — was crashing with a **500 error** under common, easily-triggered conditions. `pages/search.tsx`'s top-clinics query mapped `cover_image_url`/`city`/`area` to `undefined` when absent, which Next.js's `getServerSideProps` cannot serialize to JSON. Any time a clinic without a cover image (common) or without a city assignment (confirmed: 18 clinics, including real ones — see §0.5b) ranked into the top 24 by rating, the whole page crashed. Fixed by coalescing to `null`. Verified: direct request now returns 200.
 
 ### -1.2 CRITICAL — Fabricated "DHA/MOHAP verified" and fake statistics were live across multiple real page templates
 
