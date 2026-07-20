@@ -1,16 +1,23 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY 
-                 || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+let supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+               || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable');
-}
-
-if (!supabaseUrl.startsWith('http')) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL must be a valid URL starting with http:// or https://');
+// Falling back instead of throwing here matters: this module is imported by
+// many client components, so Next.js's build-time "collecting page data"
+// step (which statically imports every page module, including ones that
+// never call `supabase` themselves) would crash the entire build in any
+// environment without these exact env vars - e.g. CI, which intentionally
+// doesn't carry production credentials. Server-side code already follows
+// this same graceful pattern (see src/lib/supabaseServer.ts). Real runtime
+// usage in the browser always has the real NEXT_PUBLIC_* values inlined at
+// build time by whichever environment actually deploys the app.
+if (!supabaseUrl || !supabaseKey || !supabaseUrl.startsWith('http')) {
+  console.warn('Supabase client env vars are missing or invalid - using a placeholder client. Real requests will fail until NEXT_PUBLIC_SUPABASE_URL/NEXT_PUBLIC_SUPABASE_ANON_KEY are set.');
+  supabaseUrl = 'https://placeholder.supabase.co';
+  supabaseKey = 'placeholder-anon-key';
 }
 
 export const supabase: SupabaseClient<Database> = createClient<Database>(supabaseUrl, supabaseKey, {

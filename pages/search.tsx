@@ -18,11 +18,11 @@ interface SearchPageSSRProps {
       title?: string;
       rating: number;
       reviewCount: number;
-      image?: string;
+      image?: string | null;
       isVerified: boolean;
       clinicName?: string;
-      emirateName?: string;
-      areaName?: string;
+      emirateName?: string | null;
+      areaName?: string | null;
       languages?: string[];
       gender?: string;
       specializations?: string[];
@@ -132,11 +132,11 @@ export const getServerSideProps: GetServerSideProps<SearchPageSSRProps> = async 
         title: 'Dental Clinic',
         rating: Number(clinic.rating) || 0,
         reviewCount: clinic.review_count || 0,
-        image: clinic.cover_image_url || undefined,
+        image: clinic.cover_image_url || null,
         isVerified: clinic.claim_status === 'claimed' && clinic.verification_status === 'verified',
         clinicName: clinic.name,
-        emirateName: clinic.city?.state?.name,
-        areaName: clinic.area?.name || clinic.city?.name,
+        emirateName: clinic.city?.state?.name || null,
+        areaName: clinic.area?.name || clinic.city?.name || null,
       })),
       total: topClinicsRes.count || (topClinicsRes.data?.length || 0),
     };
